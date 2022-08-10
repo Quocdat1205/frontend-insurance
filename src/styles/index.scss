@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "custom";
+@import "fonts";
+
+html {
+    @apply font-SVN;
+    font-weight: 300;
+}
