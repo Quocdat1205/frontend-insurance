@@ -4,9 +4,9 @@ import { LANGUAGE_TAG } from 'utils/constants';
 
 type Props = {};
 
-export default function SwapLanguageBtn({}: Props) {
+export default function SwapLanguageBtn({ }: Props) {
     const [currentLocale, onChangeLang] = useLanguage();
-    const renderLanguageBtn = (language) => {
+    const renderLanguageBtn = (language: string) => {
         if (currentLocale === language)
             return (
                 <div className="text-sm font-medium p-[6px] leading-4 rounded uppercase bg-gradient text-white">

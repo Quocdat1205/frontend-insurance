@@ -3,9 +3,11 @@ import 'styles/index.scss'
 import Head from 'components/layout/Head';
 import MetaMaskProvider from 'components/web3/MetaMaskProvider';
 import { Provider } from 'react-redux';
+import 'types/declare'
 import store from 'redux/store';
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
+
   return (
     <Provider store={store}>
       <Head />

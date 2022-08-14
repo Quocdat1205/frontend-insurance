@@ -22,6 +22,15 @@ export type ConnectorInfo = {
 };
 export type ConnectorId = "metaMask" | "walletConnect" | "coinbaseWallet";
 export type ConnectorsData = Record<ConnectorId, ConnectorInfo>;
+export type ChainData = {
+    chainId: number;
+    chain: string;
+    network: string;
+    networkId: number;
+  };
+export type ChainDataList = {
+    [chainId: number]: ChainData;
+  };
 
 export const getConnectorInfo = (connector: Connector): ConnectorInfo => {
     if (connector instanceof MetaMask) {

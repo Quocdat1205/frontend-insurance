@@ -1,4 +1,4 @@
-import { ChainDataList } from "@types";
+import { ChainDataList } from "../Web3Types";
 
 export const Chains: ChainDataList = {
   1: {

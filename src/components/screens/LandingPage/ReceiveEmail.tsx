@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from 'components/common/Button/Button';
-import * as yup from 'yup';
+// import * as yup from 'yup';
 import fetchApi from 'services/fetch-api';
 import { API_SUBCRIBE } from 'services/api';
 

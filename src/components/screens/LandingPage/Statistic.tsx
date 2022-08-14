@@ -9,13 +9,13 @@ import _ from 'lodash';
 type Props = {};
 interface infoItem {
     _id: string;
-    sum: Number;
+    sum: number;
 }
 interface infoGeneral {
     totalRefund: infoItem[];
     totalDeposit: infoItem[];
-    totalUser: Number;
-    payoutRatio: Number;
+    totalUser: number;
+    payoutRatio: number;
 }
 export default function Statistic({}: Props) {
     const [dataStatistic, setDataStatistic] = useState({} as infoGeneral);
