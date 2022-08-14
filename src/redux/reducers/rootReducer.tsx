@@ -1,10 +1,12 @@
-import { combineReducers } from 'redux';
-import { authSlice } from '../auth/authReducer';
-import setting from 'redux/reducers/setting';
+import { combineReducers } from 'redux'
+
+import setting from 'redux/reducers/setting'
+
+import { authSlice } from '../auth/authReducer'
 
 const rootReducer = combineReducers({
-    auth: authSlice.reducer,
-    setting: setting
-});
+  auth: authSlice.reducer,
+  setting,
+})
 
-export default rootReducer;
+export default rootReducer

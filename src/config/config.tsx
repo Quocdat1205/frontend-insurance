@@ -1,9 +1,9 @@
-import env from 'config/env';
+import env from 'config/env'
 
 class Config {
-    static env = env;
+  static env = env
 
-    static client = typeof window !== 'undefined';
+  static client = typeof window !== 'undefined'
 }
 
-export default Config;
+export default Config

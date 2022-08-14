@@ -1,1 +1,1 @@
-export const LOADING: string = 'LOADING'
+export const LOADING = 'LOADING'

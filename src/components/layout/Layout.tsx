@@ -1,16 +1,17 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import Header from 'components/screens/HomePage/Header';
-import Footer from 'components/screens/LandingPage/Footer';
+import React from 'react'
+import PropTypes from 'prop-types'
 
-const Layout = ({ children }: any) => {
-    return (
-        <div className="w-full">
-            <Header></Header>
-            {children}
-            <Footer></Footer>
-        </div>
-    );
-};
+import Header from 'components/screens/HomePage/Header'
+import Footer from 'components/screens/LandingPage/Footer'
 
-export default Layout;
+function Layout({ children }: any) {
+  return (
+    <div className="w-full">
+      <Header />
+      {children}
+      <Footer />
+    </div>
+  )
+}
+
+export default Layout

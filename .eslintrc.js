@@ -1,19 +1,27 @@
 module.exports = {
   extends: [
-    'airbnb-base',
+    'airbnb',
     'prettier',
     'plugin:@typescript-eslint/recommended',
-    'airbnb/hooks'
+    'airbnb/hooks',
   ],
   plugins: ['prettier', 'import'],
   rules: {
     // 'prettier/prettier': ['error', { endOfLine: 'auto', },],
-    'prettier/prettier': ['warn', { endOfLine: 'auto', singleQuote: true },],
+    'prettier/prettier': ['warn', { endOfLine: 'auto', singleQuote: true }],
     'import/no-unresolved': 'error', // turn on errors for missing imports
     'react/jsx-filename-extension': [0, { extensions: ['.tsx'] }],
+    camelcase: 'off',
+    'import/no-cycle': 'off',
+    'default-param-last': 'off',
+    'no-return-await': 'off',
+    'import/prefer-default-export': 'off',
     'react/react-in-jsx-scope': 'off',
+    'no-underscore-dangle': 'off',
+    'quote-props': 'off',
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-use-before-define': 'off',
     'react/jsx-props-no-spreading': [
       0,
       { html: 'ignore', custom: 'ignore', explicitSpread: 'ignore' },
@@ -35,17 +43,16 @@ module.exports = {
       },
     ],
     'import/newline-after-import': 1,
-    "import/extensions": [
-      "error",
-      "ignorePackages",
+    'import/extensions': [
+      'error',
+      'ignorePackages',
       {
-        "js": "never",
-        "jsx": "never",
-        "ts": "never",
-        "tsx": "never"
-      }
+        js: 'never',
+        jsx: 'never',
+        ts: 'never',
+        tsx: 'never',
+      },
     ],
-
   },
   parserOptions: {
     project: './tsconfig.eslint.json',
@@ -60,4 +67,4 @@ module.exports = {
       },
     },
   },
-};
+}

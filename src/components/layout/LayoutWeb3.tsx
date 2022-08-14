@@ -1,11 +1,7 @@
-import React from 'react';
+import React from 'react'
 
-const LayoutWeb3 = () => {
-    return (
-        <div>
-            
-        </div>
-    );
-};
+function LayoutWeb3() {
+  return <div />
+}
 
-export default LayoutWeb3;
+export default LayoutWeb3
