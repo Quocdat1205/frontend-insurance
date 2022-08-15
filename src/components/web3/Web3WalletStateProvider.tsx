@@ -1,16 +1,8 @@
-import React, {
-  createContext,
-  useRef,
-  useEffect,
-  useState,
-  cloneElement,
-  useMemo,
-  ReactNode,
-} from 'react'
 import { useWeb3React } from '@web3-react/core'
+import { Connector } from '@web3-react/types'
 import { WalletConnect } from '@web3-react/walletconnect'
 import { ethers, providers } from 'ethers'
-import { Connector } from '@web3-react/types'
+import React, { useEffect, useMemo, ReactNode } from 'react'
 
 import {
   getConnectorInfo,
@@ -19,8 +11,8 @@ import {
   ConnectorId,
   ConnectorsData,
 } from 'components/web3/Web3Types'
-import { Web3WalletContext } from 'hooks/useWeb3Wallet'
 import { ContractCaller } from 'components/web3/contract/index'
+import { Web3WalletContext } from 'hooks/useWeb3Wallet'
 
 const useWeb3WalletState = (
   connectorsData: Record<
@@ -31,13 +23,13 @@ const useWeb3WalletState = (
   const { connector, account, chainId, isActive, error, provider } =
     useWeb3React()
 
-  const activate = async (connectorId: ConnectorId, chainId?: number) => {
-    const { connector } = connectorsData[connectorId]
-    connector.deactivate()
-    connector instanceof WalletConnect
-      ? await connector.activate(chainId)
-      : await connector.activate(
-          !chainId ? undefined : getAddChainParameters(chainId),
+  const activate = async (connectorId: ConnectorId, _chainId?: number) => {
+    const { connector: _connector } = connectorsData[connectorId]
+    _connector.deactivate()
+    _connector instanceof WalletConnect
+      ? await _connector.activate(_chainId)
+      : await _connector.activate(
+          !_chainId ? undefined : getAddChainParameters(_chainId),
         )
   }
 
@@ -67,8 +59,8 @@ const useWeb3WalletState = (
   //     }
   // );
 
-  const switchNetwork = async (chainId: number) => {
-    activate(getConnectorInfo(connector).id, chainId)
+  const switchNetwork = async (_chainId: number) => {
+    activate(getConnectorInfo(connector).id, _chainId)
   }
 
   const getBalance = async () => {

@@ -1,9 +1,9 @@
 import { BigNumber, ethers, providers } from 'ethers'
 
-import { INSURANCE_ABI } from 'components/web3/constants/abi/INSURANCE_ABI'
-import InsuranceContract from 'components/web3/contract/Insurance'
-import { contractAddress } from 'components/web3/constants/contractAddress'
 import { weiToEther } from 'components/web3/Web3Types'
+import { INSURANCE_ABI } from 'components/web3/constants/abi/INSURANCE_ABI'
+import { contractAddress } from 'components/web3/constants/contractAddress'
+import InsuranceContract from 'components/web3/contract/Insurance'
 
 export class ContractCaller {
   provider: providers.Web3Provider

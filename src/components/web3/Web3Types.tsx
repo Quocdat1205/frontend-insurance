@@ -1,7 +1,7 @@
 import { MetaMask } from '@web3-react/metamask'
+import type { AddEthereumChainParameter, Connector } from '@web3-react/types'
 import { WalletConnect } from '@web3-react/walletconnect'
 import { BigNumber, ethers } from 'ethers'
-import type { AddEthereumChainParameter, Connector } from '@web3-react/types'
 
 interface BasicChainInformation {
   urls: string[]

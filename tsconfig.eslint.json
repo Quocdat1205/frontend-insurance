@@ -1,4 +1,15 @@
 {
-    "extends": "./tsconfig.json",
-    "include": ["src/**/*.ts", "src/**/*.js", "test/**/*.ts", ".eslintrc.js", "**/*.ts", "**/*.tsx"]
-  }
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.js",
+    "test/**/*.ts",
+    ".eslintrc.js",
+    "**/*.ts",
+    "**/*.tsx",
+    "tailwind.config.js",
+    "next-i18next.config.js",
+    "next.config.js",
+    "postcss.config.js"
+  ]
+}

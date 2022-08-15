@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+import Config from 'config/config'
+import { API_GET_NONCE, API_LOGIN } from 'services/api'
 import {
   LogIntype,
   BuyInsuranceType,
@@ -7,8 +9,6 @@ import {
   GetOrderFuture,
 } from 'types/InsuranceTypes'
 import { parseNumber } from 'utils/utils'
-import { API_GET_NONCE, API_LOGIN } from 'services/api'
-import Config from 'config/config'
 
 export const baseURL = Config.env.API_URL
 export const fetcher = axios.create({ baseURL })

@@ -1,10 +1,10 @@
 import classNames from 'classnames'
+import _ from 'lodash'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
-import _ from 'lodash'
 
-import fetchApi from 'services/fetch-api'
 import { API_GET_INFO_GENERAL } from 'services/api'
+import fetchApi from 'services/fetch-api'
 import { formatNumber } from 'utils/utils'
 
 type Props = {}

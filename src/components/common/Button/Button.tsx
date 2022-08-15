@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react'
 import classNames from 'classnames'
+import React, { ReactNode } from 'react'
 
 type Props = {
   variants: 'outlined' | 'primary' | 'gradient'

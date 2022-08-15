@@ -1,12 +1,12 @@
-import { useEffect } from 'react'
 import { useWeb3React } from '@web3-react/core'
+import { useEffect } from 'react'
 
-import useWeb3Wallet from 'hooks/useWeb3Wallet'
-import Config from 'config/config'
 import LayoutLanding from 'components/layout/LayoutLanding'
 import BannerLP from 'components/screens/LandingPage/BannerLP'
 import CategoryLP from 'components/screens/LandingPage/CategoryLP'
 import Statistic from 'components/screens/LandingPage/Statistic'
+import Config from 'config/config'
+import useWeb3Wallet from 'hooks/useWeb3Wallet'
 
 function Home(props: any) {
   return (

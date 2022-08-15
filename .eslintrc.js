@@ -1,6 +1,6 @@
 module.exports = {
   extends: [
-    'airbnb',
+    'airbnb-base',
     'prettier',
     'plugin:@typescript-eslint/recommended',
     'airbnb/hooks',
@@ -19,15 +19,17 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'no-underscore-dangle': 'off',
     'quote-props': 'off',
-    '@typescript-eslint/interface-name-prefix': 'off',
+    radix: 'off',
+    'class-methods-use-this': 'off',
+    'interface-name-prefix': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/no-var-requires': 'off',
+    'no-use-before-define': 'off',
+    'no-unused-expressions': 'off',
     'react/jsx-props-no-spreading': [
       0,
       { html: 'ignore', custom: 'ignore', explicitSpread: 'ignore' },
     ],
-    'no-use-before-define': 0,
-    '@typescript-eslint/no-use-before-define': 2,
     'import/order': [
       2,
       {
@@ -39,7 +41,11 @@ module.exports = {
           'sibling',
           'index',
         ],
-        'newlines-between': 'always',
+        'newlines-between': 'ignore',
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: false,
+        },
       },
     ],
     'import/newline-after-import': 1,

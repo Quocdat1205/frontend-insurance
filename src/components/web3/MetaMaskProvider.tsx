@@ -1,4 +1,3 @@
-import { createContext, ReactNode, useEffect, useMemo, useRef } from 'react'
 import {
   initializeConnector,
   useWeb3React,
@@ -8,9 +7,10 @@ import {
 import { MetaMask } from '@web3-react/metamask'
 import { Connector } from '@web3-react/types'
 import { WalletConnect } from '@web3-react/walletconnect'
+import { createContext, ReactNode, useEffect, useMemo, useRef } from 'react'
 
-import Web3WalletStateProvider from 'components/web3/Web3WalletStateProvider'
 import { getConnectorInfo } from 'components/web3/Web3Types'
+import Web3WalletStateProvider from 'components/web3/Web3WalletStateProvider'
 
 export interface Web3WalletProviderProps {
   children: ReactNode

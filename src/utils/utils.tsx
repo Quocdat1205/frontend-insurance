@@ -8,7 +8,6 @@ export const getS3Url = (url: string) => Config.env.CDN + url
 
 export const countDecimals = (value: number) => {
   if (Math.floor(value) === value) return 0
-
   const str = value?.toString()
   if (str?.indexOf('.') !== -1 && str?.indexOf('-') !== -1) {
     return str?.split('-')[1] || 0
@@ -49,9 +48,10 @@ export const formatCurrency = (n: number, digits = 4) => {
     return `${formatNumber(+(n / 1e9).toFixed(4), digits, 0, true)}B`
   if (n >= 1e12)
     return `${formatNumber(+(n / 1e12).toFixed(4), digits, 0, true)}T`
+  return n
 }
 
-export function formatTime(value: Date, f = 'yyyy-MM-dd HH:mm') {
+export const formatTime = (value: Date, f = 'yyyy-MM-dd HH:mm') => {
   if (value) {
     const date = value instanceof Date ? value : new Date(value)
     return format(date, f)
@@ -59,7 +59,7 @@ export function formatTime(value: Date, f = 'yyyy-MM-dd HH:mm') {
   return null
 }
 
-export function getTimeAgo(value: Date, options: any) {
+export const getTimeAgo = (value: Date, options: any) => {
   if (!value) return null
   const date = value instanceof Date ? value : new Date(value)
   if (options) {

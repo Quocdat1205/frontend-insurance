@@ -5,8 +5,8 @@ import { CarretDown } from 'components/common/Svg/SvgIcon'
 import SwapLanguageBtn from 'components/screens/LandingPage/SwapLanguageBtn'
 import useLanguage from 'hooks/useLanguage'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
-import { useAppDispatch, useAppSelector } from 'redux/store'
 import { loginAction } from 'redux/auth/authActions'
+import { useAppDispatch, useAppSelector } from 'redux/store'
 
 function Header() {
   const [currentLocale, onChangeLang] = useLanguage()

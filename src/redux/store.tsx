@@ -1,10 +1,10 @@
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { applyMiddleware, createStore, compose, AnyAction } from 'redux'
 import thunkMiddleware, { ThunkDispatch } from 'redux-thunk'
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 
-import rootReducer from 'redux/reducers/rootReducer'
-import loggerMiddleware from 'redux/loggerMiddleware'
 import Config from 'config/config'
+import loggerMiddleware from 'redux/loggerMiddleware'
+import rootReducer from 'redux/reducers/rootReducer'
 
 let composeEnhancers = compose
 const middleware = [thunkMiddleware]
