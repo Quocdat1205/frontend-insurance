@@ -1,89 +1,60 @@
-import Link from 'next/link'
+import { useTranslation } from 'next-i18next'
 import React from 'react'
+import styled from 'styled-components'
 
-import ReceiveEmail from './ReceiveEmail'
-
-type Props = {}
-
-export default function Footer({}: Props) {
-  // const renderItemsFooter = () => {
-
-  // }
-  return (
-    <footer>
-      <div className="my-[120px]">
-        <ReceiveEmail />
-      </div>
-
-      <div className="bg_footer items-center justify-center gap-8 h-[134px] hidden md:flex ">
-        <div className="text-[1.25rem] font-medium text-white">
-          Sản phẩm được bảo trợ bởi
-        </div>
-        <div className="flex">
-          <img
-            className="!h-[68px]"
-            src="/images/logo_foundation.png"
-            alt="logo"
-          />
-        </div>
-      </div>
-      <div className="py-12 bg-white2 px-3 sm:px-10 flex flex-col gap-6">
-        <div className="flex flex-col justify-between items-start lg:items-center lg:flex-row">
-          <img src="/images/logo_insurance.png" alt="logo" className="mb-6" />
-          <div className="block lg:flex items-center gap-8">
-            {itemFooter.map((menu, index) => (
-              <div key={index}>
-                <p className="font-medium">{menu.title}</p>
-                <div className="flex items-center gap-4">
-                  {menu.items.map((submenu, subIndex) => (
-                    <Link key={subIndex} href={submenu.url}>
-                      <div className="text-txtSecondary mt-2">
-                        {submenu.title}
-                      </div>
-                    </Link>
-                  ))}
+const Footer = () => {
+    const { t } = useTranslation()
+    return (
+        <footer className="footer pt-20 sm:pt-[7.5rem]">
+            <BgSponsor>
+                <div className="text-white font-bold text-sm sm:text-xl">{t('home:landing:products_sponsored_by')}</div>
+                <div className="max-w-[230px]">
+                    <img src="/images/screens/landing-page/ic_logo_nami_foundation.png" />
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="border border-divider" />
-        <div className="text-xs leading-3 text-txtSecondary">
-          Copyright © 2021 UI8 LLC. All rights reserved
-        </div>
-      </div>
-    </footer>
-  )
+            </BgSponsor>
+            <div className="bg-white-2 px-10 py-12 ">
+                <div className="max-w-screen-layout m-auto">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between">
+                        <div className="w-[121px]">
+                            <img src="/images/ic_logo.png" />
+                        </div>
+                        <div className="flex flex-row space-x-8 mt-12 sm:mt-0 text-sm sm:text-base">
+                            <div className="flex flex-col space-y-4 sm:space-y-2">
+                                <div className="font-semibold">{t('home:landing:features')}</div>
+                                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 text-txtSecondary">
+                                    <div>{t('home:landing:buy_covered')}</div>
+                                    <div>{t('home:landing:buy_nain')}</div>
+                                </div>
+                            </div>
+                            <div className="flex flex-col space-y-4 sm:space-y-2">
+                                <div className="font-semibold">{t('home:landing:document')}</div>
+                                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 text-txtSecondary">
+                                    <div>{t('home:landing:white_paper')}</div>
+                                    <div>{t('home:landing:faq')}</div>
+                                    <div>{t('home:landing:terms_of_service')}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="my-6 h-[1px] bg-divider" />
+                    <div className="text-xs sm:text-sm leading-3 text-txtSecondary">Copyright © 2021 UI8 LLC. All rights reserved</div>
+                </div>
+            </div>
+        </footer>
+    )
 }
-const itemFooter = [
-  {
-    title: 'Tính năng',
-    items: [
-      {
-        title: 'Mua bảo hiểm',
-        url: '#',
-      },
-      {
-        title: 'Mua nain',
-        url: '#',
-      },
-    ],
-  },
-  {
-    title: 'Tài liệu',
-    items: [
-      {
-        title: 'White paper',
-        url: '#',
-      },
-      {
-        title: 'Câu hỏi thường gặp',
-        url: '#',
-      },
-      {
-        title: 'Điều khoản sử dụng',
-        url: '#',
-      },
-    ],
-  },
-]
+
+const BgSponsor = styled.div.attrs({
+    className: 'flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 space-x-8 justify-center bg-opacity-[0.4] py-8 sm:py-6',
+})`
+    background: linear-gradient(
+        88.49deg,
+        rgba(254, 235, 238, 0.4) -1.12%,
+        rgba(255, 121, 135, 0.4) 16.3%,
+        rgba(255, 55, 68, 0.4) 50.07%,
+        rgba(255, 121, 135, 0.4) 82.97%,
+        rgba(254, 235, 238, 0.4) 101.26%
+    );
+`
+
+export default Footer

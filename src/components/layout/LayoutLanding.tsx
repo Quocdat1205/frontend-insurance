@@ -1,16 +1,17 @@
 import React from 'react'
-
+import HeaderLanding from 'components/screens/LandingPage/HeaderLanding'
 import Footer from 'components/screens/LandingPage/Footer'
-import HeaderLP from 'components/screens/LandingPage/HeaderLP'
+import { PORTAL_MODAL_ID } from 'utils/constants'
 
 function LayoutLanding({ children }: any) {
-  return (
-    <div className="w-full">
-      <HeaderLP />
-      {children}
-      <Footer />
-    </div>
-  )
+    return (
+        <>
+            <HeaderLanding />
+            {children}
+            <Footer/>
+            <div id={PORTAL_MODAL_ID} />
+        </>
+    )
 }
 
 export default LayoutLanding

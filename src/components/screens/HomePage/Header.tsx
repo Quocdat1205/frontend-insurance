@@ -1,75 +1,58 @@
-import Link from 'next/link'
-
 import Button from 'components/common/Button/Button'
-import { CarretDown } from 'components/common/Svg/SvgIcon'
-import SwapLanguageBtn from 'components/screens/LandingPage/SwapLanguageBtn'
-import useLanguage from 'hooks/useLanguage'
-import useWeb3Wallet from 'hooks/useWeb3Wallet'
-import { loginAction } from 'redux/auth/authActions'
-import { useAppDispatch, useAppSelector } from 'redux/store'
+import ButtonLanguage from 'components/common/Button/ButtonLanguage'
+import Menu from 'components/common/Menu/Menu'
+import { MenuIcon } from 'components/common/Svg/SvgIcon'
+import Drawer from 'components/layout/Drawer'
+import useWindowSize from 'hooks/useWindowSize'
+import { useTranslation } from 'next-i18next'
+import React, { useState } from 'react'
+import { screens } from 'utils/constants'
 
-function Header() {
-  const [currentLocale, onChangeLang] = useLanguage()
-  const wallet = useWeb3Wallet()
-  const dispatch = useAppDispatch()
-  const token = useAppSelector((state) => state.auth)
-  const { account: walletAddress, activate, connector, contractCaller } = wallet
-  // console.log(contractCaller);
-  function handleConnectWallet() {
-    activate('metaMask')
-  }
+const Header = () => {
+    const { t } = useTranslation()
+    const { width } = useWindowSize()
+    const isMobile = width && width < screens.drawer
+    const menu = [
+        { menuId: 'home', router: 'home', name: t('home:landing:home'), parentId: 0 },
+        { menuId: 'insurance', router: 'insurance', name: t('home:landing:buy_covered'), parentId: 0 },
+        { menuId: 'history-insurance', router: 'history-insurance', name: 'Lịch sử bảo hiểm', parentId: 'insurance' },
+    ]
 
-  async function handleLogin() {
-    dispatch(loginAction({ walletAddress, contractCaller }))
-  }
-
-  function renderBtnLogin() {
-    if (walletAddress)
-      return (
-        <div className="flex items-center gap-2 bg-white3 px-1 py-2 rounded-[5px]">
-          <img src="/images/cryptocurrency.png" className="w-6 h-6" />
-          <div className="text-sm leading-[14px] font-semibold">
-            {connector?.name}
-          </div>
-          <div className="text-sm leading-[14px] font-semibold px-4 py-1 bg-white rounded-[5px]">
-            {`${walletAddress.slice(0, 5)}...${walletAddress.slice(-4)}`}
-          </div>
-        </div>
-      )
+    const [visible, setVisible] = useState(false)
     return (
-      <Button
-        variants="gradient"
-        className="text-sm leading-[14px] w-[107px] h-[38px]"
-        onClick={handleConnectWallet}
-      >
-        ketnoivi
-      </Button>
+        <header className="header-landing px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[10]">
+            <div className="max-w-screen-layout m-auto flex items-center justify-between space-x-12">
+                <div className="w-[75px]">
+                    <img src="/images/ic_logo.png" />
+                </div>
+                <div className="w-full flex items-center justify-end mb:justify-between  py-3 mb:py-0 text-sm font-semibold">
+                    {!isMobile && <Menu data={menu} />}
+                    <div className="flex items-center space-x-6">
+                        {!isMobile && <ButtonLanguage />}
+                        <Button className="font-semibold px-4 py-2 leading-[1rem] space-x-2">{t('home:home:connect_wallet')}</Button>
+                        {isMobile && (
+                            <div className="cursor-pointer" onClick={() => setVisible(!visible)}>
+                                <MenuIcon />
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+            {isMobile && (
+                <Drawer visible={visible} onClose={() => setVisible(false)}>
+                    <div>
+                        <div className="mb-8">
+                            <Menu data={menu} />
+                        </div>
+                        <div className="mx-4">
+                            <Button className="w-full font-semibold py-[0.875rem] leading-5 space-x-2">{t('home:home:connect_wallet')}</Button>
+                        </div>
+                    </div>
+                    <ButtonLanguage className="mx-4" mobile />
+                </Drawer>
+            )}
+        </header>
     )
-  }
-  return (
-    <header className="flex items-center justify-between px-3 md:px-10 h-[70px] border-b border-divider">
-      <div className="flex items-center">
-        <img
-          src="/images/logo_insurance.png"
-          className="w-[75px] h-[36px]"
-          alt="logo"
-        />
-        <div className="items-center font-medium gap-6 ml-12 hidden md:flex">
-          <Link href="#">
-            <div className="text-sm leading-[14px] font-medium">Trang chủ</div>
-          </Link>
-          <div className="flex items-center text-sm leading-[14px] font-medium">
-            Mua bảo hiểm
-            <CarretDown className="ml-[14px]" />
-          </div>
-        </div>
-      </div>
-      <div className="hidden md:flex items-center gap-6 h-full">
-        <SwapLanguageBtn />
-        {renderBtnLogin()}
-      </div>
-    </header>
-  )
 }
 
 export default Header

@@ -1,33 +1,28 @@
-import { useTranslation } from 'next-i18next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import React, { useEffect } from 'react'
-
-import Layout from 'components/layout/Layout'
+import LayoutWeb3 from 'components/layout/LayoutWeb3'
+import Assets from 'components/screens/HomePage/Assets'
 import Banner from 'components/screens/HomePage/Banner'
-import NewInsuarance from 'components/screens/HomePage/NewInsuarance'
 import News from 'components/screens/HomePage/News'
-import Statistic from 'components/screens/LandingPage/Statistic'
-import useLanguage from 'hooks/useLanguage'
+import Slogan from 'components/screens/HomePage/Slogan'
+import RegisterLanding from 'components/screens/LandingPage/RegisterLanding'
+import { GetStaticProps } from 'next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import React from 'react'
 
-function Index() {
-  const { t } = useTranslation()
-  const [currentLocale, onChangeLang] = useLanguage()
-  return (
-    <Layout>
-      <div className="flex flex-col gap-[120px]">
-        <Banner />
-        <NewInsuarance />
-        <Statistic />
-        <News />
-      </div>
-    </Layout>
-  )
+const Home = () => {
+    return (
+        <LayoutWeb3>
+            <Slogan />
+            <Assets />
+            <Banner />
+            <News />
+            <RegisterLanding />
+        </LayoutWeb3>
+    )
 }
-
-export const getStaticProps = async ({ locale }: any) => ({
-  props: {
-    ...(await serverSideTranslations(locale, ['home'])),
-  },
+export const getStaticProps: GetStaticProps = async ({ locale }: any) => ({
+    props: {
+        ...(await serverSideTranslations(locale, ['common', 'home'])),
+    },
 })
 
-export default Index
+export default Home

@@ -6,6 +6,72 @@
 @import "fonts";
 
 html {
-    @apply font-SVN;
-    font-weight: 300;
+    @apply font-Manrope;
+    @apply text-txtPrimary;
+}
+
+.text-gradient {
+    background: linear-gradient(88.09deg, #ce0014 0.48%, #e92828 52.94%, #ff5f6d 114.93%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.border-gradient-red {
+    background: linear-gradient(88.09deg, #fff, #fff), linear-gradient(88.09deg, #ce0014, #e92828);
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
+    border: 1.5px solid transparent;
+    // border-image-source: linear-gradient(88.09deg, #ce0014 0.48%, #e92828 52.94%, #ff5f6d 114.93%);
+}
+
+.hover\:border-gradient-hover-red:hover {
+    background: linear-gradient(to right, #fff, #fff), linear-gradient(to top left, #e92828, #ff5f68);
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
+}
+.no-border {
+    outline: none;
+}
+
+@layer utilities {
+    .active-menu > ul {
+        max-height: 500px !important;
+        transform: scaleY(1) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        animation: fromBottom 1s !important;
+    }
+}
+.sidebar-menu {
+    user-select: none;
+    .sub-menu > ul {
+        max-height: 0;
+        overflow: hidden;
+        transform: scaleY(0);
+        transform-origin: top;
+        transition: transform 0.2s ease-in-out;
+        animation: toBottom 0.2s;
+    }
+
+    @apply active-menu;
+}
+
+@keyframes fromBottom {
+    from {
+        max-height: 0;
+        overflow: hidden;
+    }
+    to {
+        max-height: 500px;
+    }
+}
+
+@keyframes toBottom {
+    from {
+        max-height: 500px;
+    }
+    to {
+        max-height: 0;
+        overflow: hidden;
+    }
 }

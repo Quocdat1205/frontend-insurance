@@ -6,27 +6,27 @@ import { contractAddress } from 'components/web3/constants/contractAddress'
 import InsuranceContract from 'components/web3/contract/Insurance'
 
 export class ContractCaller {
-  provider: providers.Web3Provider
+    provider: providers.Web3Provider
 
-  insuranceContract: InsuranceContract
+    insuranceContract: InsuranceContract
 
-  constructor(provider: providers.Web3Provider) {
-    this.provider = provider
-    this.insuranceContract = new InsuranceContract(
-      this.provider,
-      contractAddress,
-      INSURANCE_ABI,
-    )
-  }
+    constructor(provider: providers.Web3Provider) {
+        this.provider = provider
+        this.insuranceContract = new InsuranceContract(
+            this.provider,
+            contractAddress,
+            INSURANCE_ABI,
+        )
+    }
 
-  public async getEtherBalance(from: string) {
-    const balance: BigNumber = await this.provider.getBalance(from)
-    return weiToEther(balance.toString())
-  }
+    public async getEtherBalance(from: string) {
+        const balance: BigNumber = await this.provider.getBalance(from)
+        return weiToEther(balance.toString())
+    }
 
-  public async sign(message: string | ethers.utils.Bytes) {
-    const signer = this.provider.getSigner()
-    const signature = await signer.signMessage(message)
-    return signature
-  }
+    public async sign(message: string | ethers.utils.Bytes) {
+        const signer = this.provider.getSigner()
+        const signature = await signer.signMessage(message)
+        return signature
+    }
 }

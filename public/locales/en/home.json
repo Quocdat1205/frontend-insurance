@@ -1,10 +1,44 @@
 {
-    "navbar": {
+    "landing": {
         "white_paper": "White paper",
         "faq": "FAQ",
-        "contact": "Contact"
+        "contact": "Contact",
+        "home": "Home",
+        "access": "Access",
+        "buy_covered": "Buy Cover",
+        "buy_nain": "Buy NAIN",
+        "total_q_covered": "Total Q-Covered (USDT)",
+        "total_q_claim": "Total Q-Claim (USDT)",
+        "total_margin": "Total Margin (USDT)",
+        "users": "Users",
+        "avg_r_claim": "Avg R-Claim",
+        "features": "Features",
+        "unique_features": "Unique Features",
+        "unique_features_content": "Providing a trustworthy and transparent decentralized insurance service, mitigating the risk of users' asset value loss resulting from market fluctuations with many unique attributes.",
+        "asset_value": "Asset value protection",
+        "asset_value_content": "Nami Insurance offers asset value insurance, mitigating user losses prior to market uncertainty.",
+        "insurance_options": "On-demand insurance options",
+        "insurance_options_content": "Users can choose from many insurance plans, based on actual needs with the main indicators of each insurance contract such as: Margin Value, Cover Price , Cover Period, Cover Margin Unit for insurance...",
+        "multi_asset": "Multi-asset insurance",
+        "multi_asset_content": "Nami Insurance's product is available for most common assets, held by many users such as BTC, ETH, BNB...",
+        "stay_up_to_date": "Stay up to date",
+        "stay_up_to_date_content": "Get updates on all of our events and be the first to get notified when new products launch",
+        "enter_your_email": "Enter your email",
+        "subscribe": "Subscribe",
+        "terms_of_service": "Terms of Service",
+        "document": "Document",
+        "products_sponsored_by": "Products sponsored by",
+        "register_successfully": "Register successfully",
+        "register_content": "The lasted information will be sent to you. Please check email regularly",
+        "email_invalid": "Confirmation email invalid. Please try again."
     },
-    "white_paper": "White paper",
-    "faq": "FAQ",
-    "contact": "Contact"
+    "home": {
+        "connect_wallet": "Connect Wallet",
+        "new_insurance_assets": "New Insurance Assets",
+        "bitcoin_get_covered": "Bitcoin Get Covered",
+        "ethereum_get_covered": "Ethereum Get Covered",
+        "binance_get_covered": "Binance Get Covered",
+        "statistics": "Statistics",
+        "news": "News"
+    }
 }

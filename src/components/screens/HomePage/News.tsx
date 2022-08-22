@@ -1,84 +1,90 @@
-import React, { useMemo } from 'react'
-import 'slick-carousel/slick/slick.css'
-import 'slick-carousel/slick/slick-theme.css'
-import Slider from 'react-slick'
-import styled from 'styled-components'
+import React, { useEffect, useState } from 'react'
+import { Autoplay, Pagination } from 'swiper'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import 'swiper/css'
+import 'swiper/css/pagination'
+import CardShadow from 'components/common/Card/CardShadow'
+import { formatTime } from 'utils/utils'
+import { useTranslation } from 'next-i18next'
 
-import useWindowSize from 'hooks/useWindowSize'
-// doc react-slick.neostack.com/docs/api/#swipeToSlide
+const News = () => {
+    const { t } = useTranslation()
+    const [mount, setMount] = useState(false)
 
-export default function News() {
-  const { width } = useWindowSize()
-  const numberItem = useMemo(
-    () => (width >= 767 ? (width > 1279 ? 4 : 2) : 1),
-    [width],
-  )
-  const showDots = useMemo(() => width >= 767, [width])
+    useEffect(() => {
+        setMount(true)
+    }, [])
 
-  const renderSlides = () =>
-    newsData(16).map((v, i) => {
-      const { url, category, time, title } = v
-      return (
-        <div key={i} className="pr-6">
-          <div className="rounded-xl p-4 mb-6 shadow-lv4">
-            <img src={url} alt="img" />
-            <div className="flex items-center mt-6 mb-1">
-              <div>{category} /</div>
-              <div className="text-txtSecondary">{time}</div>
-            </div>
-            <div className="font-medium text-[20px] leading-7">{title}</div>
-          </div>
-        </div>
-      )
-    })
-  return (
-    <section id="News" className="ins_container font-medium">
-      <div className="text-2xl md:text-5xl leading-10 mb-9">Tin tức</div>
-      <NewStyles>
-        <Slider
-          dots={showDots}
-          slidesToShow={numberItem}
-          slidesToScroll={numberItem}
-          autoplaySpeed={3000}
-          swipeToSlide
-          autoplay={false}
-        >
-          {renderSlides()}
-        </Slider>
-      </NewStyles>
-    </section>
-  )
+    const news = [
+        { img: '/images/screens/home/img_news.png', category: 'TIN TỨC ', title: 'Nami Insurance - Bảo vệ tài sản số của bạn', time: new Date() },
+        { img: '/images/screens/home/img_news.png', category: 'TIN TỨC ', title: 'Nami Insurance - Bảo vệ tài sản số của bạn', time: new Date() },
+        { img: '/images/screens/home/img_news.png', category: 'TIN TỨC ', title: 'Nami Insurance - Bảo vệ tài sản số của bạn', time: new Date() },
+        { img: '/images/screens/home/img_news.png', category: 'TIN TỨC ', title: 'Nami Insurance - Bảo vệ tài sản số của bạn', time: new Date() },
+    ]
+
+    const renderNews = () => {
+        const html: any = []
+        news.map((item: any, index: number) => {
+            html.push(
+                <SwiperSlide key={index}>
+                    <CardShadow className="p-4">
+                        <div className="rounded-xl mb-6">
+                            <img src={item.img} />
+                        </div>
+                        <div className="flex items-center text-sm mb-1">
+                            <span>{item.category}</span>
+                            &nbsp;/&nbsp;
+                            <span className="text-gray">{formatTime(item.time, 'dd.MM.yyyy')}</span>
+                        </div>
+                        <div className="text-xl font-medium">{item.title}</div>
+                    </CardShadow>
+                </SwiperSlide>,
+            )
+        })
+        return html
+    }
+
+    const pagination = {
+        clickable: true,
+        bulletClass: 'swiper-pagination-bullet !bg-txtSecondary',
+        bulletActiveClass: 'swiper-pagination-bullet-active !bg-red',
+        horizontalClass: '!-bottom-[5px]',
+        // renderBullet: (index: number, className: string) => {
+        //     return `<span class="${className}"> ${index+1} </span>`
+        // },
+    }
+
+    return (
+        <section className="pt-20 sm:pt-[7.5rem] max-w-screen-insurance m-auto">
+            <div className="text-2xl font-semibold -mb-2 px-4">{t('home:home:news')}</div>
+            <Swiper
+                pagination={pagination}
+                modules={[Pagination, Autoplay]}
+                className="mySwiper !px-4 !py-8"
+                slidesPerView={4}
+                breakpoints={{
+                    320: {
+                        slidesPerView: 1,
+                        spaceBetween: 16,
+                    },
+                    640: {
+                        slidesPerView: 2,
+                        spaceBetween: 16,
+                    },
+                    1080: {
+                        slidesPerView: 4,
+                        spaceBetween: 24,
+                    },
+                }}
+                autoplay={{
+                    delay: 3000,
+                    disableOnInteraction: false,
+                }}
+            >
+                {mount && renderNews()}
+            </Swiper>
+        </section>
+    )
 }
 
-const NewStyles = styled.div`
-  .slick-list {
-    padding: 1px;
-  }
-  .slick-track {
-    /* display: flex;
-        gap: 24px; */
-  }
-
-  .slick-dots {
-    position: absolute;
-    left: 0;
-    bottom: -5px;
-  }
-  .slick-dots li.slick-active button:before {
-    color: red;
-  }
-`
-
-const newsData = (num = 4) => {
-  const arr = []
-  const data = {
-    url: '/images/news1.png',
-    category: 'TIN TUC',
-    time: '18/07/2022',
-    title: 'Nami Insurance - Bảo vệ tài sản số của bạn',
-  }
-  for (let index = 0; index < num; index++) {
-    arr.push(data)
-  }
-  return arr
-}
+export default News

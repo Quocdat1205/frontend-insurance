@@ -4,17 +4,17 @@ import styled, { keyframes } from 'styled-components'
 import colors from 'styles/colors'
 
 function LoadingPage() {
-  return (
-    <div className="h-[100vh] w-full bg-onus text-white flex flex-col items-center justify-center">
-      {/* <img src="/images/logo/nami_maldives.png" width="100" height="100" /> */}
-      <div className="font-medium text-sm pt-[60px] pb-[20px]">
-        Change mindset, make giant steps
-      </div>
-      <Loader>
-        <div className="progress-bar" />
-      </Loader>
-    </div>
-  )
+    return (
+        <div className="h-[100vh] w-full bg-onus text-white flex flex-col items-center justify-center">
+            {/* <img src="/images/logo/nami_maldives.png" width="100" height="100" /> */}
+            <div className="font-medium text-sm pt-[60px] pb-[20px]">
+                Change mindset, make giant steps
+            </div>
+            <Loader>
+                <div className="progress-bar" />
+            </Loader>
+        </div>
+    )
 }
 
 const animation = keyframes`
@@ -27,24 +27,24 @@ const animation = keyframes`
 `
 
 const Loader = styled.div.attrs({
-  className: '',
+    className: '',
 })`
-  width: 100%;
-  width: 200px;
-  height: 3px;
-  background: #333c54;
-  border-radius: 18px;
-  overflow: hidden;
-  .progress-bar {
-    position: relative;
-    left: -50%;
-    width: 50%;
-    background: ${colors.blue};
+    width: 100%;
+    width: 200px;
     height: 3px;
+    background: #333c54;
     border-radius: 18px;
-    transition: all;
-    animation: ${animation} 2s linear infinite;
-  }
+    overflow: hidden;
+    .progress-bar {
+        position: relative;
+        left: -50%;
+        width: 50%;
+        background: ${colors.blue};
+        height: 3px;
+        border-radius: 18px;
+        transition: all;
+        animation: ${animation} 2s linear infinite;
+    }
 `
 
 export default LoadingPage

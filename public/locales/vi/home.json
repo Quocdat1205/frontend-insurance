@@ -1,10 +1,44 @@
 {
-    "navbar": {
+    "landing": {
         "white_paper": "White paper",
-        "faq": "FAQ",
-        "contact": "Contact"
+        "faq": "Câu hỏi thường gặp",
+        "contact": "Liên hệ",
+        "home": "Trang chủ",
+        "access": "Truy cập",
+        "buy_covered": "Mua bảo hiểm",
+        "buy_nain": "Mua NAIN",
+        "total_q_covered": "Tổng Q-Covered (USDT)",
+        "total_q_claim": "Tổng Q-Claim (USDT)",
+        "total_margin": "Tổng Margin (USDT)",
+        "users": "Số người tham gia",
+        "avg_r_claim": "R-Claim trung bình",
+        "features": "Tính năng",
+        "unique_features": "Tính năng độc đáo",
+        "unique_features_content": "Cung cấp dịch vụ bảo hiểm phi tập trung tin cậy và minh bạch, giảm thiểu tối đa rủi ro thất thoát trị giá tài sản của người dùng trước các biến động của thị trườn với nhiều tính năng độc đáo.",
+        "asset_value": "Bảo hiểm giá trị tài sản",
+        "asset_value_content": "Nami Insurance cung cấp dịch vụ bảo hiểm giá trị tài sản, giảm thiểu tối đa thiệt hại cho người dùng trước những biến động của thị trường.",
+        "insurance_options": "Tùy chọn bảo hiểm theo nhu cầu",
+        "insurance_options_content": "Người dùng có thể tùy chọn nhiều phương án bảo hiểm, dựa trên nhu cầu thực tế với các chỉ số chính của mỗi hợp đồng bảo hiểm như: Giá trị ký quỹ, Mức giá bảo hiểm, Thời hạn bảo hiểm, Đơn vị thanh toán và chi trả bảo hiểm...",
+        "multi_asset": "Hỗ trợ bảo hiểm đa dạng tài sản",
+        "multi_asset_content": "Sản phẩm bảo hiểm giá trị của Nami Insurance khả dụng với hầu hết các loại tài sản thông dụng, được nhiều người dùng nắm giữ như BTC, ETH, BNB...",
+        "stay_up_to_date": "Nhận thông báo",
+        "stay_up_to_date_content": "Trở thành người đầu tiên nhận được các tin tức và sự kiện quan trọng",
+        "enter_your_email": "Nhập địa chỉ email",
+        "subscribe": "Đăng ký",
+        "terms_of_service": "Điều khoản sử dụng",
+        "document": "Tài liệu",
+        "products_sponsored_by": "Sản phẩm được tài trợ bởi",
+        "register_successfully": "Đăng ký thành công",
+        "register_content": "Chúng tôi sẽ gửi những thông báo mới nhất đến hộp thư của bạn",
+        "email_invalid": "Email không đúng định dạng. Vui lòng nhập lại."
     },
-    "white_paper": "White paper",
-    "faq": "FAQ",
-    "contact": "Contact"
+    "home": {
+        "connect_wallet": "Kết nối ví",
+        "new_insurance_assets": "Tài sản bảo hiểm mới",
+        "bitcoin_get_covered": "Bitcoin Mua bảo hiểm",
+        "ethereum_get_covered": "Ethereum Mua bảo hiểm",
+        "binance_get_covered": "Binance Mua bảo hiểm",
+        "statistics": "Các chỉ số ấn tượng",
+        "news": "Tin tức"
+    }
 }
