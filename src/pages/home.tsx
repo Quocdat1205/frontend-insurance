@@ -7,22 +7,27 @@ import RegisterLanding from 'components/screens/LandingPage/RegisterLanding'
 import { GetStaticProps } from 'next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
+import { getArticles } from 'utils/utils'
 
-const Home = () => {
+const Home = ({ news }: any) => {
     return (
         <LayoutWeb3>
             <Slogan />
             <Assets />
             <Banner />
-            <News />
+            <News news={news} />
             <RegisterLanding />
         </LayoutWeb3>
     )
 }
-export const getStaticProps: GetStaticProps = async ({ locale }: any) => ({
-    props: {
-        ...(await serverSideTranslations(locale, ['common', 'home'])),
-    },
-})
+export const getStaticProps: GetStaticProps = async ({ locale }: any) => {
+    const news = await getArticles('noti', 6, locale)
+    return {
+        props: {
+            news: news,
+            ...(await serverSideTranslations(locale, ['common', 'home'])),
+        },
+    }
+}
 
 export default Home

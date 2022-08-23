@@ -261,5 +261,5 @@ module.exports = {
             cursor: ['grabbing'],
         },
     },
-    plugins: [require('tailwindcss-border-gradient-radius')],
+    plugins: [require('tailwindcss-border-gradient-radius'), require('@tailwindcss/line-clamp')],
 }

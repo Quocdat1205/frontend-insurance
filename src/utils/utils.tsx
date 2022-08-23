@@ -3,8 +3,6 @@ import isNil from 'lodash/isNil'
 import numeral from 'numeral'
 import Config from 'config/config'
 import GhostContentAPI from '@tryghost/content-api'
-import { slugify } from '@tryghost/string'
-import algoliasearch from 'algoliasearch'
 
 export const getS3Url = (url: string) => Config.env.CDN + url
 
@@ -62,18 +60,25 @@ export const ghost = new GhostContentAPI({
     version: 'v3',
 })
 
-export const getNews = async (tag: string, language: string) => {
-    const options: any = {
-        limit: 'all',
-        include: 'tags',
-    }
+export const getArticles = async (tag: string = '', limit: number = 10, language: string = 'vi', isHighlighted: boolean = false) => {
     const filter = []
-    if (tag) filter.push(`tag:${tag}`)
-    if (language === 'vi') {
-        filter.push('tags:-en')
-    } else {
-        filter.push('tags:en')
+    const options: any = {
+        limit: limit,
+        include: 'tags',
+        order: 'published_at DESC',
     }
+    const lang = language === 'vi' ? '-en' : 'en'
+
+    if (tag) {
+        filter.push(`tags:${lang}+tags:${tag}`)
+    } else {
+        filter.push(`tags:${lang}`)
+    }
+
+    if (isHighlighted) {
+        filter.push('featured:true')
+    }
+
     options.filter = filter.join('+')
     return await ghost.posts.browse(options)
 }

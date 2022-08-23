@@ -7,7 +7,7 @@ import CardShadow from 'components/common/Card/CardShadow'
 import { formatTime } from 'utils/utils'
 import { useTranslation } from 'next-i18next'
 
-const News = () => {
+const News = ({ news = [] }: any) => {
     const { t } = useTranslation()
     const [mount, setMount] = useState(false)
 
@@ -15,28 +15,21 @@ const News = () => {
         setMount(true)
     }, [])
 
-    const news = [
-        { img: '/images/screens/home/img_news.png', category: 'TIN TỨC ', title: 'Nami Insurance - Bảo vệ tài sản số của bạn', time: new Date() },
-        { img: '/images/screens/home/img_news.png', category: 'TIN TỨC ', title: 'Nami Insurance - Bảo vệ tài sản số của bạn', time: new Date() },
-        { img: '/images/screens/home/img_news.png', category: 'TIN TỨC ', title: 'Nami Insurance - Bảo vệ tài sản số của bạn', time: new Date() },
-        { img: '/images/screens/home/img_news.png', category: 'TIN TỨC ', title: 'Nami Insurance - Bảo vệ tài sản số của bạn', time: new Date() },
-    ]
-
     const renderNews = () => {
         const html: any = []
         news.map((item: any, index: number) => {
             html.push(
                 <SwiperSlide key={index}>
-                    <CardShadow className="p-4">
-                        <div className="rounded-xl mb-6">
-                            <img src={item.img} />
+                    <CardShadow className="p-4 min-h-[280px]">
+                        <div className="rounded-xl mb-6 ">
+                            <img src={item.feature_image} className="h-[140px] w-full rounded-xl" />
                         </div>
                         <div className="flex items-center text-sm mb-1">
-                            <span>{item.category}</span>
+                            <span>{item.primary_tag.name}</span>
                             &nbsp;/&nbsp;
-                            <span className="text-gray">{formatTime(item.time, 'dd.MM.yyyy')}</span>
+                            <span className="text-gray">{formatTime(item.created_at, 'dd.MM.yyyy')}</span>
                         </div>
-                        <div className="text-xl font-medium">{item.title}</div>
+                        <div className="text-xl font-medium  line-clamp-2 min-h-[56px]">{item.title}</div>
                     </CardShadow>
                 </SwiperSlide>,
             )
@@ -63,12 +56,12 @@ const News = () => {
                 className="mySwiper !px-4 !py-8"
                 slidesPerView={4}
                 breakpoints={{
-                    320: {
+                    300: {
                         slidesPerView: 1,
                         spaceBetween: 16,
                     },
                     640: {
-                        slidesPerView: 2,
+                        slidesPerView: 3,
                         spaceBetween: 16,
                     },
                     1080: {
