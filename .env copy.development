@@ -3,5 +3,5 @@ NEXT_PUBLIC_NODE_ENV=dev
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_API_URL=https://insurance-test.namifutures.com/api/insurance
 
-NEXT_PUBLIC_BLOG_API_URL = https://blog.nami.today
-NEXT_PUBLIC_BLOG_API_CONTENT_KEY = bafd2bfa46387a4f2ce13c7ea0
+NEXT_PUBLIC_BLOG_API_URL = https://nami.today
+NEXT_PUBLIC_BLOG_API_CONTENT_KEY = a81384eeb138b985c2583f8962
