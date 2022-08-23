@@ -1,10 +1,29 @@
 import Button from 'components/common/Button/Button'
 import CardShadow from 'components/common/Card/CardShadow'
+import Config from 'config/config'
+// import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
 const Assets = () => {
     const { t } = useTranslation()
+    // const { account } = useWeb3Wallet()
+    // console.log(account)
+
+    const onConnectWallet = () => {
+        console.log('onConnectWallet')
+    }
+
+    const onBuy = (key: string) => {
+        Config.notify.show('error', t('common:please_connect_your_wallet'), {
+            button: (
+                <button className="text-sm font-semibold underline" onClick={onConnectWallet}>
+                    {t('common:connect_now')}
+                </button>
+            ),
+        })
+    }
+
     return (
         <section className="pt-20 sm:pt-[7.5rem] px-4 max-w-screen-insurance m-auto">
             <div className="text-2xl font-semibold mb-6">{t('home:home:new_insurance_assets')}</div>
@@ -14,7 +33,7 @@ const Assets = () => {
                         <img width="36" height="36" src="/images/icons/ic_bitcoin.png" />
                         <span className="font-semibold text-xl">Bitcoin</span>
                     </div>
-                    <Button variants="outlined" className="py-3">
+                    <Button onClick={() => onBuy('bitcoin')} variants="outlined" className="py-3">
                         {t('home:landing:buy_covered')}
                     </Button>
                 </CardShadow>
@@ -23,7 +42,7 @@ const Assets = () => {
                         <img width="36" height="36" src="/images/icons/ic_ethereum.png" />
                         <span className="font-semibold text-xl">Ethereum</span>
                     </div>
-                    <Button variants="outlined" className="py-3">
+                    <Button onClick={() => onBuy('ethereum')} variants="outlined" className="py-3">
                         {t('home:landing:buy_covered')}
                     </Button>
                 </CardShadow>
@@ -32,7 +51,7 @@ const Assets = () => {
                         <img width="36" height="36" src="/images/icons/ic_binance.png" />
                         <span className="font-semibold text-xl">Binance Coin</span>
                     </div>
-                    <Button variants="outlined" className="py-3">
+                    <Button onClick={() => onBuy('binance')} variants="outlined" className="py-3">
                         {t('home:landing:buy_covered')}
                     </Button>
                 </CardShadow>

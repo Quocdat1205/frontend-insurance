@@ -21,7 +21,7 @@ const Home = ({ news }: any) => {
     )
 }
 export const getStaticProps: GetStaticProps = async ({ locale }: any) => {
-    const news = await getArticles('noti', 6, locale)
+    const news = await getArticles('crypto101', 6, locale)
     return {
         props: {
             news: news,

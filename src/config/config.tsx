@@ -9,6 +9,11 @@ class Config {
     static notify: Notify
     static alert: Notify
 
+    static blogUrl: { nami_exchange: string; nami_today: string } = {
+        nami_exchange: 'https://nami.exchange',
+        nami_today: 'https://nami.today',
+    }
+
     static pattern = (key: string) => {
         let rs: any = ''
         switch (key) {

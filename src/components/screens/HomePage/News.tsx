@@ -6,9 +6,14 @@ import 'swiper/css/pagination'
 import CardShadow from 'components/common/Card/CardShadow'
 import { formatTime } from 'utils/utils'
 import { useTranslation } from 'next-i18next'
+import Config from 'config/config'
+import Link from 'next/link'
 
 const News = ({ news = [] }: any) => {
-    const { t } = useTranslation()
+    const {
+        t,
+        i18n: { language },
+    } = useTranslation()
     const [mount, setMount] = useState(false)
 
     useEffect(() => {
@@ -18,19 +23,24 @@ const News = ({ news = [] }: any) => {
     const renderNews = () => {
         const html: any = []
         news.map((item: any, index: number) => {
+            const url = Config.blogUrl.nami_today + `/${item.slug}`
             html.push(
                 <SwiperSlide key={index}>
-                    <CardShadow className="p-4 min-h-[280px]">
-                        <div className="rounded-xl mb-6 ">
-                            <img src={item.feature_image} className="h-[140px] w-full rounded-xl" />
-                        </div>
-                        <div className="flex items-center text-sm mb-1">
-                            <span>{item.primary_tag.name}</span>
-                            &nbsp;/&nbsp;
-                            <span className="text-gray">{formatTime(item.created_at, 'dd.MM.yyyy')}</span>
-                        </div>
-                        <div className="text-xl font-medium  line-clamp-2 min-h-[56px]">{item.title}</div>
-                    </CardShadow>
+                    <Link href={url}>
+                        <a target="_blank">
+                            <CardShadow className="p-4 min-h-[280px] cursor-pointer">
+                                <div className="rounded-xl mb-6 ">
+                                    <img src={item.feature_image} className="h-[140px] w-full rounded-xl" />
+                                </div>
+                                <div className="flex items-center text-sm mb-1">
+                                    <span>{item.primary_tag.name}</span>
+                                    &nbsp;/&nbsp;
+                                    <span className="text-gray">{formatTime(item.created_at, 'dd.MM.yyyy')}</span>
+                                </div>
+                                <div title={item.title} className="text-xl font-medium  line-clamp-2 min-h-[56px]">{item.title}</div>
+                            </CardShadow>
+                        </a>
+                    </Link>
                 </SwiperSlide>,
             )
         })
