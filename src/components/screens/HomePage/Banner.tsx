@@ -46,8 +46,8 @@ const Banner = () => {
 
 const Item = styled.div.attrs<any>({
     className: classnames(
-        'shadow-banner pt-6 pb-9 last:mb-0 lg:last:!-mb-3 last:pb-6 -mb-3 lg:last:m-0 first:mt-0 sm:mt-0 sm:!p-4 w-full ',
-        'text-center flex flex-col items-center space-y-2 ',
+        'shadow-banner pt-6 pb-9 last:pb-6 -mb-3 lg:m-0 first:mt-0 sm:!p-4 w-full ',
+        'text-center flex flex-col items-center space-y-2 sm:even:mb-0 last:m-0',
     ),
 })`
     backdrop-filter: blur(5px);

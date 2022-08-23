@@ -24,7 +24,7 @@ const BannerLanding = () => {
                 </div>
                 <div className="grid grid-rows-4 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-4 grid-flow-col sm:gap-x-6 lg:gap-6">
                     {list.map((item: any, index: number) => (
-                        <Item key={index} className="border-gradient-red ">
+                        <Item key={index} className="bg-gradient-red ">
                             <div className="text-txtSecondary text-sm">{item.title}</div>
                             <div className="font-semibold text-2xl">{item.value}</div>
                         </Item>
@@ -37,8 +37,8 @@ const BannerLanding = () => {
 
 const Item = styled.div.attrs<any>({
     className: classnames(
-        'shadow-banner pt-6 pb-9 last:mb-0 lg:last:!-mb-3 last:pb-6 -mb-3 lg:last:m-0 first:mt-0 sm:mt-0 sm:!p-4 w-full ',
-        'text-center flex flex-col lg:items-start items-center space-y-2 ',
+        'shadow-banner pt-6 pb-9 last:pb-6 -mb-3 lg:m-0 first:mt-0 sm:!p-4 w-full ',
+        'text-center flex flex-col lg:items-start items-center space-y-2 sm:even:mb-0 last:m-0',
     ),
 })`
     backdrop-filter: blur(5px);
