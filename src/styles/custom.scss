@@ -49,3 +49,56 @@
         padding: 0 80px;
     }
 }
+
+// breadcrumb
+ul.breadcrumb {
+  padding: 10px 16px;
+  padding-left: 0px !important;
+  list-style: none;
+  background-color: #eee;
+}
+
+ul.breadcrumb li {
+  display: inline;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+ul.breadcrumb li+li:before {
+  padding: 8px;
+  color: black;
+  content: ">\00a0";
+}
+
+ul.breadcrumb li a {
+  color: #808890;
+  text-decoration: none;
+}
+
+ul.breadcrumb li a:hover {
+   cursor: default;
+ }
+//end breadcrumb
+
+//ICoin
+#iCoin::-webkit-outer-spin-button,
+#iCoin::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+//Insurance Select
+button#headlessui-listbox-button-\:r0\:{
+  width: 100%;
+}
+
+input#iCoin{
+  box-shadow: none;
+}
+
+
+
+
+
+

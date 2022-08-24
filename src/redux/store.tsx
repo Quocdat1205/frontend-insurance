@@ -9,13 +9,11 @@ import rootReducer from 'redux/reducers/rootReducer'
 let composeEnhancers = compose
 const middleware = [thunkMiddleware]
 if (Config.env.NODE_ENV !== 'production') {
-    composeEnhancers = Config.client
-        ? (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ as typeof compose)
-        : compose
+    composeEnhancers = Config.client ? (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ as typeof compose) : compose
     middleware.push(loggerMiddleware)
 }
 const middlewareEnhancer = applyMiddleware(...middleware)
-const store = createStore(rootReducer, composeEnhancers(middlewareEnhancer))
+const store = createStore(rootReducer, compose(middlewareEnhancer))
 export type StoreState = ReturnType<typeof store.getState>
 export type ReduxState = ReturnType<typeof store.getState>
 export type TypedDispatch = ThunkDispatch<ReduxState, any, AnyAction>

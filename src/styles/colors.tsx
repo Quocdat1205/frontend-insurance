@@ -47,6 +47,7 @@ const colors = {
         3: '#F2F3F4',
     },
     txtPrimary: '#22313F',
+    txtSencondary: '#808890',
     error: '#E5544B',
 }
 
