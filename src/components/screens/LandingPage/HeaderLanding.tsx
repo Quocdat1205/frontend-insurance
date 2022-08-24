@@ -36,7 +36,7 @@ const HeaderLanding = () => {
                         <>
                             <Menu data={menu} />
                             <ButtonLanguage />
-                            <Button onClick={() => router.push('/home')} className="px-6 py-3 leading-[0.875rem] flex items-center space-x-2">
+                            <Button onClick={() => router.push('/home')} className="px-6 py-2 flex items-center space-x-2">
                                 <span>{t('home:landing:access')}</span>
                                 <RightArrow />
                             </Button>

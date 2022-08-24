@@ -25,7 +25,20 @@ const Header = () => {
     const menu = [
         { menuId: 'home', router: 'home', name: t('home:landing:home'), parentId: 0 },
         { menuId: 'insurance', router: 'insurance', name: t('home:landing:buy_covered'), parentId: 0 },
-        { menuId: 'history-insurance', router: 'history-insurance', name: 'Lịch sử bảo hiểm', parentId: 'insurance' },
+        {
+            menuId: 'buy-covered',
+            router: 'buy-covered',
+            name: t('home:landing:buy_covered'),
+            parentId: 'insurance',
+            icon: '/images/icons/ic_menu_buy_covered.png',
+        },
+        {
+            menuId: 'insurance-history',
+            router: 'insurance-history',
+            name: t('home:home:insurance_history'),
+            parentId: 'insurance',
+            icon: '/images/icons/Ic_menu_users.png',
+        },
     ]
 
     const [visible, setVisible] = useState(false)
@@ -57,7 +70,7 @@ const Header = () => {
                         )}
                         {!isMobile && <ButtonLanguage />}
                         {!account && (
-                            <Button onClick={onConnect} className="font-semibold px-4 py-2 leading-[1rem] space-x-2">
+                            <Button onClick={onConnect} className="font-semibold px-4 py-2 space-x-2">
                                 {t('home:home:connect_wallet')}
                             </Button>
                         )}

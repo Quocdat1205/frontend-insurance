@@ -1,6 +1,4 @@
 import Button from 'components/common/Button/Button'
-import Config from 'config/config'
-import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import useWindowSize from 'hooks/useWindowSize'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
@@ -8,7 +6,6 @@ import styled from 'styled-components'
 
 const Slogan = () => {
     const { t } = useTranslation()
-    const { account } = useWeb3Wallet()
     const { width } = useWindowSize()
     const isMobile = width && width < 640 ? true : false
     return (
@@ -18,13 +15,6 @@ const Slogan = () => {
                     <span>Đây là slogan </span>
                     <span className="text-gradient">của Nami Insurance</span>
                 </div>
-                {!account && (
-                    <div className="flex items-center justify-between sm:justify-start space-x-4 text-sm font-semibold">
-                        <Button onClick={() => Config.connectWallet()} className="h-12 px-9 text-sm ">
-                            {t('home:home:connect_wallet')}
-                        </Button>
-                    </div>
-                )}
             </div>
         </Background>
     )

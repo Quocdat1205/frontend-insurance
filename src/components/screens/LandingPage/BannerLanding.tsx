@@ -25,7 +25,7 @@ const BannerLanding = () => {
                 <div className="grid grid-rows-4 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-4 grid-flow-col sm:gap-x-6 lg:gap-6">
                     {list.map((item: any, index: number) => (
                         <Item key={index} className="border-gradient-red">
-                            <div className="text-txtSecondary text-sm">{item.title}</div>
+                            <div className="text-txtSecondary text-sm sm:text-base">{item.title}</div>
                             <div className="font-semibold text-2xl">{item.value}</div>
                         </Item>
                     ))}

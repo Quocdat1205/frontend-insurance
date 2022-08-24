@@ -59,7 +59,7 @@ const News = ({ news = [] }: any) => {
 
     return (
         <section className="pt-20 sm:pt-[7.5rem] max-w-screen-insurance m-auto">
-            <div className="text-2xl font-semibold -mb-2 px-4">{t('home:home:news')}</div>
+            <div className="text-2xl sm:text-5xl font-semibold -mb-2 px-4">{t('home:home:news')}</div>
             <Swiper
                 pagination={pagination}
                 modules={[Pagination, Autoplay]}

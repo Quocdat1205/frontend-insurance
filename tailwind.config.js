@@ -92,7 +92,7 @@ module.exports = {
                 '.75rem',
                 {
                     letterSpacing: '0.5px',
-                    lineHeight: '1.125rem',
+                    lineHeight: '1rem',
                 },
             ], // Caption 12px
             sm: [
@@ -150,7 +150,14 @@ module.exports = {
                     letterSpacing: '0.5px',
                     lineHeight: '2.75rem',
                 },
-            ], // Heading 3 32px
+            ], // Heading 3 32px,
+            '5xl': [
+                '2.5rem',
+                {
+                    letterSpacing: '0.5px',
+                    lineHeight: '3.25rem',
+                },
+            ], //  40px
         },
         // TODO split text, background
         colors: {

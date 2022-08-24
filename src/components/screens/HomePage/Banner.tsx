@@ -17,7 +17,7 @@ const Banner = () => {
     ]
     return (
         <section className="pt-20 sm:pt-[7.5rem]">
-            <div className="text-2xl font-semibold mb-6 px-4 max-w-screen-insurance m-auto">{t('home:home:statistics')}</div>
+            <div className="text-2xl sm:text-5xl font-semibold mb-6 px-4 max-w-screen-insurance m-auto">{t('home:home:statistics')}</div>
 
             <Background isMobile={isMobile}>
                 <div className="max-w-screen-insurance m-auto text-center flex flex-col space-y-8 sm:space-y-6">
@@ -32,7 +32,7 @@ const Banner = () => {
                                     <InlineSVG src={item.icon} />
                                 </div>
                                 <div className="flex flex-col space-y-[2px] sm:space-y-2">
-                                    <div className="text-txtSecondary text-sm">{item.title}</div>
+                                    <div className="text-txtSecondary text-sm sm:text-base">{item.title}</div>
                                     <div className="font-semibold text-2xl">{item.value}</div>
                                 </div>
                             </Item>

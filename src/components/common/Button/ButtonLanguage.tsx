@@ -21,7 +21,7 @@ const ButtonLanguage = ({ mobile = false, className }: Language) => {
     } = useTranslation()
     return (
         <div className={`${className} border border-red rounded-[3px] w-max`}>
-            <div className="flex items-center space-x-1 bg-white-3 p-1 rounded-[3px]">
+            <div className="flex items-center space-x-1 bg-white-3 px-1 py-[3px] rounded-[3px]">
                 <Language mobile={mobile} active={language === LANGUAGE_TAG.VI} onClick={() => language !== LANGUAGE_TAG.VI && onChangeLang()}>
                     VI
                 </Language>

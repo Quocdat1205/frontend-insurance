@@ -13,10 +13,10 @@ const SloganLanding = () => {
                         <span className="text-gradient">của Nami Insurance</span>
                     </div>
                     <div className="flex items-center justify-between sm:justify-start space-x-4 text-sm font-semibold">
-                        <Button className="w-full sm:w-max h-12 sm:h-full whitespace-nowrap !rounded-xl px-6 py-4 leading-6">
+                        <Button className="w-full sm:w-max h-12 sm:text-base sm:h-full whitespace-nowrap !rounded-xl px-6 py-4 leading-6">
                             {t('home:landing:buy_covered')}
                         </Button>
-                        <Button variants="outlined" className="w-full sm:w-max h-12 sm:h-full px-6 py-[0.875rem] leading-6 whitespace-nowrap">
+                        <Button variants="outlined" className="w-full sm:w-max h-12 sm:text-base sm:h-full px-6 py-[0.875rem] leading-6 whitespace-nowrap">
                             {t('home:landing:buy_nain')}
                         </Button>
                     </div>
