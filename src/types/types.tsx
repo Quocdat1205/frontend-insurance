@@ -11,6 +11,6 @@ export interface OptionNotify {
     id?: string | number
     button?: any
 }
-export interface Notify {
+export interface Toast {
     show: (type: string, messages: string, option?: OptionNotify) => void
 }

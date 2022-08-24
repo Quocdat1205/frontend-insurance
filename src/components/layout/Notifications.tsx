@@ -1,78 +1,50 @@
-import { SuccessCircleIcon, ErrorIcon } from 'components/common/Svg/SvgIcon'
-import React, { forwardRef, useImperativeHandle } from 'react'
-import { toast, Toaster, ToastBar, resolveValue } from 'react-hot-toast'
-import colors from 'styles/colors'
-import { OptionNotify } from 'types/types'
-import { Transition } from '@headlessui/react'
-import { useState } from 'react'
+import { Popover, Transition } from '@headlessui/react'
+import { NotificationsIcon } from 'components/common/Svg/SvgIcon'
+import React, { Fragment } from 'react'
+import InlineSVG from 'react-inlinesvg'
 
-const Notifications = forwardRef((props, ref) => {
-    const [button, setButton] = useState<any>(null)
-
-    useImperativeHandle(ref, () => ({
-        show: onShow,
-    }))
-
-    const onShow = (type: string, messages: string, option: OptionNotify) => {
-        const { icon, style } = getOption(type)
-        toast.dismiss();
-        setButton(option?.button)
-        toast(messages, {
-            icon: icon,
-            style: style,
-            duration: option?.duration || 3000,
-            className: '',
-        })
-    }
-
-    const getOption = (type: string) => {
-        const style: any = {
-            background: colors.txtPrimary,
-            color: colors.white.white,
-        }
-        switch (type) {
-            case 'success':
-                return {
-                    icon: <SuccessCircleIcon />,
-                    style,
-                }
-            case 'error':
-                style.background = colors.error
-                return {
-                    icon: <ErrorIcon />,
-                    style,
-                }
-            default:
-                return {
-                    icon: <SuccessCircleIcon />,
-                }
-        }
-    }
-
+const Notifications = () => {
     return (
-        <Toaster containerClassName="!top-[6.25rem]">
-            {({ icon, message, visible, style, className }: any) => (
-                <Transition
-                    appear
-                    show={visible}
-                    style={style}
-                    className={`${className} transform flex items-center rounded-[3px] space-x-9 px-6 py-4 leading-6`}
-                    enter="transition-all duration-150"
-                    enterFrom="opacity-0 scale-50"
-                    enterTo="opacity-100 scale-100"
-                    leave="transition-all duration-150"
-                    leaveFrom="opacity-100 scale-100"
-                    leaveTo="opacity-0 scale-75"
-                >
-                    <div className="flex items-center space-x-2">
-                        {icon}
-                        <div className="">{message}</div>
-                    </div>
-                    {button}
-                </Transition>
+        <Popover className="relative">
+            {({ open }) => (
+                <>
+                    <Popover.Button type="button" className="inline-flex items-center focus:outline-none" aria-expanded="false">
+                        <div className="p-2 bg-hover rounded-[3px] relative">
+                            <NotificationsIcon />
+                            <div className="bg-red w-2 h-2 rounded-[50%] absolute top-[30%] right-[30%]" />
+                        </div>
+                    </Popover.Button>
+                    <Transition
+                        show={open}
+                        as={Fragment}
+                        enter="transition ease-out duration-200"
+                        enterFrom="opacity-0 translate-y-1"
+                        enterTo="opacity-100 translate-y-0"
+                        leave="transition ease-in duration-150"
+                        leaveFrom="opacity-100 translate-y-0"
+                        leaveTo="opacity-0 translate-y-1"
+                    >
+                        <Popover.Panel static className="absolute z-10 mt-3 shadow-subMenu rounded-xl min-w-[360px] py-1 bg-white">
+                            <div className="overflow-hidden font-normal">
+                                <div className="flex items-center px-6 py-4 space-x-4">
+                                    <div className="min-w-[40px] min-h-[40px]">
+                                        <img src="/images/icons/ic_noti_active.png" width="40" height="40" />
+                                    </div>
+                                    <div className="flex flex-col space-y-[2px]">
+                                        <div className="text-sm">
+                                            Hợp đồng bảo hiểm mã <span className="text-red">22160725070001</span> đã kết thúc khi thông báo chưa đọc
+                                        </div>
+                                        <span className="text-xs leading-[1rem] text-gray">Bây giờ</span>
+                                    </div>
+                                    <div className="min-w-[6px] min-h-[6px] bg-red rounded-[50%]" />
+                                </div>
+                            </div>
+                        </Popover.Panel>
+                    </Transition>
+                </>
             )}
-        </Toaster>
+        </Popover>
     )
-})
+}
 
 export default Notifications

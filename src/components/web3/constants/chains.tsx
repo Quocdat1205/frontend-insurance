@@ -6,6 +6,7 @@ export const Chains: ChainDataList = {
         chain: 'ETH',
         network: 'mainnet',
         networkId: 1,
+        icon: '/images/icons/ic_ethereum.png',
     },
     2: {
         chainId: 2,
@@ -174,6 +175,7 @@ export const Chains: ChainDataList = {
         chain: 'BSC',
         network: 'binance-testnet',
         networkId: 97,
+        icon: '/images/icons/ic_binance.png',
     },
     99: {
         chainId: 99,

@@ -5,14 +5,16 @@ import { PORTAL_MODAL_ID } from 'utils/constants'
 
 interface LayoutWeb3 {
     children: ReactNode
+    sponsor: boolean
+    widthLayout?: boolean
 }
 
-const LayoutWeb3 = ({ children }: LayoutWeb3) => {
+const LayoutWeb3 = ({ children, sponsor, widthLayout = false }: LayoutWeb3) => {
     return (
         <>
             <Header />
-            {children}
-            <Footer />
+            <div className={widthLayout ? 'max-w-screen-layout m-auto' : ''}> {children}</div>
+            <Footer sponsor={sponsor} />
             <div id={PORTAL_MODAL_ID} />
         </>
     )

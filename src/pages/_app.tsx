@@ -6,14 +6,14 @@ import MetaMaskProvider from 'components/web3/MetaMaskProvider'
 import 'types/declare'
 import store from 'redux/store'
 import { appWithTranslation } from 'next-i18next'
-import Notifications from 'components/layout/Notifications'
+import Toast from 'components/layout/Toast'
 import Config from 'config/config'
 import AlertModal from 'components/common/Modal/AlertModal'
 
 function MyApp({ Component, pageProps }: AppProps) {
     return (
         <Provider store={store}>
-            <Notifications ref={(ref: any) => (Config.notify = ref)} />
+            <Toast ref={(ref: any) => (Config.toast = ref)} />
             <AlertModal portalId="alert-modal" ref={(ref: any) => (Config.alert = ref)} />
             <Head />
             <MetaMaskProvider>

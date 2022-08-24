@@ -18,6 +18,11 @@ export type ConnectorInfo = {
     name: string
     connector: Connector
 }
+export const wallets = {
+    metaMask: 'metaMask',
+    walletConnect: 'walletConnect',
+    coinbaseWallet: 'coinbaseWallet',
+}
 export type ConnectorId = 'metaMask' | 'walletConnect' | 'coinbaseWallet'
 export type ConnectorsData = Record<ConnectorId, ConnectorInfo>
 export type ChainData = {
@@ -25,6 +30,7 @@ export type ChainData = {
     chain: string
     network: string
     networkId: number
+    icon?: any
 }
 export type ChainDataList = {
     [chainId: number]: ChainData
@@ -66,22 +72,16 @@ export const CHAINS: {
     },
 
     42: {
-        urls: [
-            'https://kovan.infura.io/ws/v3/f87b967bc65a41c0a1a25635493fa482',
-        ],
+        urls: ['https://kovan.infura.io/ws/v3/f87b967bc65a41c0a1a25635493fa482'],
         name: 'Kovan',
     },
 }
 
-function isExtendedChainInformation(
-    chainInformation: BasicChainInformation | ExtendedChainInformation,
-): chainInformation is ExtendedChainInformation {
+function isExtendedChainInformation(chainInformation: BasicChainInformation | ExtendedChainInformation): chainInformation is ExtendedChainInformation {
     return !!(chainInformation as ExtendedChainInformation).nativeCurrency
 }
 
-export function getAddChainParameters(
-    chainId: number,
-): AddEthereumChainParameter | number {
+export function getAddChainParameters(chainId: number): AddEthereumChainParameter | number {
     const chainInformation = CHAINS[chainId]
     if (isExtendedChainInformation(chainInformation)) {
         return {
@@ -95,8 +95,6 @@ export function getAddChainParameters(
     return chainId
 }
 
-export const etherToWei = (amount: number | string) =>
-    ethers.utils.parseEther(amount.toString())
+export const etherToWei = (amount: number | string) => ethers.utils.parseEther(amount.toString())
 
-export const weiToEther = (wei: string | BigNumber) =>
-    parseFloat(ethers.utils.formatEther(wei))
+export const weiToEther = (wei: string | BigNumber) => parseFloat(ethers.utils.formatEther(wei))

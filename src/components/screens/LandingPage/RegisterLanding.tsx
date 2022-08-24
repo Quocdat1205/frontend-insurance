@@ -23,7 +23,7 @@ const RegisterLanding = () => {
         if (!email || loading) return
         const regex = Config.pattern('email')
         if (!regex.test(email)) {
-            Config.notify.show('error', t('home:landing:email_invalid'))
+            Config.toast.show('error', t('home:landing:email_invalid'))
             return
         }
         setLoading(true)
@@ -36,7 +36,7 @@ const RegisterLanding = () => {
             if (data) {
                 setVisible(true)
             } else {
-                Config.notify.show('error', message)
+                Config.toast.show('error', message)
             }
         } catch (e) {
             console.log(e)

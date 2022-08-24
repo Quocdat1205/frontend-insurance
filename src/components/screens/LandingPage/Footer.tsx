@@ -2,16 +2,22 @@ import { useTranslation } from 'next-i18next'
 import React from 'react'
 import styled from 'styled-components'
 
-const Footer = () => {
+interface Footer {
+    sponsor: boolean
+}
+
+const Footer = ({ sponsor = true }) => {
     const { t } = useTranslation()
     return (
         <footer className="footer pt-20 sm:pt-[7.5rem]">
-            <BgSponsor>
-                <div className="text-white font-bold text-sm sm:text-xl">{t('home:landing:products_sponsored_by')}</div>
-                <div className="max-w-[230px]">
-                    <img src="/images/screens/landing-page/ic_logo_nami_foundation.png" />
-                </div>
-            </BgSponsor>
+            {sponsor && (
+                <BgSponsor>
+                    <div className="text-white font-bold text-sm sm:text-xl">{t('home:landing:products_sponsored_by')}</div>
+                    <div className="max-w-[230px]">
+                        <img src="/images/screens/landing-page/ic_logo_nami_foundation.png" />
+                    </div>
+                </BgSponsor>
+            )}
             <div className="bg-white-2 px-10 py-12 ">
                 <div className="max-w-screen-layout m-auto">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between">

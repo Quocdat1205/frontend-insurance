@@ -145,33 +145,12 @@ module.exports = {
                 },
             ], // Heading 4 28px
             '4xl': [
-                '2.25rem',
+                '2rem',
                 {
                     letterSpacing: '0.5px',
-                    lineHeight: '3.5rem',
+                    lineHeight: '2.75rem',
                 },
-            ], // Heading 3 36px
-            '5xl': [
-                '2.5rem',
-                {
-                    letterSpacing: '0.5px',
-                    lineHeight: '3.5rem',
-                },
-            ], // Heading 2 40px
-            '6xl': [
-                '4rem',
-                {
-                    letterSpacing: '0.5px',
-                    lineHeight: '4.5rem',
-                },
-            ], // Heading 1 64px
-            '5.5xl': [
-                '3.5rem',
-                {
-                    letterSpacing: '0.5px',
-                    lineHeight: '4.25rem',
-                },
-            ], // Heading 2 56px
+            ], // Heading 3 32px
         },
         // TODO split text, background
         colors: {
@@ -183,6 +162,8 @@ module.exports = {
             btnOutline: '#FFF4F5',
             shadow: '#3D4251',
             hover: '#F7F8FA',
+            error: '#E5544B',
+            success: '#52CC74',
             bgModal: commonColors.bgModal,
             red: {
                 DEFAULT: commonColors.red.red,

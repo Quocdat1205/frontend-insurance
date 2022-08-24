@@ -3,34 +3,22 @@ import { Connector } from '@web3-react/types'
 import { WalletConnect } from '@web3-react/walletconnect'
 import { ethers, providers } from 'ethers'
 import React, { useEffect, useMemo, ReactNode } from 'react'
-
-import {
-    getConnectorInfo,
-    CHAINS,
-    getAddChainParameters,
-    ConnectorId,
-    ConnectorsData,
-} from 'components/web3/Web3Types'
+import { getConnectorInfo, CHAINS, getAddChainParameters, ConnectorId, ConnectorsData } from 'components/web3/Web3Types'
 import { ContractCaller } from 'components/web3/contract/index'
 import { Web3WalletContext } from 'hooks/useWeb3Wallet'
+import { useAppDispatch } from 'redux/store'
+import { setProfile } from 'redux/actions/setting'
 
-const useWeb3WalletState = (
-    connectorsData: Record<
-        ConnectorId,
-        { id: ConnectorId; name: string; connector: Connector }
-    >,
-) => {
-    const { connector, account, chainId, isActive, error, provider } =
-        useWeb3React()
+const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorId; name: string; connector: Connector }>) => {
+    const { connector, account, chainId, isActive, error, provider } = useWeb3React()
+    const dispatch = useAppDispatch()
 
     const activate = async (connectorId: ConnectorId, _chainId?: number) => {
         const { connector: _connector } = connectorsData[connectorId]
         _connector.deactivate()
         _connector instanceof WalletConnect
             ? await _connector.activate(_chainId)
-            : await _connector.activate(
-                  !_chainId ? undefined : getAddChainParameters(_chainId),
-              )
+            : await _connector.activate(!_chainId ? undefined : getAddChainParameters(_chainId))
     }
 
     const deactivate = () => {
@@ -41,13 +29,7 @@ const useWeb3WalletState = (
         connector.connectEagerly && connector.connectEagerly()
     }, [connector])
 
-    const contractCaller = useMemo(
-        () =>
-            provider
-                ? new ContractCaller(provider as providers.Web3Provider)
-                : null,
-        [provider],
-    )
+    const contractCaller = useMemo(() => (provider ? new ContractCaller(provider as providers.Web3Provider) : null), [provider])
 
     // const { data: balance } = useQuery(
     //     "balance",
@@ -66,11 +48,7 @@ const useWeb3WalletState = (
     }
 
     const getBalance = async () => {
-        const balance =
-            provider &&
-            (await provider!
-                .getBalance(account!)
-                .then((res) => parseFloat(ethers.utils.formatEther(res))))
+        const balance = provider && (await provider!.getBalance(account!).then((res) => parseFloat(ethers.utils.formatEther(res))))
         return balance
     }
 
@@ -99,21 +77,13 @@ const useWeb3WalletState = (
     }
 }
 
-function Web3WalletStateProvider({
-    children,
-    connectorsData,
-}: {
-    children: ReactNode
-    connectorsData: ConnectorsData
-}) {
+function Web3WalletStateProvider({ children, connectorsData }: { children: ReactNode; connectorsData: ConnectorsData }) {
     const state = useWeb3WalletState(connectorsData)
     return (
         // cloneElement(children, {
         //     web3: state,
         // })
-        <Web3WalletContext.Provider value={state}>
-            {children}
-        </Web3WalletContext.Provider>
+        <Web3WalletContext.Provider value={state}>{children}</Web3WalletContext.Provider>
     )
 }
 

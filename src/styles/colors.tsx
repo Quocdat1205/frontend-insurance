@@ -47,7 +47,9 @@ const colors = {
         3: '#F2F3F4',
     },
     txtPrimary: '#22313F',
+    txtSecondary: '#808890',
     error: '#E5544B',
+    success: '#52CC74',
 }
 
 export default colors

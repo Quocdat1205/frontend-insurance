@@ -1,13 +1,19 @@
+import { wallets } from 'components/web3/Web3Types'
 import env from 'config/env'
 import { Ref } from 'react'
-import { Notify } from 'types/types'
+import { Toast } from 'types/types'
 
 class Config {
     static env = env
 
     static client = typeof window !== 'undefined'
-    static notify: Notify
-    static alert: Notify
+    static toast: Toast
+    static alert: Toast
+    static web3: any
+
+    static connectWallet = (wallet: string = wallets.metaMask) => {
+        Config.web3?.activate(wallet)
+    }
 
     static blogUrl: { nami_exchange: string; nami_today: string } = {
         nami_exchange: 'https://nami.exchange',
