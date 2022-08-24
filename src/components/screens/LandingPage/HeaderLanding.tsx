@@ -3,12 +3,11 @@ import { MenuIcon, RightArrow } from 'components/common/Svg/SvgIcon'
 import React, { useState } from 'react'
 import useWindowSize from 'hooks/useWindowSize'
 import { useTranslation } from 'next-i18next'
-import styled from 'styled-components'
-import classnames from 'classnames'
 import Drawer from 'components/layout/Drawer'
 import { useRouter } from 'next/router'
 import Button from 'components/common/Button/Button'
 import Menu from 'components/common/Menu/Menu'
+import { X } from 'react-feather'
 
 const HeaderLanding = () => {
     const router = useRouter()
@@ -49,7 +48,7 @@ const HeaderLanding = () => {
                                 <RightArrow />
                             </Button>
                             <div className="cursor-pointer" onClick={() => setVisible(!visible)}>
-                                <MenuIcon />
+                                {visible ? <X /> : <MenuIcon />}
                             </div>
                         </>
                     )}

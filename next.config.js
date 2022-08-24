@@ -21,15 +21,9 @@ const nextConfig = withPlugins([[withBundleAnalyzer], [withFonts]], {
     sassOptions: {
         includePaths: [path.join(__dirname, 'styles')],
     },
-    // images: {
-    //   domains: [
-    //     'test.nami.exchange',
-    //     'static.namifutures.com',
-    //     'sgp1.digitaloceanspaces.com',
-    //     'nami.io',
-    //     'datav2.nami.exchange',
-    //   ],
-    // },
+    images: {
+        domains: ['blog.nami.today'],
+    },
     distDir: process.env.BUILD_DIR || 'build',
     styledComponents: true,
     webpack(config) {

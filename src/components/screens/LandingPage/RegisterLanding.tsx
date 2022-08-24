@@ -23,7 +23,7 @@ const RegisterLanding = () => {
         if (!email || loading) return
         const regex = Config.pattern('email')
         if (!regex.test(email)) {
-            Config.notify.show('error', t('home:landing:email_invalid'))
+            Config.toast.show('error', t('home:landing:email_invalid'))
             return
         }
         setLoading(true)
@@ -36,7 +36,7 @@ const RegisterLanding = () => {
             if (data) {
                 setVisible(true)
             } else {
-                Config.notify.show('error', message)
+                Config.toast.show('error', message)
             }
         } catch (e) {
             console.log(e)
@@ -47,7 +47,7 @@ const RegisterLanding = () => {
 
     return (
         <section className="px-4 lg:px-20">
-            {visible && <SuccessModal onClose={() => setVisible(false)} t={t} />}
+            <SuccessModal isVisible={visible} onClose={() => setVisible(false)} t={t} />
             <div className="max-w-screen-insurance m-auto register-landing flex items-center justify-center pt-20 sm:pt-[7.5rem]">
                 <Background isMobile={isMobile}>
                     <div className="font-semibold text-2xl sm:text-[2.5rem] leading-8 sm:leading-10 mb-2 text-red">{t('home:landing:stay_up_to_date')}</div>
@@ -71,11 +71,11 @@ const RegisterLanding = () => {
     )
 }
 
-const SuccessModal = ({ onClose, t }: any) => {
+const SuccessModal = ({ isVisible, onClose, t }: any) => {
     return (
         <Modal
             portalId="modal"
-            isVisible={true}
+            isVisible={isVisible}
             onBackdropCb={onClose}
             className="rounded-xl p-6 bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         >

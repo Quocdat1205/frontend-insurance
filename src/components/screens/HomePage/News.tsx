@@ -6,38 +6,41 @@ import 'swiper/css/pagination'
 import CardShadow from 'components/common/Card/CardShadow'
 import { formatTime } from 'utils/utils'
 import { useTranslation } from 'next-i18next'
+import Config from 'config/config'
+import Link from 'next/link'
 
-const News = () => {
-    const { t } = useTranslation()
+const News = ({ news = [] }: any) => {
+    const {
+        t,
+        i18n: { language },
+    } = useTranslation()
     const [mount, setMount] = useState(false)
 
     useEffect(() => {
         setMount(true)
     }, [])
 
-    const news = [
-        { img: '/images/screens/home/img_news.png', category: 'TIN TỨC ', title: 'Nami Insurance - Bảo vệ tài sản số của bạn', time: new Date() },
-        { img: '/images/screens/home/img_news.png', category: 'TIN TỨC ', title: 'Nami Insurance - Bảo vệ tài sản số của bạn', time: new Date() },
-        { img: '/images/screens/home/img_news.png', category: 'TIN TỨC ', title: 'Nami Insurance - Bảo vệ tài sản số của bạn', time: new Date() },
-        { img: '/images/screens/home/img_news.png', category: 'TIN TỨC ', title: 'Nami Insurance - Bảo vệ tài sản số của bạn', time: new Date() },
-    ]
-
     const renderNews = () => {
         const html: any = []
         news.map((item: any, index: number) => {
+            const url = Config.blogUrl.nami_today + `/${item.slug}`
             html.push(
                 <SwiperSlide key={index}>
-                    <CardShadow className="p-4">
-                        <div className="rounded-xl mb-6">
-                            <img src={item.img} />
-                        </div>
-                        <div className="flex items-center text-sm mb-1">
-                            <span>{item.category}</span>
-                            &nbsp;/&nbsp;
-                            <span className="text-gray">{formatTime(item.time, 'dd.MM.yyyy')}</span>
-                        </div>
-                        <div className="text-xl font-medium">{item.title}</div>
-                    </CardShadow>
+                    <Link href={url}>
+                        <a target="_blank">
+                            <CardShadow className="p-4 min-h-[280px] cursor-pointer">
+                                <div className="rounded-xl mb-6 ">
+                                    <img src={item.feature_image} className="h-[140px] w-full rounded-xl" />
+                                </div>
+                                <div className="flex items-center text-sm mb-1">
+                                    <span>{item.primary_tag.name}</span>
+                                    &nbsp;/&nbsp;
+                                    <span className="text-gray">{formatTime(item.created_at, 'dd.MM.yyyy')}</span>
+                                </div>
+                                <div title={item.title} className="text-xl font-medium  line-clamp-2 min-h-[56px]">{item.title}</div>
+                            </CardShadow>
+                        </a>
+                    </Link>
                 </SwiperSlide>,
             )
         })
@@ -63,12 +66,12 @@ const News = () => {
                 className="mySwiper !px-4 !py-8"
                 slidesPerView={4}
                 breakpoints={{
-                    320: {
+                    300: {
                         slidesPerView: 1,
                         spaceBetween: 16,
                     },
                     640: {
-                        slidesPerView: 2,
+                        slidesPerView: 3,
                         spaceBetween: 16,
                     },
                     1080: {
