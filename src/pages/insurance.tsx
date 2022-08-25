@@ -1,10 +1,12 @@
 import {useEffect, useState} from 'react'
 import useWindowSize from "hooks/useWindowSize";
 import {screens} from "utils/constants";
-import {CheckCircle, LeftArrow} from "components/common/Svg/SvgIcon";
+import {CheckCircle, LeftArrow, ErrorMessage} from "components/common/Svg/SvgIcon";
 import {useTranslation} from "next-i18next";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import dynamic from 'next/dynamic'
+import Config from 'config/config'
+import throttle from 'lodash/throttle'
 
 //layout
 import LayoutInsurance from 'components/layout/layoutInsurance'
@@ -18,9 +20,15 @@ import {Input} from "components/common/Input/input";
 //interface
 import {ICoin} from "components/common/Input/input.interface";
 import Button from "components/common/Button/Button";
+import Toast from "components/layout/Toast";
 
 //chart
 const ChartComponent = dynamic(() => import("../components/common/Chart/chartComponent"), { ssr: false });
+
+const testdefault = {
+    address: '0x77C52F41b77711FcE24D47b4fA1f5012D76bC0D4',
+    USDT: 15000
+}
 
 const Insurance = () => {
     const {t} = useTranslation()
@@ -31,15 +39,18 @@ const Insurance = () => {
     const [percentInsurance,setPercentInsurance] = useState<number>(0)
     const [selectTime,setSelectTime] = useState<string>('ALL')
     const [selectPeriod, setSelectPeriod] = useState<number>(2)
+    const [isLoading, setLoading] = useState(false)
+
+    const [index,setIndex] = useState<1|2>(1)
 
     const [state, setState] = useState({
         margin: 0,
         typeCoin: {},
         period: 0,
-        percentClaim: 0,
         p_claim: 0,
         q_claim: 0,
         r_claim: 0,
+        q_covered: 0,
     });
 
     const listCoin: ICoin[] = [
@@ -78,10 +89,9 @@ const Insurance = () => {
 
     useEffect(() => {
         if(iCoin && iCoin > 0){
-            setState({...state,margin: iCoin})
-        }
-        if(percentInsurance && percentInsurance > 25 ){
-            setState({...state,percentClaim: percentInsurance})
+            setState({...state,q_covered: iCoin})
+            const percent : number = Number((iCoin/testdefault.USDT*100).toFixed(2))
+            setPercentInsurance(percent)
         }
         if(selectPeriod && selectPeriod > 2){
             setState({...state,period: selectPeriod})
@@ -89,8 +99,18 @@ const Insurance = () => {
         if(selectCoin){
             setState({...state,typeCoin: selectCoin})
         }
-    }, [iCoin, percentInsurance, selectPeriod, selectCoin]);
-    console.log(state)
+
+        handleCheckValidate()
+    }, [iCoin, selectPeriod, selectCoin]);
+
+    const handleCheckValidate =  () => {
+        if (!iCoin || isLoading) return
+        if (iCoin > testdefault.USDT) {
+            Config.toast.show('error', t('insurance:buy:input_invalid'))
+            return
+        }
+
+    }
 
 
 
@@ -123,6 +143,10 @@ const Insurance = () => {
 
                 {
                     //title
+                    <div className={'flex flex-col justify-center items-center mt-[20px] mb-[32px] '}>
+                        <div>{index}/2</div>
+                        <div className={'font-semibold text-[32px] leading-[44px]'}>Mua bảo hiểm</div>
+                    </div>
                 }
                 {
                     //chart
@@ -135,16 +159,24 @@ const Insurance = () => {
                                 type={'number'}
                                 inputName={'Loại tài sản và số lượng tài sản'}
                                 idInput={'iCoin'}
-                                value={iCoin}
+                                value={iCoin && iCoin}
                                 onChange={(a:any) => {
-                                    if(a.target.value <= 0 || a.target.value.length <=0) {
-                                        setICoin(undefined)
+                                    if(a.target.value*1 < 0 || a.target.value.length <=0 ) {
+                                        setICoin(0)
                                     }else {
                                         setICoin(a.target.value.replace(/^0+/, ''))
+                                    }
+                                    setPercentInsurance(0)
+
+                                    if(a.target.value*1 > testdefault.USDT){
+                                        return setICoin(testdefault.USDT)
                                     }
                                 }}
                                 placeholder={'0'}
                             />
+                            <div>
+                                <Toast/>
+                            </div>
                             <Popover className="relative w-[25%] outline-none bg-[#F7F8FA] focus:ring-0 rounded-none shadow-none flex items-center justify-center pr-[21px]"                            >
                                 <Popover.Button
                                     id={'popoverInsurance'}
@@ -200,19 +232,19 @@ const Insurance = () => {
 
                         </div>
                         <div className={'flex flex-row justify-between mt-[8px]'}>
-                            <div className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'} onClick={() => setPercentInsurance(25)}>
-                                <div className={`${ 25 <= percentInsurance && percentInsurance < 50 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}/>
+                            <div className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'} onClick={() => setICoin(25/100*testdefault.USDT)}>
+                                <div className={`${ percentInsurance == 25 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}/>
                                 <span>25%</span>
                             </div>
-                            <div className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'} onClick={() => setPercentInsurance(50)}>
-                                <div className={`${50 <= percentInsurance && percentInsurance < 75 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}/>
+                            <div className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'} onClick={() => setICoin(50/100*testdefault.USDT)}>
+                                <div className={`${50 == percentInsurance ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}/>
                                 <span className={''}>50%</span>
                             </div>
-                            <div className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'} onClick={() => setPercentInsurance(75)}>
-                                <div className={`${75 <= percentInsurance && percentInsurance < 100 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}/>
+                            <div className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'} onClick={() => setICoin(75/100*testdefault.USDT)}>
+                                <div className={`${75 == percentInsurance  ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}/>
                                 <span className={''}>75%</span>
                             </div>
-                            <div className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'} onClick={() => setPercentInsurance(100)}>
+                            <div className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'} onClick={() => setICoin(testdefault.USDT)}>
                                 <div className={`${percentInsurance == 100 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}/>
                                 <span>100%</span>
                             </div>

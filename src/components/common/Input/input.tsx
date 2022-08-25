@@ -11,6 +11,7 @@ export type InputProps = {
     className: string;
     checked: boolean;
     disabled: boolean;
+    onKeyDown: any;
 };
 
 export const Input = ({
@@ -23,6 +24,7 @@ export const Input = ({
      className,
      checked,
      disabled = false,
+     onKeyDown,
      }: Partial<InputProps>) => {
     return (
         <React.Fragment>
@@ -39,6 +41,8 @@ export const Input = ({
                 onChange={onChange}
                 checked={checked}
                 disabled={disabled}
+                min={type == 'number' ? 0 : undefined}
+                onKeyDown={onKeyDown}
             />
         </React.Fragment>
     );

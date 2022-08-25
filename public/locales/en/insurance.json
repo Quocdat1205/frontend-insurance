@@ -1,0 +1,26 @@
+{
+    "buy": {
+        "home": "Home",
+        "buy_covered": "Buy covered",
+        "back_to_home": "Back to Home",
+        "default": "Default",
+        "change_r_claim": "Change R-Claim",
+        "change_q_claim": "Change Q-Claim",
+        "change_margin": "Change Margin",
+        "covered_history": "History covered",
+        "help": "FAQ buy insurance",
+        "quality_and_type": "Crypto and quality",
+        "continue": "Continue",
+        "saved": "Save",
+        "sub_saved": "compared to no insurance",
+        "info_covered": "Insurance deposit information",
+        "day": "Day",
+        "accept_buy": "With accept you have agree to",
+        "accept_buy_sub": "the terms and conditions",
+        "accept_buy_copyright": "of Nami Insurance",
+        "notified": "Get 100% Margin when P-Market from",
+        "notified_sub": "at the last day of period.",
+        "price_had_update": "Price had updated",
+        "accept": "Accept"
+    }
+}

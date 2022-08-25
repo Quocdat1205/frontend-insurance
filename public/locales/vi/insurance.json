@@ -1,0 +1,26 @@
+{
+    "buy": {
+        "home": "Trang chủ",
+        "buy_covered": "Mua bảo hiểm",
+        "back_to_home": "Về trang chủ",
+        "default": "Mặc định",
+        "change_r_claim": "Tùy chỉnh R-Claim",
+        "change_q_claim": "Tùy chỉnh Q-Claim",
+        "change_margin": "Tùy chỉnh Margin",
+        "insurance_history": "Lịch sử bảo hiểm",
+        "help": "Hướng dẫn mua bảo hiểm",
+        "quality_and_type": "Loại tài sản và số lượng tài sản",
+        "continue": "Tiếp tục",
+        "saved": "Tiết kiệm",
+        "sub_saved": "so với không mua bảo hiểm",
+        "info_covered": "Thông tin ký quỹ bảo hiểm",
+        "day": "Ngày",
+        "accept_buy": "Bằng việc bấm xác nhận, bạn đã đồng ý với",
+        "accept_buy_sub": "Điều khoản dịch vụ",
+        "accept_buy_copyright": "của Nami Insurance",
+        "notified": "Nhận 100% Margin khi P-Market đạt từ",
+        "notified_sub": "vào ngày cuối kỳ hạn.",
+        "price_had_update": "Giá đã được cập nhật",
+        "accept": "Xác nhận"
+    }
+}
