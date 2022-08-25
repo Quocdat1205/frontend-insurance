@@ -9,18 +9,19 @@
         "change_margin": "Tùy chỉnh Margin",
         "insurance_history": "Lịch sử bảo hiểm",
         "help": "Hướng dẫn mua bảo hiểm",
-        "quality_and_type": "Loại tài sản và số lượng tài sản",
+        "quality_and_type": "Q-Covered",
         "continue": "Tiếp tục",
         "saved": "Tiết kiệm",
         "sub_saved": "so với không mua bảo hiểm",
         "info_covered": "Thông tin ký quỹ bảo hiểm",
         "day": "Ngày",
-        "accept_buy": "Bằng việc bấm xác nhận, bạn đã đồng ý với",
-        "accept_buy_sub": "Điều khoản dịch vụ",
-        "accept_buy_copyright": "của Nami Insurance",
+        "accept_buy": "Tôi đồng ý với",
+        "accept_buy_sub": "điều khoản địch vụ",
         "notified": "Nhận 100% Margin khi P-Market đạt từ",
         "notified_sub": "vào ngày cuối kỳ hạn.",
-        "price_had_update": "Giá đã được cập nhật",
-        "accept": "Xác nhận"
+        "price_had_update": "Giá hiện tại đã được cập nhật",
+        "accept": "Xác nhận",
+        "period": "Period",
+        "increase_cover": "Gia tăng kỳ hạn và giá trị chi trả bảo hiểm"
     }
 }
