@@ -22,6 +22,7 @@ const commonColors = {
         2: '#99DFFF',
         3: '#5CCBFF',
         4: '#0070A3',
+        5: '#3960E6',
     },
     violet: {
         violet: '#5C17FF',
@@ -43,6 +44,7 @@ const commonColors = {
         2: '#FFF98C',
         3: '#F8F068',
         4: '#E8DF3F',
+        5: '#FBCD2D',
     },
     white: {
         white: colors.white,

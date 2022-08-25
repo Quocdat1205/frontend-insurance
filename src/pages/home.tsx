@@ -8,12 +8,17 @@ import { GetStaticProps } from 'next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
 import { getArticles } from 'utils/utils'
+import { useTranslation } from 'next-i18next'
 
 const Home = ({ news }: any) => {
+    const { t } = useTranslation()
     return (
         <LayoutWeb3>
             <Slogan />
-            <Assets />
+            <section className="pt-20 sm:pt-[7.5rem] px-4 max-w-screen-insurance m-auto">
+                <div className="text-2xl sm:text-5xl font-semibold mb-6">{t('home:home:new_insurance_assets')}</div>
+                <Assets />
+            </section>
             <Banner />
             <News news={news} />
             <RegisterLanding />

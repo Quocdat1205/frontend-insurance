@@ -19,7 +19,6 @@ const Header = () => {
     const { t } = useTranslation()
     const { account, chain } = useWeb3Wallet()
     const { width } = useWindowSize()
-    const profile = useSelector((state: RootStore) => state.setting.profile)
 
     const isMobile = width && width < screens.drawer
     const menu = [

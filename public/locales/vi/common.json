@@ -1,4 +1,10 @@
 {
     "please_connect_your_wallet": "Vui lòng kết nối ví để sử dụng tính năng này",
-    "connect_now": "Kết nối ngay"
+    "connect_now": "Kết nối ngay",
+    "status": {
+        "expired": "Đã hết hạn",
+        "available": "Còn hiệu lực",
+        "payout_waiting": "Chờ chi trả",
+        "paid": "Chờ chi trả"
+    }
 }

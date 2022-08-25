@@ -6,12 +6,10 @@ import React, { useEffect, useMemo, ReactNode } from 'react'
 import { getConnectorInfo, CHAINS, getAddChainParameters, ConnectorId, ConnectorsData } from 'components/web3/Web3Types'
 import { ContractCaller } from 'components/web3/contract/index'
 import { Web3WalletContext } from 'hooks/useWeb3Wallet'
-import { useAppDispatch } from 'redux/store'
-import { setProfile } from 'redux/actions/setting'
+import Config from 'config/config'
 
 const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorId; name: string; connector: Connector }>) => {
     const { connector, account, chainId, isActive, error, provider } = useWeb3React()
-    const dispatch = useAppDispatch()
 
     const activate = async (connectorId: ConnectorId, _chainId?: number) => {
         const { connector: _connector } = connectorsData[connectorId]
@@ -79,6 +77,7 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
 
 function Web3WalletStateProvider({ children, connectorsData }: { children: ReactNode; connectorsData: ConnectorsData }) {
     const state = useWeb3WalletState(connectorsData)
+    Config.web3 = state
     return (
         // cloneElement(children, {
         //     web3: state,

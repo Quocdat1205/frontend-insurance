@@ -1,3 +1,5 @@
+import colors from 'styles/colors'
+
 export const RightArrow = () => {
     return (
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -55,6 +57,15 @@ export const TendencyIcon = () => {
     return (
         <svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M7.04069 3.5415V4.95817H11.7086L3.49902 13.1678L4.49777 14.1665L12.7074 5.95692V10.6248H14.124V3.5415H7.04069Z" fill="#52CC74" />
+        </svg>
+    )
+}
+
+export const SortIcon = ({ size = 14, color = '#C4C4C4', activeColor = colors.red.red, direction }: any) => {
+    return (
+        <svg width={size} height={size} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 3L9.59808 6H4.40192L7 3Z" fill={direction === 'asc' ? activeColor : color} />
+            <path d="M7 11L4.40192 8L9.59808 8L7 11Z" fill={direction === 'desc' ? activeColor : color} />
         </svg>
     )
 }

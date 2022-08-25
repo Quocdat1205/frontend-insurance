@@ -3,7 +3,6 @@ import isNil from 'lodash/isNil'
 import numeral from 'numeral'
 import Config from 'config/config'
 import GhostContentAPI from '@tryghost/content-api'
-import { wallets } from 'components/web3/Web3Types'
 
 export const getS3Url = (url: string) => Config.env.CDN + url
 
@@ -27,8 +26,8 @@ export const formatNumber = (value: number, digits = 2, forceDigits = 0, acceptN
     return numeral(+value).format(`0,0.${'0'.repeat(forceDigits)}${digits > 0 ? `[${'0'.repeat(digits)}]` : ''}`, Math.floor)
 }
 
-export const formatCurrency = (n: number, digits = 4) => {
-    if (n < 1e3) return formatNumber(n, 0, 0, true)
+export const formatCurrency = (n: number, digits = 4, e: number = 1e3) => {
+    if (n < e) return formatNumber(n, digits, 0, true)
     if (n >= 1e3 && n < 1e6) return `${formatNumber(+(n / 1e3).toFixed(4), digits, 0, true)}K`
     if (n >= 1e6 && n < 1e9) return `${formatNumber(+(n / 1e6).toFixed(4), digits, 0, true)}M`
     if (n >= 1e9 && n < 1e12) return `${formatNumber(+(n / 1e9).toFixed(4), digits, 0, true)}B`
