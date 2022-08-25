@@ -29,7 +29,7 @@ export const Input = ({
             <input
                 className={cx([
                     className,
-                    'px-3 py-3 placeholder-gray-400 text-gray-500 rounded text-sm shadow focus:outline-none  ease-linear transition-all duration-150',
+                    'px-3 py-3 placeholder-gray-400 rounded text-sm shadow focus:outline-none  ease-linear transition-all duration-150',
                 ])}
                 name={inputName}
                 id={idInput}
