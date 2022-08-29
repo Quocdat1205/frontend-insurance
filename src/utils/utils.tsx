@@ -85,3 +85,25 @@ export const getArticles = async (tag: string = '', limit: number = 10, language
     options.filter = filter.join('+')
     return await ghost.posts.browse(options)
 }
+
+export const timeMessage = (previous: any) => {
+    const current = Date.now()
+    const msPerMinute = 60 * 1000
+    const msPerHour = msPerMinute * 60
+    const msPerDay = msPerHour * 24
+    const msPerMonth = msPerDay * 30
+    const msPerYear = msPerDay * 365
+
+    const elapsed = current - previous
+
+    if (Math.round(elapsed / 1000) < 15) {
+        if (elapsed < msPerMinute) {
+            return Math.round(elapsed / 1000) + ' giây trước'
+        }
+    }
+    const date = new Date(previous)
+    let tempMinutes
+    date.getMinutes() < 10 ? (tempMinutes = `0${date.getMinutes()}`) : (tempMinutes = `${date.getMinutes()}`)
+
+    return date.getHours() + ':' + tempMinutes + ' ' + date.getDate() + '/' + (date.getMonth() + 1)
+}

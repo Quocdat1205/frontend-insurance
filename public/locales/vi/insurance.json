@@ -22,6 +22,8 @@
         "price_had_update": "Giá hiện tại đã được cập nhật",
         "accept": "Xác nhận",
         "period": "Period",
-        "increase_cover": "Gia tăng kỳ hạn và giá trị chi trả bảo hiểm"
+        "increase_cover": "Gia tăng kỳ hạn và giá trị chi trả bảo hiểm",
+        "example": "Ví dụ: 120.000,1243",
+        "tooltip": "Mức giá (P) kích hoạt nhận Q-Claim"
     }
 }

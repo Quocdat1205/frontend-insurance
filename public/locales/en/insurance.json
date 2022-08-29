@@ -22,6 +22,8 @@
         "price_had_update": "Updated Current Price",
         "accept": "Confirm",
         "period": "Period",
-        "increase_cover": "Increase the cover period and the payout value "
+        "increase_cover": "Increase the cover period and the payout value",
+        "example": "Example: 120.000,1243",
+        "tooltip": "Price (P) activates receiving Q-Claim"
     }
 }
