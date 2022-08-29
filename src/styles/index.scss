@@ -2,12 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "custom";
 @import "fonts";
 
 html {
     @apply font-Manrope;
     @apply text-txtPrimary;
+}
+.bg-gradient {
+    background: linear-gradient(88.09deg, #ce0014 0.48%, #e92828 52.94%, #ff5f6d 114.93%) !important;
+}
+
+.bg-gradient-blue {
+    background: linear-gradient(0deg, rgba(0, 165, 255, 0.1), rgba(0, 165, 255, 0.1)), #ffffff;
+}
+.bg-gradient-green {
+    background: linear-gradient(0deg, rgba(32, 201, 172, 0.1), rgba(32, 201, 172, 0.1)), #ffffff;
+}
+.bg-gradient-gray {
+    background: linear-gradient(0deg, rgba(182, 180, 186, 0.1), rgba(182, 180, 186, 0.1)), #ffffff;
+}
+.bg-gradient-yellow {
+    background: linear-gradient(0deg, rgba(251, 205, 45, 0.1), rgba(251, 205, 45, 0.1)), #ffffff;
 }
 
 .text-gradient {
@@ -73,5 +88,48 @@ html {
     to {
         max-height: 0;
         overflow: hidden;
+    }
+}
+
+#nprogress {
+    pointer-events: none;
+}
+
+#nprogress .bar {
+    @apply bg-red;
+    position: fixed;
+    z-index: 1031;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+}
+
+#nprogress .peg {
+    display: block;
+    position: absolute;
+    right: 0px;
+    width: 100px;
+    height: 100%;
+    opacity: 1;
+
+    -webkit-transform: rotate(3deg) translate(0px, -4px);
+    -ms-transform: rotate(3deg) translate(0px, -4px);
+    transform: rotate(3deg) translate(0px, -4px);
+}
+
+.resizer {
+    @apply bg-divider;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    touch-action: none;
+    // display: none;
+
+    &.isResizing:hover {
+        // display: block;
     }
 }

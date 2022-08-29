@@ -5,12 +5,7 @@
 }
 
 .bg-gradient {
-    background: linear-gradient(
-        88.09deg,
-        #ce0014 0.48%,
-        #e92828 52.94%,
-        #ff5f6d 114.93%
-    ) !important;
+    background: linear-gradient(88.09deg, #ce0014 0.48%, #e92828 52.94%, #ff5f6d 114.93%) !important;
 }
 
 .bg_section1 {
@@ -52,92 +47,87 @@
 
 // breadcrumb
 ul.breadcrumb {
-  padding: 10px 16px;
-  padding-left: 0px !important;
-  list-style: none;
-  background-color: #eee;
+    padding: 10px 16px;
+    padding-left: 0px !important;
+    list-style: none;
+    background-color: #eee;
 }
 
 ul.breadcrumb li {
-  display: inline;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
+    display: inline;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
 }
 
-ul.breadcrumb li+li:before {
-  padding: 8px;
-  color: black;
-  content: ">\00a0";
+ul.breadcrumb li + li:before {
+    padding: 8px;
+    color: black;
+    content: '>\00a0';
 }
 
 ul.breadcrumb li a {
-  color: #808890;
-  text-decoration: none;
+    color: #808890;
+    text-decoration: none;
 }
 
 ul.breadcrumb li a:hover {
-   cursor: default;
- }
+    cursor: default;
+}
 //end breadcrumb
 
 //ICoin
 #iCoin::-webkit-outer-spin-button,
 #iCoin::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 //Insurance Select
-button#headlessui-listbox-button-\:r0\:{
-  width: 100%;
+button#headlessui-listbox-button-\:r0\: {
+    width: 100%;
 }
 
-input#iCoin, input#pClaim{
-  box-shadow: none;
+input#iCoin,
+input#pClaim {
+    box-shadow: none;
 }
 
 .tooltip_p_claim {
-  position: relative;
+    position: relative;
 }
 
 .tooltip_p_claim .tooltip_p_claim_text {
-  visibility: hidden;
-  width: 400px;
-  background-color: white;
-  color: black;
-  text-align: center;
-  border-radius: 6px;
-  border: 0.5px solid #E5E7E8;
-  position: absolute;
-  z-index: 1;
-  margin-left: -60px;
-  left: 90px;
-  top: -5px;
+    visibility: hidden;
+    width: 400px;
+    background-color: white;
+    color: black;
+    text-align: center;
+    border-radius: 6px;
+    border: 0.5px solid #e5e7e8;
+    position: absolute;
+    z-index: 1;
+    margin-left: -60px;
+    left: 90px;
+    top: -5px;
 }
 
 .tooltip_p_claim:hover .tooltip_p_claim_text {
-  visibility: visible;
+    visibility: visible;
 }
 
-.tooltip_p_claim .tooltip_p_claim_text:after{
-  content: "";
-  position: absolute;
-  top: 10px;
-  left: -5px;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color:  transparent black transparent transparent;
+.tooltip_p_claim .tooltip_p_claim_text:after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: -5px;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent black transparent transparent;
 }
 
 .amcharts-g3 {
-  animation: none;
-  animation-delay: 0ms;
+    animation: none;
+    animation-delay: 0ms;
 }
-
-
-
-
-
-

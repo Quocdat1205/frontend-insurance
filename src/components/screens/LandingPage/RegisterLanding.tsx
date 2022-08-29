@@ -51,7 +51,7 @@ const RegisterLanding = () => {
             <div className="max-w-screen-insurance m-auto register-landing flex items-center justify-center pt-20 sm:pt-[7.5rem]">
                 <Background isMobile={isMobile}>
                     <div className="font-semibold text-2xl sm:text-[2.5rem] leading-8 sm:leading-10 mb-2 text-red">{t('home:landing:stay_up_to_date')}</div>
-                    <div className="!tracking-[0.5px] text-center sm:text-left px-11 sm:px-0 leading-5 sm:leading-6 text-sm sm:text-base">
+                    <div className="text-center sm:text-left px-5 sm:px-0 text-sm sm:text-base">
                         {t('home:landing:stay_up_to_date_content')}
                     </div>
                     <div className="mt-8 sm:mt-6 px-3 py-2 bg-white rounded-[3px] border border-red flex items-center">
@@ -61,7 +61,7 @@ const RegisterLanding = () => {
                             placeholder={t('home:landing:enter_your_email')}
                             className="no-border sm:w-[419px] leading-[20px]"
                         />
-                        <Button onClick={onRegister} className="!font-medium px-6 py-2 text-sm ">
+                        <Button onClick={onRegister} className="!font-medium px-6 py-2 text-sm whitespace-nowrap">
                             {t('home:landing:subscribe')}
                         </Button>
                     </div>

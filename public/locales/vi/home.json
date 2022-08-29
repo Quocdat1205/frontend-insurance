@@ -1,6 +1,6 @@
 {
     "landing": {
-        "white_paper": "White paper",
+        "white_paper": "Whitepaper",
         "faq": "Câu hỏi thường gặp",
         "contact": "Liên hệ",
         "home": "Trang chủ",
@@ -34,6 +34,7 @@
     },
     "home": {
         "connect_wallet": "Kết nối ví",
+        "insurance_history": "Lịch sử bảo hiểm",
         "new_insurance_assets": "Tài sản bảo hiểm mới",
         "bitcoin_get_covered": "Bitcoin Mua bảo hiểm",
         "ethereum_get_covered": "Ethereum Mua bảo hiểm",

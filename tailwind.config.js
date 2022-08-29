@@ -22,6 +22,7 @@ const commonColors = {
         2: '#99DFFF',
         3: '#5CCBFF',
         4: '#0070A3',
+        5: '#3960E6',
     },
     violet: {
         violet: '#5C17FF',
@@ -43,6 +44,7 @@ const commonColors = {
         2: '#FFF98C',
         3: '#F8F068',
         4: '#E8DF3F',
+        5: '#FBCD2D',
     },
     white: {
         white: colors.white,
@@ -92,7 +94,7 @@ module.exports = {
                 '.75rem',
                 {
                     letterSpacing: '0.5px',
-                    lineHeight: '1.125rem',
+                    lineHeight: '1rem',
                 },
             ], // Caption 12px
             sm: [
@@ -150,7 +152,14 @@ module.exports = {
                     letterSpacing: '0.5px',
                     lineHeight: '2.75rem',
                 },
-            ], // Heading 3 32px
+            ], // Heading 3 32px,
+            '5xl': [
+                '2.5rem',
+                {
+                    letterSpacing: '0.5px',
+                    lineHeight: '3.25rem',
+                },
+            ], //  40px
         },
         // TODO split text, background
         colors: {

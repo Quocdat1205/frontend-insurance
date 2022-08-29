@@ -12,3 +12,10 @@ export const PATHS = {
 
     // Add news path here
 }
+
+export const stateInsurance: any = {
+    EXPIRED: 'Expired',
+    AVAILABLE: 'Available',
+    PAYOUT_WAITING: 'Payout_Waiting',
+    PAID: 'Paid',
+}

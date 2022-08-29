@@ -20,11 +20,11 @@ const Footer = ({ sponsor = true }) => {
             )}
             <div className="bg-white-2 px-10 py-12 ">
                 <div className="max-w-screen-layout m-auto">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between">
                         <div className="w-[121px]">
                             <img src="/images/ic_logo.png" />
                         </div>
-                        <div className="flex flex-row space-x-8 mt-12 sm:mt-0 text-sm sm:text-base">
+                        <div className="flex flex-row space-x-8 mt-12 lg:mt-0 text-sm sm:text-base">
                             <div className="flex flex-col space-y-4 sm:space-y-2">
                                 <div className="font-semibold">{t('home:landing:features')}</div>
                                 <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 text-txtSecondary">
@@ -43,7 +43,7 @@ const Footer = ({ sponsor = true }) => {
                         </div>
                     </div>
                     <div className="my-6 h-[1px] bg-divider" />
-                    <div className="text-xs sm:text-sm leading-3 text-txtSecondary">Copyright © 2021 UI8 LLC. All rights reserved</div>
+                    <div className="text-xs text-txtSecondary">Copyright © 2021 UI8 LLC. All rights reserved</div>
                 </div>
             </div>
         </footer>

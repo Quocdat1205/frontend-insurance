@@ -1,4 +1,10 @@
 {
     "please_connect_your_wallet": "Please connect your wallet to utilize this feature",
-    "connect_now": "Connect Now"
+    "connect_now": "Connect Now",
+    "status": {
+        "expired": "Expired",
+        "available": "Available",
+        "payout_waiting": "Payout_Waiting",
+        "paid": "Paid"
+    }
 }

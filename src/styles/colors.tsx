@@ -46,10 +46,16 @@ const colors = {
         2: '#F8F8F8',
         3: '#F2F3F4',
     },
+    gray: {
+        gray: '#B2B7BC',
+    },
+    divider: '#E5E7E8',
     txtPrimary: '#22313F',
     txtSecondary: '#808890',
     error: '#E5544B',
     success: '#52CC74',
+    hover: '#F7F8FA',
+    active: '#F2F3F5',
 }
 
 export default colors

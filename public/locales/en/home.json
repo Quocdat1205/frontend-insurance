@@ -1,6 +1,6 @@
 {
     "landing": {
-        "white_paper": "White paper",
+        "white_paper": "Whitepaper",
         "faq": "FAQ",
         "contact": "Contact",
         "home": "Home",
@@ -34,6 +34,7 @@
     },
     "home": {
         "connect_wallet": "Connect Wallet",
+        "insurance_history": "Insurance history",
         "new_insurance_assets": "New Insurance Assets",
         "bitcoin_get_covered": "Bitcoin Get Covered",
         "ethereum_get_covered": "Ethereum Get Covered",
