@@ -162,3 +162,44 @@ export const StartIcon = () => {
         </svg>
     )
 }
+
+export const SuccessIcon = () => {
+    return (
+        <svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M41 81.5C63.3675 81.5 81.5 63.3675 81.5 41C81.5 18.6325 63.3675 0.5 41 0.5C18.6325 0.5 0.5 18.6325 0.5 41C0.5 63.3675 18.6325 81.5 41 81.5Z"
+                fill="url(#paint0_linear_1019_8538)"
+            />
+            <path
+                d="M41 81.5C63.3675 81.5 81.5 63.3675 81.5 41C81.5 18.6325 63.3675 0.5 41 0.5C18.6325 0.5 0.5 18.6325 0.5 41C0.5 63.3675 18.6325 81.5 41 81.5Z"
+                fill="url(#paint1_linear_1019_8538)"
+                fill-opacity="0.5"
+            />
+            <path
+                d="M41 81.5C63.3675 81.5 81.5 63.3675 81.5 41C81.5 18.6325 63.3675 0.5 41 0.5C18.6325 0.5 0.5 18.6325 0.5 41C0.5 63.3675 18.6325 81.5 41 81.5Z"
+                stroke="url(#paint2_linear_1019_8538)"
+            />
+            <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M66.9933 29.6609L36.4628 59.5801L18.4326 42.4687L23.1725 37.4744L36.3861 50.0147L62.174 24.7432L66.9933 29.6609Z"
+                fill="white"
+            />
+            <defs>
+                <linearGradient id="paint0_linear_1019_8538" x1="12" y1="70" x2="73" y2="16" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="white" />
+                    <stop offset="0.401042" stop-color="#61F98C" />
+                    <stop offset="1" stop-color="#3AB83A" />
+                </linearGradient>
+                <linearGradient id="paint1_linear_1019_8538" x1="48" y1="34.5" x2="45" y2="-2.5" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#3AB83A" />
+                    <stop offset="1" stop-color="white" />
+                </linearGradient>
+                <linearGradient id="paint2_linear_1019_8538" x1="41" y1="1" x2="41" y2="81" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#FFEC3E" />
+                    <stop offset="1" stop-color="#FFFAEC" />
+                </linearGradient>
+            </defs>
+        </svg>
+    )
+}

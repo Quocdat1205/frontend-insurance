@@ -1,5 +1,6 @@
 import Button from 'components/common/Button/Button'
 import { CheckBoxIcon, CheckCircle, ErrorCircleIcon, StartIcon } from 'components/common/Svg/SvgIcon'
+import NotificationInsurance from 'components/layout/notifucationInsurance'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -147,6 +148,7 @@ export const AcceptBuyInsurance = ({ state, menu, checkUpgrade, setCheckUpgrade,
                     <span className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}>{t('insurance:buy:Term_of_Service_sub')}</span>
                 </span>
             </div>
+            {/* <NotificationInsurance /> */}
         </>
     )
 }

@@ -22,6 +22,7 @@ import { ICoin } from 'components/common/Input/input.interface'
 import Button from 'components/common/Button/Button'
 import { useRouter } from 'next/router'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
+import NotificationInsurance from 'components/layout/notifucationInsurance'
 
 //chart
 const ChartComponent = dynamic(() => import('../components/common/Chart/chartComponent'), { ssr: false, loading: () => <header /> })
@@ -92,7 +93,7 @@ const Insurance = () => {
                 resolution,
         )
         let list = await response.json()
-        let data = []
+        let data: { date: number; value: any }[] = []
         list.map((item: any) => {
             data.push({
                 date: item[0] * 1000,
