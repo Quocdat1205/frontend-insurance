@@ -6,5 +6,10 @@
         "available": "Còn hiệu lực",
         "payout_waiting": "Chờ chi trả",
         "paid": "Chờ chi trả"
+    },
+    "header": {
+        "home": "Trang chủ",
+        "buy_covered": "Mua bảo hiểm",
+        "insurance_history": "Lịch sử bảo hiểm"
     }
 }

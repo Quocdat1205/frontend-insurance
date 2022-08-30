@@ -1,0 +1,16 @@
+.rc-pagination {
+    user-select: none;
+    @apply flex items-center space-x-2;
+    li {
+        @apply cursor-pointer;
+    }
+    .rc-pagination-item {
+        @apply flex items-center justify-center h-10 w-10 hover:text-red cursor-pointer;
+    }
+    .rc-pagination-item-active {
+        @apply text-red;
+    }
+    .rc-pagination-jump-next {
+        @apply hover:text-red;
+    }
+}

@@ -20,9 +20,9 @@ const HeaderLanding = () => {
     } = useTranslation()
 
     const menu = [
-        { menuId: 'white-paper', router: 'white-paper', name: t('home:landing:white_paper'), parentId: 0 },
-        { menuId: 'faq', router: 'faq', name: t('home:landing:faq'), parentId: 0 },
-        { menuId: 'contact', router: 'contact', name: t('home:landing:contact'), parentId: 0 },
+        { menuId: 'white-paper', router: 'white-paper', name: 'home:landing:white_paper', parentId: 0 },
+        { menuId: 'faq', router: 'faq', name: 'home:landing:faq', parentId: 0 },
+        { menuId: 'contact', router: 'contact', name: 'home:landing:contact', parentId: 0 },
     ]
 
     return (

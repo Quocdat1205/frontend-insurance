@@ -3,7 +3,7 @@ import React from 'react'
 import { GetStaticProps } from 'next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import Breadcrumbs from 'components/layout/Breadcrumbs'
-import MyInsurance from 'components/screens/MyInsurance/MyInsurance'
+import InsuranceHistory from 'components/screens/InsuranceHistory/InsuranceHistory'
 
 const Myinsurance = () => {
     return (
@@ -13,7 +13,7 @@ const Myinsurance = () => {
                 <div>Mua bảo hiểm</div>
                 <div>Lịch sử hợp đồng</div>
             </Breadcrumbs>
-            <MyInsurance />
+            <InsuranceHistory />
         </LayoutWeb3>
     )
 }

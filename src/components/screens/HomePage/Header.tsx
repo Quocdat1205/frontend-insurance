@@ -12,33 +12,14 @@ import React, { useMemo, useState } from 'react'
 import { screens } from 'utils/constants'
 import { X } from 'react-feather'
 import Notifications from 'components/layout/Notifications'
-import { RootStore } from 'redux/store'
-import { useSelector } from 'react-redux'
+import { useRouter } from 'next/router'
 
 const Header = () => {
     const { t } = useTranslation()
     const { account, chain } = useWeb3Wallet()
     const { width } = useWindowSize()
-
+    const router = useRouter()
     const isMobile = width && width < screens.drawer
-    const menu = [
-        { menuId: 'home', router: 'home', name: t('home:landing:home'), parentId: 0 },
-        { menuId: 'insurance', router: 'insurance', name: t('home:landing:buy_covered'), parentId: 0 },
-        {
-            menuId: 'buy-covered',
-            router: 'buy-covered',
-            name: t('home:landing:buy_covered'),
-            parentId: 'insurance',
-            icon: '/images/icons/ic_menu_buy_covered.png',
-        },
-        {
-            menuId: 'insurance-history',
-            router: 'insurance-history',
-            name: t('home:home:insurance_history'),
-            parentId: 'insurance',
-            icon: '/images/icons/Ic_menu_users.png',
-        },
-    ]
 
     const [visible, setVisible] = useState(false)
 
@@ -50,6 +31,10 @@ const Header = () => {
         return Chains[chain?.id]
     }, [account, chain])
 
+    const onChangeMenu = (e: any) => {
+        if (e.router) router.push(e.router)
+    }
+
     return (
         <header className="header-landing px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[10]">
             <div className="max-w-screen-layout m-auto flex items-center justify-between space-x-12">
@@ -57,7 +42,7 @@ const Header = () => {
                     <img src="/images/ic_logo.png" />
                 </div>
                 <div className="w-full flex items-center justify-end mb:justify-between  py-3 mb:py-0 text-sm font-semibold">
-                    {!isMobile && <Menu data={menu} />}
+                    {!isMobile && <Menu data={Config.homeMenu} onChange={onChangeMenu} />}
                     <div className="flex items-center space-x-6 cursor-pointer">
                         {network && <Notifications />}
                         {account && network && (
@@ -85,7 +70,7 @@ const Header = () => {
                 <Drawer visible={visible} onClose={() => setVisible(false)}>
                     <div>
                         <div className="mb-8">
-                            <Menu data={menu} />
+                            <Menu data={Config.homeMenu} />
                         </div>
                         <div className="mx-4">
                             <Button onClick={onConnect} className="w-full font-semibold py-[0.875rem] leading-5 space-x-2">

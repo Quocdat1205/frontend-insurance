@@ -127,79 +127,13 @@ export const SortIcon = ({ size = 14, color = '#C4C4C4', activeColor = colors.re
     )
 }
 
-export const ErrorCircleIcon = () => {
+export const CalendarIcon = ({ size = 20, color = '#22313F' }: any) => {
     return (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
-                d="M11.953 2C6.465 2 2 6.486 2 12C2 17.514 6.486 22 12 22C17.514 22 22 17.514 22 12C22 6.486 17.493 2 11.953 2ZM12 20C7.589 20 4 16.411 4 12C4 7.589 7.567 4 11.953 4C16.391 4 20 7.589 20 12C20 16.411 16.411 20 12 20Z"
-                fill="#EB2B3E"
+                d="M2.49902 4.99984V6.6665V16.6665C2.49902 17.5857 3.24652 18.3332 4.16569 18.3332H15.8324C16.7515 18.3332 17.499 17.5857 17.499 16.6665V6.6665V4.99984C17.499 4.08067 16.7515 3.33317 15.8324 3.33317H14.1657V1.6665H12.499V3.33317H7.49902V1.6665H5.83236V3.33317H4.16569C3.24652 3.33317 2.49902 4.08067 2.49902 4.99984ZM15.834 16.6665H4.16569V6.6665H15.8324L15.834 16.6665Z"
+                fill={color}
             />
-            <path d="M11 7H13V14H11V7ZM11 15H13V17H11V15Z" fill="#EB2B3E" />
-        </svg>
-    )
-}
-
-export const CheckBoxIcon = ({ size, bgColor, dotColor, borderColor, checked, checkDotColor, checkBorderColor, checkBgColor, className, onClick }: any) => {
-    return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} onClick={onClick}>
-            <path
-                d="M0.5 12C0.5 5.64873 5.64873 0.5 12 0.5C18.3513 0.5 23.5 5.64873 23.5 12C23.5 18.3513 18.3513 23.5 12 23.5C5.64873 23.5 0.5 18.3513 0.5 12Z"
-                fill={!checked ? bgColor : checkBgColor}
-                stroke={!checked ? borderColor : checkBorderColor}
-            />
-            <rect xmlns="http://www.w3.org/2000/svg" x="6" y="6" width="12" height="12" rx="6" fill={!checked ? dotColor : checkDotColor} />
-        </svg>
-    )
-}
-
-export const StartIcon = () => {
-    return (
-        <svg width="24" height="24" viewBox="0 0 20 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="M10 0L12.2451 6.90983H19.5106L13.6327 11.1803L15.8779 18.0902L10 13.8197L4.12215 18.0902L6.36729 11.1803L0.489435 6.90983H7.75486L10 0Z"
-                fill="white"
-            />
-        </svg>
-    )
-}
-
-export const SuccessIcon = () => {
-    return (
-        <svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="M41 81.5C63.3675 81.5 81.5 63.3675 81.5 41C81.5 18.6325 63.3675 0.5 41 0.5C18.6325 0.5 0.5 18.6325 0.5 41C0.5 63.3675 18.6325 81.5 41 81.5Z"
-                fill="url(#paint0_linear_1019_8538)"
-            />
-            <path
-                d="M41 81.5C63.3675 81.5 81.5 63.3675 81.5 41C81.5 18.6325 63.3675 0.5 41 0.5C18.6325 0.5 0.5 18.6325 0.5 41C0.5 63.3675 18.6325 81.5 41 81.5Z"
-                fill="url(#paint1_linear_1019_8538)"
-                fill-opacity="0.5"
-            />
-            <path
-                d="M41 81.5C63.3675 81.5 81.5 63.3675 81.5 41C81.5 18.6325 63.3675 0.5 41 0.5C18.6325 0.5 0.5 18.6325 0.5 41C0.5 63.3675 18.6325 81.5 41 81.5Z"
-                stroke="url(#paint2_linear_1019_8538)"
-            />
-            <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M66.9933 29.6609L36.4628 59.5801L18.4326 42.4687L23.1725 37.4744L36.3861 50.0147L62.174 24.7432L66.9933 29.6609Z"
-                fill="white"
-            />
-            <defs>
-                <linearGradient id="paint0_linear_1019_8538" x1="12" y1="70" x2="73" y2="16" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="white" />
-                    <stop offset="0.401042" stop-color="#61F98C" />
-                    <stop offset="1" stop-color="#3AB83A" />
-                </linearGradient>
-                <linearGradient id="paint1_linear_1019_8538" x1="48" y1="34.5" x2="45" y2="-2.5" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="#3AB83A" />
-                    <stop offset="1" stop-color="white" />
-                </linearGradient>
-                <linearGradient id="paint2_linear_1019_8538" x1="41" y1="1" x2="41" y2="81" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="#FFEC3E" />
-                    <stop offset="1" stop-color="#FFFAEC" />
-                </linearGradient>
-            </defs>
         </svg>
     )
 }
