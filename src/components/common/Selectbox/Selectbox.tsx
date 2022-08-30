@@ -72,7 +72,6 @@ interface Selectbox {
 }
 
 const Selectbox = ({ className, label, options, placeholder = label, value, displayExpr, valueExpr, ...props }: Selectbox) => {
-    console.log(value)
 
     const item = useMemo(() => {
         if (typeof value === 'string') {

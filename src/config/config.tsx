@@ -1,6 +1,5 @@
 import { wallets } from 'components/web3/Web3Types'
 import env from 'config/env'
-import { Ref } from 'react'
 import { Toast } from 'types/types'
 
 class Config {
@@ -37,6 +36,25 @@ class Config {
         }
         return rs
     }
+
+    static homeMenu = [
+        { menuId: 'home', router: '/home', name: 'common:header:home', parentId: 0 },
+        { menuId: 'buy-covered-parent', router: '/buy-covered', name: 'common:header:buy_covered', parentId: 0 },
+        {
+            menuId: 'buy-covered',
+            router: '/buy-covered',
+            name: 'common:header:buy_covered',
+            parentId: 'buy-covered-parent',
+            icon: '/images/icons/ic_menu_buy_covered.png',
+        },
+        {
+            menuId: 'insurance-history',
+            router: '/buy-covered/insurance-history',
+            name: 'common:header:insurance_history',
+            parentId: 'buy-covered-parent',
+            icon: '/images/icons/Ic_menu_users.png',
+        },
+    ]
 }
 
 export default Config

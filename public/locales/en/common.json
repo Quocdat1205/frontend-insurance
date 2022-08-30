@@ -6,5 +6,10 @@
         "available": "Available",
         "payout_waiting": "Payout_Waiting",
         "paid": "Paid"
+    },
+    "header": {
+        "home": "Home",
+        "buy_covered": "Buy Cover",
+        "insurance_history": "Insurance history"
     }
 }

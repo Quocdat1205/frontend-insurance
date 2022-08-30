@@ -16,6 +16,7 @@ const Button = ({ variants = 'gradient', children, className, onClick }: Props) 
                 {
                     'bg-gradient text-white': variants === 'gradient',
                     'border border-red text-red bg-pink': variants === 'outlined',
+                    'bg-red text-white': variants === 'primary',
                 },
                 className,
             )}

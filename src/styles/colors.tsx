@@ -46,6 +46,9 @@ const colors = {
         2: '#F8F8F8',
         3: '#F2F3F4',
     },
+    pink: {
+        pink: '#FFF1F2',
+    },
     gray: {
         gray: '#B2B7BC',
     },

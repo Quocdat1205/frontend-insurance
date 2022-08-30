@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 @import "fonts";
+@import "datepicker";
+@import "pagination";
 
 html {
     @apply font-Manrope;

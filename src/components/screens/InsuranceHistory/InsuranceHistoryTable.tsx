@@ -1,30 +1,36 @@
 import Button from 'components/common/Button/Button'
 import ReactDatepicker from 'components/common/DatePicker/DatePicker'
+import DateRangePicker from 'components/common/DatePicker/DateRangePicker'
 import Selectbox from 'components/common/Selectbox/Selectbox'
 import DataTable from 'components/common/Table/DataTable'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import { useTranslation } from 'next-i18next'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { API_GET_INSURANCE_BY_ADDRESS } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { stateInsurance } from 'utils/constants'
 import { formatCurrency, formatTime } from 'utils/utils'
+import InsurancePopover from './InsurancePopover'
 
-const MyInsuranceTable = () => {
+const InsuranceHistoryTable = () => {
     const { t } = useTranslation()
     const [loading, setLoading] = useState<boolean>(false)
     const { account } = useWeb3Wallet()
     const [dataSource, setDataSource] = useState<any>({
         count: 0,
-        list_insurance: [],
+        insurance: [],
     })
 
     const [filter, setFilter] = useState({
-        asset: null,
         skip: 0,
         limit: 10,
         isAll: false,
     })
+
+    const [asset, setAsset] = useState(null)
+    const [status, setStatus] = useState(null)
+    const [period, setPeriod] = useState([null, null])
+    const [tExpired, setTExpired] = useState(null)
 
     useEffect(() => {
         if (account) getInsurance()
@@ -58,9 +64,9 @@ const MyInsuranceTable = () => {
         )
     }
 
-    const renderStatus = (e: any) => {
+    const renderStatus = ({ value }: any) => {
         let bg = 'bg-gradient-blue text-blue-5'
-        switch (e.value) {
+        switch (value) {
             case stateInsurance.EXPIRED:
                 bg = 'bg-gradient-gray text-gray'
                 break
@@ -73,7 +79,7 @@ const MyInsuranceTable = () => {
             default:
                 break
         }
-        return <div className={`px-3 text-sm font-semibold py-[6px] rounded-[600px] ${bg}`}>{t(`common:status:${String(e.value).toLowerCase()}`)}</div>
+        return <div className={`px-3 text-sm font-semibold py-[6px] rounded-[600px] ${bg}`}>{t(`common:status:${String(value).toLowerCase()}`)}</div>
     }
 
     const columns = React.useMemo(
@@ -112,13 +118,13 @@ const MyInsuranceTable = () => {
                 Header: 'Trạng thái HĐBH',
                 accessor: 'state',
                 minWidth: 190,
-                Cell: (e: any) => renderStatus(e),
+                Cell: (e: any) => <InsurancePopover t={t} renderStatus={renderStatus} data={e} />,
             },
             {
                 Header: 'Hợp đồng',
                 accessor: '_id',
                 minWidth: 120,
-                Cell: (e: any) => <div className="underline text-blue font-light">{e.value}</div>,
+                Cell: (e: any) => <div className="underline text-red font-light cursor-pointer">{e.value}</div>,
             },
             {
                 Header: 'HashID',
@@ -134,9 +140,18 @@ const MyInsuranceTable = () => {
         { value: 'strawberry', label: 'Strawberry' },
         { value: 'vanilla', label: 'Vanilla' },
     ]
+
+    const onChangePage = (page: number) => {
+        setFilter({ ...filter, skip: (page - 1) * filter.limit })
+    }
+
+    const renderContent = () => {
+        return <div className="p-6">123123</div>
+    }
+
     return (
         <div>
-            {dataSource?.list_insurance.length <= 0 ? (
+            {dataSource?.insurance?.length <= 0 ? (
                 <div className="w-full flex flex-col items-center justify-center">
                     <div>
                         <img className="max-w-[310px]" src="/images/icons/bg_noData.png" />
@@ -146,26 +161,37 @@ const MyInsuranceTable = () => {
                 </div>
             ) : (
                 <>
-                    <div className="mb-6 grid grid-rows-4 grid-cols-1 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-4 gap-4">
+                    <div className="mb-6 grid grid-rows-3 grid-cols-1 md:grid-rows-2 md:grid-cols-2 lg:grid-rows-1 lg:grid-cols-3 gap-4">
                         <Selectbox
-                            value={filter.asset}
-                            onChange={(e) => setFilter({ ...filter, asset: e.value })}
-                            className="w-full"
+                            value={asset}
+                            onChange={(e: any) => setAsset(e.value)}
+                            className="w-full md:col-span-1"
                             label="Loại tài sản"
                             displayExpr="label"
                             valueExpr="value"
                             options={options}
                         />
-                        <ReactDatepicker label="T-Start" />
-                        {/* <Selectbox className="w-full" label="Trạng thái hợp đồng" options={options} />
-                        <Selectbox className="w-full" label="Loại tài sản" options={options} />
-                        <Selectbox className="w-full" label="Trạng thái hợp đồng" options={options} /> */}
+                        <ReactDatepicker className="md:col-span-1" value={tExpired} onChange={(e: any) => setTExpired(e)} label="T-Expired" />
+                        <DateRangePicker
+                            renderContent={renderContent}
+                            className="md:col-span-2 lg:col-span-1"
+                            value={period}
+                            label="Period"
+                            onChange={(e: any) => setPeriod(e)}
+                        />
                     </div>
-                    <DataTable columns={columns} data={dataSource?.list_insurance ?? []} />
+                    <DataTable
+                        data={dataSource?.insurance ?? []}
+                        total={dataSource?.count ?? 0}
+                        limit={filter.limit}
+                        skip={filter.skip}
+                        columns={columns}
+                        onChangePage={onChangePage}
+                    />
                 </>
             )}
         </div>
     )
 }
 
-export default MyInsuranceTable
+export default InsuranceHistoryTable

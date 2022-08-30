@@ -4,14 +4,16 @@ import styled from 'styled-components'
 import { ChevronDown, ChevronUp } from 'react-feather'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
+import { useTranslation } from 'next-i18next'
 
 interface Menu {
     data: any[]
-    onClick?: (menu: any) => void
+    onChange?: (menu: any) => void
 }
 
-const Menu = ({ data, onClick }: Menu) => {
+const Menu = ({ data, onChange }: Menu) => {
     const { width } = useWindowSize()
+    const { t } = useTranslation()
     const isMobile = width && width < screens.drawer
     const [active, setActive] = useState<any>(null)
 
@@ -19,7 +21,7 @@ const Menu = ({ data, onClick }: Menu) => {
         const _active = !menu.parentId && (active?.parentId === menu.menuId || active?.menuId === menu.menuId) ? null : menu
         e.stopPropagation()
         if (isMobile) setActive(_active)
-        if (onClick) onClick(menu)
+        if (onChange) onChange(menu)
     }
 
     const recursiveData = (menu: any[], parent: any = undefined, level: number = 0) => {
@@ -64,7 +66,7 @@ const Menu = ({ data, onClick }: Menu) => {
                 {!hasChildren ? (
                     <div className="flex items-center space-x-4">
                         {menu.icon && <img className="min-w-6 min-h-6 w-6 h-6" src={menu.icon} />}
-                        <span>{menu.name}</span>
+                        <span>{t(menu.name)}</span>
                     </div>
                 ) : (
                     <div
@@ -73,11 +75,11 @@ const Menu = ({ data, onClick }: Menu) => {
                         })}
                     >
                         {menu.icon && <img className="min-w-6 min-h-6 w-6 h-6" src={menu.icon} />}
-                        <span>{menu.name}</span> {!_active ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+                        <span>{t(menu.name)}</span> {!_active ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
                     </div>
                 )}
                 {hasChildren && (
-                    <ul className="bg-hover mb:bg-white -mx-8 mb:absolute relative flex flex-col mb:py-4 mb:space-y-2 mb:rounded-b-xl mb:shadow-subMenu mb:top-[calc(100%+1px)] h-max left-4 sm:left-8 mb:min-w-[244px]">
+                    <ul className="w-max bg-hover mb:bg-white -mx-8 mb:absolute relative flex flex-col mb:py-4 mb:space-y-2 mb:rounded-b-xl mb:shadow-subMenu mb:top-[calc(100%+1px)] h-max left-4 sm:left-8 mb:min-w-[244px]">
                         {menu.children.map((menu: any, idx: number) => renderMenu(menu, idx, true))}
                     </ul>
                 )}
