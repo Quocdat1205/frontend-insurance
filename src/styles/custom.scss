@@ -83,6 +83,12 @@ ul.breadcrumb li a:hover {
     margin: 0;
 }
 
+#iPClaim::-webkit-outer-spin-button,
+#iPClaim::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 //Insurance Select
 button#headlessui-listbox-button-\:r0\: {
     width: 100%;
@@ -91,40 +97,6 @@ button#headlessui-listbox-button-\:r0\: {
 input#iCoin,
 input#pClaim {
     box-shadow: none;
-}
-
-.tooltip_p_claim {
-    position: relative;
-}
-
-.tooltip_p_claim .tooltip_p_claim_text {
-    visibility: hidden;
-    width: 400px;
-    background-color: white;
-    color: black;
-    text-align: center;
-    border-radius: 6px;
-    border: 0.5px solid #e5e7e8;
-    position: absolute;
-    z-index: 1;
-    margin-left: -60px;
-    left: 90px;
-    top: -5px;
-}
-
-.tooltip_p_claim:hover .tooltip_p_claim_text {
-    visibility: visible;
-}
-
-.tooltip_p_claim .tooltip_p_claim_text:after {
-    content: '';
-    position: absolute;
-    top: 10px;
-    left: -5px;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent black transparent transparent;
 }
 
 .amcharts-g3 {

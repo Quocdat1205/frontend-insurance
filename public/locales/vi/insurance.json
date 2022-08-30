@@ -24,6 +24,10 @@
         "period": "Period",
         "increase_cover": "Gia tăng kỳ hạn và giá trị chi trả bảo hiểm",
         "example": "Ví dụ: 120.000,1243",
-        "tooltip": "Mức giá (P) kích hoạt nhận Q-Claim"
+        "tooltip": "Mức giá (P) kích hoạt nhận Q-Claim",
+        "upgrade": "Sử dụng 99 NAIN để nhận thêm ưu đãi",
+        "upgrade_info": "Gia tăng kỳ hạn và giá trị chi trả bảo hiểm",
+        "Term_of_Service": "Bằng việc xác nhận, bạn đã đồng ý với",
+        "Term_of_Service_sub": "Điều khoản dịch của Nami Insurance."
     }
 }

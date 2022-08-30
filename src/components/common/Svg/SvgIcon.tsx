@@ -1,3 +1,4 @@
+import { color } from '@amcharts/amcharts4/core'
 import colors from 'styles/colors'
 
 export const RightArrow = () => {
@@ -122,6 +123,42 @@ export const SortIcon = ({ size = 14, color = '#C4C4C4', activeColor = colors.re
         <svg width={size} height={size} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M7 3L9.59808 6H4.40192L7 3Z" fill={direction === 'asc' ? activeColor : color} />
             <path d="M7 11L4.40192 8L9.59808 8L7 11Z" fill={direction === 'desc' ? activeColor : color} />
+        </svg>
+    )
+}
+
+export const ErrorCircleIcon = () => {
+    return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M11.953 2C6.465 2 2 6.486 2 12C2 17.514 6.486 22 12 22C17.514 22 22 17.514 22 12C22 6.486 17.493 2 11.953 2ZM12 20C7.589 20 4 16.411 4 12C4 7.589 7.567 4 11.953 4C16.391 4 20 7.589 20 12C20 16.411 16.411 20 12 20Z"
+                fill="#EB2B3E"
+            />
+            <path d="M11 7H13V14H11V7ZM11 15H13V17H11V15Z" fill="#EB2B3E" />
+        </svg>
+    )
+}
+
+export const CheckBoxIcon = ({ size, bgColor, dotColor, borderColor, checked, checkDotColor, checkBorderColor, checkBgColor, className, onClick }: any) => {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} onClick={onClick}>
+            <path
+                d="M0.5 12C0.5 5.64873 5.64873 0.5 12 0.5C18.3513 0.5 23.5 5.64873 23.5 12C23.5 18.3513 18.3513 23.5 12 23.5C5.64873 23.5 0.5 18.3513 0.5 12Z"
+                fill={!checked ? bgColor : checkBgColor}
+                stroke={!checked ? borderColor : checkBorderColor}
+            />
+            <rect xmlns="http://www.w3.org/2000/svg" x="6" y="6" width="12" height="12" rx="6" fill={!checked ? dotColor : checkDotColor} />
+        </svg>
+    )
+}
+
+export const StartIcon = () => {
+    return (
+        <svg width="24" height="24" viewBox="0 0 20 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M10 0L12.2451 6.90983H19.5106L13.6327 11.1803L15.8779 18.0902L10 13.8197L4.12215 18.0902L6.36729 11.1803L0.489435 6.90983H7.75486L10 0Z"
+                fill="white"
+            />
         </svg>
     )
 }

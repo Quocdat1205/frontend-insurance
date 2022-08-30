@@ -11,6 +11,7 @@ import Config from 'config/config'
 //layout
 import LayoutInsurance from 'components/layout/layoutInsurance'
 import { Popover, Tab } from '@headlessui/react'
+import { AcceptBuyInsurance } from '../components/screens/Insurance/AcceptBuyInsurance'
 
 //Props
 import { GetStaticProps } from 'next'
@@ -20,11 +21,10 @@ import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
 import Button from 'components/common/Button/Button'
 import { useRouter } from 'next/router'
-import { timeMessage } from 'utils/utils'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 
 //chart
-const ChartComponent = dynamic(() => import('../components/common/Chart/chartComponent'), { ssr: false })
+const ChartComponent = dynamic(() => import('../components/common/Chart/chartComponent'), { ssr: false, loading: () => <header /> })
 
 const Insurance = () => {
     const { t } = useTranslation()
@@ -32,21 +32,22 @@ const Insurance = () => {
     const router = useRouter()
     const { width } = useWindowSize()
     const isMobile = width && width < screens.drawer
-    const [iCoin, setICoin] = useState<number>()
     const [percentInsurance, setPercentInsurance] = useState<number>(0)
     const [selectTime, setSelectTime] = useState<string>('ALL')
-    const [selectPeriod, setSelectPeriod] = useState<number>(2)
     const [isDrop, setDrop] = useState(false)
+    const [isHover, setIsHover] = useState(false)
+    const [checkUpgrade, setCheckUpgrade] = useState(false)
 
     const [index, setIndex] = useState<1 | 2>(1)
     const [tab, setTab] = useState<number>(3)
 
-    console.log(wallets.getBalance())
+    const [userBalance, setUserBalance] = useState<number>(0)
 
     const [state, setState] = useState({
+        timeframe: '',
         margin: 0,
-        typeCoin: {},
-        period: 0,
+        symbol: {},
+        period: 2,
         p_claim: 0,
         q_claim: 0,
         r_claim: 0,
@@ -54,6 +55,28 @@ const Insurance = () => {
     })
 
     const [dataChart, setDataChart] = useState()
+    const listCoin: ICoin[] = [
+        {
+            id: 1,
+            name: 'Ethereum',
+            icon: '/images/icons/ic_ethereum.png',
+            symbol: 'ETHUSDT',
+        },
+        {
+            id: 2,
+            name: 'Bitcoin ',
+            icon: '/images/icons/ic_bitcoin.png',
+            symbol: 'BTCUSDT',
+        },
+        {
+            id: 3,
+            name: 'Binance Coin ',
+            icon: '/images/icons/ic_binance.png',
+            disable: true,
+            symbol: 'BNBUSDT',
+        },
+    ]
+    const [selectCoin, setSelectedCoin] = useState<ICoin>(listCoin[0])
 
     const fetchApi = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any) => {
         const response = await fetch(
@@ -70,7 +93,7 @@ const Insurance = () => {
         )
         let list = await response.json()
         let data = []
-        list.map((item) => {
+        list.map((item: any) => {
             data.push({
                 date: item[0] * 1000,
                 value: item[1],
@@ -80,28 +103,47 @@ const Insurance = () => {
     }
 
     useEffect(() => {
-        fetchApi('BTCUSDT', '1656203508', '1661502768', '1d', setDataChart)
+        const timeEnd = new Date()
+        const timeBegin = new Date()
+        timeBegin.setDate(timeEnd.getDate() - 100)
+        fetchApi('BTCUSDT', `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1d', setDataChart)
     }, [])
 
-    const listCoin: ICoin[] = [
-        {
-            id: 1,
-            name: 'Ethereum',
-            icon: '/images/icons/ic_ethereum.png',
-        },
-        {
-            id: 2,
-            name: 'Bitcoin ',
-            icon: '/images/icons/ic_bitcoin.png',
-        },
-        {
-            id: 3,
-            name: 'Binance Coin ',
-            icon: '/images/icons/ic_binance.png',
-            disable: true,
-        },
-    ]
-    const [selectCoin, setSelectedCoin] = useState<ICoin>(listCoin[0])
+    useEffect(() => {
+        const timeEnd = new Date()
+        const timeBegin = new Date()
+        if (selectTime == '1H' || selectTime == '1D') {
+            timeBegin.setDate(timeEnd.getDate() - 1)
+            fetchApi(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1m', setDataChart)
+        } else if (selectTime == '1W') {
+            timeBegin.setDate(timeEnd.getDate() - 7)
+            fetchApi(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1h', setDataChart)
+        } else {
+            timeBegin.setDate(timeEnd.getDate() - 7)
+            fetchApi(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1d', setDataChart)
+        }
+    }, [selectTime, selectCoin])
+
+    // setInterval(() => {
+    //     const timeEnd = new Date()
+    //     const timeBegin = new Date()
+    //     if (selectTime == '1H' || selectTime == '1D') {
+    //         timeBegin.setDate(timeEnd.getDate() - 1)
+    //         fetchApi(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1m', setDataChart)
+    //     } else if (selectTime == '1W') {
+    //         timeBegin.setDate(timeEnd.getDate() - 7)
+    //         fetchApi(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1h', setDataChart)
+    //     } else {
+    //         timeBegin.setDate(timeEnd.getDate() - 7)
+    //         fetchApi(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1d', setDataChart)
+    //     }
+    // }, 6000)
+
+    useEffect(() => {
+        if (wallets) {
+            setUserBalance(wallets.Balance || 10000)
+        }
+    }, [wallets])
 
     const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', 'ALL']
     const listTabPeriod: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
@@ -123,32 +165,40 @@ const Insurance = () => {
     ]
 
     useEffect(() => {
-        if (iCoin && iCoin > 0) {
-            setState({ ...state, q_covered: iCoin })
-            const percent: number = Number(((iCoin / testdefault.USDT) * 100).toFixed(2))
+        if (state.q_covered) {
+            const percent: number = Number(((state.q_covered / userBalance) * 100).toFixed(2))
             setPercentInsurance(percent)
         }
-        if (selectPeriod && selectPeriod > 2) {
-            setState({ ...state, period: selectPeriod })
-        }
         if (selectCoin) {
-            setState({ ...state, typeCoin: selectCoin })
+            setState({ ...state, symbol: selectCoin })
         }
+        handleFillData()
+    }, [state.q_covered, state.period, selectCoin, state.margin, state.p_claim])
 
+    useEffect(() => {
+        console.log(tab)
+        router.push(`?query=${tab}`)
+    }, [tab])
+
+    const handleFillData = () => {
         handleCheckValidate()
-    }, [iCoin, selectPeriod, selectCoin])
+        if (router.query.query === '3') {
+            const q_covered = state.q_covered
+            const p_claim = state.p_claim
+            const r_claim = 220
+        }
+    }
 
     const handleCheckValidate = () => {
         if (state.q_covered <= 0) return true
         if (state.q_covered <= 0) return true
-        if (state.q_covered > testdefault.USDT) {
+        if (state.q_covered > userBalance) {
             Config.toast.show('error', t('insurance:buy:input_invalid'))
             return true
         }
 
         return false
     }
-
     return (
         <LayoutInsurance>
             {
@@ -245,17 +295,17 @@ const Insurance = () => {
                                     type={'number'}
                                     inputName={'Loại tài sản và số lượng tài sản'}
                                     idInput={'iCoin'}
-                                    value={iCoin && iCoin}
+                                    value={state.q_covered && state.q_covered}
                                     onChange={(a: any) => {
                                         if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
-                                            setICoin(0)
+                                            setState({ ...state, q_covered: 0 })
                                         } else {
-                                            setICoin(a.target.value.replace(/^0+/, ''))
+                                            setState({ ...state, q_covered: a.target.value.replace(/^0+/, '') })
                                         }
                                         setPercentInsurance(0)
 
-                                        if (a.target.value * 1 > testdefault.USDT) {
-                                            return setICoin(testdefault.USDT)
+                                        if (a.target.value * 1 > userBalance) {
+                                            return setState({ ...state, q_covered: userBalance })
                                         }
                                     }}
                                     placeholder={'0'}
@@ -271,7 +321,7 @@ const Insurance = () => {
                                         </span>
                                         <ChevronDown size={18} className={'mt-1 text-[#22313F]'} />
                                     </Popover.Button>
-                                    <Popover.Panel className="absolute z-50 bg-white top-[78px] right-0  w-[360px] w-full rounded shadow">
+                                    <Popover.Panel className="absolute z-50 bg-white top-[78px] right-0  w-[360px] rounded shadow">
                                         {({ close }) => (
                                             <div className="flex flex-col focus:border-0 focus:ring-0 active:border-0">
                                                 {listCoin &&
@@ -329,22 +379,22 @@ const Insurance = () => {
                                         className={'w-[90%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none'}
                                         type={'number'}
                                         inputName={'P-Claim'}
-                                        idInput={'iCoin'}
+                                        idInput={''}
                                         value={tab == 4 ? state.r_claim : tab == 5 ? state.q_claim : tab == 6 && state.margin}
                                         onChange={(a: any) => {
-                                            if (tab == 3) {
+                                            if (tab == 4) {
                                                 if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
                                                     setState({ ...state, r_claim: 0 })
                                                 } else {
-                                                    setState({ ...state, p_claim: a.target.value.replace(/^0+/, '') })
+                                                    setState({ ...state, r_claim: a.target.value.replace(/^0+/, '') })
                                                 }
-                                            } else if (tab == 4) {
+                                            } else if (tab == 5) {
                                                 if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
                                                     setState({ ...state, q_claim: 0 })
                                                 } else {
                                                     setState({ ...state, q_claim: a.target.value.replace(/^0+/, '') })
                                                 }
-                                            } else {
+                                            } else if (tab == 6) {
                                                 if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
                                                     setState({ ...state, margin: 0 })
                                                 } else {
@@ -361,28 +411,28 @@ const Insurance = () => {
                         <div className={`${tab > 3 ? 'w-[50%] pl-[16px]' : 'w-full'} flex flex-row justify-between mt-[8px]`}>
                             <div
                                 className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
-                                onClick={() => setICoin((25 / 100) * testdefault.USDT)}
+                                onClick={() => setState({ ...state, q_covered: (25 / 100) * userBalance })}
                             >
                                 <div className={`${percentInsurance == 25 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
                                 <span>25%</span>
                             </div>
                             <div
                                 className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
-                                onClick={() => setICoin((50 / 100) * testdefault.USDT)}
+                                onClick={() => setState({ ...state, q_covered: (50 / 100) * userBalance })}
                             >
                                 <div className={`${50 == percentInsurance ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
                                 <span className={''}>50%</span>
                             </div>
                             <div
                                 className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
-                                onClick={() => setICoin((75 / 100) * testdefault.USDT)}
+                                onClick={() => setState({ ...state, q_covered: (75 / 100) * userBalance })}
                             >
                                 <div className={`${75 == percentInsurance ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
                                 <span className={''}>75%</span>
                             </div>
                             <div
                                 className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
-                                onClick={() => setICoin(testdefault.USDT)}
+                                onClick={() => setState({ ...state, q_covered: userBalance })}
                             >
                                 <div className={`${percentInsurance == 100 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
                                 <span>100%</span>
@@ -406,8 +456,10 @@ const Insurance = () => {
                                 return (
                                     <div
                                         key={key}
-                                        className={`${selectTime == time && 'text-[#EB2B3E]'} hover:cursor-pointer font-medium text-[#808890] text-base`}
-                                        onClick={() => setSelectTime(time)}
+                                        className={`${selectTime == time ? 'text-[#EB2B3E]' : 'text-[#808890]'} hover:cursor-pointer font-medium  text-base`}
+                                        onClick={() => {
+                                            setSelectTime(time)
+                                        }}
                                     >
                                         {time}
                                     </div>
@@ -425,9 +477,9 @@ const Insurance = () => {
                                             <div
                                                 key={key}
                                                 className={`${
-                                                    selectPeriod == item && 'bg-[#FFF1F2] text-[#EB2B3E]'
-                                                } bg-[#F7F8FA] rounded-[300px] p-3 h-[32px] w-[49px] flex justify-center items-center`}
-                                                onClick={() => setSelectPeriod(item)}
+                                                    state.period == item && 'bg-[#FFF1F2] text-[#EB2B3E]'
+                                                } bg-[#F7F8FA] rounded-[300px] p-3 h-[32px] w-[49px] flex justify-center items-center hover:cursor-pointer`}
+                                                onClick={() => setState({ ...state, period: item })}
                                             >
                                                 {item}
                                             </div>
@@ -441,28 +493,31 @@ const Insurance = () => {
                         <div className={'my-[24px] px-[32px]'}>
                             <span className={'flex flex-row items-center'}>
                                 P-Claim
-                                <span className={'tooltip_p_claim'}>
-                                    <InfoCircle />
-                                    <span className={'tooltip_p_claim_text px-[8px] py-[4px] shadow-lg'}>
-                                        {menu[10]?.name} - {menu[9]?.name}
+                                {
+                                    <span className={'tooltip_p_claim relative'} onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}>
+                                        <InfoCircle />
+                                        <span
+                                            className={`${
+                                                isHover ? 'visible' : 'hidden'
+                                            } tooltip_p_claim_text px-[8px] py-[4px] shadow-lg w-[400px] bg-[white] text-[black] text-center rounded-[6px] border border-0.5 border-[#e5e7e8] absolute z-10 left-[28px] top-[-33px]`}
+                                        >
+                                            {menu[10]?.name} - {menu[9]?.name}
+                                        </span>
                                     </span>
-                                </span>
+                                }
                             </span>
                             <div className={'mt-[8px] flex justify-between border-collapse rounded-[3px] shadow-none '}>
                                 <Input
                                     className={'w-[90%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none'}
                                     type={'number'}
                                     inputName={'P-Claim'}
-                                    idInput={'iCoin'}
+                                    idInput={'iPClaim'}
                                     value={state.p_claim}
                                     onChange={(a: any) => {
                                         if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
                                             setState({ ...state, p_claim: 0 })
                                         } else {
                                             setState({ ...state, p_claim: a.target.value.replace(/^0+/, '') })
-                                        }
-                                        if (a.target.value * 1 > testdefault.USDT) {
-                                            return setICoin(testdefault.USDT)
                                         }
                                     }}
                                     placeholder={`${menu[9].name}`}
@@ -480,20 +535,21 @@ const Insurance = () => {
                     <div
                         className={`${
                             tab == 4 ? 'hidden' : ''
-                        } flex flex-row justify-between items-center w-[30%] rounded-[12px] border border-[#E5E7E8] border-[0.5px] px-[24px] py-[16px] mx-[12px]`}
+                        } flex flex-row justify-between items-center w-[30%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] mx-[12px]`}
                     >
                         <div className={'text-[#808890]'}>R-Claim</div>
                         <div className={'font-semibold'}>
-                            <span>%</span>
+                            <span>{state.r_claim}%</span>
                         </div>
                     </div>
                     <div
                         className={`${
                             tab == 5 ? 'hidden' : ''
-                        } flex flex-row justify-between items-center w-[30%] rounded-[12px] border border-[#E5E7E8] border-[0.5px] px-[24px] py-[16px] mx-[12px]`}
+                        } flex flex-row justify-between items-center w-[30%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] mx-[12px]`}
                     >
                         <div className={'text-[#808890]'}>Q-Claim</div>
                         <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
+                            {state.q_claim}
                             <span className={'text-[#EB2B3E]'}>USDT</span>
                             <ChevronDown size={18} className={'ml-1 mt-1'} />
                         </div>
@@ -501,10 +557,11 @@ const Insurance = () => {
                     <div
                         className={`${
                             tab == 6 ? 'hidden' : ''
-                        } flex flex-row justify-between items-center w-[30%] rounded-[12px] border border-[#E5E7E8] border-[0.5px] px-[24px] py-[16px] mx-[12px]`}
+                        } flex flex-row justify-between items-center w-[30%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] mx-[12px]`}
                     >
                         <div className={'text-[#808890]'}>Margin</div>
                         <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
+                            {state.margin}
                             <span className={'text-[#EB2B3E]'}>USDT</span>
                             <ChevronDown size={18} className={'ml-1 mt-1'} />
                         </div>
@@ -547,21 +604,15 @@ const Insurance = () => {
                     </Button>
                 </div>
             )}
-
-            {
-                //Infomation Insurance
-                index == 2 && (
-                    <div className={'max-w-screen-layout shadow-xl mx-auto rounded-[12px] bg-white'}>
-                        <div className={'flex justify-center items-center mt-[24px]'}>
-                            <CheckCircle />
-                            <span className={'font-semibold text-[#22313F]'}>
-                                {t('insurance:buy:saved')}
-                                <span className={'text-[#EB2B3E]'}>1,000 USDT</span> {t('insurance:buy:sub_saved')}
-                            </span>
-                        </div>
-                    </div>
-                )
-            }
+            {index == 2 && (
+                <AcceptBuyInsurance
+                    state={state}
+                    menu={menu}
+                    checkUpgrade={checkUpgrade}
+                    setCheckUpgrade={setCheckUpgrade}
+                    handleCheckValidate={handleCheckValidate}
+                />
+            )}
         </LayoutInsurance>
     )
 }

@@ -43,7 +43,7 @@ const handleTrendLine = (hasDrawed: boolean, chart: am4charts.XYChart) => {
     trend.defaultState.transitionDuration = 1
 
     let endPoint = new Date(chart.data[chart.data.length - 1].date)
-    endPoint.setDate(endPoint.getDate() + 10)
+    endPoint.setDate(endPoint.getDate() + 30)
 
     if (!hasDrawed) {
         trend.data = [
