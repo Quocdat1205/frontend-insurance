@@ -137,3 +137,88 @@ export const CalendarIcon = ({ size = 20, color = '#22313F' }: any) => {
         </svg>
     )
 }
+
+export const SuccessIcon = () => {
+    return (
+        <svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M41 81.5C63.3675 81.5 81.5 63.3675 81.5 41C81.5 18.6325 63.3675 0.5 41 0.5C18.6325 0.5 0.5 18.6325 0.5 41C0.5 63.3675 18.6325 81.5 41 81.5Z"
+                fill="url(#paint0_linear_1019_8538)"
+            />
+            <path
+                d="M41 81.5C63.3675 81.5 81.5 63.3675 81.5 41C81.5 18.6325 63.3675 0.5 41 0.5C18.6325 0.5 0.5 18.6325 0.5 41C0.5 63.3675 18.6325 81.5 41 81.5Z"
+                fill="url(#paint1_linear_1019_8538)"
+                fill-opacity="0.5"
+            />
+            <path
+                d="M41 81.5C63.3675 81.5 81.5 63.3675 81.5 41C81.5 18.6325 63.3675 0.5 41 0.5C18.6325 0.5 0.5 18.6325 0.5 41C0.5 63.3675 18.6325 81.5 41 81.5Z"
+                stroke="url(#paint2_linear_1019_8538)"
+            />
+            <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M66.9933 29.6609L36.4628 59.5801L18.4326 42.4687L23.1725 37.4744L36.3861 50.0147L62.174 24.7432L66.9933 29.6609Z"
+                fill="white"
+            />
+            <defs>
+                <linearGradient id="paint0_linear_1019_8538" x1="12" y1="70" x2="73" y2="16" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="white" />
+                    <stop offset="0.401042" stopColor="#61F98C" />
+                    <stop offset="1" stopColor="#3AB83A" />
+                </linearGradient>
+                <linearGradient id="paint1_linear_1019_8538" x1="48" y1="34.5" x2="45" y2="-2.5" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#3AB83A" />
+                    <stop offset="1" stopColor="white" />
+                </linearGradient>
+                <linearGradient id="paint2_linear_1019_8538" x1="41" y1="1" x2="41" y2="81" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#FFEC3E" />
+                    <stop offset="1" stopColor="#FFFAEC" />
+                </linearGradient>
+            </defs>
+        </svg>
+    )
+}
+
+export const CheckBoxIcon = ({ bgColor, dotColor, size, borderColor, checked, checkBgColor, checkDotColor, checkBorderColor, className, onClick }: any) => {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} onClick={onClick}>
+            <path
+                d="M12 23.5C5.64873 23.5 0.5 18.3513 0.5 12C0.5 5.64873 5.64873 0.5 12 0.5C18.3513 0.5 23.5 5.64873 23.5 12C23.5 18.3513 18.3513 23.5 12 23.5Z"
+                fill={`${!checked ? bgColor : checkBgColor}`}
+                stroke={`${!checked ? borderColor : checkBorderColor}`}
+            />
+            <rect x="6" y="6" width="12" height="12" rx="6" fill={`${!checked ? dotColor : checkDotColor}`} />
+        </svg>
+    )
+}
+
+export const ErrorCircleIcon = () => {
+    return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M11.953 2C6.465 2 2 6.486 2 12C2 17.514 6.486 22 12 22C17.514 22 22 17.514 22 12C22 6.486 17.493 2 11.953 2ZM12 20C7.589 20 4 16.411 4 12C4 7.589 7.567 4 11.953 4C16.391 4 20 7.589 20 12C20 16.411 16.411 20 12 20Z"
+                fill="#EB2B3E"
+            />
+            <path d="M11 7H13V14H11V7ZM11 15H13V17H11V15Z" fill="#EB2B3E" />
+        </svg>
+    )
+}
+
+export const StartIcon = () => {
+    return (
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0H36V18C36 27.9411 27.9411 36 18 36C8.05888 36 0 27.9411 0 18V0Z" fill="url(#paint0_linear_1019_5325)" />
+            <path
+                d="M18 8L20.2451 14.9098H27.5106L21.6327 19.1803L23.8779 26.0902L18 21.8197L12.1221 26.0902L14.3673 19.1803L8.48944 14.9098H15.7549L18 8Z"
+                fill="white"
+            />
+            <defs>
+                <linearGradient id="paint0_linear_1019_5325" x1="-2.62881e-07" y1="30.6" x2="42.526" y2="29.1823" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#CE0014" />
+                    <stop offset="0.458333" stopColor="#E92828" />
+                    <stop offset="1" stopColor="#FF5F6D" />
+                </linearGradient>
+            </defs>
+        </svg>
+    )
+}

@@ -1,16 +1,18 @@
 import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themes_animated from '@amcharts/amcharts4/themes/animated'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 export type iProps = {
-    p_expired?: Idata
+    p_expired?: any
     p_market?: Idata
-    p_claim?: Idata
+    p_claim?: any
+    state?: any
     data?: []
     setP_Expired?: any
     setP_Market?: any
     setP_Claim?: any
+    ref?: any
 }
 
 export type Idata = {
@@ -18,22 +20,7 @@ export type Idata = {
     date: any
 }
 
-const timeMessage = (previous: any) => {
-    const current = Date.now()
-    const msPerMinute = 60 * 1000
-    const msPerHour = msPerMinute * 60
-    const msPerDay = msPerHour * 24
-    const msPerMonth = msPerDay * 30
-    const msPerYear = msPerDay * 365
-
-    const elapsed = current - previous
-
-    const date = new Date(previous)
-
-    return date
-}
-
-const handleTrendLine = (hasDrawed: boolean, chart: am4charts.XYChart) => {
+const handleTrendLine = (chart: am4charts.XYChart, p_claim: number) => {
     let trend = chart.series.push(new am4charts.LineSeries())
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
@@ -42,37 +29,37 @@ const handleTrendLine = (hasDrawed: boolean, chart: am4charts.XYChart) => {
     trend.strokeDasharray = '3,3'
     trend.defaultState.transitionDuration = 1
 
-    let endPoint = new Date(chart.data[chart.data.length - 1].date)
-    endPoint.setDate(endPoint.getDate() + 30)
+    let endPoint = new Date(chart.data[chart.data.length - 1]?.date)
+    endPoint.setDate(endPoint.getDate() + 10)
 
-    if (!hasDrawed) {
+    if (!p_claim) {
         trend.data = [
             {
-                date: chart.data[0].date,
-                value: chart.data[chart.data.length - 1].value,
+                date: chart.data[0]?.date,
+                value: chart.data[chart.data.length - 1]?.value,
             },
             {
                 date: endPoint,
-                value: chart.data[chart.data.length - 1].value,
+                value: chart.data[chart.data.length - 1]?.value,
             },
         ]
     }
 
-    if (hasDrawed) {
+    if (p_claim) {
         trend.data = [
             {
-                date: chart.data[0].date,
-                value: p_claim?.value,
+                date: chart.data[0]?.date,
+                value: p_claim,
             },
             {
-                date: p_claim?.date,
-                value: p_claim?.value,
+                date: endPoint,
+                value: p_claim,
             },
         ]
     }
 }
 
-const handleTrendLineStatus = (chart: am4charts.XYChart) => {
+const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number) => {
     let trend = chart.series.push(new am4charts.LineSeries())
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
@@ -82,35 +69,41 @@ const handleTrendLineStatus = (chart: am4charts.XYChart) => {
     trend.defaultState.transitionDuration = 1
 
     if (p_claim) {
+        const timeBegin = new Date(chart.data[chart.data.length - 1].date)
+        const timeEnd = new Date()
+        timeEnd.setDate(timeEnd.getDate() + 5)
+
         trend.data = [
             {
                 date: chart.data[chart.data.length - 1].date,
                 value: chart.data[chart.data.length - 1].value,
             },
             {
-                date: p_claim?.date,
-                value: p_claim?.value,
+                date: timeEnd,
+                value: p_claim,
             },
         ]
     }
 }
 
-const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP_Market, setP_Claim }: iProps) => {
+const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP_Market, setP_Claim, state }: iProps) => {
     const [dataChart, setDataChart] = useState([])
+    let chart: any
+    const ref = useRef<any>(null)
 
     useEffect(() => {
         if (data && data.length > 0) setDataChart(data)
     }, [data])
 
     useEffect(() => {
-        if (dataChart && dataChart.length > 0) {
-            InitChart(dataChart)
-        }
-    }, [dataChart])
+        InitChart(dataChart)
+        ref.current.renderer
+        setP_Market(chart.data[chart.data.length - 1]?.value)
+    }, [dataChart, p_claim, p_expired, state.period])
 
     const InitChart = async (test_data: Idata[]) => {
         am4core.unuseTheme(am4themes_animated)
-        let chart = am4core.create('chartdiv', am4charts.XYChart)
+        chart = am4core.create('chartdiv', am4charts.XYChart)
 
         if (chart) {
             chart.data = test_data
@@ -128,6 +121,7 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
             dateAxis.renderer.axisFills.template.disabled = true
             dateAxis.renderer.ticks.template.disabled = true
             dateAxis.hidden = true
+            dateAxis.tooltip.disabled = true
 
             let valueAxis = chart.yAxes.push(new am4charts.ValueAxis())
             valueAxis.renderer.opposite = true
@@ -156,16 +150,18 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
 
             //chart sub
             let subSeries = chart.series.push(new am4charts.LineSeries())
-            subSeries.data = []
+            subSeries.data = [
+                {
+                    date: chart.data[chart.data.length - 1]?.date,
+                    value: chart.data[chart.data.length - 1]?.value,
+                },
+            ]
             subSeries.dataFields.dateX = 'date'
             subSeries.dataFields.valueY = 'value'
             subSeries.interpolationDuration = 0
 
             // load data for chart sub
-            subSeries.data.push({
-                date: chart.data[chart.data.length - 1].date,
-                value: chart.data[chart.data.length - 1].value,
-            })
+            // subSeries.data.push()
 
             //bullet main
             let bullet = subSeries.bullets.push(new am4charts.CircleBullet())
@@ -174,15 +170,16 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
             bullet.circle.strokeWidth = 2
             bullet.circle.propertyFields.radius = '1'
 
-            handleTrendLine(false, chart)
+            handleTrendLine(chart, p_claim)
 
             // //Label bullet main
-            // let latitudeLabel = subSeries.bullets.push(new am4charts.LabelBullet())
-            // latitudeLabel.label.text = `P-Market ${chart.data[chart.data.length - 1].value}`
-            // latitudeLabel.label.horizontalCenter = 'left'
-            // latitudeLabel.label.dx = 14
-            // latitudeLabel.label.verticalCenter = 'bottom'
-            // latitudeLabel.label.fill = am4core.color('#B2B7BC')
+            let latitudeLabel = subSeries.bullets.push(new am4charts.LabelBullet())
+            latitudeLabel.label.text = `P-Market ${chart.data[chart.data.length - 1]?.value}`
+            latitudeLabel.label.horizontalCenter = 'right'
+            latitudeLabel.label.dx = 100
+            latitudeLabel.label.dy = 15
+            latitudeLabel.label.verticalCenter = 'top'
+            latitudeLabel.label.fill = am4core.color('#B2B7BC')
 
             if (p_expired) {
                 //chart Expired
@@ -190,11 +187,14 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
                 latitudeExpired.dataFields.dateX = 'date'
                 latitudeExpired.dataFields.valueY = 'value'
                 latitudeExpired.data = []
+                subSeries.interpolationDuration = 0
 
                 // load data for chart sub
-                subSeries.data.push({
-                    date: p_expired?.date,
-                    value: p_expired?.value,
+                const t_expired = new Date()
+                t_expired.setDate(state.t_market.getDate() + state.period)
+                latitudeExpired.data.push({
+                    date: t_expired,
+                    value: p_expired,
                 })
 
                 //bullet expired
@@ -209,16 +209,27 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
                 expiredLabel.label.text = `P-Expired ${latitudeExpired.data[0].value}`
                 expiredLabel.label.horizontalCenter = 'middle'
                 expiredLabel.label.dx = 50
+                expiredLabel.label.dy = 30
                 expiredLabel.label.verticalCenter = 'bottom'
                 expiredLabel.label.fill = am4core.color('#B2B7BC')
             }
 
             if (p_claim) {
                 //chart claim
+
+                const timeBegin = new Date(chart.data[chart.data.length - 1]?.date)
+                const timeEnd = new Date()
+                timeEnd.setDate(timeEnd.getDate() + 5)
+
                 let latitudeClaim = chart.series.push(new am4charts.LineSeries())
                 latitudeClaim.dataFields.valueY = 'value'
                 latitudeClaim.dataFields.dateX = 'date'
-                latitudeClaim.data = []
+                latitudeClaim.data = [
+                    {
+                        date: timeEnd,
+                        value: p_claim,
+                    },
+                ]
 
                 let bulletClaim = latitudeClaim.bullets.push(new am4charts.CircleBullet())
                 bulletClaim.fill = am4core.color('white')
@@ -229,20 +240,20 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
                 claimLabel.label.dx = 20
                 claimLabel.label.verticalCenter = 'middle'
                 claimLabel.label.fill = am4core.color('#EB2B3E')
-                claimLabel.label.html = `<div class="hover:cursor-pointer" style="color: #EB2B3E; border-radius: 800px; padding: 4px 16px; background-color: #FFF1F2">P-Claim ${123}</div>`
+                claimLabel.label.html = `<div class="hover:cursor-pointer" style="color: #EB2B3E; border-radius: 800px; padding: 4px 16px; background-color: #FFF1F2">P-Claim ${p_claim}</div>`
                 claimLabel.id = 'g2'
 
                 //label claim
                 claimLabel.label.draggable = true
                 let interract = am4core.getInteraction()
-                claimLabel.events.once('drag', (event) => {
+                claimLabel.events.once('drag', (event: any) => {
                     interract.events.once('up', (e) => {
                         let point = am4core.utils.documentPointToSprite(e.pointer.point, chart.seriesContainer)
-                        return valueAxis.yToValue(point?.y)
+                        return setP_Claim(valueAxis.yToValue(point?.y))
                     })
                 })
 
-                handleTrendLineStatus(chart)
+                handleTrendLineStatus(chart, p_claim)
             }
 
             //cursor
@@ -252,7 +263,7 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
         }
     }
 
-    return <div id="chartdiv" style={{ width: '100%', height: '500px' }} className={'relative'} />
+    return <div ref={ref} id="chartdiv" style={{ width: '100%', height: '500px' }} className={'relative'} />
 }
 
 export default ChartComponent

@@ -18,10 +18,7 @@ export const Input = ({ inputName, idInput, value, type, placeholder, onChange, 
     return (
         <React.Fragment>
             <input
-                className={cx([
-                    className,
-                    'px-3 py-3 placeholder-gray-400 rounded text-sm shadow focus:outline-none  ease-linear transition-all duration-150 appearance-none',
-                ])}
+                className={cx([className, 'px-3 py-3 placeholder-gray-400 rounded text-sm shadow focus:outline-none  ease-linear transition-all duration-150'])}
                 name={inputName}
                 id={idInput}
                 value={value}

@@ -28,6 +28,21 @@
         "upgrade": "Sử dụng 99 NAIN để nhận thêm ưu đãi",
         "upgrade_info": "Gia tăng kỳ hạn và giá trị chi trả bảo hiểm",
         "Term_of_Service": "Bằng việc xác nhận, bạn đã đồng ý với",
-        "Term_of_Service_sub": "Điều khoản dịch của Nami Insurance."
+        "Term_of_Service_sub": "Điều khoản dịch của Nami Insurance.",
+        "connect_wallet": "Kết nối ví"
+    },
+    "final": {
+        "succes": "Mua bảo hiểm thành công",
+        "completa": "Hoàn tất",
+        "contract": "Hợp đồng bảo hiểm",
+        "contract_sub": "đã kết thúc",
+        "reasons": "Lý do: Chạm P-Claim",
+        "reasons1": "Lý do: Hết thời hạn bảo hiểm",
+        "buy_again": "Mua lại / Gia hạn bảo hiểm",
+        "get_noti": "Nhận thông báo",
+        "input_email": "Nhập tài khoản email để nhận thông báo",
+        "label_email": "Nhập Email",
+        "hidden_noti": "Không hiện lại thông báo này",
+        "confirm_email": "Nhận thông báo"
     }
 }

@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react'
-import useWindowSize from 'hooks/useWindowSize'
-import { screens } from 'utils/constants'
+import { useEffect, useRef, useState } from 'react'
 import { CheckCircle, LeftArrow, InfoCircle } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
@@ -19,25 +17,26 @@ import { Input } from 'components/common/Input/input'
 
 //interface
 import { ICoin } from 'components/common/Input/input.interface'
-import Button from 'components/common/Button/Button'
 import { useRouter } from 'next/router'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
-import NotificationInsurance from 'components/layout/notifucationInsurance'
+import Button from 'components/common/Button/Button'
+import axios from 'axios'
 
 //chart
 const ChartComponent = dynamic(() => import('../components/common/Chart/chartComponent'), { ssr: false, loading: () => <header /> })
 
 const Insurance = () => {
     const { t } = useTranslation()
-    const wallets = useWeb3Wallet()
+    const wallet = useWeb3Wallet()
     const router = useRouter()
-    const { width } = useWindowSize()
-    const isMobile = width && width < screens.drawer
     const [percentInsurance, setPercentInsurance] = useState<number>(0)
     const [selectTime, setSelectTime] = useState<string>('ALL')
     const [isDrop, setDrop] = useState(false)
     const [isHover, setIsHover] = useState(false)
     const [checkUpgrade, setCheckUpgrade] = useState(false)
+    const elementRef = useRef(null)
+    const [clear, setClear] = useState(false)
+    const [isUSDT, setIsUSDT] = useState(false)
 
     const [index, setIndex] = useState<1 | 2>(1)
     const [tab, setTab] = useState<number>(3)
@@ -53,6 +52,9 @@ const Insurance = () => {
         q_claim: 0,
         r_claim: 0,
         q_covered: 0,
+        p_market: 0,
+        t_market: new Date(),
+        p_expired: 0,
     })
 
     const [dataChart, setDataChart] = useState()
@@ -79,72 +81,43 @@ const Insurance = () => {
     ]
     const [selectCoin, setSelectedCoin] = useState<ICoin>(listCoin[0])
 
-    const fetchApi = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any) => {
-        const response = await fetch(
-            'https://datav2.nami.exchange/api/v1/chart/history?' +
-                'broker=NAMI_SPOT' +
-                '&symbol=' +
-                symbol +
-                '&from=' +
-                from +
-                '&to=' +
-                to +
-                '&resolution=' +
-                resolution,
-        )
-        let list = await response.json()
-        let data: { date: number; value: any }[] = []
-        list.map((item: any) => {
-            data.push({
-                date: item[0] * 1000,
-                value: item[1],
-            })
-        })
-        data.length > 0 && setDataChart(data)
-    }
+    const [general, setGeneral] = useState<any>(null)
 
     useEffect(() => {
         const timeEnd = new Date()
         const timeBegin = new Date()
-        timeBegin.setDate(timeEnd.getDate() - 100)
-        fetchApi('BTCUSDT', `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1d', setDataChart)
+        timeBegin.setDate(timeEnd.getDate() - 10)
+        setState({ ...state, t_market: timeEnd })
+        fetchApiNami(`${listCoin[0].symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1d', setDataChart)
+        getPrice(listCoin[0].symbol, state, setState)
     }, [])
 
     useEffect(() => {
+        refreshApi(selectTime, selectCoin)
+        getPrice(selectCoin.symbol, state, setState)
+    }, [selectTime, selectCoin])
+
+    const refreshApi = (
+        selectTime: string | undefined,
+        selectCoin: { id?: number; name?: string; icon?: string; disable?: boolean | undefined; symbol: any },
+    ) => {
         const timeEnd = new Date()
         const timeBegin = new Date()
         if (selectTime == '1H' || selectTime == '1D') {
-            timeBegin.setDate(timeEnd.getDate() - 1)
-            fetchApi(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1m', setDataChart)
+            timeBegin.setDate(timeEnd.getDate() - 10)
+            fetchApiNami(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1m', setDataChart)
         } else if (selectTime == '1W') {
-            timeBegin.setDate(timeEnd.getDate() - 7)
-            fetchApi(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1h', setDataChart)
+            timeBegin.setDate(timeEnd.getDate() - 10)
+            fetchApiNami(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1h', setDataChart)
         } else {
-            timeBegin.setDate(timeEnd.getDate() - 7)
-            fetchApi(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1d', setDataChart)
+            timeBegin.setDate(timeEnd.getDate() - 10)
+            fetchApiNami(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1h', setDataChart)
         }
-    }, [selectTime, selectCoin])
-
-    // setInterval(() => {
-    //     const timeEnd = new Date()
-    //     const timeBegin = new Date()
-    //     if (selectTime == '1H' || selectTime == '1D') {
-    //         timeBegin.setDate(timeEnd.getDate() - 1)
-    //         fetchApi(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1m', setDataChart)
-    //     } else if (selectTime == '1W') {
-    //         timeBegin.setDate(timeEnd.getDate() - 7)
-    //         fetchApi(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1h', setDataChart)
-    //     } else {
-    //         timeBegin.setDate(timeEnd.getDate() - 7)
-    //         fetchApi(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1d', setDataChart)
-    //     }
-    // }, 6000)
+    }
 
     useEffect(() => {
-        if (wallets) {
-            setUserBalance(wallets.Balance || 10000)
-        }
-    }, [wallets])
+        setUserBalance(wallet.getBalance())
+    }, [wallet])
 
     const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', 'ALL']
     const listTabPeriod: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
@@ -167,56 +140,64 @@ const Insurance = () => {
 
     useEffect(() => {
         if (state.q_covered) {
-            const percent: number = Number(((state.q_covered / userBalance) * 100).toFixed(2))
+            const percent: number = Math.floor((state.q_covered / userBalance) * 100)
             setPercentInsurance(percent)
         }
         if (selectCoin) {
             setState({ ...state, symbol: selectCoin })
         }
-        handleFillData()
+        if ((state.period, state.q_covered, state.p_claim)) {
+            const margin = Math.floor((8 * state.q_covered * state.p_market) / 100)
+            const userCapital = margin
+            const systemCapital = userCapital
+            const hedge_capital = userCapital + systemCapital
+            const hedge = margin / (state.q_covered * state.p_market)
+            const p_stop = P_stop(state.p_market, state.p_claim, hedge)
+            const laverage = Leverage(state.p_market, p_stop)
+            const ratio_profit = (state.p_claim - state.p_market) / state.p_market
+            const q_claim = Math.floor(ratio_profit * hedge_capital * laverage)
+            setState({ ...state, q_claim: q_claim, margin: margin, r_claim: Number((q_claim / margin).toFixed(2)), p_expired: Math.floor(p_stop) })
+        }
     }, [state.q_covered, state.period, selectCoin, state.margin, state.p_claim])
 
+    const Leverage = (p_market: number, p_stop: number) => {
+        const leverage = Math.floor(p_market / Math.abs(p_market - p_stop))
+        return leverage < 1 ? 1 : leverage
+    }
+
+    const P_stop = (p_market: number, p_claim: number, hedge: number) => {
+        const diffStopfutures = 0 / 100
+        const ratio_min_profit = Math.abs(p_claim - p_market) / p_market / 2
+        if (p_claim > p_market) {
+            const p_stop = p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)
+            return Math.round(Math.abs(p_stop) * 100) / 100
+        } else {
+            const p_stop = p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)
+            return Math.round(Math.abs(p_stop) * 100) / 100
+        }
+    }
+
+    //validate
     useEffect(() => {
-        console.log(tab)
-        router.push(`?query=${tab}`)
-    }, [tab])
-
-    const handleFillData = () => {
-        handleCheckValidate()
-        if (router.query.query === '3') {
-            const q_covered = state.q_covered
-            const p_claim = state.p_claim
-            const r_claim = 220
+        if (validatePclaim(state.p_claim)) {
+            return setClear(true)
         }
+    }, [state.p_claim])
+
+    const validatePclaim = (value: number) => {
+        let status: boolean = false
+
+        if (
+            (value > (2 * state.p_market) / 100 && value < (70 * state.p_market) / 100) ||
+            (value > (-70 * state.p_market) / 100 && value < (-2 * state.p_market) / 100)
+        ) {
+            status = true
+        }
+        return status
     }
 
-    const handleCheckValidate = () => {
-        if (state.q_covered <= 0) return true
-        if (state.q_covered <= 0) return true
-        if (state.q_covered > userBalance) {
-            Config.toast.show('error', t('insurance:buy:input_invalid'))
-            return true
-        }
-
-        return false
-    }
     return (
         <LayoutInsurance>
-            {
-                //subtitle
-                !isMobile && (
-                    <div className="bg-[#eee]">
-                        <ul className="breadcrumb max-w-screen-layout m-auto">
-                            <li>
-                                <a href="#">{menu[0].name}</a>
-                            </li>
-                            <li>
-                                <a href="#">{menu[1].name}</a>
-                            </li>
-                        </ul>
-                    </div>
-                )
-            }
             {
                 // head Insurance
                 <div className="max-w-screen-2xl m-auto flex items-center justify-between space-x-12 pt-[20px]   ">
@@ -243,8 +224,7 @@ const Insurance = () => {
                                     {menu.map((e, key) => {
                                         let Press = false
                                         return (
-                                            key >= 3 &&
-                                            key <= 6 && (
+                                            (key == 3 || key == 6) && (
                                                 <div
                                                     onClick={() => {
                                                         setTab(key)
@@ -279,6 +259,23 @@ const Insurance = () => {
                     <div>{index}/2</div>
                     <div className={'font-semibold text-[32px] leading-[44px]'}>{index == 1 ? menu[1].name : t('insurance:buy:info_covered')}</div>
                 </div>
+            }
+
+            {
+                //checkAuth
+                wallet.accout == '' ? (
+                    <div className="ư-full flex justify-center items-center">
+                        <Button
+                            variants={'primary'}
+                            className={`bg-[#EB2B3E] h-[48px] w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
+                            onClick={() => {}}
+                        >
+                            {t('insurance:buy:connect_wallet')}
+                        </Button>
+                    </div>
+                ) : (
+                    ''
+                )
             }
             {
                 //chart
@@ -383,19 +380,7 @@ const Insurance = () => {
                                         idInput={''}
                                         value={tab == 4 ? state.r_claim : tab == 5 ? state.q_claim : tab == 6 && state.margin}
                                         onChange={(a: any) => {
-                                            if (tab == 4) {
-                                                if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
-                                                    setState({ ...state, r_claim: 0 })
-                                                } else {
-                                                    setState({ ...state, r_claim: a.target.value.replace(/^0+/, '') })
-                                                }
-                                            } else if (tab == 5) {
-                                                if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
-                                                    setState({ ...state, q_claim: 0 })
-                                                } else {
-                                                    setState({ ...state, q_claim: a.target.value.replace(/^0+/, '') })
-                                                }
-                                            } else if (tab == 6) {
+                                            if (tab == 6) {
                                                 if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
                                                     setState({ ...state, margin: 0 })
                                                 } else {
@@ -405,7 +390,12 @@ const Insurance = () => {
                                         }}
                                         placeholder={''}
                                     />
-                                    <div className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px]'}>{tab == 4 ? '%' : 'USDT'}</div>
+                                    <div
+                                        className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px] select-none hover:cursor-pointer'}
+                                        onClick={() => setIsUSDT(!isUSDT)}
+                                    >
+                                        {!isUSDT ? '%' : 'USDT'}
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -443,7 +433,14 @@ const Insurance = () => {
 
                         {/*body*/}
                         <div className={'pl-[32px] pr-[32px] flex flex-row relative'}>
-                            <ChartComponent data={dataChart} />
+                            <ChartComponent
+                                data={dataChart}
+                                state={state ? state : null}
+                                p_claim={Number(state && state.p_claim)}
+                                p_expired={state.p_expired > 0 ? state.p_expired : undefined}
+                                setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
+                                setP_Market={(data: number) => setState({ ...state, p_market: data })}
+                            />
                             <svg className={'absolute right-[95px]'} width="10" height="458" viewBox="0 0 2 240" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <line x1="1" y1="3.5011e-08" x2="0.999987" y2="240" stroke="#B2B7BC" strokeWidth="150" strokeDasharray="0.74 3.72" />
                             </svg>
@@ -586,32 +583,32 @@ const Insurance = () => {
             {/* the next level*/}
             {index == 1 && (
                 <div className={'flex flex-col justify-center items-center mt-[146px]'}>
-                    <Button
-                        variants={'primary'}
+                    <button
                         className={`${
-                            handleCheckValidate() ? 'bg-[#E5E7E8]' : 'bg-[#EB2B3E]'
-                        }  h-[48px] w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
-                        disable={handleCheckValidate()}
+                            clear ? 'bg-red text-white border border-red' : 'text-white bg-[#E5E7E8] border border-[#E5E7E8]'
+                        }flex items-center justify-center rounded-lg px-auto py-auto font-semibold py-[12px] px-[148px]`}
                         onClick={() => {
-                            if (!handleCheckValidate()) {
+                            if (clear) {
                                 setIndex(2)
                             }
                         }}
+                        disabled={!clear}
                     >
                         {menu[11].name}
-                    </Button>
-                    <Button variants={'primary'} className={'my-[16px] text-[#00ABF9] underline'} onClick={() => {}}>
+                    </button>
+                    <span className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'} onClick={() => {}}>
                         {menu[12].name}
-                    </Button>
+                    </span>
                 </div>
             )}
             {index == 2 && (
                 <AcceptBuyInsurance
                     state={state}
+                    setState={setState}
                     menu={menu}
                     checkUpgrade={checkUpgrade}
                     setCheckUpgrade={setCheckUpgrade}
-                    handleCheckValidate={handleCheckValidate}
+                    getPrice={getPrice}
                 />
             )}
         </LayoutInsurance>
@@ -623,5 +620,43 @@ export const getStaticProps: GetStaticProps = async ({ locale }: any) => ({
         ...(await serverSideTranslations(locale, ['common', 'insurance'])),
     },
 })
+
+export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any) => {
+    const response = await fetch(
+        'https://datav2.nami.exchange/api/v1/chart/history?' +
+            'broker=NAMI_SPOT' +
+            '&symbol=' +
+            symbol +
+            '&from=' +
+            from +
+            '&to=' +
+            to +
+            '&resolution=' +
+            resolution,
+    )
+    let list = await response.json()
+    let data: { date: number; value: any }[] = []
+    list.map((item: any) => {
+        data.push({
+            date: item[0] * 1000,
+            value: item[1],
+        })
+    })
+    data.length > 0 && setDataChart(data)
+}
+
+export const getPrice = async (symbol: string, state: any, setState: any) => {
+    try {
+        const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${symbol}`)
+        if (data) {
+            if (data.data[0]) {
+                console.log('fetch data', data.data[0]?.p)
+                return setState({ ...state, p_market: data.data[0]?.p })
+            }
+        }
+    } catch (err) {
+        console.log(err)
+    }
+}
 
 export default Insurance

@@ -28,6 +28,21 @@
         "upgrade": "Use 99 NAIN to get more special benefits",
         "upgrade_info": "Increase the amount of Period and Q-Claim",
         "Term_of_Service": "By providing press \"Confirm\", you agree to ",
-        "Term_of_Service_sub": "the Nami Insurance's Term of Service."
+        "Term_of_Service_sub": "the Nami Insurance's Term of Service.",
+        "connect_wallet": "Connect wallet"
+    },
+    "final": {
+        "succes": "Successfully purchased Insurance Contract",
+        "complete": "Complete",
+        "contract": "Cover contract",
+        "contract_sub": "has ended",
+        "reasons": "Reason: Reach P-Claim",
+        "reasons1": "Reason: The cover period is expired",
+        "buy_again": "Buy back / Repurchase / Extend Cover",
+        "get_noti": "Stay up to date",
+        "input_email": "Enter your email to get notified",
+        "label_email": "Enter your email ",
+        "hidden_noti": "Do not show again",
+        "confirm_email": "Get Notification"
     }
 }
