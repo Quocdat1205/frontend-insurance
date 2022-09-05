@@ -6,7 +6,7 @@ import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { buyInsurance } from 'services/buy-insurance'
-import { formatPriceToWeiValue } from 'utils/format'
+import { etherToWei, formatPriceToWeiValue } from 'utils/format'
 
 export type IProps = {
     state: any
@@ -26,16 +26,15 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
     const createContract = async () => {
         if (!wallet.account) return console.log('chua login')
         const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${state.symbol.symbol}`)
-
         const t_expired = new Date()
         t_expired.setDate(state.t_market.getDate() + state.period)
 
         const dataPost = {
             owner: wallet.account as string,
-            current_price: data[0].h.toFixed(),
+            current_price: data.data[0].h.toFixed(),
             liquidation_price: state.p_claim,
             deposit: formatPriceToWeiValue(state.q_covered),
-            expired: t_expired,
+            expired: t_expired.getTime(),
         }
 
         const buy = await wallet.contractCaller.insuranceContract.contract.buyInsurance(
@@ -46,6 +45,7 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
             dataPost.expired,
             { value: dataPost.deposit },
         )
+        console.log(buy, 'bsc')
 
         if (buy) {
             try {
@@ -65,8 +65,6 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
     }
     return (
         <>
-            {/* <NotificationInsurance id={'1111111'} name={'email'} /> */}
-
             <div
                 className="max-w-screen-md mx-auto relative flex flex-col"
                 style={{ filter: 'drop-shadow(0px 6px 18px rgba(9, 30, 66, 0.15)) drop-shadow(0px 0px 1px rgba(9, 30, 66, 0.31))' }}
@@ -80,12 +78,6 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                         </span>
                     </div>
                 </div>
-                {/* <div
-                    className=" relative h-[40px] z-2 mx-[20px] px-[10px] bg-[white]
-                            before:left-[0px] before:bg-transparent before:top-[20px] before:absolute before:content-[' '] before:w-[40px] before:h-[40px] before:border-transparent before:border-[1.5px] before:border-t-[red] before:border-r-[red] before:-translate-x-1/2 before:-translate-y-1/2 before:rotate-45 before:rounded-[50%]
-                            after:right-[-40px] after:top-[20px] after:absolute after:content-[' '] after:w-[40px] after:h-[40px] after:border-transparent after:border-[1.5px] after:border-t-[red] after:border-r-[red] after:-translate-x-1/2 after:-translate-y-1/2 after:rotate-[225deg] after:rounded-[50%] 
-                            "
-                ></div> */}
 
                 <div className="ticket relative overflow-hidden">
                     <div className="dashedLine absolute z-2000 top-[50%] left-[20px] w-[95%]"></div>

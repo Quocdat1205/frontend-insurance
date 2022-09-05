@@ -147,16 +147,20 @@ const Insurance = () => {
             setState({ ...state, symbol: selectCoin })
         }
         if ((state.period, state.q_covered, state.p_claim)) {
-            const margin = Math.floor((8 * state.q_covered * state.p_market) / 100)
-            const userCapital = margin
-            const systemCapital = userCapital
-            const hedge_capital = userCapital + systemCapital
-            const hedge = margin / (state.q_covered * state.p_market)
-            const p_stop = P_stop(state.p_market, state.p_claim, hedge)
-            const laverage = Leverage(state.p_market, p_stop)
-            const ratio_profit = (state.p_claim - state.p_market) / state.p_market
-            const q_claim = Math.floor(ratio_profit * hedge_capital * laverage)
-            setState({ ...state, q_claim: q_claim, margin: margin, r_claim: Number((q_claim / margin).toFixed(2)), p_expired: Math.floor(p_stop) })
+            if (tab == 3) {
+                const margin = Math.floor((8 * state.q_covered * state.p_market) / 100)
+                const userCapital = margin
+                const systemCapital = userCapital
+                const hedge_capital = userCapital + systemCapital
+                const hedge = margin / (state.q_covered * state.p_market)
+                const p_stop = P_stop(state.p_market, state.p_claim, hedge)
+                const laverage = Leverage(state.p_market, p_stop)
+                const ratio_profit = (state.p_claim - state.p_market) / state.p_market
+                const q_claim = Math.floor(ratio_profit * hedge_capital * laverage)
+                setState({ ...state, q_claim: q_claim, margin: margin, r_claim: Number((q_claim / margin).toFixed(2)), p_expired: Math.floor(p_stop) })
+            }
+            if (tab == 6) {
+            }
         }
     }, [state.q_covered, state.period, selectCoin, state.margin, state.p_claim])
 
@@ -391,7 +395,9 @@ const Insurance = () => {
                                         placeholder={''}
                                     />
                                     <div
-                                        className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px] select-none hover:cursor-pointer'}
+                                        className={
+                                            'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px] select-none hover:cursor-pointer text-red'
+                                        }
                                         onClick={() => setIsUSDT(!isUSDT)}
                                     >
                                         {!isUSDT ? '%' : 'USDT'}
