@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic'
 import LayoutInsurance from 'components/layout/layoutInsurance'
+
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import Button from 'components/common/Button/Button'
 import axios from 'axios'
@@ -185,17 +186,16 @@ const BuyCovered = () => {
         }
 
         if (tab == 6) {
-            if (state.period || state.q_covered || state.p_claim || state.percent_margin) {
-                const margin = Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2))
-                const userCapital = margin
+            if (state.period || state.q_covered || state.p_claim || state.margin) {
+                const userCapital = state.margin
                 const systemCapital = userCapital
                 const hedge_capital = userCapital + systemCapital
-                const hedge = Number((margin / (state.q_covered * state.p_market)).toFixed(2))
+                const hedge = Number((state.margin / (state.q_covered * state.p_market)).toFixed(2))
                 const p_stop = P_stop(state.p_market, state.p_claim, hedge)
                 const laverage = Leverage(state.p_market, p_stop)
                 const ratio_profit = Number((Math.abs(state.p_claim - state.p_market) / state.p_market).toFixed(2))
                 const q_claim = Number((ratio_profit * hedge_capital * laverage).toFixed(2))
-                setState({ ...state, q_claim: q_claim, r_claim: Number((q_claim / margin).toFixed(2)), p_expired: Math.floor(p_stop), margin: margin })
+                setState({ ...state, q_claim: q_claim, r_claim: Number((q_claim / state.margin).toFixed(2)), p_expired: Math.floor(p_stop) })
             }
         }
     }, [state.q_covered, state.period, selectCoin, state.margin, state.p_claim, state.percent_margin])
@@ -442,7 +442,11 @@ const BuyCovered = () => {
                                 <div
                                     className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
                                     onClick={() => {
-                                        setState({ ...state, percent_margin: 2 })
+                                        setState({
+                                            ...state,
+                                            percent_margin: 2,
+                                            margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                        })
                                     }}
                                 >
                                     <div className={`${state.percent_margin == 2 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
@@ -451,7 +455,11 @@ const BuyCovered = () => {
                                 <div
                                     className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
                                     onClick={() => {
-                                        setState({ ...state, percent_margin: 5 })
+                                        setState({
+                                            ...state,
+                                            percent_margin: 5,
+                                            margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                        })
                                     }}
                                 >
                                     <div className={`${5 == state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
@@ -460,7 +468,11 @@ const BuyCovered = () => {
                                 <div
                                     className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
                                     onClick={() => {
-                                        setState({ ...state, percent_margin: 7 })
+                                        setState({
+                                            ...state,
+                                            percent_margin: 7,
+                                            margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                        })
                                     }}
                                 >
                                     <div className={`${7 == state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
@@ -469,7 +481,11 @@ const BuyCovered = () => {
                                 <div
                                     className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
                                     onClick={() => {
-                                        setState({ ...state, percent_margin: 10 })
+                                        setState({
+                                            ...state,
+                                            percent_margin: 10,
+                                            margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                        })
                                     }}
                                 >
                                     <div className={`${state.percent_margin == 10 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />

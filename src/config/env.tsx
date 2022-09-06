@@ -4,7 +4,6 @@ interface Env {
     PORT: string | number
     CDN: string
     NODE_ENV: string
-    
 }
 
 const env: Env = {

@@ -2,11 +2,13 @@ import axios from 'axios'
 import Button from 'components/common/Button/Button'
 import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { buyInsurance } from 'services/buy-insurance'
 import { formatPriceToWeiValue } from 'utils/format'
 import { CheckBoxIcon, CheckCircle, ErrorCircleIcon, StartIcon } from 'components/common/Svg/SvgIcon'
+import fetchApi from 'services/fetch-api'
+import { API_GET_GET_TOKEN } from 'services/apis'
+import { buyInsurance } from 'services/buy-insurance'
 
 export type IProps = {
     state: any
@@ -103,10 +105,19 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                     q_covered: formatPriceToWeiValue(state.q_covered),
                     p_market: formatPriceToWeiValue(data.data[0].p),
                     p_claim: formatPriceToWeiValue(state.p_claim),
-                    period: formatPriceToWeiValue(state.period + 2),
+                    period: state.period + 2,
                 }
                 const buy = await wallet.contractCaller.insuranceContract.contract
-                    .createInsurance(dataPost.buyer, dataPost.asset, dataPost.margin, dataPost.q_covered, dataPost.p_market, dataPost.p_claim, dataPost.period)
+                    .createInsurance(
+                        dataPost.buyer,
+                        dataPost.asset,
+                        dataPost.margin,
+                        dataPost.q_covered,
+                        dataPost.p_market,
+                        dataPost.p_claim,
+                        dataPost.period,
+                        { value: dataPost.margin },
+                    )
                     .then((e: any) => {
                         console.log(e)
                         handlePostInsurance(e, dataPost, state)
@@ -121,7 +132,7 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
         if (props) {
             try {
                 const data = {
-                    owner: dataPost.buyer,
+                    owner: props.from,
                     transaction_hash: props.hash,
                     id_sc: 0,
                     asset_covered: dataPost.asset,
@@ -131,6 +142,7 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                     p_claim: state.p_claim,
                     period: state.period,
                 }
+
                 await buyInsurance(data)
                 console.log(data)
                 // Config.toast.show('success', 'success')

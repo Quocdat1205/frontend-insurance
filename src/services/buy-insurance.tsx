@@ -1,21 +1,38 @@
 import axios from 'axios'
+import Config from 'config/config'
+import { API_GET_GET_TOKEN } from './apis'
 
-const mandatory = () => Promise.reject(new Error('Fetch API Missing parameter!'))
-
-export const buyInsurance = async ({ props }: any = mandatory(), cb: any = (f: any) => f) => {
+export const buyInsurance = async (props: {
+    owner: string
+    transaction_hash: string
+    id_sc: number
+    asset_covered: string
+    asset_refund: string
+    margin: number
+    q_covered: number
+    p_claim: number
+    period: number
+}) => {
     try {
         const { owner, transaction_hash, id_sc, asset_covered, asset_refund, margin, q_covered, p_claim, period } = props
-        const { data } = await axios.post('/buy-insurance', {
-            owner,
-            transaction_hash,
-            id_sc,
-            asset_covered,
-            asset_refund,
-            margin,
-            q_covered,
-            p_claim,
-            period,
-        })
+
+        const AuthToken = await axios.get(`${Config.env.API_URL}${API_GET_GET_TOKEN}`, { params: { walletAddress: owner } })
+
+        const { data } = await axios.post(
+            `${Config.env.API_URL}/buy-insurance`,
+            {
+                owner,
+                transaction_hash,
+                id_sc,
+                asset_covered,
+                asset_refund,
+                margin,
+                q_covered,
+                p_claim,
+                period,
+            },
+            { headers: { Authorization: AuthToken.data } },
+        )
 
         return data
     } catch (error) {
