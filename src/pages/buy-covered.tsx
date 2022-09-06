@@ -1,30 +1,24 @@
+import dynamic from 'next/dynamic'
+import LayoutInsurance from 'components/layout/layoutInsurance'
+import useWeb3Wallet from 'hooks/useWeb3Wallet'
+import Button from 'components/common/Button/Button'
+import axios from 'axios'
+import { Popover, Tab } from '@headlessui/react'
+import { AcceptBuyInsurance } from '../components/screens/Insurance/AcceptBuyInsurance'
+import { GetStaticProps } from 'next'
+import { Input } from 'components/common/Input/input'
+import { ICoin } from 'components/common/Input/input.interface'
+import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { CheckCircle, LeftArrow, InfoCircle } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import dynamic from 'next/dynamic'
-
-//layout
-import LayoutInsurance from 'components/layout/layoutInsurance'
-import { Popover, Tab } from '@headlessui/react'
-import { AcceptBuyInsurance } from '../components/screens/Insurance/AcceptBuyInsurance'
-
-//Props
-import { GetStaticProps } from 'next'
-import { Input } from 'components/common/Input/input'
-
-//interface
-import { ICoin } from 'components/common/Input/input.interface'
-import { useRouter } from 'next/router'
-import useWeb3Wallet from 'hooks/useWeb3Wallet'
-import Button from 'components/common/Button/Button'
-import axios from 'axios'
 
 //chart
 const ChartComponent = dynamic(() => import('../components/common/Chart/chartComponent'), { ssr: false, loading: () => <header /> })
 
-const Insurance = () => {
+const BuyCovered = () => {
     const { t } = useTranslation()
     const wallet = useWeb3Wallet()
     const router = useRouter()
@@ -35,28 +29,11 @@ const Insurance = () => {
     const [checkUpgrade, setCheckUpgrade] = useState(false)
     const elementRef = useRef(null)
     const [clear, setClear] = useState(false)
-    const [isUSDT, setIsUSDT] = useState(false)
 
     const [index, setIndex] = useState<1 | 2>(1)
     const [tab, setTab] = useState<number>(3)
 
     const [userBalance, setUserBalance] = useState<number>(0)
-
-    const [state, setState] = useState({
-        timeframe: '',
-        margin: 0,
-        symbol: {},
-        period: 2,
-        p_claim: 0,
-        q_claim: 0,
-        r_claim: 0,
-        q_covered: 0,
-        p_market: 0,
-        t_market: new Date(),
-        p_expired: 0,
-    })
-
-    const [dataChart, setDataChart] = useState()
     const listCoin: ICoin[] = [
         {
             id: 1,
@@ -81,9 +58,75 @@ const Insurance = () => {
             type: 'BNB',
         },
     ]
+
+    const [state, setState] = useState({
+        timeframe: '',
+        margin: 0,
+        percent_margin: 0,
+        symbol: listCoin[0],
+        period: 2,
+        p_claim: 0,
+        q_claim: 0,
+        r_claim: 0,
+        q_covered: 0,
+        p_market: 0,
+        t_market: new Date(),
+        p_expired: 0,
+    })
+
+    const [dataChart, setDataChart] = useState()
+
     const [selectCoin, setSelectedCoin] = useState<ICoin>(listCoin[0])
 
     const [general, setGeneral] = useState<any>(null)
+
+    const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', 'ALL']
+    const listTabPeriod: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+
+    const menu = [
+        { menuId: 'home', router: 'home', name: t('insurance:buy:home'), parentId: 0 },
+        { menuId: 'buy_covered', router: 'insurance', name: t('insurance:buy:buy_covered'), parentId: 0 },
+        { menuId: 'back_to_home', router: 'home', name: t('insurance:buy:back_to_home'), parentId: 0 },
+        { menuId: 'default', name: t('insurance:buy:default'), parentId: 0 },
+        { menuId: 'change_r_claim', name: t('insurance:buy:change_r_claim'), parentId: 0 },
+        { menuId: 'change_q_claim', name: t('insurance:buy:change_q_claim'), parentId: 0 },
+        { menuId: 'change_margin', name: t('insurance:buy:change_margin'), parentId: 0 },
+        { menuId: 'quality_and_type', name: t('insurance:buy:quality_and_type') },
+        { menuId: 'day', name: t('insurance:buy:day') },
+        { menuId: 'example', name: t('insurance:buy:example') },
+        { menuId: 'tooltip', name: t('insurance:buy:tooltip') },
+        { menuId: 'continue', name: t('insurance:buy:continue') },
+        { menuId: 'help', name: t('insurance:buy:help') },
+    ]
+
+    const Leverage = (p_market: number, p_stop: number) => {
+        const leverage = Number((p_market / Math.abs(p_market - p_stop)).toFixed(2))
+        return leverage < 1 ? 1 : leverage
+    }
+
+    const P_stop = (p_market: number, p_claim: number, hedge: number) => {
+        const diffStopfutures = 0 / 100
+        const ratio_min_profit = Math.abs(p_claim - p_market) / p_market / 2
+        if (p_claim > p_market) {
+            const p_stop = Number(((p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2))
+            return Math.abs(p_stop) / 100
+        } else {
+            const p_stop = Number(((p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2))
+            return Math.abs(p_stop) / 100
+        }
+    }
+
+    const validatePclaim = (value: number) => {
+        let status: boolean = false
+
+        if (
+            (value > (2 * state.p_market) / 100 && value < (70 * state.p_market) / 100) ||
+            (value > (-70 * state.p_market) / 100 && value < (-2 * state.p_market) / 100)
+        ) {
+            status = true
+        }
+        return status
+    }
 
     useEffect(() => {
         const timeEnd = new Date()
@@ -118,30 +161,6 @@ const Insurance = () => {
     }
 
     useEffect(() => {
-        setUserBalance(wallet.getBalance())
-        console.log(wallet)
-    }, [wallet])
-
-    const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', 'ALL']
-    const listTabPeriod: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-
-    const menu = [
-        { menuId: 'home', router: 'home', name: t('insurance:buy:home'), parentId: 0 },
-        { menuId: 'buy_covered', router: 'insurance', name: t('insurance:buy:buy_covered'), parentId: 0 },
-        { menuId: 'back_to_home', router: 'home', name: t('insurance:buy:back_to_home'), parentId: 0 },
-        { menuId: 'default', name: t('insurance:buy:default'), parentId: 0 },
-        { menuId: 'change_r_claim', name: t('insurance:buy:change_r_claim'), parentId: 0 },
-        { menuId: 'change_q_claim', name: t('insurance:buy:change_q_claim'), parentId: 0 },
-        { menuId: 'change_margin', name: t('insurance:buy:change_margin'), parentId: 0 },
-        { menuId: 'quality_and_type', name: t('insurance:buy:quality_and_type') },
-        { menuId: 'day', name: t('insurance:buy:day') },
-        { menuId: 'example', name: t('insurance:buy:example') },
-        { menuId: 'tooltip', name: t('insurance:buy:tooltip') },
-        { menuId: 'continue', name: t('insurance:buy:continue') },
-        { menuId: 'help', name: t('insurance:buy:help') },
-    ]
-
-    useEffect(() => {
         if (state.q_covered) {
             const percent: number = Math.floor((state.q_covered / userBalance) * 100)
             setPercentInsurance(percent)
@@ -149,40 +168,37 @@ const Insurance = () => {
         if (selectCoin) {
             setState({ ...state, symbol: selectCoin })
         }
-        if ((state.period, state.q_covered, state.p_claim)) {
-            if (tab == 3) {
-                const margin = Math.floor((8 * state.q_covered * state.p_market) / 100)
+
+        if (tab == 3) {
+            if (state.period || state.q_covered || state.p_claim) {
+                const margin = Number(((8 * state.q_covered * state.p_market) / 100).toFixed(2))
                 const userCapital = margin
                 const systemCapital = userCapital
                 const hedge_capital = userCapital + systemCapital
-                const hedge = margin / (state.q_covered * state.p_market)
+                const hedge = Number((margin / (state.q_covered * state.p_market)).toFixed(2))
                 const p_stop = P_stop(state.p_market, state.p_claim, hedge)
                 const laverage = Leverage(state.p_market, p_stop)
-                const ratio_profit = (state.p_claim - state.p_market) / state.p_market
-                const q_claim = Math.floor(ratio_profit * hedge_capital * laverage)
-                setState({ ...state, q_claim: q_claim, margin: margin, r_claim: Number((q_claim / margin).toFixed(2)), p_expired: Math.floor(p_stop) })
-            }
-            if (tab == 6) {
+                const ratio_profit = Number((Math.abs(state.p_claim - state.p_market) / state.p_market).toFixed(2))
+                const q_claim = Number((ratio_profit * hedge_capital * laverage).toFixed(2))
+                setState({ ...state, q_claim: q_claim, r_claim: Number((q_claim / margin).toFixed(2)), p_expired: Math.floor(p_stop), margin: margin })
             }
         }
-    }, [state.q_covered, state.period, selectCoin, state.margin, state.p_claim])
 
-    const Leverage = (p_market: number, p_stop: number) => {
-        const leverage = Math.floor(p_market / Math.abs(p_market - p_stop))
-        return leverage < 1 ? 1 : leverage
-    }
-
-    const P_stop = (p_market: number, p_claim: number, hedge: number) => {
-        const diffStopfutures = 0 / 100
-        const ratio_min_profit = Math.abs(p_claim - p_market) / p_market / 2
-        if (p_claim > p_market) {
-            const p_stop = p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)
-            return Math.round(Math.abs(p_stop) * 100) / 100
-        } else {
-            const p_stop = p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)
-            return Math.round(Math.abs(p_stop) * 100) / 100
+        if (tab == 6) {
+            if (state.period || state.q_covered || state.p_claim || state.percent_margin) {
+                const margin = Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2))
+                const userCapital = margin
+                const systemCapital = userCapital
+                const hedge_capital = userCapital + systemCapital
+                const hedge = Number((margin / (state.q_covered * state.p_market)).toFixed(2))
+                const p_stop = P_stop(state.p_market, state.p_claim, hedge)
+                const laverage = Leverage(state.p_market, p_stop)
+                const ratio_profit = Number((Math.abs(state.p_claim - state.p_market) / state.p_market).toFixed(2))
+                const q_claim = Number((ratio_profit * hedge_capital * laverage).toFixed(2))
+                setState({ ...state, q_claim: q_claim, r_claim: Number((q_claim / margin).toFixed(2)), p_expired: Math.floor(p_stop), margin: margin })
+            }
         }
-    }
+    }, [state.q_covered, state.period, selectCoin, state.margin, state.p_claim, state.percent_margin])
 
     //validate
     useEffect(() => {
@@ -191,18 +207,10 @@ const Insurance = () => {
         }
     }, [state.p_claim])
 
-    const validatePclaim = (value: number) => {
-        let status: boolean = false
-
-        if (
-            (value > (2 * state.p_market) / 100 && value < (70 * state.p_market) / 100) ||
-            (value > (-70 * state.p_market) / 100 && value < (-2 * state.p_market) / 100)
-        ) {
-            status = true
-        }
-        return status
-    }
-
+    useEffect(() => {
+        setUserBalance(wallet.getBalance())
+        console.log(wallet)
+    }, [wallet])
     return (
         <LayoutInsurance>
             {
@@ -302,16 +310,12 @@ const Insurance = () => {
                                     idInput={'iCoin'}
                                     value={state.q_covered && state.q_covered}
                                     onChange={(a: any) => {
-                                        if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
-                                            setState({ ...state, q_covered: 0 })
+                                        if (a.target.value > userBalance) {
+                                            return setState({ ...state, q_covered: userBalance })
                                         } else {
-                                            setState({ ...state, q_covered: a.target.value.replace(/^0+/, '') })
+                                            setState({ ...state, q_covered: a.target.value })
                                         }
                                         setPercentInsurance(0)
-
-                                        if (a.target.value * 1 > userBalance) {
-                                            return setState({ ...state, q_covered: userBalance })
-                                        }
                                     }}
                                     placeholder={'0'}
                                 />
@@ -378,6 +382,7 @@ const Insurance = () => {
                                     </Popover.Panel>
                                 </Popover>
                             </div>
+
                             {tab > 3 && (
                                 <div className={`${tab > 3 ? 'w-[50%]' : 'hidden'} ml-[12px] flex justify-between border-collapse rounded-[3px] shadow-none`}>
                                     <Input
@@ -385,15 +390,9 @@ const Insurance = () => {
                                         type={'number'}
                                         inputName={'P-Claim'}
                                         idInput={''}
-                                        value={tab == 4 ? state.r_claim : tab == 5 ? state.q_claim : tab == 6 && state.margin}
+                                        value={state.margin && state.margin}
                                         onChange={(a: any) => {
-                                            if (tab == 6) {
-                                                if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
-                                                    setState({ ...state, margin: 0 })
-                                                } else {
-                                                    setState({ ...state, margin: a.target.value.replace(/^0+/, '') })
-                                                }
-                                            }
+                                            setState({ ...state, margin: a.target.value })
                                         }}
                                         placeholder={''}
                                     />
@@ -401,41 +400,81 @@ const Insurance = () => {
                                         className={
                                             'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px] select-none hover:cursor-pointer text-red'
                                         }
-                                        onClick={() => setIsUSDT(!isUSDT)}
                                     >
-                                        {!isUSDT ? '%' : 'USDT'}
+                                        {'USDT'}
                                     </div>
                                 </div>
                             )}
                         </div>
-                        <div className={`${tab > 3 ? 'w-[50%] pl-[16px]' : 'w-full'} flex flex-row justify-between mt-[8px]`}>
-                            <div
-                                className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
-                                onClick={() => setState({ ...state, q_covered: (25 / 100) * userBalance })}
-                            >
-                                <div className={`${percentInsurance == 25 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
-                                <span>25%</span>
+                        <div className="flex flex-row w-full px-[0px]">
+                            <div className={`flex flex-row justify-between mt-[8px] ${tab == 6 ? 'w-1/2' : 'w-full'}`}>
+                                <div
+                                    className={`flex flex-col justify-center w-[25%] items-center hover:cursor-pointer`}
+                                    onClick={() => setState({ ...state, q_covered: (25 / 100) * userBalance })}
+                                >
+                                    <div className={`${percentInsurance == 25 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                    <span>25%</span>
+                                </div>
+                                <div
+                                    className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
+                                    onClick={() => setState({ ...state, q_covered: (50 / 100) * userBalance })}
+                                >
+                                    <div className={`${50 == percentInsurance ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                    <span className={''}>50%</span>
+                                </div>
+                                <div
+                                    className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
+                                    onClick={() => setState({ ...state, q_covered: (75 / 100) * userBalance })}
+                                >
+                                    <div className={`${75 == percentInsurance ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                    <span className={''}>75%</span>
+                                </div>
+                                <div
+                                    className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
+                                    onClick={() => setState({ ...state, q_covered: userBalance })}
+                                >
+                                    <div className={`${percentInsurance == 100 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                    <span>100%</span>
+                                </div>
                             </div>
-                            <div
-                                className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
-                                onClick={() => setState({ ...state, q_covered: (50 / 100) * userBalance })}
-                            >
-                                <div className={`${50 == percentInsurance ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
-                                <span className={''}>50%</span>
-                            </div>
-                            <div
-                                className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
-                                onClick={() => setState({ ...state, q_covered: (75 / 100) * userBalance })}
-                            >
-                                <div className={`${75 == percentInsurance ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
-                                <span className={''}>75%</span>
-                            </div>
-                            <div
-                                className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
-                                onClick={() => setState({ ...state, q_covered: userBalance })}
-                            >
-                                <div className={`${percentInsurance == 100 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
-                                <span>100%</span>
+
+                            <div className={`flex flex-row justify-between mt-[8px] ${tab == 6 ? 'w-1/2' : 'hidden'}`}>
+                                <div
+                                    className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
+                                    onClick={() => {
+                                        setState({ ...state, percent_margin: 2 })
+                                    }}
+                                >
+                                    <div className={`${state.percent_margin == 2 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                    <span>2%</span>
+                                </div>
+                                <div
+                                    className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
+                                    onClick={() => {
+                                        setState({ ...state, percent_margin: 5 })
+                                    }}
+                                >
+                                    <div className={`${5 == state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                    <span className={''}>5%</span>
+                                </div>
+                                <div
+                                    className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
+                                    onClick={() => {
+                                        setState({ ...state, percent_margin: 7 })
+                                    }}
+                                >
+                                    <div className={`${7 == state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                    <span className={''}>7%</span>
+                                </div>
+                                <div
+                                    className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
+                                    onClick={() => {
+                                        setState({ ...state, percent_margin: 10 })
+                                    }}
+                                >
+                                    <div className={`${state.percent_margin == 10 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                    <span>10%</span>
+                                </div>
                             </div>
                         </div>
                         {/*end head*/}
@@ -631,27 +670,31 @@ export const getStaticProps: GetStaticProps = async ({ locale }: any) => ({
 })
 
 export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any) => {
-    const response = await fetch(
-        'https://datav2.nami.exchange/api/v1/chart/history?' +
-            'broker=NAMI_SPOT' +
-            '&symbol=' +
-            symbol +
-            '&from=' +
-            from +
-            '&to=' +
-            to +
-            '&resolution=' +
-            resolution,
-    )
-    let list = await response.json()
-    let data: { date: number; value: any }[] = []
-    list.map((item: any) => {
-        data.push({
-            date: item[0] * 1000,
-            value: item[1],
+    try {
+        const response = await fetch(
+            'https://datav2.nami.exchange/api/v1/chart/history?' +
+                'broker=NAMI_SPOT' +
+                '&symbol=' +
+                symbol +
+                '&from=' +
+                from +
+                '&to=' +
+                to +
+                '&resolution=' +
+                resolution,
+        )
+        let list = await response.json()
+        let data: { date: number; value: any }[] = []
+        list.map((item: any) => {
+            data.push({
+                date: item[0] * 1000,
+                value: item[1],
+            })
         })
-    })
-    data.length > 0 && setDataChart(data)
+        data.length > 0 && setDataChart(data)
+    } catch (err) {
+        console.log(err)
+    }
 }
 
 export const getPrice = async (symbol: string, state: any, setState: any) => {
@@ -664,8 +707,8 @@ export const getPrice = async (symbol: string, state: any, setState: any) => {
             }
         }
     } catch (err) {
-        console.log(err)
+        console.log('fecth current price error')
     }
 }
 
-export default Insurance
+export default BuyCovered

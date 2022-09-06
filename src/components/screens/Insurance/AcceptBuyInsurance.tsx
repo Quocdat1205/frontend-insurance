@@ -1,13 +1,12 @@
 import axios from 'axios'
 import Button from 'components/common/Button/Button'
-import { CheckBoxIcon, CheckCircle, ErrorCircleIcon, StartIcon } from 'components/common/Svg/SvgIcon'
 import Config from 'config/config'
-import { ethers } from 'ethers'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { buyInsurance } from 'services/buy-insurance'
-import { etherToWei, formatPriceToWeiValue } from 'utils/format'
+import { formatPriceToWeiValue } from 'utils/format'
+import { CheckBoxIcon, CheckCircle, ErrorCircleIcon, StartIcon } from 'components/common/Svg/SvgIcon'
 
 export type IProps = {
     state: any
@@ -34,79 +33,87 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
 
     const [isUpdated, setUpdated] = useState<boolean>(false)
     const [isCanBuy, setCanBuy] = useState<boolean>(false)
-    const [props, setProps] = useState(state)
 
-    useEffect(() => {
-        if (state) {
-            setProps({ ...state })
+    const onConnectWallet = () => {
+        try {
+            Config.connectWallet()
+        } catch (err) {
+            console.log(err)
         }
-    }, [state])
+    }
 
     const createContract = async () => {
-        if (!wallet.account) return console.log('chua login')
-        const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${state.symbol.symbol}`)
-
-        if (data.data[0].p != state.p_market) {
-            setUpdated(false)
-            return setCanBuy(false)
+        if (!wallet.account) {
+            return Config.toast.show('error', t('common:please_connect_your_wallet'), {
+                button: (
+                    <button className="text-sm font-semibold underline" onClick={onConnectWallet}>
+                        {t('common:connect_now')}
+                    </button>
+                ),
+            })
         }
-        console.log(wallet)
+        try {
+            const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${state.symbol.symbol}`)
 
-        if (!checkUpgrade) {
-            const t_expired = new Date()
-            t_expired.setDate(state.t_market.getDate() + state.period)
-
-            const dataPost = {
-                // createInsurance: state.q_covered,
-                buyer: wallet?.account as string,
-                cover_payout: etherToWei(state.q_claim),
-                asset: state.symbol.type,
-                current_price: etherToWei(data.data[0].p),
-                insurance_value: etherToWei(state.margin),
-                expire: t_expired.getTime(),
+            if (data.data.length > 0) {
+                if (data.data[0].p != state.p_market) {
+                    setUpdated(false)
+                    return setCanBuy(false)
+                }
             }
 
-            const buy = await wallet.contractCaller.insuranceContract.contract
-                .createInsurance(
-                    // dataPost.createInsurance,
-                    dataPost.buyer,
-                    dataPost.cover_payout,
-                    dataPost.asset,
-                    dataPost.current_price,
-                    dataPost.insurance_value,
-                    dataPost.expire,
-                )
-                .then((e: any) => {
-                    console.log(e, 'buy')
-                })
-        }
+            if (!checkUpgrade) {
+                const t_expired = new Date()
+                t_expired.setDate(state.t_market.getDate() + state.period)
 
-        if (checkUpgrade) {
-            const t_expired = new Date()
-            t_expired.setDate(state.t_market.getDate() + state.period + 2)
+                const dataPost = {
+                    buyer: wallet?.account as string,
+                    asset: state.symbol.type,
+                    margin: formatPriceToWeiValue(state.margin),
+                    q_covered: formatPriceToWeiValue(state.q_covered),
+                    p_market: formatPriceToWeiValue(data.data[0].p),
+                    p_claim: formatPriceToWeiValue(state.p_claim),
+                    period: state.period,
+                }
 
-            const dataPost = {
-                // createInsurance: state.q_covered,
-                buyer: wallet?.account as string,
-                cover_payout: etherToWei(state.q_claim + (state.q_claim * 5) / 100),
-                asset: state.symbol.type,
-                current_price: etherToWei(data.data[0].p),
-                insurance_value: etherToWei(state.margin),
-                expire: t_expired.getTime(),
+                console.log(state, dataPost)
+
+                const buy = await wallet.contractCaller.insuranceContract.contract
+                    .createInsurance(
+                        dataPost.buyer,
+                        dataPost.asset,
+                        dataPost.margin,
+                        dataPost.q_covered,
+                        dataPost.p_market,
+                        dataPost.p_claim,
+                        dataPost.period,
+                        { value: dataPost.margin },
+                    )
+                    .then((e: any) => {
+                        console.log(e)
+                        handlePostInsurance(e, dataPost, state)
+                    })
             }
-            const buy = await wallet.contractCaller.insuranceContract.contract
-                .createInsurance(
-                    // dataPost.createInsurance,
-                    dataPost.buyer,
-                    dataPost.cover_payout,
-                    dataPost.asset,
-                    dataPost.current_price,
-                    dataPost.insurance_value,
-                    dataPost.expire,
-                )
-                .then((e: any) => {
-                    console.log(e, 'buy')
-                })
+
+            if (checkUpgrade) {
+                const dataPost = {
+                    buyer: wallet?.account as string,
+                    asset: state.symbol.type,
+                    margin: formatPriceToWeiValue(state.margin),
+                    q_covered: formatPriceToWeiValue(state.q_covered),
+                    p_market: formatPriceToWeiValue(data.data[0].p),
+                    p_claim: formatPriceToWeiValue(state.p_claim),
+                    period: formatPriceToWeiValue(state.period + 2),
+                }
+                const buy = await wallet.contractCaller.insuranceContract.contract
+                    .createInsurance(dataPost.buyer, dataPost.asset, dataPost.margin, dataPost.q_covered, dataPost.p_market, dataPost.p_claim, dataPost.period)
+                    .then((e: any) => {
+                        console.log(e)
+                        handlePostInsurance(e, dataPost, state)
+                    })
+            }
+        } catch (err) {
+            console.log(err)
         }
     }
 
@@ -124,11 +131,12 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                     p_claim: state.p_claim,
                     period: state.period,
                 }
-                await buyInsurance(dataPost)
+                await buyInsurance(data)
+                console.log(data)
+                // Config.toast.show('success', 'success')
             } catch (error) {
                 console.log(error)
             }
-            Config.toast.show('success', 'success')
         } else {
             console.error('Error submitting transaction')
             Config.toast.show('error', 'Error submitting transaction')
@@ -209,6 +217,7 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                                             variants="outlined"
                                             className="py-[8px] px-[24px] rounded-[8px]"
                                             onClick={() => {
+                                                console.log(state.symbol)
                                                 getPrice(state.symbol.symbol, state, setState)
                                                 setUpdated(true)
                                                 setCanBuy(true)

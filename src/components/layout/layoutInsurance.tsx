@@ -10,11 +10,11 @@ interface layoutInsurance {
 const LayoutInsurance = ({ children }: layoutInsurance) => {
     const { t } = useTranslation()
     return (
-        <>
+        <div>
             <Header />
             <Breadcrumbs>{[`${t('insurance:buy:home')}`, `${t('insurance:buy:buy_covered')}`]}</Breadcrumbs>
             {children}
-        </>
+        </div>
     )
 }
 

@@ -58,8 +58,8 @@ export const getTimeAgo = (value: Date, options: any) => {
 export const parseNumber = (_number: any) => parseInt(_number)
 
 export const ghost = new GhostContentAPI({
-    url: process.env.NEXT_PUBLIC_BLOG_API_URL ?? '',
-    key: process.env.NEXT_PUBLIC_BLOG_API_CONTENT_KEY ?? '',
+    url: process.env.NEXT_PUBLIC_BLOG_API_URL || '',
+    key: process.env.NEXT_PUBLIC_BLOG_API_CONTENT_KEY || '',
     version: 'v3',
 })
 
