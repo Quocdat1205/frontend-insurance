@@ -179,9 +179,30 @@ export const SuccessIcon = () => {
     )
 }
 
-export const CheckBoxIcon = ({ bgColor, dotColor, size, borderColor, checked, checkBgColor, checkDotColor, checkBorderColor, className, onClick }: any) => {
+export const CheckBoxIcon = ({
+    bgColor,
+    dotColor,
+    size,
+    borderColor,
+    checked,
+    checkBgColor,
+    checkDotColor,
+    checkBorderColor,
+    className,
+    onClick,
+    onChange,
+}: any) => {
     return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} onClick={onClick}>
+        <svg
+            width={size}
+            height={size}
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className={className}
+            onClick={onClick}
+            onChange={onChange}
+        >
             <path
                 d="M12 23.5C5.64873 23.5 0.5 18.3513 0.5 12C0.5 5.64873 5.64873 0.5 12 0.5C18.3513 0.5 23.5 5.64873 23.5 12C23.5 18.3513 18.3513 23.5 12 23.5Z"
                 fill={`${!checked ? bgColor : checkBgColor}`}

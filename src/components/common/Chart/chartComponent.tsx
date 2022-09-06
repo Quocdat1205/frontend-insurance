@@ -69,7 +69,7 @@ const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number) => {
     trend.defaultState.transitionDuration = 1
 
     if (p_claim) {
-        const timeBegin = new Date(chart.data[chart.data.length - 1].date)
+        // const timeBegin = new Date(chart.data[chart.data.length - 1].date)
         const timeEnd = new Date()
         timeEnd.setDate(timeEnd.getDate() + 5)
 

@@ -2,6 +2,7 @@ import axios from 'axios'
 import Button from 'components/common/Button/Button'
 import { CheckBoxIcon, CheckCircle, ErrorCircleIcon, StartIcon } from 'components/common/Svg/SvgIcon'
 import Config from 'config/config'
+import { ethers } from 'ethers'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -17,38 +18,112 @@ export type IProps = {
     getPrice: any
 }
 
+export type IBuyInsurance = {
+    createInsurance: number
+    _buyer: string
+    _cover_payout: any
+    _asset: string
+    _current_price: any
+    _insurance_value: any
+    _expire: any
+}
+
 export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setCheckUpgrade, getPrice }: Partial<IProps>) => {
     const { t } = useTranslation()
     const wallet = useWeb3Wallet()
 
-    const [isUpdated, setUpdated] = useState(false)
+    const [isUpdated, setUpdated] = useState<boolean>(false)
+    const [isCanBuy, setCanBuy] = useState<boolean>(false)
+    const [props, setProps] = useState(state)
+
+    useEffect(() => {
+        if (state) {
+            setProps({ ...state })
+        }
+    }, [state])
 
     const createContract = async () => {
         if (!wallet.account) return console.log('chua login')
         const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${state.symbol.symbol}`)
-        const t_expired = new Date()
-        t_expired.setDate(state.t_market.getDate() + state.period)
 
-        const dataPost = {
-            owner: wallet.account as string,
-            current_price: data.data[0].h.toFixed(),
-            liquidation_price: state.p_claim,
-            deposit: formatPriceToWeiValue(state.q_covered),
-            expired: t_expired.getTime(),
+        if (data.data[0].p != state.p_market) {
+            setUpdated(false)
+            return setCanBuy(false)
+        }
+        console.log(wallet)
+
+        if (!checkUpgrade) {
+            const t_expired = new Date()
+            t_expired.setDate(state.t_market.getDate() + state.period)
+
+            const dataPost = {
+                // createInsurance: state.q_covered,
+                buyer: wallet?.account as string,
+                cover_payout: etherToWei(state.q_claim),
+                asset: state.symbol.type,
+                current_price: etherToWei(data.data[0].p),
+                insurance_value: etherToWei(state.margin),
+                expire: t_expired.getTime(),
+            }
+
+            const buy = await wallet.contractCaller.insuranceContract.contract
+                .createInsurance(
+                    // dataPost.createInsurance,
+                    dataPost.buyer,
+                    dataPost.cover_payout,
+                    dataPost.asset,
+                    dataPost.current_price,
+                    dataPost.insurance_value,
+                    dataPost.expire,
+                )
+                .then((e: any) => {
+                    console.log(e, 'buy')
+                })
         }
 
-        const buy = await wallet.contractCaller.insuranceContract.contract.buyInsurance(
-            dataPost.owner,
-            dataPost.deposit,
-            dataPost.current_price,
-            dataPost.liquidation_price,
-            dataPost.expired,
-            { value: dataPost.deposit },
-        )
-        console.log(buy, 'bsc')
+        if (checkUpgrade) {
+            const t_expired = new Date()
+            t_expired.setDate(state.t_market.getDate() + state.period + 2)
 
-        if (buy) {
+            const dataPost = {
+                // createInsurance: state.q_covered,
+                buyer: wallet?.account as string,
+                cover_payout: etherToWei(state.q_claim + (state.q_claim * 5) / 100),
+                asset: state.symbol.type,
+                current_price: etherToWei(data.data[0].p),
+                insurance_value: etherToWei(state.margin),
+                expire: t_expired.getTime(),
+            }
+            const buy = await wallet.contractCaller.insuranceContract.contract
+                .createInsurance(
+                    // dataPost.createInsurance,
+                    dataPost.buyer,
+                    dataPost.cover_payout,
+                    dataPost.asset,
+                    dataPost.current_price,
+                    dataPost.insurance_value,
+                    dataPost.expire,
+                )
+                .then((e: any) => {
+                    console.log(e, 'buy')
+                })
+        }
+    }
+
+    const handlePostInsurance = async (props: any, dataPost: any, state: any) => {
+        if (props) {
             try {
+                const data = {
+                    owner: dataPost.buyer,
+                    transaction_hash: props.hash,
+                    id_sc: 0,
+                    asset_covered: dataPost.asset,
+                    asset_refund: 'USDT',
+                    margin: state.margin,
+                    q_covered: state.q_covered,
+                    p_claim: state.p_claim,
+                    period: state.period,
+                }
                 await buyInsurance(dataPost)
             } catch (error) {
                 console.log(error)
@@ -60,9 +135,6 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
         }
     }
 
-    const handleCheckValidate = () => {
-        return false
-    }
     return (
         <>
             <div
@@ -89,28 +161,35 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                             <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
                                 <div className={'text-[#808890]'}>R-Claim</div>
                                 <div className={'font-semibold'}>
-                                    <span>{state.r_claim}%</span>
+                                    <span className={`${checkUpgrade ? 'line-through text-[#808890]' : 'pr-[2px]'}`}>{state.r_claim}</span>{' '}
+                                    <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>
+                                        {(state.q_claim + (state.q_claim * 5) / 100) / state.margin}
+                                    </span>{' '}
+                                    %
                                 </div>
                             </div>
                             <div className="flex flex-row justify-between py-[8px] px-[8px]">
                                 <div className={'text-[#808890]'}>Q-Claim</div>
                                 <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                    {state.q_claim}
+                                    <span className={`${checkUpgrade ? 'line-through text-[#808890] pr-[2px]' : 'pr-[2px]'}`}>{state.q_claim}</span>{' '}
+                                    <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[2px]' : 'hidden'}`}>
+                                        {state.q_claim + (state.q_claim * 5) / 100}
+                                    </span>{' '}
                                     <span className={'text-[#EB2B3E]'}>USDT</span>
                                 </div>
                             </div>
                             <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
                                 <div className={'text-[#808890]'}>Margin</div>
                                 <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                    {state.margin}
-                                    <span className={'text-[#EB2B3E]'}>USDT</span>
+                                    <span className={'pr-[2px]'}>{state.margin}</span> <span className={'text-[#EB2B3E]'}>USDT</span>
                                 </div>
                             </div>
                             <div className="flex flex-row justify-between py-[8px] px-[8px]">
                                 <div className={'text-[#808890]'}>Period</div>
                                 <div className={'font-semibold'}>
                                     <span>
-                                        {state.r_claim} {menu[8].name}
+                                        <span className={`${checkUpgrade ? 'line-through text-[#808890]' : 'pr-[2px]'}`}>{state.period}</span>{' '}
+                                        <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>{state.period + 2}</span> {menu[8].name}
                                     </span>
                                 </div>
                             </div>
@@ -132,6 +211,7 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                                             onClick={() => {
                                                 getPrice(state.symbol.symbol, state, setState)
                                                 setUpdated(true)
+                                                setCanBuy(true)
                                                 Config.toast.show('success', `${t('insurance:buy:price_had_update')}`)
                                             }}
                                         >
@@ -156,6 +236,9 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                                                 type="radio"
                                                 id="test1"
                                                 checked={checkUpgrade}
+                                                onChange={(e) => {
+                                                    console.log(e)
+                                                }}
                                                 onClick={() => setCheckUpgrade(!checkUpgrade)}
                                             />
                                             <CheckBoxIcon
@@ -169,6 +252,9 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                                                 checkBorderColor="#EB2B3E"
                                                 className="hover:cursor-pointer mr-[8px]"
                                                 onClick={() => setCheckUpgrade(!checkUpgrade)}
+                                                onChange={(e: any) => {
+                                                    console.log(e)
+                                                }}
                                             />
                                             <label htmlFor="test1" className="select-none text-[#22313F] font-medium">
                                                 {t('insurance:buy:upgrade')}
@@ -196,11 +282,12 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                 <Button
                     variants={'primary'}
                     className={`${
-                        handleCheckValidate() ? 'bg-[#E5E7E8]' : 'bg-[#EB2B3E]'
+                        !isCanBuy ? 'bg-[#E5E7E8]' : 'bg-[#EB2B3E]'
                     }  h-[48px] w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                     onClick={() => {
                         createContract()
                     }}
+                    disable={!isCanBuy}
                 >
                     {t('insurance:buy:accept')}
                 </Button>

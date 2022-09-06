@@ -4,6 +4,7 @@ export type ICoin = {
     icon: string
     disable?: boolean
     symbol: string
+    type: string
 }
 
 export type ISelectBox = {

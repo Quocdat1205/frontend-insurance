@@ -4,7 +4,6 @@ import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import dynamic from 'next/dynamic'
-import Config from 'config/config'
 
 //layout
 import LayoutInsurance from 'components/layout/layoutInsurance'
@@ -64,12 +63,14 @@ const Insurance = () => {
             name: 'Ethereum',
             icon: '/images/icons/ic_ethereum.png',
             symbol: 'ETHUSDT',
+            type: 'ETH',
         },
         {
             id: 2,
             name: 'Bitcoin ',
             icon: '/images/icons/ic_bitcoin.png',
             symbol: 'BTCUSDT',
+            type: 'BTC',
         },
         {
             id: 3,
@@ -77,6 +78,7 @@ const Insurance = () => {
             icon: '/images/icons/ic_binance.png',
             disable: true,
             symbol: 'BNBUSDT',
+            type: 'BNB',
         },
     ]
     const [selectCoin, setSelectedCoin] = useState<ICoin>(listCoin[0])
@@ -117,6 +119,7 @@ const Insurance = () => {
 
     useEffect(() => {
         setUserBalance(wallet.getBalance())
+        console.log(wallet)
     }, [wallet])
 
     const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', 'ALL']
