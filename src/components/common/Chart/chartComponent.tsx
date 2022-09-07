@@ -20,7 +20,7 @@ export type Idata = {
     date: any
 }
 
-const handleTrendLine = (chart: am4charts.XYChart, p_claim: number) => {
+export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number) => {
     let trend = chart.series.push(new am4charts.LineSeries())
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
@@ -59,7 +59,7 @@ const handleTrendLine = (chart: am4charts.XYChart, p_claim: number) => {
     }
 }
 
-const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number) => {
+export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number) => {
     let trend = chart.series.push(new am4charts.LineSeries())
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
@@ -86,10 +86,10 @@ const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number) => {
     }
 }
 
-const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP_Market, setP_Claim, state }: iProps) => {
+export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, state }: iProps) => {
     const [dataChart, setDataChart] = useState([])
     let chart: any
-    const ref = useRef<any>(null)
+    // const ref = useRef<any>(null)
 
     useEffect(() => {
         if (data && data.length > 0) setDataChart(data)
@@ -97,7 +97,7 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
 
     useEffect(() => {
         InitChart(dataChart)
-        ref.current.renderer
+        // ref.current.renderer
         setP_Market(chart.data[chart.data.length - 1]?.value)
     }, [dataChart, p_claim, p_expired, state.period])
 
@@ -263,7 +263,7 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
         }
     }
 
-    return <div ref={ref} id="chartdiv" style={{ width: '100%', height: '500px' }} className={'relative'} />
+    return <div id="chartdiv" style={{ width: '100%', height: '500px' }} className={'relative'}></div>
 }
 
 export default ChartComponent

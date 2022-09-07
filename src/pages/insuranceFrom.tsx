@@ -1,6 +1,5 @@
 import dynamic from 'next/dynamic'
 import LayoutInsurance from 'components/layout/layoutInsurance'
-
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import Button from 'components/common/Button/Button'
 import axios from 'axios'
@@ -10,18 +9,18 @@ import { GetStaticProps } from 'next'
 import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CheckCircle, LeftArrow, InfoCircle, XMark, Dot } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
-
+import { Suspense } from 'react'
 //chart
-const ChartComponent = dynamic(() => import('../components/common/Chart/chartComponent'), { ssr: false, loading: () => <header /> })
+const ChartComponent = dynamic(() => import('../components/common/Chart/chartComponent'), { ssr: false, suspense: true })
 
-const InsuranceFrom = () => {
+export const InsuranceFrom = () => {
     const { t } = useTranslation()
     const wallet = useWeb3Wallet()
     const router = useRouter()
@@ -36,6 +35,7 @@ const InsuranceFrom = () => {
 
     const [index, setIndex] = useState<1 | 2>(1)
     const [tab, setTab] = useState<number>(3)
+    const [loadings, setLoadings] = useState(true)
 
     const [userBalance, setUserBalance] = useState<number>(0)
     const listCoin: ICoin[] = [
@@ -81,8 +81,6 @@ const InsuranceFrom = () => {
     const [dataChart, setDataChart] = useState()
 
     const [selectCoin, setSelectedCoin] = useState<ICoin>(listCoin[0])
-
-    const [general, setGeneral] = useState<any>(null)
 
     const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', 'ALL']
     const listTabPeriod: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
@@ -137,7 +135,10 @@ const InsuranceFrom = () => {
         const timeBegin = new Date()
         timeBegin.setDate(timeEnd.getDate() - 10)
         setState({ ...state, t_market: timeEnd })
-        fetchApiNami(`${listCoin[0].symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1d', setDataChart)
+        setLoadings(true)
+        fetchApiNami(`${listCoin[0].symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1d', setDataChart).then(
+            () => setLoadings(false),
+        )
         getPrice(listCoin[0].symbol, state, setState)
     }, [])
 
@@ -152,15 +153,35 @@ const InsuranceFrom = () => {
     ) => {
         const timeEnd = new Date()
         const timeBegin = new Date()
+        setLoadings(true)
+
         if (selectTime == '1H' || selectTime == '1D') {
             timeBegin.setDate(timeEnd.getDate() - 10)
-            fetchApiNami(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1m', setDataChart)
+            fetchApiNami(
+                `${selectCoin.symbol}`,
+                `${Math.floor(timeBegin.getTime() / 1000)}`,
+                `${Math.ceil(timeEnd.getTime() / 1000)}`,
+                '1m',
+                setDataChart,
+            ).then(() => setLoadings(false))
         } else if (selectTime == '1W') {
             timeBegin.setDate(timeEnd.getDate() - 10)
-            fetchApiNami(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1h', setDataChart)
+            fetchApiNami(
+                `${selectCoin.symbol}`,
+                `${Math.floor(timeBegin.getTime() / 1000)}`,
+                `${Math.ceil(timeEnd.getTime() / 1000)}`,
+                '1h',
+                setDataChart,
+            ).then(() => setLoadings(false))
         } else {
             timeBegin.setDate(timeEnd.getDate() - 10)
-            fetchApiNami(`${selectCoin.symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1h', setDataChart)
+            fetchApiNami(
+                `${selectCoin.symbol}`,
+                `${Math.floor(timeBegin.getTime() / 1000)}`,
+                `${Math.ceil(timeEnd.getTime() / 1000)}`,
+                '1h',
+                setDataChart,
+            ).then(() => setLoadings(false))
         }
     }
 
@@ -214,14 +235,14 @@ const InsuranceFrom = () => {
         setUserBalance(wallet.getBalance())
         console.log(wallet)
     }, [wallet])
-    return (
+    return !loadings ? (
         <LayoutInsurance>
             {
                 // head Insurance
                 !isMobile && (
                     <div className="max-w-screen-2xl m-auto flex items-center justify-between space-x-12 pt-[20px]   ">
                         <div className="flex items-center">
-                            <LeftArrow />
+                            <LeftArrow></LeftArrow>
                             <span className={'pl-1 font-semibold text-[#22313F] hover:cursor-pointer'} onClick={() => router.push('/ ')}>
                                 {menu[2].name}
                             </span>
@@ -235,8 +256,8 @@ const InsuranceFrom = () => {
                                 onClick={() => setDrop(true)}
                             >
                                 {menu[tab].name}
-                                {!isDrop && <ChevronDown />}
-                                {isDrop && <ChevronUp />}
+                                {!isDrop && <ChevronDown></ChevronDown>}
+                                {isDrop && <ChevronUp></ChevronUp>}
                             </Popover.Button>
                             <Popover.Panel className="absolute z-50 bg-white w-[260px] right-0 top-[48px] rounded shadow">
                                 {({ close }) => (
@@ -260,7 +281,7 @@ const InsuranceFrom = () => {
                                                     >
                                                         <div className={'flex flex-row justify-between w-full px-[16px] py-[6px] '}>
                                                             <span> {e.name} </span>
-                                                            {tab === key ? <Check size={18} className={'text-[#EB2B3E]'} /> : ''}
+                                                            {tab === key ? <Check size={18} className={'text-[#EB2B3E]'}></Check> : ''}
                                                         </div>
                                                     </div>
                                                 )
@@ -284,7 +305,7 @@ const InsuranceFrom = () => {
                 ) : (
                     index == 1 && (
                         <div className={`h-[32px] flex flex-row justify-between w-full items-center mx-[16px] mt-[24px] mb-[16px]`}>
-                            <XMark />
+                            <XMark></XMark>
                             <div className={`h-[32px] flex flex-row`}>
                                 <span className={'text-[#00ABF9] underline hover:cursor-pointer pr-[16px] flex items-center'} onClick={() => {}}>
                                     {menu[12].name}
@@ -367,17 +388,17 @@ const InsuranceFrom = () => {
                                                 setPercentInsurance(0)
                                             }}
                                             placeholder={'0'}
-                                        />
+                                        ></Input>
                                         <Popover className="relative w-[25%] outline-none bg-[#F7F8FA] focus:ring-0 rounded-none shadow-none flex items-center justify-center pr-[21px]">
                                             <Popover.Button
                                                 id={'popoverInsurance'}
                                                 className={'flex flex-row justify-end w-full items-center focus:border-0 focus:ring-0 active:border-0'}
                                             >
-                                                <img alt={''} src={`${selectCoin.icon}`} width="36" height="36" className={'mr-[4px]'} />
+                                                <img alt={''} src={`${selectCoin.icon}`} width="36" height="36" className={'mr-[4px]'}></img>
                                                 <span className={'w-[104px] flex flex-start font-semibold text-[#EB2B3E] text-base'}>
                                                     {selectCoin && selectCoin.name}
                                                 </span>
-                                                <ChevronDown size={18} className={'mt-1 text-[#22313F]'} />
+                                                <ChevronDown size={18} className={'mt-1 text-[#22313F]'}></ChevronDown>
                                             </Popover.Button>
                                             <Popover.Panel className="absolute z-50 bg-white top-[78px] right-0  w-[360px] rounded shadow">
                                                 {({ close }) => (
@@ -387,7 +408,7 @@ const InsuranceFrom = () => {
                                                                 let isPress = false
                                                                 // @ts-ignore
                                                                 return !coin.disable ? (
-                                                                    <a
+                                                                    <div
                                                                         id={`${coin.id}`}
                                                                         key={key}
                                                                         onMouseDown={() => (isPress = true)}
@@ -400,12 +421,16 @@ const InsuranceFrom = () => {
                                                                             isPress ? 'bg-[#F2F3F5]' : 'hover:bg-[#F7F8FA]'
                                                                         } flex flex-row justify-start w-full items-center p-3 font-medium`}
                                                                     >
-                                                                        <img alt={''} src={`${coin.icon}`} width="36" height="36" className={'mr-[5px]'} />
+                                                                        <img alt={''} src={`${coin.icon}`} width="36" height="36" className={'mr-[5px]'}></img>
                                                                         <div className={'flex flex-row justify-between w-full'}>
                                                                             <span className={'hover:cursor-default'}>{coin.name}</span>
-                                                                            {coin.id === selectCoin.id ? <Check size={18} className={'text-[#EB2B3E]'} /> : ''}
+                                                                            {coin.id === selectCoin.id ? (
+                                                                                <Check size={18} className={'text-[#EB2B3E]'}></Check>
+                                                                            ) : (
+                                                                                ''
+                                                                            )}
                                                                         </div>
-                                                                    </a>
+                                                                    </div>
                                                                 ) : (
                                                                     <a
                                                                         id={`${coin.id}`}
@@ -418,10 +443,14 @@ const InsuranceFrom = () => {
                                                                             width="36"
                                                                             height="36"
                                                                             className={'mr-[5px] grayscale hover:cursor-default'}
-                                                                        />
+                                                                        ></img>
                                                                         <div className={'flex flex-row justify-between w-full'}>
                                                                             <span>{coin.name}</span>
-                                                                            {coin.id === selectCoin.id ? <Check size={18} className={'text-[#EB2B3E]'} /> : ''}
+                                                                            {coin.id === selectCoin.id ? (
+                                                                                <Check size={18} className={'text-[#EB2B3E]'}></Check>
+                                                                            ) : (
+                                                                                ''
+                                                                            )}
                                                                         </div>
                                                                     </a>
                                                                 )
@@ -450,7 +479,7 @@ const InsuranceFrom = () => {
                                                     setState({ ...state, margin: a.target.value })
                                                 }}
                                                 placeholder={''}
-                                            />
+                                            ></Input>
                                             <div
                                                 className={
                                                     'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px] select-none hover:cursor-pointer text-red'
@@ -467,28 +496,28 @@ const InsuranceFrom = () => {
                                             className={`flex flex-col justify-center w-[25%] items-center hover:cursor-pointer`}
                                             onClick={() => setState({ ...state, q_covered: (25 / 100) * userBalance })}
                                         >
-                                            <div className={`${percentInsurance == 25 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                            <div className={`${percentInsurance == 25 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span>25%</span>
                                         </div>
                                         <div
                                             className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
                                             onClick={() => setState({ ...state, q_covered: (50 / 100) * userBalance })}
                                         >
-                                            <div className={`${50 == percentInsurance ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                            <div className={`${50 == percentInsurance ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span className={''}>50%</span>
                                         </div>
                                         <div
                                             className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
                                             onClick={() => setState({ ...state, q_covered: (75 / 100) * userBalance })}
                                         >
-                                            <div className={`${75 == percentInsurance ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                            <div className={`${75 == percentInsurance ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span className={''}>75%</span>
                                         </div>
                                         <div
                                             className={'flex flex-col justify-center w-[25%] items-center hover:cursor-pointer'}
                                             onClick={() => setState({ ...state, q_covered: userBalance })}
                                         >
-                                            <div className={`${percentInsurance == 100 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                            <div className={`${percentInsurance == 100 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span>100%</span>
                                         </div>
                                     </div>
@@ -504,7 +533,7 @@ const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${state.percent_margin == 2 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                            <div className={`${state.percent_margin == 2 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span>2%</span>
                                         </div>
                                         <div
@@ -517,7 +546,7 @@ const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${5 == state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                            <div className={`${5 == state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span className={''}>5%</span>
                                         </div>
                                         <div
@@ -530,7 +559,7 @@ const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${7 == state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                            <div className={`${7 == state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span className={''}>7%</span>
                                         </div>
                                         <div
@@ -543,7 +572,7 @@ const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${state.percent_margin == 10 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`} />
+                                            <div className={`${state.percent_margin == 10 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span>10%</span>
                                         </div>
                                     </div>
@@ -572,7 +601,7 @@ const InsuranceFrom = () => {
                                                 }
                                                 setPercentInsurance(0)
                                             }}
-                                        />
+                                        ></input>
                                     </label>{' '}
                                     <span className="text-[#EB2B3E]">BNB</span>
                                 </div>
@@ -594,7 +623,7 @@ const InsuranceFrom = () => {
                                                         percent_margin: a.target.value / (state.q_covered * state.p_market),
                                                     })
                                                 }}
-                                            />
+                                            ></input>
                                         </label>{' '}
                                         <span className="text-[#EB2B3E]">USDT</span>
                                     </div>
@@ -606,16 +635,18 @@ const InsuranceFrom = () => {
 
                         {/*body*/}
                         <div className={'pl-[32px] pr-[32px] flex flex-row relative'}>
-                            <ChartComponent
-                                data={dataChart}
-                                state={state ? state : null}
-                                p_claim={Number(state && state.p_claim)}
-                                p_expired={state.p_expired > 0 ? state.p_expired : undefined}
-                                setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
-                                setP_Market={(data: number) => setState({ ...state, p_market: data })}
-                            />
+                            <Suspense fallback={`Loading...`}>
+                                <ChartComponent
+                                    data={dataChart}
+                                    state={state ? state : null}
+                                    p_claim={Number(state && state.p_claim)}
+                                    p_expired={state.p_expired > 0 ? state.p_expired : undefined}
+                                    setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
+                                    setP_Market={(data: number) => setState({ ...state, p_market: data })}
+                                ></ChartComponent>
+                            </Suspense>
                             <svg className={`absolute right-[34px]`} width="10" height="458" viewBox="0 0 2 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <line x1="1" y1="3.5011e-08" x2="0.999987" y2="240" stroke="#B2B7BC" strokeWidth="150" strokeDasharray="0.74 3.72" />
+                                <line x1="1" y1="3.5011e-08" x2="0.999987" y2="240" stroke="#B2B7BC" strokeWidth="150" strokeDasharray="0.74 3.72"></line>
                             </svg>
                         </div>
                         {/*end body*/}
@@ -649,7 +680,7 @@ const InsuranceFrom = () => {
                                             onMouseEnter={() => setIsHover(true)}
                                             onMouseLeave={() => setIsHover(false)}
                                         >
-                                            <InfoCircle />
+                                            <InfoCircle></InfoCircle>
                                             <span
                                                 className={`${
                                                     isHover ? 'visible' : 'hidden'
@@ -675,7 +706,7 @@ const InsuranceFrom = () => {
                                             }
                                         }}
                                         placeholder={`${menu[9].name}`}
-                                    />
+                                    ></Input>
                                     <div className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px]'}>USDT</div>
                                 </div>
                             </div>
@@ -747,7 +778,7 @@ const InsuranceFrom = () => {
                                             onMouseEnter={() => setIsHover(true)}
                                             onMouseLeave={() => setIsHover(false)}
                                         >
-                                            <InfoCircle />
+                                            <InfoCircle></InfoCircle>
                                             <span
                                                 className={`${
                                                     isHover ? 'visible' : 'hidden'
@@ -773,7 +804,7 @@ const InsuranceFrom = () => {
                                             }
                                         }}
                                         placeholder={`${menu[9].name}`}
-                                    />
+                                    ></Input>
                                     <div className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px]'}>USDT</div>
                                 </div>
                             </div>
@@ -804,7 +835,7 @@ const InsuranceFrom = () => {
                         <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                             {state.q_claim}
                             <span className={'text-[#EB2B3E]'}>USDT</span>
-                            <ChevronDown size={18} className={'ml-1 mt-1'} />
+                            <ChevronDown size={18} className={'ml-1 mt-1'}></ChevronDown>
                         </div>
                     </div>
                     <div
@@ -816,7 +847,7 @@ const InsuranceFrom = () => {
                         <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                             {state.margin}
                             <span className={'text-[#EB2B3E]'}>USDT</span>
-                            <ChevronDown size={18} className={'ml-1 mt-1'} />
+                            <ChevronDown size={18} className={'ml-1 mt-1'}></ChevronDown>
                         </div>
                     </div>
                 </div>
@@ -826,7 +857,7 @@ const InsuranceFrom = () => {
                 //description
                 !isMobile && index == 1 && (
                     <div className={'flex justify-center items-center mt-[24px]'}>
-                        <CheckCircle />
+                        <CheckCircle></CheckCircle>
                         <span className={'font-semibold text-[#22313F]'}>
                             {t('insurance:buy:saved')}
                             <span className={'text-[#EB2B3E]'}>1,000 USDT</span> {t('insurance:buy:sub_saved')}
@@ -861,7 +892,7 @@ const InsuranceFrom = () => {
             {index == 1 && isMobile && clear && (
                 <>
                     <div className={'flex justify-center items-center mt-[24px]'}>
-                        <CheckCircle />
+                        <CheckCircle></CheckCircle>
                         <span className={'font-semibold text-[#22313F]'}>
                             {t('insurance:buy:saved')}
                             <span className={'text-[#EB2B3E]'}>1,000 USDT</span> {t('insurance:buy:sub_saved')}
@@ -934,9 +965,11 @@ const InsuranceFrom = () => {
                     checkUpgrade={checkUpgrade}
                     setCheckUpgrade={setCheckUpgrade}
                     getPrice={getPrice}
-                />
+                ></AcceptBuyInsurance>
             )}
         </LayoutInsurance>
+    ) : (
+        <div></div>
     )
 }
 
@@ -970,7 +1003,8 @@ export const fetchApiNami = async (symbol: string, from: string, to: string, res
         })
         data.length > 0 && setDataChart(data)
     } catch (err) {
-        console.log(err)
+        // console.log(err)
+        console.log('fecth current price error')
     }
 }
 
