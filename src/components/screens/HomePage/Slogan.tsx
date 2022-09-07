@@ -28,7 +28,7 @@ const Background = styled.section.attrs<any>({
     className: 'px-4 pt-[4.25rem] pb-20',
 })<Slogan>`
     background-image: ${({ isMobile }) => `url(${`/images/screens/home/bg_slogan${isMobile ? '_mobile' : ''}.png`})`};
-    background-position: top;
+    background-position: bottom;
     background-repeat: no-repeat;
     background-size: cover;
 `

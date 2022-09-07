@@ -1,15 +1,15 @@
-import AOS from 'aos';
+import AOS from 'aos'
 import classnames from 'classnames'
-import useWindowSize from 'hooks/useWindowSize'
-import React, { useEffect, useMemo, useState } from 'react'
-import styled from 'styled-components'
-import InlineSVG from 'react-inlinesvg'
 import { useTranslation } from 'next-i18next'
+import React, { useEffect, useMemo, useState } from 'react'
+import InlineSVG from 'react-inlinesvg'
+import styled from 'styled-components'
+import useWindowSize from 'hooks/useWindowSize'
 import { API_GET_INFO_GENERAL } from 'services/apis'
 import fetchApi from 'services/fetch-api'
+import { DURATION_AOS } from 'utils/constants'
 import { formatNumber } from 'utils/utils'
-import "aos/dist/aos.css";
-import {DURATION_AOS} from "utils/constants";
+import 'aos/dist/aos.css'
 
 const Banner = () => {
     const { width } = useWindowSize()
@@ -45,10 +45,10 @@ const Banner = () => {
 
     useEffect(() => {
         AOS.init({
-            once: true
-        });
-        AOS.refresh();
-    }, []);
+            once: true,
+        })
+        AOS.refresh()
+    }, [])
 
     return (
         <section className="pt-20 sm:pt-[7.5rem]">
@@ -58,7 +58,13 @@ const Banner = () => {
                 <div className="max-w-screen-insurance m-auto text-center flex flex-col space-y-8 sm:space-y-6">
                     <div className="flex flex-col space-y-[2px]">
                         <div className="leading-5 sm:leading-6">{t('home:landing:total_q_claim')}</div>
-                        <div className="text-red text-[2.5rem] leading-[3.5rem] sm:leading-10 font-bold sm:font-semibold" data-aos="fade-up" data-aos-delay={DURATION_AOS}>{formatNumber(general?.q_claim, 4)}</div>
+                        <div
+                            className="text-red text-[2.5rem] leading-[3.5rem] sm:leading-10 font-bold sm:font-semibold"
+                            data-aos="fade-up"
+                            data-aos-delay={DURATION_AOS}
+                        >
+                            {formatNumber(general?.q_claim, 4)}
+                        </div>
                     </div>
                     <div className="grid grid-rows-4 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-4 grid-flow-col gap-x-6 lg:gap-6">
                         {list.map((item: any, index: number) => (
@@ -95,9 +101,10 @@ const Item = styled.div.attrs<any>({
 const Background = styled.div.attrs({
     className: 'pt-8 px-4',
 })<any>`
-    background-image: ${({ isMobile }) => `url(${`/images/screens/home/bg_banner${isMobile ? '_mobile' : ''}.png`})`};
+    background-image: ${({ isMobile }) => `url(${`/images/screens/home/banner${isMobile ? '_mobile' : ''}.png`})`};
     background-position: top;
     background-repeat: no-repeat;
     background-size: cover;
+    background-repeat: repeat-x;
 `
 export default Banner

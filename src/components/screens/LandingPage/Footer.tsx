@@ -53,14 +53,16 @@ const Footer = ({ sponsor = true }) => {
 const BgSponsor = styled.div.attrs({
     className: 'flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 space-x-8 justify-center bg-opacity-[0.4] py-8 sm:py-6',
 })`
-    background: linear-gradient(
+    background-color: #ffe4e9;
+    /* opacity: 0.4; */
+    /* background: linear-gradient(
         88.49deg,
         rgba(254, 235, 238, 0.4) -1.12%,
         rgba(255, 121, 135, 0.4) 16.3%,
         rgba(255, 55, 68, 0.4) 50.07%,
         rgba(255, 121, 135, 0.4) 82.97%,
         rgba(254, 235, 238, 0.4) 101.26%
-    );
+    ); */
 `
 
 export default Footer
