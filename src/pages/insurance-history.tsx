@@ -4,14 +4,16 @@ import { GetStaticProps } from 'next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import Breadcrumbs from 'components/layout/Breadcrumbs'
 import InsuranceHistory from 'components/screens/InsuranceHistory/InsuranceHistory'
+import { useTranslation } from 'next-i18next'
 
 const Myinsurance = () => {
+    const { t } = useTranslation()
     return (
         <LayoutWeb3 sponsor={false}>
             <Breadcrumbs>
-                <div>Trang chủ</div>
-                <div>Mua bảo hiểm</div>
-                <div>Lịch sử hợp đồng</div>
+                <div>{t('home:header:home')}</div>
+                <div>{t('home:header:buy_covered')}</div>
+                <div>{t('home:header:insurance_history')}</div>
             </Breadcrumbs>
             <InsuranceHistory />
         </LayoutWeb3>

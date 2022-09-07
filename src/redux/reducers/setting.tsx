@@ -2,20 +2,14 @@ import * as types from 'redux/actions/types'
 import { Action } from 'types/types'
 
 const initialState = {
-    loading: false,
-    profile: null,
+    assetsToken: [],
 }
 const setting = (state = initialState, action: Action) => {
     switch (action.type) {
-        case types.LOADING:
+        case types.SET_ASSETS_TOKEN:
             return {
                 ...state,
-                loading: action.payload,
-            }
-        case types.PROFILE:
-            return {
-                ...state,
-                profile: action.payload,
+                assetsToken: action.payload,
             }
         default:
             return state

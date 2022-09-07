@@ -4,12 +4,12 @@ import colors from 'styles/colors'
 const Breadcrumbs = ({ children }: any) => {
     return (
         <div className="bg-hover">
-            <div className="max-w-screen-layout m-auto flex items-center space-x-2 text-sm text-txtSecondary py-4 px-10">
+            <div className="max-w-screen-layout m-auto flex items-center flex-wrap text-xs sm:text-sm text-txtSecondary py-2 sm:py-4 px-4 sm:px-10">
                 {children.map((child: any, index: number) => (
                     <Fragment key={index}>
                         {child}
                         {index !== children.length - 1 && (
-                            <div className="w-6 h-6 flex items-center justify-center">
+                            <div className="w-6 h-6 flex items-center justify-center sm:mx-2">
                                 <ChevronRight size={18} color={colors.txtSecondary} />
                             </div>
                         )}

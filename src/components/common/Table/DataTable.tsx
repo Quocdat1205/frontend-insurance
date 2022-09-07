@@ -139,20 +139,22 @@ const DataTable = ({ columns, data, total = 0, skip = 0, limit = 10, onChangePag
                     </tbody>
                 </table>
             </div>
-            <div className="paging mt-6 flex items-center justify-center">
-                <Pagination
-                    prevIcon={(e: any) => <ChevronLeft color={e.disabled ? colors.divider : colors.txtPrimary} size={18} />}
-                    nextIcon={(e: any) => <ChevronRight color={e.disabled ? colors.divider : colors.txtPrimary} size={18} />}
-                    jumpPrevIcon={() => <div>...</div>}
-                    jumpNextIcon={() => <div>...</div>}
-                    current={currentPage}
-                    total={total}
-                    showLessItems={totalPage >= 10}
-                    pageSize={limit}
-                    onChange={_onChangePage}
-                    showTitle={false}
-                />
-            </div>
+            {totalPage > 1 && (
+                <div className="paging mt-6 flex items-center justify-center">
+                    <Pagination
+                        prevIcon={(e: any) => <ChevronLeft color={e.disabled ? colors.divider : colors.txtPrimary} size={18} />}
+                        nextIcon={(e: any) => <ChevronRight color={e.disabled ? colors.divider : colors.txtPrimary} size={18} />}
+                        jumpPrevIcon={() => <div>...</div>}
+                        jumpNextIcon={() => <div>...</div>}
+                        current={currentPage}
+                        total={total}
+                        showLessItems={totalPage >= 10}
+                        pageSize={limit}
+                        onChange={_onChangePage}
+                        showTitle={false}
+                    />
+                </div>
+            )}
         </>
     )
 }

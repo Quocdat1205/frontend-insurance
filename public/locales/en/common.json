@@ -2,14 +2,21 @@
     "please_connect_your_wallet": "Please connect your wallet to utilize this feature",
     "connect_now": "Connect Now",
     "status": {
-        "expired": "Expired",
         "available": "Available",
-        "payout_waiting": "Payout_Waiting",
-        "paid": "Paid"
+        "claim_waiting": "Claim waiting",
+        "expired": "Expired",
+        "claimed": "Claimed",
+        "refunded": "Refunded"
     },
     "header": {
         "home": "Home",
         "buy_covered": "Buy Cover",
         "insurance_history": "Insurance history"
-    }
+    },
+    "days": "days",
+    "asset_type": "Asset type",
+    "choose_asset_type": "Choose Asset type",
+    "status_ins": "Status",
+    "choose_status": "Choose Status",
+    "insurance": "Insurance"
 }

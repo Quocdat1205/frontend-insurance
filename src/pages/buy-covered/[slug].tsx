@@ -2,7 +2,7 @@ import Config from 'config/config'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import dynamic from 'next/dynamic'
 const InsuranceHistory = dynamic(() => import('components/screens/InsuranceHistory/InsuranceHistory'), {
-    suspense: true,
+    ssr: false,
 })
 const Insurance = ({ slug }: any) => {
     switch (slug) {
@@ -17,7 +17,7 @@ export const getServerSideProps = async ({ locale, query }: any) => {
             return {
                 props: {
                     slug: query.slug,
-                    ...(await serverSideTranslations(locale, ['common', 'home', 'insurance'])),
+                    ...(await serverSideTranslations(locale, ['common', 'home', 'insurance', 'insurance_history'])),
                 },
             }
         }

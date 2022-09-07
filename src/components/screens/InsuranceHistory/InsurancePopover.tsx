@@ -23,7 +23,7 @@ const InsurancePopover = ({ data, renderStatus, t }: any) => {
                         leaveFrom="opacity-100 translate-y-0"
                         leaveTo="opacity-0 translate-y-1"
                     >
-                        <Popover.Panel static className={`absolute top-0 right-full z-10 shadow-subMenu rounded-xl min-w-[448px] py-1 bg-white`}>
+                        <Popover.Panel static className={`absolute top-0 right-full mr-4 z-10 shadow-subMenu rounded-xl min-w-[448px] py-1 bg-white`}>
                             <div className="overflow-hidden font-normal">
                                 <div className="p-6 flex flex-col">
                                     <div className="text-xl font-medium">
