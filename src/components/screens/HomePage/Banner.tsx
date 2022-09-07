@@ -1,3 +1,4 @@
+import AOS from 'aos';
 import classnames from 'classnames'
 import useWindowSize from 'hooks/useWindowSize'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -7,6 +8,8 @@ import { useTranslation } from 'next-i18next'
 import { API_GET_INFO_GENERAL } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { formatNumber } from 'utils/utils'
+import "aos/dist/aos.css";
+import {DURATION_AOS} from "utils/constants";
 
 const Banner = () => {
     const { width } = useWindowSize()
@@ -40,6 +43,13 @@ const Banner = () => {
         ]
     }, [general])
 
+    useEffect(() => {
+        AOS.init({
+            once: true
+        });
+        AOS.refresh();
+    }, []);
+
     return (
         <section className="pt-20 sm:pt-[7.5rem]">
             <div className="text-2xl sm:text-5xl font-semibold mb-6 px-4 max-w-screen-insurance m-auto">{t('home:home:statistics')}</div>
@@ -48,7 +58,7 @@ const Banner = () => {
                 <div className="max-w-screen-insurance m-auto text-center flex flex-col space-y-8 sm:space-y-6">
                     <div className="flex flex-col space-y-[2px]">
                         <div className="leading-5 sm:leading-6">{t('home:landing:total_q_claim')}</div>
-                        <div className="text-red text-[2.5rem] leading-[3.5rem] sm:leading-10 font-bold sm:font-semibold">{formatNumber(general?.q_claim, 4)}</div>
+                        <div className="text-red text-[2.5rem] leading-[3.5rem] sm:leading-10 font-bold sm:font-semibold" data-aos="fade-up" data-aos-delay={DURATION_AOS}>{formatNumber(general?.q_claim, 4)}</div>
                     </div>
                     <div className="grid grid-rows-4 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-4 grid-flow-col gap-x-6 lg:gap-6">
                         {list.map((item: any, index: number) => (
@@ -58,7 +68,7 @@ const Banner = () => {
                                 </div>
                                 <div className="flex flex-col space-y-[2px] sm:space-y-2">
                                     <div className="text-txtSecondary text-sm sm:text-base">{item.title}</div>
-                                    <div className="font-semibold text-2xl">
+                                    <div className="font-semibold text-2xl" data-aos="fade-up" data-aos-delay={DURATION_AOS} data-aos-offset="50">
                                         {formatNumber(item.value, item.decimal)}
                                         {item.suffix}
                                     </div>

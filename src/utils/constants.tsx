@@ -12,3 +12,5 @@ export const PATHS = {
 
     // Add news path here
 }
+
+export const DURATION_AOS = 400

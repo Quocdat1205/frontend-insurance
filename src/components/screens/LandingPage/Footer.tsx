@@ -12,9 +12,9 @@ const Footer = ({ sponsor = true }) => {
         <footer className="footer pt-20 sm:pt-[7.5rem]">
             {sponsor && (
                 <BgSponsor>
-                    <div className="text-white font-bold text-sm sm:text-xl">{t('home:landing:products_sponsored_by')}</div>
+                    <div className="text-txtPrimary font-bold text-sm sm:text-xl">{t('home:landing:products_sponsored_by')}</div>
                     <div className="max-w-[230px]">
-                        <img src="/images/screens/landing-page/ic_logo_nami_foundation.png" />
+                        <img src="/images/screens/landing-page/ic_logo_nami_foundation_black.png" />
                     </div>
                 </BgSponsor>
             )}
