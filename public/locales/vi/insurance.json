@@ -4,8 +4,7 @@
         "buy_covered": "Mua bảo hiểm",
         "back_to_home": "Về trang chủ",
         "default": "Mặc định",
-        "change_r_claim": "Tùy chỉnh R-Claim",
-        "change_q_claim": "Tùy chỉnh Q-Claim",
+        "change": "Tùy chỉnh",
         "change_margin": "Tùy chỉnh Margin",
         "insurance_history": "Lịch sử bảo hiểm",
         "help": "Hướng dẫn mua bảo hiểm",
@@ -29,7 +28,9 @@
         "upgrade_info": "Gia tăng kỳ hạn và giá trị chi trả bảo hiểm",
         "Term_of_Service": "Bằng việc xác nhận, bạn đã đồng ý với",
         "Term_of_Service_sub": "Điều khoản dịch của Nami Insurance.",
-        "connect_wallet": "Kết nối ví"
+        "connect_wallet": "Kết nối ví",
+        "quality": "Số lượng",
+        "title_change_margin": "và Margin là"
     },
     "final": {
         "succes": "Mua bảo hiểm thành công",

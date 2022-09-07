@@ -243,3 +243,22 @@ export const StartIcon = () => {
         </svg>
     )
 }
+
+export const XMark = () => {
+    return (
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M10.192 0.344238L5.94897 4.58624L1.70697 0.344238L0.292969 1.75824L4.53497 6.00024L0.292969 10.2422L1.70697 11.6562L5.94897 7.41424L10.192 11.6562L11.606 10.2422L7.36397 6.00024L11.606 1.75824L10.192 0.344238Z"
+                fill="#22313F"
+            />
+        </svg>
+    )
+}
+
+export const Dot = (color: any, className: any) => {
+    return (
+        <svg width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+            <rect x="0.143066" y="0.143066" width="5.71429" height="5.71429" rx="2.85714" fill={color} />
+        </svg>
+    )
+}

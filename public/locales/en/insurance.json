@@ -4,8 +4,7 @@
         "buy_covered": "Buy Cover",
         "back_to_home": "Back to Home",
         "default": "Default",
-        "change_r_claim": "Customize R-Claim",
-        "change_q_claim": "Customize Q-Claim",
+        "change": "Customize",
         "change_margin": "Customize Margin",
         "covered_history": "Cover History",
         "help": "How to get covered",
@@ -29,7 +28,9 @@
         "upgrade_info": "Increase the amount of Period and Q-Claim",
         "Term_of_Service": "By providing press \"Confirm\", you agree to ",
         "Term_of_Service_sub": "the Nami Insurance's Term of Service.",
-        "connect_wallet": "Connect wallet"
+        "connect_wallet": "Connect wallet",
+        "quality": "Quantity",
+        "title_change_margin": "and Margin is"
     },
     "final": {
         "succes": "Successfully purchased Insurance Contract",
