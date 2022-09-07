@@ -53,11 +53,13 @@ const commonColors = {
     },
     pink: {
         pink: '#FFF1F2',
+        1: '#FFF5F6'
     },
     gray: {
         gray: '#B2B7BC',
+        1: '#F2F3F5',
     },
-    bgModal: '#243042',
+    bgModal: '#3d4252',
 }
 
 module.exports = {

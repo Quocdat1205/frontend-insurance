@@ -7,7 +7,7 @@ const customStyles = {
         backgroundColor: colors.hover,
         display: 'flex',
         alignItems: 'center',
-        minHeight: 48,
+        height: '100%',
         borderRadius: 3,
         padding: '0 16px',
     }),
@@ -48,7 +48,9 @@ const customStyles = {
         ...styles,
         color: isDisabled ? colors.divider : colors.txtPrimary,
         cursor: isDisabled ? 'not-allowed' : 'default',
-        backgroundColor: isSelected ? colors.active : colors.white.white,
+        backgroundColor: isSelected ? colors.gray[1] : colors.white.white,
+        paddingLeft: '1rem',
+        paddingRight: '1rem',
         ':hover': {
             ...styles[':hover'],
             backgroundColor: isDisabled ? colors.white.white : colors.hover,
@@ -69,10 +71,11 @@ interface Selectbox {
     onChange?: (e: any) => void
     displayExpr: string
     valueExpr: string
+    formatOptionLabel?: any
+    labelClassName?: string
 }
 
-const Selectbox = ({ className, label, options, placeholder = label, value, displayExpr, valueExpr, ...props }: Selectbox) => {
-
+const Selectbox = ({ className, label, options, placeholder = label, value, displayExpr, valueExpr, labelClassName, ...props }: Selectbox) => {
     const item = useMemo(() => {
         if (typeof value === 'string') {
             return options.find((rs: any) => valueExpr && rs[valueExpr] === value)
@@ -82,13 +85,14 @@ const Selectbox = ({ className, label, options, placeholder = label, value, disp
 
     return (
         <div className={`flex flex-col space-y-2 ${className}`}>
-            <div className="text-sm">{label}</div>
+            <div className={`text-sm ${labelClassName}`}>{label}</div>
             <Select
                 {...props}
                 value={item}
                 placeholder={placeholder}
                 styles={customStyles}
                 options={options}
+                className='h-[2.75rem] sm:h-[3rem]'
                 getOptionLabel={(option: any) => option && displayExpr && option[displayExpr]}
                 getOptionValue={(option: any) => option && valueExpr && option[valueExpr]}
             />

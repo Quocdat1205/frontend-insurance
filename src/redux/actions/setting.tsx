@@ -1,27 +1,18 @@
 import { Dispatch } from 'redux'
-
 import * as types from 'redux/actions/types'
+import { API_GET_GET_LIST_TOKEN } from 'services/apis'
+import fetchApi from 'services/fetch-api'
 
-export const onLoading = (param?: any, cb?: any) => async (dispatch: Dispatch) => {
+export const getListAssetToken = () => async (dispatch: Dispatch) => {
     try {
-        dispatch({
-            type: types.LOADING,
-            payload: param,
-        })
-        if (cb) cb(param)
+        const data = await fetchApi({ url: API_GET_GET_LIST_TOKEN })
+        if (data) {
+            dispatch({
+                type: types.SET_ASSETS_TOKEN,
+                payload: data,
+            })
+        }
     } catch (error) {
-        console.log('onLoading', error)
-    }
-}
-
-export const setProfile = (param?: any, cb?: any) => async (dispatch: Dispatch) => {
-    try {
-        dispatch({
-            type: types.PROFILE,
-            payload: param,
-        })
-        if (cb) cb(param)
-    } catch (error) {
-        console.log('onLoading', error)
+        console.log('getListToken', error)
     }
 }

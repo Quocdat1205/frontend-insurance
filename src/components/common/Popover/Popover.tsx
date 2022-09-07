@@ -8,7 +8,7 @@ interface ReactPopover {
 }
 const ReactPopover = ({ children, label, className }: ReactPopover) => {
     return (
-        <Popover className="relative">
+        <Popover className="relative w-full">
             {({ open }) => (
                 <>
                     <Popover.Button type="button" className="inline-flex items-center focus:outline-none w-full" aria-expanded="false">

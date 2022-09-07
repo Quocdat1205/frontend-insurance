@@ -48,9 +48,11 @@ const colors = {
     },
     pink: {
         pink: '#FFF1F2',
+        1: '#FFF5F6',
     },
     gray: {
         gray: '#B2B7BC',
+        1: '#F2F3F5',
     },
     divider: '#E5E7E8',
     txtPrimary: '#22313F',
@@ -58,7 +60,6 @@ const colors = {
     error: '#E5544B',
     success: '#52CC74',
     hover: '#F7F8FA',
-    active: '#F2F3F5',
 }
 
 export default colors

@@ -38,7 +38,7 @@ const Header = () => {
     return (
         <header className="header-landing px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[10]">
             <div className="max-w-screen-layout m-auto flex items-center justify-between space-x-12">
-                <div className="w-[75px]">
+                <div className="min-w-[67px] w-[75px]">
                     <img src="/images/ic_logo.png" />
                 </div>
                 <div className="w-full flex items-center justify-end mb:justify-between  py-3 mb:py-0 text-sm font-semibold">
@@ -49,7 +49,9 @@ const Header = () => {
                             <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
                                 <img src={network.icon} width={24} height={24} />
                                 <div>{network.chain}</div>
-                                <div className="rounded-[5px] bg-white  px-4 py-1">{account.substr(0, 4) + '...' + account.substr(-4)}</div>
+                                {!isMobile && (
+                                    <div className="rounded-[5px] bg-white overflow-hidden px-4 py-1">{account.substr(0, 4) + '...' + account.substr(-4)}</div>
+                                )}
                             </div>
                         )}
                         {!isMobile && <ButtonLanguage />}
