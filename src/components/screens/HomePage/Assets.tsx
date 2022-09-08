@@ -94,8 +94,7 @@ const Assets = () => {
     )
 
     return (
-        <section className="pt-20 sm:pt-[7.5rem] px-4 max-w-screen-insurance m-auto">
-            <div className="text-2xl sm:text-5xl font-semibold mb-6">{t('home:home:new_insurance_assets')}</div>
+        <>
             {isMobile ? (
                 <Swiper
                     pagination={pagination}
@@ -146,7 +145,7 @@ const Assets = () => {
                     </CardShadow>
                 </div>
             )}
-        </section>
+        </>
     )
 }
 
