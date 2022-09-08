@@ -113,14 +113,15 @@ export const InsuranceFrom = () => {
 
     const validatePclaim = (value: number) => {
         console.log(state.p_market + (2 * state.p_market) / 100, state.p_market + (70 * state.p_market) / 100)
-
-        if (value > state.p_market + (2 * state.p_market) / 100 && value < state.p_market + (70 * state.p_market) / 100) {
-            return setClear(true)
+        if (wallet.account) {
+            if (value > state.p_market + (2 * state.p_market) / 100 && value < state.p_market + (70 * state.p_market) / 100) {
+                return setClear(true)
+            }
+            if (value > state.p_market - (70 * state.p_market) / 100 && value < state.p_market - (2 * state.p_market) / 100) {
+                return setClear(true)
+            }
+            setClear(false)
         }
-        if (value > state.p_market - (70 * state.p_market) / 100 && value < state.p_market - (2 * state.p_market) / 100) {
-            return setClear(true)
-        }
-        setClear(false)
     }
 
     useEffect(() => {
@@ -404,7 +405,7 @@ export const InsuranceFrom = () => {
                     <div className={'flex flex-col justify-center items-center mb-[32px] '} onClick={() => setDrop(false)}>
                         <div>{index}/2</div>
                         <div className={'font-semibold text-[32px] leading-[44px]'}>{index == 1 ? menu[1].name : t('insurance:buy:info_covered')}</div>
-                        <div className={'mt-[12px]'}>{t('insurance:buy:connect_wallet_error')}</div>
+                        {!wallet.account && <div className={'mt-[12px]'}>{t('insurance:buy:connect_wallet_error')}</div>}
                     </div>
                 ) : (
                     index == 1 && (
@@ -1101,7 +1102,7 @@ export const InsuranceFrom = () => {
 
 export const getStaticProps: GetStaticProps = async ({ locale }: any) => ({
     props: {
-        ...(await serverSideTranslations(locale, ['common', 'insurance'])),
+        ...(await serverSideTranslations(locale, ['common', 'insurance', 'home'])),
     },
 })
 
