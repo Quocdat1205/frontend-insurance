@@ -176,8 +176,8 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                 <div className="relative bg-white" style={{ borderRadius: '5px 5px 0 0' }}>
                     <div className={'flex justify-center items-center my-[32px]'}>
                         <CheckCircle />
-                        <span className={'font-semibold text-[#22313F]'}>
-                            {t('insurance:buy:saved')}
+                        <span className={'font-semibold text-[#22313F] px-[4px]'}>
+                            {`${t('insurance:buy:saved')} `}
                             <span className={'text-[#EB2B3E]'}>1,000 USDT</span> {t('insurance:buy:sub_saved')}
                         </span>
                     </div>
@@ -349,8 +349,8 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                         </div>
                         <div className="flex flex-row">
                             <span className={'font-semibold text-[#22313F]'}>
-                                {t('insurance:buy:saved')}
-                                <span className={'text-[#EB2B3E]'}>1,000 USDT</span> {t('insurance:buy:sub_saved')}
+                                {`${t('insurance:buy:saved')} `}
+                                <span className={'text-[#EB2B3E] px-[4px]'}>1,000 USDT</span> {t('insurance:buy:sub_saved')}
                             </span>
                         </div>
                     </div>

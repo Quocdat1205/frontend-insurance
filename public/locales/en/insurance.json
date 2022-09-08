@@ -30,6 +30,7 @@
         "Term_of_Service_sub": "Term of Service.",
         "Term_of_Service_of": "the Nami Insurance's ",
         "connect_wallet": "Connect wallet",
+        "connect_wallet_error": "Please connect your wallet to utilize this feature",
         "quality": "Quantity",
         "title_change_margin": "and Margin is"
     },
