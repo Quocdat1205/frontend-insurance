@@ -1,12 +1,12 @@
 import { color } from '@amcharts/amcharts4/core'
 import colors from 'styles/colors'
 
-export const RightArrow = () => {
+export const RightArrow = ({ size = 16, color = 'white' }: any) => {
     return (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
                 d="M1.99988 8.66685L11.7239 8.66685L8.19521 12.1955L9.13788 13.1382L14.2759 8.00018L9.13788 2.86218L8.19521 3.80485L11.7239 7.33352L1.99988 7.33352L1.99988 8.66685Z"
-                fill="white"
+                fill={color}
             />
         </svg>
     )
@@ -259,6 +259,37 @@ export const Dot = (color: any, className: any) => {
     return (
         <svg width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
             <rect x="0.143066" y="0.143066" width="5.71429" height="5.71429" rx="2.85714" fill={color} />
+        </svg>
+    )
+}
+
+export const FilterIcon = ({ size = 24, color = '#22313F' }: any) => {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill={color} d="M10 18H14V16H10V18ZM3 6V8H21V6H3ZM6 13H18V11H6V13Z" />
+        </svg>
+    )
+}
+export const AddCircleIcon = ({ size = 24, color = '#EB2B3E' }: any) => {
+    return (
+        <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M9.16668 4.66683H7.83334V7.3335H5.16668V8.66683H7.83334V11.3335H9.16668V8.66683H11.8333V7.3335H9.16668V4.66683ZM8.50001 1.3335C4.82001 1.3335 1.83334 4.32016 1.83334 8.00016C1.83334 11.6802 4.82001 14.6668 8.50001 14.6668C12.18 14.6668 15.1667 11.6802 15.1667 8.00016C15.1667 4.32016 12.18 1.3335 8.50001 1.3335ZM8.50001 13.3335C5.56001 13.3335 3.16668 10.9402 3.16668 8.00016C3.16668 5.06016 5.56001 2.66683 8.50001 2.66683C11.44 2.66683 13.8333 5.06016 13.8333 8.00016C13.8333 10.9402 11.44 13.3335 8.50001 13.3335Z"
+                fill={color}
+            />
+        </svg>
+    )
+}
+export const AlarmIcon = ({ size = 24, color = '#EB2B3E' }: any) => {
+    return (
+        <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M8.5 2.6665C5.24733 2.6665 2.5 5.41384 2.5 8.6665C2.5 11.9192 5.24733 14.6665 8.5 14.6665C11.7527 14.6665 14.5 11.9192 14.5 8.6665C14.5 5.41384 11.7527 2.6665 8.5 2.6665ZM8.5 13.3332C5.97067 13.3332 3.83333 11.1958 3.83333 8.6665C3.83333 6.13717 5.97067 3.99984 8.5 3.99984C11.0293 3.99984 13.1667 6.13717 13.1667 8.6665C13.1667 11.1958 11.0293 13.3332 8.5 13.3332Z"
+                fill={color}
+            />
+            <path d="M9.16668 8.00016V5.3335H7.83334V8.00016V9.3335H9.16668H11.8333V8.00016H9.16668Z" fill={color} />
+            <path d="M12.0226 2.47119L12.964 1.52703L14.9704 3.52763L14.0289 4.47179L12.0226 2.47119Z" fill={color} />
+            <path d="M4.96527 2.47119L2.97173 4.47044L2.02757 3.52899L4.02111 1.52973L4.96527 2.47119Z" fill={color} />
         </svg>
     )
 }

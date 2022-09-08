@@ -6,9 +6,6 @@ import MetaMaskProvider from 'components/web3/MetaMaskProvider'
 import 'types/declare'
 import store from 'redux/store'
 import { appWithTranslation } from 'next-i18next'
-import Toast from 'components/layout/Toast'
-import Config from 'config/config'
-import AlertModal from 'components/common/Modal/AlertModal'
 import NProgress from 'nprogress'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
@@ -17,6 +14,8 @@ import { registerLocale } from 'react-datepicker'
 import vi from 'date-fns/locale/vi'
 import en from 'date-fns/locale/en-US'
 import { days, months } from 'utils/constants'
+import Container from 'components/layout/Container'
+
 vi.localize = {
     day: (n: number) => days[n]['vi'],
     month: (n: number) => months[n]['vi'],
@@ -43,6 +42,7 @@ registerLocale('en', {
 })
 function MyApp({ Component, pageProps }: AppProps) {
     const router = useRouter()
+
     useEffect(() => {
         const handleRouteChange = (url: string) => {
             NProgress.done()
@@ -59,12 +59,12 @@ function MyApp({ Component, pageProps }: AppProps) {
 
     return (
         <Provider store={store}>
-            <Toast ref={(ref: any) => (Config.toast = ref)} />
-            <AlertModal portalId="alert-modal" ref={(ref: any) => (Config.alert = ref)} />
-            <Head />
-            <MetaMaskProvider>
-                <Component {...pageProps} />
-            </MetaMaskProvider>
+            <Container>
+                <Head />
+                <MetaMaskProvider>
+                    <Component {...pageProps} />
+                </MetaMaskProvider>
+            </Container>
         </Provider>
     )
 }

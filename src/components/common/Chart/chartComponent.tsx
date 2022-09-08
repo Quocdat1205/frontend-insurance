@@ -20,7 +20,7 @@ export type Idata = {
     date: any
 }
 
-const handleTrendLine = (chart: am4charts.XYChart, p_claim: number) => {
+export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number) => {
     let trend = chart.series.push(new am4charts.LineSeries())
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
@@ -59,7 +59,7 @@ const handleTrendLine = (chart: am4charts.XYChart, p_claim: number) => {
     }
 }
 
-const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number) => {
+export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number) => {
     let trend = chart.series.push(new am4charts.LineSeries())
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
@@ -75,8 +75,8 @@ const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number) => {
 
         trend.data = [
             {
-                date: chart.data[chart.data.length - 1].date,
-                value: chart.data[chart.data.length - 1].value,
+                date: chart.data[chart.data.length - 1]?.date,
+                value: chart.data[chart.data.length - 1]?.value,
             },
             {
                 date: timeEnd,
@@ -86,10 +86,10 @@ const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number) => {
     }
 }
 
-const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP_Market, setP_Claim, state }: iProps) => {
+export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, state }: iProps) => {
     const [dataChart, setDataChart] = useState([])
     let chart: any
-    const ref = useRef<any>(null)
+    // const ref = useRef<any>(null)
 
     useEffect(() => {
         if (data && data.length > 0) setDataChart(data)
@@ -97,7 +97,7 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
 
     useEffect(() => {
         InitChart(dataChart)
-        ref.current.renderer
+        // ref.current.renderer
         setP_Market(chart.data[chart.data.length - 1]?.value)
     }, [dataChart, p_claim, p_expired, state.period])
 
@@ -240,7 +240,9 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
                 claimLabel.label.dx = 20
                 claimLabel.label.verticalCenter = 'middle'
                 claimLabel.label.fill = am4core.color('#EB2B3E')
-                claimLabel.label.html = `<div class="hover:cursor-pointer" style="color: #EB2B3E; border-radius: 800px; padding: 4px 16px; background-color: #FFF1F2">P-Claim ${p_claim}</div>`
+                claimLabel.label.html = `<div class="hover:cursor-pointer" style="color: ${
+                    p_claim < state.p_market ? '#EB2B3E' : '#52CC74'
+                } ; border-radius: 800px; padding: 4px 16px; background-color: ${p_claim < state.p_market ? '#FFF1F2' : '#F1FFF5'}  ">P-Claim ${p_claim}</div>`
                 claimLabel.id = 'g2'
 
                 //label claim
@@ -249,7 +251,7 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
                 claimLabel.events.once('drag', (event: any) => {
                     interract.events.once('up', (e) => {
                         let point = am4core.utils.documentPointToSprite(e.pointer.point, chart.seriesContainer)
-                        return setP_Claim(valueAxis.yToValue(point?.y))
+                        return setP_Claim(valueAxis.yToValue(point?.y).toFixed(2))
                     })
                 })
 
@@ -263,7 +265,7 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
         }
     }
 
-    return <div ref={ref} id="chartdiv" style={{ width: '100%', height: '500px' }} className={'relative'} />
+    return <div id="chartdiv" style={{ width: '100%', height: '500px' }} className={'relative'}></div>
 }
 
 export default ChartComponent

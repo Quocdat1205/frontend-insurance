@@ -15,7 +15,7 @@ const Toast = forwardRef((props, ref) => {
 
     const onShow = (type: string, messages: string, option: OptionNotify) => {
         const { icon, style } = getOption(type)
-        toast.dismiss();
+        toast.dismiss()
         setButton(option?.button)
         toast(messages, {
             icon: icon,
@@ -27,7 +27,7 @@ const Toast = forwardRef((props, ref) => {
 
     const getOption = (type: string) => {
         const style: any = {
-            background: colors.txtPrimary,
+            background: '#52CC74',
             color: colors.white.white,
         }
         switch (type) {

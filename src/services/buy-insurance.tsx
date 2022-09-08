@@ -1,6 +1,6 @@
 import axios from 'axios'
 import Config from 'config/config'
-import { API_GET_GET_TOKEN } from './apis'
+import { API_GET_BUY_INSURANCE, API_GET_GET_TOKEN } from './apis'
 
 export const buyInsurance = async (props: {
     owner: string
@@ -19,7 +19,7 @@ export const buyInsurance = async (props: {
         const AuthToken = await axios.get(`${Config.env.API_URL}${API_GET_GET_TOKEN}`, { params: { walletAddress: owner } })
 
         const { data } = await axios.post(
-            `${Config.env.API_URL}/buy-insurance`,
+            `${Config.env.API_URL}${API_GET_BUY_INSURANCE}`,
             {
                 owner,
                 transaction_hash,

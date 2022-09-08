@@ -2,14 +2,19 @@
     "please_connect_your_wallet": "Vui lòng kết nối ví để sử dụng tính năng này",
     "connect_now": "Kết nối ngay",
     "status": {
-        "expired": "Đã hết hạn",
         "available": "Còn hiệu lực",
-        "payout_waiting": "Chờ chi trả",
-        "paid": "Chờ chi trả"
+        "claim_waiting": "Chờ chi trả",
+        "expired": "Đã hết hạn",
+        "claimed": "Đã chi trả",
+        "refunded": "Đã chuyển nhượng"
     },
     "header": {
         "home": "Trang chủ",
         "buy_covered": "Mua bảo hiểm",
         "insurance_history": "Lịch sử bảo hiểm"
-    }
+    },
+    "days": "Ngày",
+    "asset_type": "Loại tài sản",
+    "choose_asset_type": "Chọn loại tài sản",
+    "insurance": "Hợp đồng"
 }

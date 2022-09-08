@@ -1,2 +1,1 @@
-export const LOADING: string = 'LOADING'
-export const PROFILE: string = 'PROFILE'
+export const SET_ASSETS_TOKEN: string = 'SET_ASSETS_TOKEN'

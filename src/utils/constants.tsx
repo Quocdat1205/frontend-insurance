@@ -14,10 +14,11 @@ export const PATHS = {
 }
 
 export const stateInsurance: any = {
-    EXPIRED: 'Expired',
     AVAILABLE: 'Available',
-    PAYOUT_WAITING: 'Payout_Waiting',
-    PAID: 'Paid',
+    REFUNDED: 'Refunded',
+    CLAIM_WAITING: 'Claim_waiting',
+    CLAIMED: 'Claimed',
+    EXPIRED: 'Expired',
 }
 
 export const months: any = [
