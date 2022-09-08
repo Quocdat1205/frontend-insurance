@@ -68,7 +68,7 @@ const Banner = () => {
                     </div>
                     <div className="grid grid-rows-4 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-4 grid-flow-col gap-x-6 lg:gap-6">
                         {list.map((item: any, index: number) => (
-                            <Item key={index} className="border-gradient-red">
+                            <Item key={index} className=" border-transparent-red lg:border-gradient-red">
                                 <div className="max-h-[54px]">
                                     <InlineSVG src={item.icon} />
                                 </div>
@@ -101,7 +101,7 @@ const Item = styled.div.attrs<any>({
 const Background = styled.div.attrs({
     className: 'pt-8 px-4',
 })<any>`
-    background-image: ${({ isMobile }) => `url(${`/images/screens/home/banner${isMobile ? '_mobile' : ''}.png`})`};
+    background-image: ${({ isMobile }) => `url(${`/images/screens/home/banner_alt${isMobile ? '_mobile' : ''}.png`})`};
     background-position: top;
     background-repeat: no-repeat;
     background-size: cover;
