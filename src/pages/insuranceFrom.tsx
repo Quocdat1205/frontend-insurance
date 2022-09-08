@@ -112,13 +112,13 @@ export const InsuranceFrom = () => {
     }
 
     const validatePclaim = (value: number) => {
-        if (value > (2 * state.p_market) / 100 && value < (70 * state.p_market) / 100) {
+        if (value > state.p_market + (2 * state.p_market) / 100 && value < state.p_market + (70 * state.p_market) / 100) {
             return setClear(true)
         }
-        if (value > (-70 * state.p_market) / 100 && value < (-2 * state.p_market) / 100) {
+        if (value > -state.p_market + (-70 * state.p_market) / 100 && value < -state.p_market + (-2 * state.p_market) / 100) {
             return setClear(true)
         }
-        return setClear(false)
+        setClear(false)
     }
 
     useEffect(() => {
