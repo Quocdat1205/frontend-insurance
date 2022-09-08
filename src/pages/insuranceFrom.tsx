@@ -17,6 +17,9 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
 import { Suspense } from 'react'
+import store from 'redux/store'
+import Config from 'config/config'
+import NotificationInsurance from 'components/layout/notifucationInsurance'
 //chart
 const ChartComponent = dynamic(() => import('../components/common/Chart/chartComponent'), { ssr: false, suspense: true })
 
@@ -32,42 +35,34 @@ export const InsuranceFrom = () => {
     const [isHover, setIsHover] = useState(false)
     const [checkUpgrade, setCheckUpgrade] = useState(false)
     const [clear, setClear] = useState(false)
-
+    const stone = store.getState()
     const [index, setIndex] = useState<1 | 2>(1)
     const [tab, setTab] = useState<number>(3)
     const [loadings, setLoadings] = useState(true)
+    const [priceBNB, setPriceBNB] = useState(0)
+    const [openChangeToken, setOpenChangeToken] = useState(false)
+    const [active, setActive] = useState<boolean>(false)
 
     const [userBalance, setUserBalance] = useState<number>(0)
-    const listCoin: ICoin[] = [
-        {
-            id: 1,
-            name: 'Ethereum',
-            icon: '/images/icons/ic_ethereum.png',
-            symbol: 'ETHUSDT',
-            type: 'ETH',
-        },
-        {
-            id: 2,
-            name: 'Bitcoin',
-            icon: '/images/icons/ic_bitcoin.png',
-            symbol: 'BTCUSDT',
-            type: 'BTC',
-        },
-        {
-            id: 3,
-            name: 'Binance Coin ',
-            icon: '/images/icons/ic_binance.png',
-            disable: true,
-            symbol: 'BNBUSDT',
-            type: 'BNB',
-        },
-    ]
-
+    const [listCoin, setListCoin] = useState<ICoin[]>([])
+    const [selectCoin, setSelectedCoin] = useState<ICoin>({
+        icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
+        id: '63187ae8c2ad72eac4d0f363',
+        name: 'Binance',
+        symbol: 'BNBUSDT',
+        type: 'BNB',
+    })
     const [state, setState] = useState({
         timeframe: '',
         margin: 0,
         percent_margin: 0,
-        symbol: listCoin[0],
+        symbol: {
+            icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
+            id: '63187ae8c2ad72eac4d0f363',
+            name: 'Binance',
+            symbol: 'BNBUSDT',
+            type: 'BNB',
+        },
         period: 2,
         p_claim: 0,
         q_claim: 0,
@@ -79,8 +74,6 @@ export const InsuranceFrom = () => {
     })
 
     const [dataChart, setDataChart] = useState()
-
-    const [selectCoin, setSelectedCoin] = useState<ICoin>(listCoin[0])
 
     const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', 'ALL']
     const listTabPeriod: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
@@ -119,69 +112,137 @@ export const InsuranceFrom = () => {
     }
 
     const validatePclaim = (value: number) => {
-        let status: boolean = false
-
-        if (
-            (value > (2 * state.p_market) / 100 && value < (70 * state.p_market) / 100) ||
-            (value > (-70 * state.p_market) / 100 && value < (-2 * state.p_market) / 100)
-        ) {
-            status = true
+        if (value > (2 * state.p_market) / 100 && value < (70 * state.p_market) / 100) {
+            return setClear(true)
         }
-        return status
+        if (value > (-70 * state.p_market) / 100 && value < (-2 * state.p_market) / 100) {
+            return setClear(true)
+        }
+        return setClear(false)
     }
 
     useEffect(() => {
-        const timeEnd = new Date()
-        const timeBegin = new Date()
-        timeBegin.setDate(timeEnd.getDate() - 10)
-        setState({ ...state, t_market: timeEnd })
-        setLoadings(true)
-        fetchApiNami(`${listCoin[0].symbol}`, `${Math.floor(timeBegin.getTime() / 1000)}`, `${Math.ceil(timeEnd.getTime() / 1000)}`, '1d', setDataChart).then(
-            () => setLoadings(false),
-        )
-        getPrice(listCoin[0].symbol, state, setState)
-    }, [])
+        if (stone.setting.assetsToken.length > 0) {
+            let list: ICoin[] = []
+            stone.setting.assetsToken.map((token: any) => {
+                list.push({
+                    id: token._id,
+                    name: token.name,
+                    icon: token.attachment,
+                    symbol: `${token.symbol}USDT`,
+                    type: token.symbol,
+                })
+            })
+            setListCoin(list)
+        }
+        const data = localStorage.getItem('state')
+        if (data) {
+            const res = JSON.parse(data)
+            setSelectedCoin({
+                ...selectCoin,
+                icon: res.symbol.icon,
+                id: res.symbol.id,
+                name: res.symbol.name,
+                symbol: res.symbol.symbol,
+                type: res.symbol.type,
+            })
+            setState({
+                ...state,
+                symbol: {
+                    ...state.symbol,
+                    icon: res.symbol.icon,
+                    id: res.symbol.id,
+                    name: res.symbol.name,
+                    symbol: res.symbol.symbol,
+                    type: res.symbol.type,
+                },
+            })
+            setState({
+                ...state,
+                percent_margin: res.percent_margin,
+                period: res.period,
+                p_claim: res.p_claim,
+                q_claim: res.q_claim,
+                r_claim: res.r_claim,
+                q_covered: res.q_covered,
+            })
+            // setIndex(res.index || 1)
+        }
+        getPriceBNBUSDT(setPriceBNB)
+    }, [stone])
+
+    useEffect(() => {
+        if (state.p_claim != 0) {
+            validatePclaim(state.p_claim)
+            const dataSave = { ...state, index: index }
+            return localStorage.setItem('state', JSON.stringify(dataSave))
+        }
+    }, [state])
+
+    useEffect(() => {
+        if (listCoin.length > 0) {
+            const timeEnd = new Date()
+            const timeBegin = new Date()
+            timeBegin.setDate(timeEnd.getDate() - 10)
+            setState({ ...state, t_market: timeEnd })
+            setLoadings(true)
+            fetchApiNami(
+                `${listCoin[0].symbol}`,
+                `${Math.floor(timeBegin.getTime() / 1000)}`,
+                `${Math.ceil(timeEnd.getTime() / 1000)}`,
+                '1d',
+                setDataChart,
+            ).then(() => setLoadings(false))
+            getPrice(listCoin[0].symbol, state, setState)
+        }
+    }, [listCoin])
 
     useEffect(() => {
         refreshApi(selectTime, selectCoin)
-        getPrice(selectCoin.symbol, state, setState)
     }, [selectTime, selectCoin])
+
+    useEffect(() => {
+        if (selectCoin) {
+            getPrice(selectCoin.symbol, state, setState)
+        }
+    }, [selectCoin])
 
     const refreshApi = (
         selectTime: string | undefined,
-        selectCoin: { id?: number; name?: string; icon?: string; disable?: boolean | undefined; symbol: any },
+        selectCoin: { id?: string; name?: string; icon?: string; disable?: boolean | undefined; symbol: any },
     ) => {
         const timeEnd = new Date()
         const timeBegin = new Date()
         setLoadings(true)
-
-        if (selectTime == '1H' || selectTime == '1D') {
-            timeBegin.setDate(timeEnd.getDate() - 10)
-            fetchApiNami(
-                `${selectCoin.symbol}`,
-                `${Math.floor(timeBegin.getTime() / 1000)}`,
-                `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                '1m',
-                setDataChart,
-            ).then(() => setLoadings(false))
-        } else if (selectTime == '1W') {
-            timeBegin.setDate(timeEnd.getDate() - 10)
-            fetchApiNami(
-                `${selectCoin.symbol}`,
-                `${Math.floor(timeBegin.getTime() / 1000)}`,
-                `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                '1h',
-                setDataChart,
-            ).then(() => setLoadings(false))
-        } else {
-            timeBegin.setDate(timeEnd.getDate() - 10)
-            fetchApiNami(
-                `${selectCoin.symbol}`,
-                `${Math.floor(timeBegin.getTime() / 1000)}`,
-                `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                '1h',
-                setDataChart,
-            ).then(() => setLoadings(false))
+        if (selectCoin) {
+            if (selectTime == '1H' || selectTime == '1D') {
+                timeBegin.setDate(timeEnd.getDate() - 10)
+                fetchApiNami(
+                    `${selectCoin.symbol}`,
+                    `${Math.floor(timeBegin.getTime() / 1000)}`,
+                    `${Math.ceil(timeEnd.getTime() / 1000)}`,
+                    '1m',
+                    setDataChart,
+                ).then(() => setLoadings(false))
+            } else if (selectTime == '1W') {
+                timeBegin.setDate(timeEnd.getDate() - 10)
+                fetchApiNami(
+                    `${selectCoin.symbol}`,
+                    `${Math.floor(timeBegin.getTime() / 1000)}`,
+                    `${Math.ceil(timeEnd.getTime() / 1000)}`,
+                    '1h',
+                    setDataChart,
+                ).then(() => setLoadings(false))
+            } else {
+                timeBegin.setDate(timeEnd.getDate() - 10)
+                fetchApiNami(
+                    `${selectCoin.symbol}`,
+                    `${Math.floor(timeBegin.getTime() / 1000)}`,
+                    `${Math.ceil(timeEnd.getTime() / 1000)}`,
+                    '1h',
+                    setDataChart,
+                ).then(() => setLoadings(false))
+            }
         }
     }
 
@@ -222,28 +283,45 @@ export const InsuranceFrom = () => {
                 setState({ ...state, q_claim: q_claim, r_claim: Number((q_claim / state.margin).toFixed(2)), p_expired: Math.floor(p_stop) })
             }
         }
+        validatePclaim(state.p_claim)
     }, [state.q_covered, state.period, selectCoin, state.margin, state.p_claim, state.percent_margin])
 
-    //validate
     useEffect(() => {
-        if (validatePclaim(state.p_claim)) {
-            return setClear(true)
+        const result = wallet.getBalance()
+        result.then((balance: number) => {
+            setUserBalance(Number((balance * priceBNB) / state.p_market))
+        })
+    }, [wallet])
+
+    useEffect(() => {
+        if (state.p_claim > 0) {
+            validatePclaim(state.p_claim)
         }
     }, [state.p_claim])
 
-    useEffect(() => {
-        setUserBalance(wallet.getBalance())
-        console.log(wallet)
-    }, [wallet])
     return !loadings ? (
-        <LayoutInsurance>
+        <LayoutInsurance handleClick={() => setDrop(false)}>
+            {active && (
+                <div className="absolute w-full h-full bg-gray/[0.5] z-50 flex flex-col items-center justify-center">
+                    <NotificationInsurance
+                        id=""
+                        name={'success'}
+                        state={state}
+                        active={active}
+                        setActive={() => {
+                            setActive(false)
+                        }}
+                        isMobile={false}
+                    />
+                </div>
+            )}
             {
                 // head Insurance
                 !isMobile && (
-                    <div className="max-w-screen-2xl m-auto flex items-center justify-between space-x-12 pt-[20px]   ">
-                        <div className="flex items-center">
+                    <div className="mx-[80px] mt-[48px] mb-[20px] flex items-center justify-between" onClick={() => setDrop(false)}>
+                        <div className="flex items-center font-semibold text-base">
                             <LeftArrow></LeftArrow>
-                            <span className={'pl-1 font-semibold text-[#22313F] hover:cursor-pointer'} onClick={() => router.push('/ ')}>
+                            <span className={' text-[#22313F] hover:cursor-pointer'} onClick={() => router.push('/ ')}>
                                 {menu[2].name}
                             </span>
                         </div>
@@ -251,13 +329,12 @@ export const InsuranceFrom = () => {
                         <Popover className="relative">
                             <Popover.Button
                                 className={
-                                    'border border-[0.5] border-[#F7F8FA] rounded-[6px] h-[40px] w-auto py-[8px] px-[12px] flex flex-row bg-[#F7F8FA] shadow'
+                                    'border border-[0.5] text-base border-[#F7F8FA] rounded-[6px] h-[40px] w-auto py-[8px] px-[12px] flex flex-row bg-[#F7F8FA] shadow'
                                 }
-                                onClick={() => setDrop(true)}
+                                onClick={() => setDrop(!isDrop)}
                             >
                                 {menu[tab].name}
-                                {!isDrop && <ChevronDown></ChevronDown>}
-                                {isDrop && <ChevronUp></ChevronUp>}
+                                {!isDrop ? <ChevronDown></ChevronDown> : <ChevronUp></ChevronUp>}
                             </Popover.Button>
                             <Popover.Panel className="absolute z-50 bg-white w-[260px] right-0 top-[48px] rounded shadow">
                                 {({ close }) => (
@@ -275,13 +352,13 @@ export const InsuranceFrom = () => {
                                                         key={key}
                                                         onMouseDown={() => (Press = true)}
                                                         onMouseUp={() => (Press = false)}
-                                                        className={`${
-                                                            Press ? 'bg-[#F2F3F5]' : 'hover:bg-[#F7F8FA]'
+                                                        className={`${Press ? 'bg-[#F2F3F5]' : 'hover:bg-[#F7F8FA]'} ${
+                                                            tab === key ? 'bg-white' : 'bg-[#F2F3F5]'
                                                         } flex flex-row justify-start w-full items-center p-3 font-medium hover:cursor-pointer`}
                                                     >
-                                                        <div className={'flex flex-row justify-between w-full px-[16px] py-[6px] '}>
+                                                        <div className={`flex flex-row justify-between w-full px-[16px] py-[6px] `}>
                                                             <span> {e.name} </span>
-                                                            {tab === key ? <Check size={18} className={'text-[#EB2B3E]'}></Check> : ''}
+                                                            {/* {tab === key ? <Check size={18} className={'text-[#EB2B3E]'}></Check> : ''} */}
                                                         </div>
                                                     </div>
                                                 )
@@ -298,7 +375,7 @@ export const InsuranceFrom = () => {
             {
                 //title
                 !isMobile ? (
-                    <div className={'flex flex-col justify-center items-center mt-[20px] mb-[32px] '}>
+                    <div className={'flex flex-col justify-center items-center mb-[32px] '} onClick={() => setDrop(false)}>
                         <div>{index}/2</div>
                         <div className={'font-semibold text-[32px] leading-[44px]'}>{index == 1 ? menu[1].name : t('insurance:buy:info_covered')}</div>
                     </div>
@@ -307,7 +384,12 @@ export const InsuranceFrom = () => {
                         <div className={`h-[32px] flex flex-row justify-between w-full items-center mx-[16px] mt-[24px] mb-[16px]`}>
                             <XMark></XMark>
                             <div className={`h-[32px] flex flex-row`}>
-                                <span className={'text-[#00ABF9] underline hover:cursor-pointer pr-[16px] flex items-center'} onClick={() => {}}>
+                                <span
+                                    className={'text-[#00ABF9] underline hover:cursor-pointer pr-[16px] flex items-center'}
+                                    onClick={() => {
+                                        router.push('https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/')
+                                    }}
+                                >
                                     {menu[12].name}
                                 </span>
                                 <div className="flex items-center">
@@ -338,13 +420,15 @@ export const InsuranceFrom = () => {
 
             {
                 //checkAuth
-                wallet.accout == ''
+                !wallet.account
                     ? !isMobile && (
-                          <div className="ư-full flex justify-center items-center">
+                          <div className="w-full flex justify-center items-center" onClick={() => setDrop(false)}>
                               <Button
                                   variants={'primary'}
                                   className={`bg-[#EB2B3E] h-[48px] w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
-                                  onClick={() => {}}
+                                  onClick={() => {
+                                      Config.connectWallet()
+                                  }}
                               >
                                   {t('insurance:buy:connect_wallet')}
                               </Button>
@@ -356,11 +440,8 @@ export const InsuranceFrom = () => {
                 //chart
                 index == 1 && (
                     <div
-                        className={`${
-                            !isMobile
-                                ? 'shadow border border-1 border-[#E5E7E8] max-w-screen-layout m-auto h-auto pt-[20px] w-[100%] rounded-[12px] mt-[32px]'
-                                : ''
-                        }`}
+                        className={`${!isMobile ? 'shadow border border-1 border-[#E5E7E8] max-w-6xl m-auto h-auto rounded-[12px] mt-[32px]' : ''}`}
+                        onClick={() => setDrop(false)}
                     >
                         {/*head*/}
                         {!isMobile ? (
@@ -415,6 +496,7 @@ export const InsuranceFrom = () => {
                                                                         onMouseUp={() => {
                                                                             isPress = false
                                                                             setSelectedCoin(coin)
+                                                                            setState({ ...state, symbol: { ...coin } })
                                                                         }}
                                                                         onClick={() => close()}
                                                                         className={`${
@@ -579,9 +661,17 @@ export const InsuranceFrom = () => {
                                 </div>
                             </>
                         ) : (
-                            <div className=" my-[24px] w-full mx-auto flex flex-wrap flex-col justify-center content-center font-medium text-2xl">
+                            <div className=" my-[24px] w-full mx-auto flex flex-wrap flex-col justify-center content-center font-medium text-2xl relative">
                                 <div>
-                                    <span>{t('insurance:buy:buy_covered')} </span> <span className="text-[#EB2B3E]">{selectCoin.name}</span>
+                                    <span>{t('insurance:buy:buy_covered')} </span>{' '}
+                                    <span
+                                        className="text-[#EB2B3E]"
+                                        onClick={() => {
+                                            setOpenChangeToken(true)
+                                        }}
+                                    >
+                                        {selectCoin.name}
+                                    </span>
                                 </div>
                                 <div className="flex flex-row">
                                     <span className="pr-[4px]">{t('insurance:buy:quantity')} </span>{' '}
@@ -672,8 +762,8 @@ export const InsuranceFrom = () => {
                         {/*P-Claim*/}
                         {isMobile && (
                             <div className={'my-[24px] px-[32px]'}>
-                                <span className={'flex flex-row items-center'}>
-                                    P-Claim
+                                <span className={'flex flex-row items-center '}>
+                                    <span className={'text-[#808890] text-sm mr-[4px]'}>P-Claim</span>
                                     {
                                         <span
                                             className={'tooltip_p_claim relative'}
@@ -712,8 +802,51 @@ export const InsuranceFrom = () => {
                             </div>
                         )}
 
+                        {/*P-Claim*/}
+                        {!isMobile && (
+                            <div className={'my-[24px] px-[32px] text-sm text-[#808890]'}>
+                                <span className={'flex flex-row items-center mr-[4px]'}>
+                                    P-Claim
+                                    {
+                                        <span
+                                            className={'tooltip_p_claim relative'}
+                                            onMouseEnter={() => setIsHover(true)}
+                                            onMouseLeave={() => setIsHover(false)}
+                                        >
+                                            <InfoCircle></InfoCircle>
+                                            <span
+                                                className={`${
+                                                    isHover ? 'visible' : 'hidden'
+                                                } tooltip_p_claim_text px-[8px] py-[4px] shadow-lg w-[400px] bg-[white] text-[black] text-center rounded-[6px] border border-0.5 border-[#e5e7e8] absolute z-10 left-[28px] top-[-33px]`}
+                                            >
+                                                {menu[10]?.name} - {menu[9]?.name}
+                                            </span>
+                                        </span>
+                                    }
+                                </span>
+                                <div className={'mt-[8px] flex justify-between border-collapse rounded-[3px] shadow-none text-base '}>
+                                    <Input
+                                        className={'w-[90%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none'}
+                                        type={'number'}
+                                        inputName={'P-Claim'}
+                                        idInput={'iPClaim'}
+                                        value={state.p_claim}
+                                        onChange={(a: any) => {
+                                            if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
+                                                setState({ ...state, p_claim: 0 })
+                                            } else {
+                                                setState({ ...state, p_claim: a.target.value.replace(/^0+/, '') })
+                                            }
+                                        }}
+                                        placeholder={`${menu[9].name}`}
+                                    ></Input>
+                                    <div className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px]'}>USDT</div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Period */}
-                        <div className={'mt-5 pl-[32px] pr-[32px] pb-[32px]'}>
+                        <div className={'mt-5 pl-[32px] pr-[32px] pb-[32px] text-sm text-[#808890]'}>
                             <span>Period ({menu[8].name})</span>
                             <Tab.Group>
                                 <Tab.List className={`flex flex-row justify-between mt-[20px]  ${isMobile ? 'overflow-scroll w-full' : 'w-[85%]'}`}>
@@ -766,60 +899,17 @@ export const InsuranceFrom = () => {
                                 </Tab.Group>
                             </div>
                         )}
-
-                        {/*P-Claim*/}
-                        {!isMobile && (
-                            <div className={'my-[24px] px-[32px]'}>
-                                <span className={'flex flex-row items-center'}>
-                                    P-Claim
-                                    {
-                                        <span
-                                            className={'tooltip_p_claim relative'}
-                                            onMouseEnter={() => setIsHover(true)}
-                                            onMouseLeave={() => setIsHover(false)}
-                                        >
-                                            <InfoCircle></InfoCircle>
-                                            <span
-                                                className={`${
-                                                    isHover ? 'visible' : 'hidden'
-                                                } tooltip_p_claim_text px-[8px] py-[4px] shadow-lg w-[400px] bg-[white] text-[black] text-center rounded-[6px] border border-0.5 border-[#e5e7e8] absolute z-10 left-[28px] top-[-33px]`}
-                                            >
-                                                {menu[10]?.name} - {menu[9]?.name}
-                                            </span>
-                                        </span>
-                                    }
-                                </span>
-                                <div className={'mt-[8px] flex justify-between border-collapse rounded-[3px] shadow-none '}>
-                                    <Input
-                                        className={'w-[90%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none'}
-                                        type={'number'}
-                                        inputName={'P-Claim'}
-                                        idInput={'iPClaim'}
-                                        value={state.p_claim}
-                                        onChange={(a: any) => {
-                                            if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
-                                                setState({ ...state, p_claim: 0 })
-                                            } else {
-                                                setState({ ...state, p_claim: a.target.value.replace(/^0+/, '') })
-                                            }
-                                        }}
-                                        placeholder={`${menu[9].name}`}
-                                    ></Input>
-                                    <div className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px]'}>USDT</div>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 )
             }
 
             {/*Only Show Claim And Margin*/}
             {index == 1 && !isMobile && (
-                <div className={'max-w-screen-layout m-auto flex flex-row justify-center items-center mt-[24px] hover:cursor-default'}>
+                <div className={'max-w-6xl m-auto flex flex-row justify-center items-center mt-[24px] hover:cursor-default'} onClick={() => setDrop(false)}>
                     <div
                         className={`${
                             tab == 4 ? 'hidden' : ''
-                        } flex flex-row justify-between items-center w-[30%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] mx-[12px]`}
+                        } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px]`}
                     >
                         <div className={'text-[#808890]'}>R-Claim</div>
                         <div className={'font-semibold'}>
@@ -829,24 +919,24 @@ export const InsuranceFrom = () => {
                     <div
                         className={`${
                             tab == 5 ? 'hidden' : ''
-                        } flex flex-row justify-between items-center w-[30%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] mx-[12px]`}
+                        } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] mx-[12px]`}
                     >
                         <div className={'text-[#808890]'}>Q-Claim</div>
                         <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                             {state.q_claim}
-                            <span className={'text-[#EB2B3E]'}>USDT</span>
+                            <span className={'text-[#EB2B3E] pl-[8px]'}>USDT</span>
                             <ChevronDown size={18} className={'ml-1 mt-1'}></ChevronDown>
                         </div>
                     </div>
                     <div
                         className={`${
                             tab == 6 ? 'hidden' : ''
-                        } flex flex-row justify-between items-center w-[30%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] mx-[12px]`}
+                        } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] `}
                     >
                         <div className={'text-[#808890]'}>Margin</div>
                         <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                             {state.margin}
-                            <span className={'text-[#EB2B3E]'}>USDT</span>
+                            <span className={'text-[#EB2B3E] pl-[8px]'}>USDT</span>
                             <ChevronDown size={18} className={'ml-1 mt-1'}></ChevronDown>
                         </div>
                     </div>
@@ -856,7 +946,7 @@ export const InsuranceFrom = () => {
             {
                 //description
                 !isMobile && index == 1 && (
-                    <div className={'flex justify-center items-center mt-[24px]'}>
+                    <div className={'flex justify-center items-center mt-[24px]'} onClick={() => setDrop(false)}>
                         <CheckCircle></CheckCircle>
                         <span className={'font-semibold text-[#22313F]'}>
                             {t('insurance:buy:saved')}
@@ -868,7 +958,7 @@ export const InsuranceFrom = () => {
 
             {/* the next level*/}
             {index == 1 && !isMobile && (
-                <div className={`flex flex-col justify-center items-center mt-[146px]`}>
+                <div className={`flex flex-col justify-center items-center my-[48px]`} onClick={() => setDrop(false)}>
                     <button
                         className={`${
                             clear ? 'bg-red text-white border border-red' : 'text-white bg-[#E5E7E8] border border-[#E5E7E8]'
@@ -883,14 +973,19 @@ export const InsuranceFrom = () => {
                         {menu[11].name}
                     </button>
 
-                    <span className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'} onClick={() => {}}>
+                    <span
+                        className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}
+                        onClick={() => {
+                            router.push('https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/')
+                        }}
+                    >
                         {menu[12].name}
                     </span>
                 </div>
             )}
 
             {index == 1 && isMobile && clear && (
-                <>
+                <div onClick={() => setDrop(false)}>
                     <div className={'flex justify-center items-center mt-[24px]'}>
                         <CheckCircle></CheckCircle>
                         <span className={'font-semibold text-[#22313F]'}>
@@ -906,7 +1001,6 @@ export const InsuranceFrom = () => {
                         >
                             <div className={'text-[#808890]'}>R-Claim</div>
                             <div className={'font-semibold'}>
-                                {'   '}
                                 <span>{state.r_claim}%</span>
                             </div>
                         </div>
@@ -918,8 +1012,8 @@ export const InsuranceFrom = () => {
                             <div className={'text-[#808890]'}>Q-Claim</div>
                             <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                                 {state.q_claim}
-                                {'   '}
-                                <span className={'text-[#EB2B3E]'}>USDT</span>
+
+                                <span className={'text-[#EB2B3E] pl-[8px]'}>USDT</span>
                             </div>
                         </div>
                         <div
@@ -930,8 +1024,8 @@ export const InsuranceFrom = () => {
                             <div className={'text-[#808890]'}>Margin</div>
                             <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                                 {state.margin}
-                                {'   '}
-                                <span className={'text-[#EB2B3E]'}>USDT</span>
+
+                                <span className={'text-[#EB2B3E] pl-[8px]'}>USDT</span>
                             </div>
                         </div>
                     </div>
@@ -950,11 +1044,16 @@ export const InsuranceFrom = () => {
                             {menu[11].name}
                         </button>
 
-                        <span className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'} onClick={() => {}}>
+                        <span
+                            className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}
+                            onClick={() => {
+                                router.push('https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/')
+                            }}
+                        >
                             {menu[12].name}
                         </span>
                     </div>
-                </>
+                </div>
             )}
 
             {index == 2 && (
@@ -1003,7 +1102,6 @@ export const fetchApiNami = async (symbol: string, from: string, to: string, res
         })
         data.length > 0 && setDataChart(data)
     } catch (err) {
-        // console.log(err)
         console.log('fecth current price error')
     }
 }
@@ -1013,8 +1111,20 @@ export const getPrice = async (symbol: string, state: any, setState: any) => {
         const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${symbol}`)
         if (data) {
             if (data.data[0]) {
-                console.log('fetch data', data.data[0]?.p)
                 return setState({ ...state, p_market: data.data[0]?.p })
+            }
+        }
+    } catch (err) {
+        console.log('fecth current price error')
+    }
+}
+
+export const getPriceBNBUSDT = async (setPriceBNB: any) => {
+    try {
+        const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=BNBUSDT`)
+        if (data) {
+            if (data.data[0]) {
+                return setPriceBNB(data.data[0].p)
             }
         }
     } catch (err) {

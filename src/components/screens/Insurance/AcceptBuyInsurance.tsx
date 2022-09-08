@@ -6,12 +6,11 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatPriceToWeiValue } from 'utils/format'
 import { CheckBoxIcon, CheckCircle, ErrorCircleIcon, StartIcon } from 'components/common/Svg/SvgIcon'
-import fetchApi from 'services/fetch-api'
-import { API_GET_GET_TOKEN } from 'services/apis'
 import { buyInsurance } from 'services/buy-insurance'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
+import { useRouter } from 'next/router'
 
 export type IProps = {
     state: any
@@ -33,10 +32,16 @@ export type IBuyInsurance = {
 }
 
 export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setCheckUpgrade, getPrice }: Partial<IProps>) => {
-    const { t } = useTranslation()
+    const {
+        t,
+        i18n: { language },
+    } = useTranslation()
     const wallet = useWeb3Wallet()
+    const router = useRouter()
     const { width } = useWindowSize()
     const isMobile = width && width < screens.drawer
+
+    console.log(wallet)
 
     const [isUpdated, setUpdated] = useState<boolean>(false)
     const [isCanBuy, setCanBuy] = useState<boolean>(false)
@@ -97,9 +102,9 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                         dataPost.period,
                         { value: dataPost.margin },
                     )
-                    .then((e: any) => {
-                        console.log(e)
-                        handlePostInsurance(e, dataPost, state)
+                    .then((receipt: any) => {
+                        console.log(receipt)
+                        handlePostInsurance(receipt, dataPost, state)
                     })
             }
 
@@ -179,12 +184,12 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                 </div>
 
                 <div className="ticket relative overflow-hidden">
-                    <div className="dashedLine absolute z-2000 top-[50%] left-[20px] w-[95%]"></div>
+                    <div className="dashedLine absolute z-2000 top-[50%] left-[18px] w-[95%]"></div>
                 </div>
 
-                <div className="bg-[white] p-[1px] py-[32px]" style={{ borderRadius: '0 0 5px 5px' }}>
+                <div className="bg-[white] p-[1px] " style={{ borderRadius: '0 0 5px 5px' }}>
                     <div className={''}>
-                        <div className="p-[32px]">
+                        <div className="p-[32px] pb-[24px] pt-0">
                             <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
                                 <div className={'text-[#808890]'}>R-Claim</div>
                                 <div className={'font-semibold'}>
@@ -306,7 +311,7 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                 </div>
             </div>
 
-            <div className={'flex flex-col justify-center items-center mt-[146px]'}>
+            <div className={'flex flex-col justify-center items-center my-[48px]'}>
                 <Button
                     variants={'primary'}
                     className={`${
@@ -320,15 +325,22 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                     {t('insurance:buy:accept')}
                 </Button>
                 <span>
-                    {t('insurance:buy:Term_of_Service')}{' '}
-                    <span className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}>{t('insurance:buy:Term_of_Service_sub')}</span>
+                    {t('insurance:buy:Term_of_Service')} <span className={`${language == 'en' ? '' : 'hidden'}`}>{t('insurance:buy:Term_of_Service_of')}</span>
+                    <span
+                        className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}
+                        onClick={() => {
+                            router.push('https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/')
+                        }}
+                    >
+                        {t('insurance:buy:Term_of_Service_sub')}
+                    </span>
+                    <span className={`${language == 'vi' ? '' : 'hidden'}`}>{t('insurance:buy:Term_of_Service_of')}</span>
                 </span>
             </div>
         </>
     ) : (
         <div className="relative">
-            <NotificationInsurance id="" name={'success'} state={state} active={active} setActive={setActive} />
-
+            <NotificationInsurance id="" name={'success'} state={state} active={active} setActive={setActive} isMobile={true} />
             <div className="relative flex flex-col w-full">
                 <div className="relative bg-white w-full mx-[24px]" style={{ borderRadius: '5px 5px 0 0' }}>
                     <div className={'flex flex-col w-[100%] mt-[24px] items-center'}>
@@ -469,7 +481,14 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
             <div className={'flex flex-col justify-center items-center mt-[89px] mx-[24px]'}>
                 <span className="text-center pb-[16px]">
                     {t('insurance:buy:Term_of_Service')}{' '}
-                    <span className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}>{t('insurance:buy:Term_of_Service_sub')}</span>
+                    <span
+                        className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}
+                        onClick={() => {
+                            router.push('https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/')
+                        }}
+                    >
+                        {t('insurance:buy:Term_of_Service_sub')}
+                    </span>
                 </span>
                 <Button
                     variants={'primary'}

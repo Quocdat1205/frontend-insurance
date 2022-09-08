@@ -4,7 +4,7 @@ import colors from 'styles/colors'
 const Breadcrumbs = ({ children }: any) => {
     return (
         <div className="bg-hover">
-            <div className="max-w-screen-layout m-auto flex items-center flex-wrap text-xs sm:text-sm text-txtSecondary py-2 sm:py-4 px-4 sm:px-10">
+            <div className=" m-auto flex items-center flex-wrap text-xs sm:text-sm text-txtSecondary py-2 sm:py-4 px-4 sm:px-10">
                 {children.map((child: any, index: number) => (
                     <Fragment key={index}>
                         {child}

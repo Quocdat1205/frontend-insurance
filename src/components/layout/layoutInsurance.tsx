@@ -7,20 +7,21 @@ import { screens } from 'utils/constants'
 
 interface layoutInsurance {
     children: ReactNode
+    handleClick?: any
 }
 
-const LayoutInsurance = ({ children }: layoutInsurance) => {
+const LayoutInsurance = ({ children, handleClick }: layoutInsurance) => {
     const { t } = useTranslation()
     const { width } = useWindowSize()
     const isMobile = width && width < screens.drawer
     return !isMobile ? (
-        <div>
+        <div className="relative" onClick={handleClick}>
             <Header />
             <Breadcrumbs>{[`${t('insurance:buy:home')}`, `${t('insurance:buy:buy_covered')}`]}</Breadcrumbs>
             {children}
         </div>
     ) : (
-        <div>{children}</div>
+        <div className="relative">{children}</div>
     )
 }
 

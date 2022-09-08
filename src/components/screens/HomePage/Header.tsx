@@ -37,7 +37,7 @@ const Header = () => {
 
     return (
         <header className="header-landing px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[10]">
-            <div className="max-w-screen-layout m-auto flex items-center justify-between space-x-12">
+            <div className="m-auto flex items-center justify-between space-x-12">
                 <div className="min-w-[67px] w-[75px]">
                     <img src="/images/ic_logo.png" />
                 </div>

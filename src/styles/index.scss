@@ -140,16 +140,15 @@ html {
 .ticket {
     display: inline-block;
     box-sizing: content-box;
-    // filter: drop-shadow(0 2px 5px rgba(black, 0.5));
     position: relative;
-    height: 1em;
+    height: 32px;
     padding: 1em;
     color: black;
     font-size: 16px;
     background-size: 50% 100%;
     background-repeat: no-repeat;
-    background-image: radial-gradient(circle at 0 50%, rgba(white, 0) 20px, white (0.4em + 0.1em)),
-        radial-gradient(circle at 100% 50%, rgba(white, 0) 20px, white (0.4em + 0.1em));
+    background-image: radial-gradient(circle at 0 50%, rgba(white, 0) 18px, white (0.4em + 0.1em)),
+        radial-gradient(circle at 100% 50%, rgba(white, 0) 18px, white (0.4em + 0.1em));
     background-position: top left, top right;
 }
 

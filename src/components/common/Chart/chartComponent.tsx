@@ -75,8 +75,8 @@ export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number)
 
         trend.data = [
             {
-                date: chart.data[chart.data.length - 1].date,
-                value: chart.data[chart.data.length - 1].value,
+                date: chart.data[chart.data.length - 1]?.date,
+                value: chart.data[chart.data.length - 1]?.value,
             },
             {
                 date: timeEnd,
@@ -240,7 +240,9 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                 claimLabel.label.dx = 20
                 claimLabel.label.verticalCenter = 'middle'
                 claimLabel.label.fill = am4core.color('#EB2B3E')
-                claimLabel.label.html = `<div class="hover:cursor-pointer" style="color: #EB2B3E; border-radius: 800px; padding: 4px 16px; background-color: #FFF1F2">P-Claim ${p_claim}</div>`
+                claimLabel.label.html = `<div class="hover:cursor-pointer" style="color: ${
+                    p_claim < state.p_market ? '#EB2B3E' : '#52CC74'
+                } ; border-radius: 800px; padding: 4px 16px; background-color: ${p_claim < state.p_market ? '#FFF1F2' : '#F1FFF5'}  ">P-Claim ${p_claim}</div>`
                 claimLabel.id = 'g2'
 
                 //label claim
@@ -249,7 +251,7 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                 claimLabel.events.once('drag', (event: any) => {
                     interract.events.once('up', (e) => {
                         let point = am4core.utils.documentPointToSprite(e.pointer.point, chart.seriesContainer)
-                        return setP_Claim(valueAxis.yToValue(point?.y))
+                        return setP_Claim(valueAxis.yToValue(point?.y).toFixed(2))
                     })
                 })
 
