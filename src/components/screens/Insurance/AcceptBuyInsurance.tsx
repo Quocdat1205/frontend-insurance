@@ -51,6 +51,8 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
         fetch()
     }, [])
 
+    console.log(wallet)
+
     const fetch = async () => {
         const e = await wallet.contractCaller.insuranceContract.contract.filters.EBuyInsurance()
 
