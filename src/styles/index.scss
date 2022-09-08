@@ -42,6 +42,11 @@ html {
     // border-image-source: linear-gradient(88.09deg, #ce0014 0.48%, #e92828 52.94%, #ff5f6d 114.93%);
 }
 
+.border-transparent-red {
+    border: 1.5px solid red;
+    background: rgba(54, 25, 25, .00004);
+}
+
 .hover\:border-gradient-hover-red:hover {
     background: linear-gradient(to right, #fff, #fff), linear-gradient(to top left, #e92828, #ff5f68);
     background-clip: padding-box, border-box;

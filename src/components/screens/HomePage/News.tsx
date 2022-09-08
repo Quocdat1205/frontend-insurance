@@ -1,29 +1,39 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Autoplay, Pagination } from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import 'swiper/css/pagination'
+import { PaginationOptions } from 'swiper/types'
 import CardShadow from 'components/common/Card/CardShadow'
+import Config from 'config/config'
+import useWindowSize from 'hooks/useWindowSize'
 import { formatTime } from 'utils/utils'
 import { useTranslation } from 'next-i18next'
-import Config from 'config/config'
 import Link from 'next/link'
+import styled from 'styled-components'
 
+const initPaginationState = {
+    clickable: true,
+    bulletClass: 'swiper-pagination-bullet !bg-txtSecondary',
+    bulletActiveClass: 'swiper-pagination-bullet-active !bg-red',
+    horizontalClass: '!-bottom-[5px]',
+}
 const News = ({ news = [] }: any) => {
     const {
         t,
         i18n: { language },
     } = useTranslation()
-    const [mount, setMount] = useState(false)
+    const { width } = useWindowSize()
+    const [isMobile, setIsMobile] = useState<boolean>(true)
 
-    useEffect(() => {
-        setMount(true)
-    }, [])
+    const [mount, setMount] = useState(false)
+    const [modules, setModules] = useState([Pagination])
+    const [pagination, setPag] = useState<PaginationOptions>({ ...initPaginationState })
 
     const renderNews = () => {
         const html: any = []
         news.map((item: any, index: number) => {
-            const url = Config.blogUrl.nami_today + `/${item.slug}`
+            const url = `${Config.blogUrl.nami_today}/${item.slug}`
             html.push(
                 <SwiperSlide key={index}>
                     <Link href={url}>
@@ -37,7 +47,9 @@ const News = ({ news = [] }: any) => {
                                     &nbsp;/&nbsp;
                                     <span className="text-gray">{formatTime(item.created_at, 'dd.MM.yyyy')}</span>
                                 </div>
-                                <div title={item.title} className="text-xl font-medium  line-clamp-2 min-h-[56px]">{item.title}</div>
+                                <div title={item.title} className="text-xl font-medium  line-clamp-2 min-h-[56px]">
+                                    {item.title}
+                                </div>
                             </CardShadow>
                         </a>
                     </Link>
@@ -47,31 +59,41 @@ const News = ({ news = [] }: any) => {
         return html
     }
 
-    const pagination = {
-        clickable: true,
-        bulletClass: 'swiper-pagination-bullet !bg-txtSecondary',
-        bulletActiveClass: 'swiper-pagination-bullet-active !bg-red',
-        horizontalClass: '!-bottom-[5px]',
-        // renderBullet: (index: number, className: string) => {
-        //     return `<span class="${className}"> ${index+1} </span>`
-        // },
-    }
+    /* --------------------------------- Effect --------------------------------- */
 
+    useEffect(() => {
+        if (width && width < 640) {
+            setModules([Pagination])
+            setIsMobile(true)
+        } else {
+            setIsMobile(false)
+            setModules([Pagination, Autoplay])
+        }
+    }, [width])
+
+    useEffect(() => {
+        setMount(true)
+    }, [])
+
+    const restProps = {
+        isMobile,
+    }
     return (
         <section className="pt-20 sm:pt-[7.5rem] max-w-screen-insurance m-auto">
             <div className="text-2xl sm:text-5xl font-semibold -mb-2 px-4">{t('home:home:news')}</div>
-            <Swiper
+            <StyledNews
                 pagination={pagination}
-                modules={[Pagination, Autoplay]}
+                modules={modules}
+                // modules={[Pagination, Autoplay]}
                 className="mySwiper !px-4 !py-8"
                 slidesPerView={4}
                 breakpoints={{
                     300: {
-                        slidesPerView: 1,
+                        slidesPerView: 1.2,
                         spaceBetween: 16,
                     },
                     640: {
-                        slidesPerView: 3,
+                        slidesPerView: 2,
                         spaceBetween: 16,
                     },
                     1080: {
@@ -83,11 +105,18 @@ const News = ({ news = [] }: any) => {
                     delay: 3000,
                     disableOnInteraction: false,
                 }}
+                {...restProps}
             >
                 {mount && renderNews()}
-            </Swiper>
+            </StyledNews>
         </section>
     )
 }
+
+const StyledNews = styled(Swiper)<{isMobile: boolean}>`
+    & > .swiper-pagination {
+        display: ${(props) => (props.isMobile ? 'none' : '')};
+    }
+`
 
 export default News
