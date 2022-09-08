@@ -339,17 +339,20 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                 >
                     {t('insurance:buy:accept')}
                 </Button>
-                <span>
-                    {t('insurance:buy:Term_of_Service')} <span className={`${language == 'en' ? '' : 'hidden'}`}>{t('insurance:buy:Term_of_Service_of')}</span>
-                    <span
-                        className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}
-                        onClick={() => {
-                            router.push('https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/')
-                        }}
-                    >
-                        {t('insurance:buy:Term_of_Service_sub')}
-                    </span>
-                    <span className={`${language == 'vi' ? '' : 'hidden'}`}>{t('insurance:buy:Term_of_Service_of')}</span>
+                <span className="my-[16px] flex flex-col justify-center items-center">
+                    {t('insurance:buy:Term_of_Service')}
+                    <div>
+                        <span className={`${language == 'en' ? '' : 'hidden'}`}>{t('insurance:buy:Term_of_Service_of')}</span>
+                        <span
+                            className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}
+                            onClick={() => {
+                                router.push('https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/')
+                            }}
+                        >
+                            {t('insurance:buy:Term_of_Service_sub')}
+                        </span>
+                        <span className={`${language == 'vi' ? '' : 'hidden'}`}>{t('insurance:buy:Term_of_Service_of')}</span>
+                    </div>
                 </span>
             </div>
         </>

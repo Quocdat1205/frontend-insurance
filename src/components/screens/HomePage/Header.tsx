@@ -57,7 +57,7 @@ const Header = () => {
                         {!isMobile && <ButtonLanguage />}
                         {!account && (
                             <Button onClick={onConnect} className="font-semibold px-4 py-2 space-x-2">
-                                {t('home:home:connect_wallet')}
+                                {t('insurance:buy:connect_wallet')}
                             </Button>
                         )}
                         {isMobile && (
