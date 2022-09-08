@@ -112,10 +112,12 @@ export const InsuranceFrom = () => {
     }
 
     const validatePclaim = (value: number) => {
+        console.log(state.p_market + (2 * state.p_market) / 100, state.p_market + (70 * state.p_market) / 100)
+
         if (value > state.p_market + (2 * state.p_market) / 100 && value < state.p_market + (70 * state.p_market) / 100) {
             return setClear(true)
         }
-        if (value > -state.p_market + (-70 * state.p_market) / 100 && value < -state.p_market + (-2 * state.p_market) / 100) {
+        if (value > state.p_market - (70 * state.p_market) / 100 && value < state.p_market - (2 * state.p_market) / 100) {
             return setClear(true)
         }
         setClear(false)
@@ -166,7 +168,10 @@ export const InsuranceFrom = () => {
                 r_claim: res.r_claim,
                 q_covered: res.q_covered,
             })
-            // setIndex(res.index || 1)
+
+            if (res.tab) {
+                setTab(res.tab)
+            }
         }
         getPriceBNBUSDT(setPriceBNB)
     }, [stone])
@@ -174,10 +179,19 @@ export const InsuranceFrom = () => {
     useEffect(() => {
         if (state.p_claim != 0) {
             validatePclaim(state.p_claim)
-            const dataSave = { ...state, index: index }
+            const dataSave = { ...state, index: index, tab: tab }
             return localStorage.setItem('state', JSON.stringify(dataSave))
         }
     }, [state])
+
+    useEffect(() => {
+        const data = localStorage.getItem('state')
+        if (data) {
+            const res = JSON.parse(data)
+            const newData = { ...res, tab: tab }
+            return localStorage.setItem('state', JSON.stringify(newData))
+        }
+    }, [tab])
 
     useEffect(() => {
         if (listCoin.length > 0) {
@@ -287,11 +301,25 @@ export const InsuranceFrom = () => {
     }, [state.q_covered, state.period, selectCoin, state.margin, state.p_claim, state.percent_margin])
 
     useEffect(() => {
-        const result = wallet.getBalance()
-        result.then((balance: number) => {
-            setUserBalance(Number((balance * priceBNB) / state.p_market))
-        })
+        try {
+            setLoadings(true)
+            const result = wallet.getBalance()
+            result.then((balance: number) => {
+                const tmp = Number((balance * priceBNB) / state.p_market)
+                console.log('connect success')
+
+                setUserBalance(tmp)
+                return setLoadings(false)
+            })
+        } catch (error) {
+            return console.log(error)
+        }
     }, [wallet])
+
+    const getBalance = async () => {
+        if (wallet.account) {
+        }
+    }
 
     useEffect(() => {
         if (state.p_claim > 0) {
@@ -333,7 +361,7 @@ export const InsuranceFrom = () => {
                                 }
                                 onClick={() => setDrop(!isDrop)}
                             >
-                                {menu[tab].name}
+                                {menu[tab]?.name}
                                 {!isDrop ? <ChevronDown></ChevronDown> : <ChevronUp></ChevronUp>}
                             </Popover.Button>
                             <Popover.Panel className="absolute z-50 bg-white w-[260px] right-0 top-[48px] rounded shadow">
@@ -352,13 +380,11 @@ export const InsuranceFrom = () => {
                                                         key={key}
                                                         onMouseDown={() => (Press = true)}
                                                         onMouseUp={() => (Press = false)}
-                                                        className={`${Press ? 'bg-[#F2F3F5]' : 'hover:bg-[#F7F8FA]'} ${
-                                                            tab === key ? 'bg-white' : 'bg-[#F2F3F5]'
-                                                        } flex flex-row justify-start w-full items-center p-3 font-medium hover:cursor-pointer`}
+                                                        className={`${Press ? 'bg-[#F2F3F5]' : 'hover:bg-[#F7F8FA]'}
+                                                        flex flex-row justify-start w-full items-center p-3 font-medium hover:cursor-pointer`}
                                                     >
                                                         <div className={`flex flex-row justify-between w-full px-[16px] py-[6px] `}>
                                                             <span> {e.name} </span>
-                                                            {/* {tab === key ? <Check size={18} className={'text-[#EB2B3E]'}></Check> : ''} */}
                                                         </div>
                                                     </div>
                                                 )
@@ -378,6 +404,7 @@ export const InsuranceFrom = () => {
                     <div className={'flex flex-col justify-center items-center mb-[32px] '} onClick={() => setDrop(false)}>
                         <div>{index}/2</div>
                         <div className={'font-semibold text-[32px] leading-[44px]'}>{index == 1 ? menu[1].name : t('insurance:buy:info_covered')}</div>
+                        <div className={'mt-[12px]'}>{t('insurance:buy:connect_wallet_error')}</div>
                     </div>
                 ) : (
                     index == 1 && (
@@ -422,7 +449,7 @@ export const InsuranceFrom = () => {
                 //checkAuth
                 !wallet.account
                     ? !isMobile && (
-                          <div className="w-full flex justify-center items-center" onClick={() => setDrop(false)}>
+                          <div className="w-full flex flex-col justify-center items-center" onClick={() => setDrop(false)}>
                               <Button
                                   variants={'primary'}
                                   className={`bg-[#EB2B3E] h-[48px] w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
@@ -948,8 +975,8 @@ export const InsuranceFrom = () => {
                 !isMobile && index == 1 && (
                     <div className={'flex justify-center items-center mt-[24px]'} onClick={() => setDrop(false)}>
                         <CheckCircle></CheckCircle>
-                        <span className={'font-semibold text-[#22313F]'}>
-                            {t('insurance:buy:saved')}
+                        <span className={'font-semibold text-[#22313F] px-[4px]'}>
+                            {`${t('insurance:buy:saved')} `}
                             <span className={'text-[#EB2B3E]'}>1,000 USDT</span> {t('insurance:buy:sub_saved')}
                         </span>
                     </div>
@@ -988,7 +1015,7 @@ export const InsuranceFrom = () => {
                 <div onClick={() => setDrop(false)}>
                     <div className={'flex justify-center items-center mt-[24px]'}>
                         <CheckCircle></CheckCircle>
-                        <span className={'font-semibold text-[#22313F]'}>
+                        <span className={'font-semibold text-[#22313F] px-[4px]'}>
                             {t('insurance:buy:saved')}
                             <span className={'text-[#EB2B3E]'}>1,000 USDT</span> {t('insurance:buy:sub_saved')}
                         </span>
