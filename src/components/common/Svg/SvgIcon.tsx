@@ -1,12 +1,12 @@
 import { color } from '@amcharts/amcharts4/core'
 import colors from 'styles/colors'
 
-export const RightArrow = () => {
+export const RightArrow = ({ size = 16, color = 'white' }: any) => {
     return (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
                 d="M1.99988 8.66685L11.7239 8.66685L8.19521 12.1955L9.13788 13.1382L14.2759 8.00018L9.13788 2.86218L8.19521 3.80485L11.7239 7.33352L1.99988 7.33352L1.99988 8.66685Z"
-                fill="white"
+                fill={color}
             />
         </svg>
     )
