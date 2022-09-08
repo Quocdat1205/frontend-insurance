@@ -101,3 +101,5 @@ export const days: any = [
         vi: 'T7',
     },
 ]
+
+export const DURATION_AOS = 400
