@@ -2,7 +2,7 @@ import axios from 'axios'
 import Button from 'components/common/Button/Button'
 import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatPriceToWeiValue } from 'utils/format'
 import { CheckBoxIcon, CheckCircle, ErrorCircleIcon, StartIcon } from 'components/common/Svg/SvgIcon'
@@ -41,7 +41,22 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
     const { width } = useWindowSize()
     const isMobile = width && width < screens.drawer
 
-    console.log(wallet)
+    useEffect(() => {
+        // const inter = new ethers.utils.Interface(INSURANCE_ABI)
+        // const decodedInput = inter.decodeFunctionData(
+        //     'createInsurance',
+        //     '0x6696d7580000000000000000000000000d17d1de09c0841c9e023a2a21aa7ea8851b0fb800000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000030d98d59a960000000000000000000000000000000000000000000000000000002386f26fc1000000000000000000000000000000000000000000000000000f0b160bbdf2e60000000000000000000000000000000000000000000000000000a688906bd8b0000000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000003424e420000000000000000000000000000000000000000000000000000000000',
+        // )
+        // console.log(decodedInput)
+        fetch()
+    }, [])
+
+    const fetch = async () => {
+        const e = await wallet.contractCaller.insuranceContract.contract.filters.EBuyInsurance()
+
+        const filter = await wallet.contractCaller.insuranceContract.contract.queryFilter(e, 22658137, 22658137 + 1000)
+        console.log(filter)
+    }
 
     const [isUpdated, setUpdated] = useState<boolean>(false)
     const [isCanBuy, setCanBuy] = useState<boolean>(false)
@@ -89,23 +104,21 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                     period: state.period,
                 }
 
-                console.log(state, dataPost)
+                const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
+                    dataPost.buyer,
+                    dataPost.asset,
+                    dataPost.margin,
+                    dataPost.q_covered,
+                    dataPost.p_market,
+                    dataPost.p_claim,
+                    dataPost.period,
+                    { value: dataPost.margin },
+                )
+                await buy.wait()
 
-                const buy = await wallet.contractCaller.insuranceContract.contract
-                    .createInsurance(
-                        dataPost.buyer,
-                        dataPost.asset,
-                        dataPost.margin,
-                        dataPost.q_covered,
-                        dataPost.p_market,
-                        dataPost.p_claim,
-                        dataPost.period,
-                        { value: dataPost.margin },
-                    )
-                    .then((receipt: any) => {
-                        console.log(receipt)
-                        handlePostInsurance(receipt, dataPost, state)
-                    })
+                const id_sc = await buy.wait()
+
+                console.log(Number(id_sc.events[0].args[0]))
             }
 
             if (checkUpgrade) {
@@ -118,7 +131,7 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                     p_claim: formatPriceToWeiValue(state.p_claim),
                     period: state.period + 2,
                 }
-                const buy = await wallet.contractCaller.insuranceContract.contract
+                await wallet.contractCaller.insuranceContract.contract
                     .createInsurance(
                         dataPost.buyer,
                         dataPost.asset,
