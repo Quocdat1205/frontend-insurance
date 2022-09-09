@@ -36,24 +36,24 @@ const Header = () => {
     }
 
     return (
-        <header className="header-landing px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[10]">
-            <div className="m-auto flex items-center justify-between space-x-12">
+        <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[10]">
+            <div className="max-w-screen-layout m-auto w-full flex items-center justify-between space-x-4 sm:space-x-12">
                 <div className="min-w-[67px] w-[75px]">
                     <img src="/images/ic_logo.png" />
                 </div>
                 <div className="w-full flex items-center justify-end mb:justify-between  py-3 mb:py-0 text-sm font-semibold">
                     {!isMobile && <Menu data={Config.homeMenu} onChange={onChangeMenu} />}
-                    <div className="flex items-center space-x-6 cursor-pointer">
-                        {network && <Notifications />}
+                    <div className="flex items-center space-x-5 sm:space-x-6 cursor-pointer">
                         {account && network && (
                             <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
                                 <img src={network.icon} width={24} height={24} />
                                 <div>{network.chain}</div>
-                                {!isMobile && (
-                                    <div className="rounded-[5px] bg-white overflow-hidden px-4 py-1">{account.substr(0, 4) + '...' + account.substr(-4)}</div>
-                                )}
+                                <div className="rounded-[5px] bg-white overflow-hidden px-4 py-1">
+                                    {account.substr(0, isMobile ? 2 : 4) + '...' + account.substr(-4)}
+                                </div>
                             </div>
                         )}
+                        {network && <Notifications />}
                         {!isMobile && <ButtonLanguage />}
                         {!account && (
                             <Button onClick={onConnect} className="font-semibold px-4 py-2 space-x-2">

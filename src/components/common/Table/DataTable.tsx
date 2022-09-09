@@ -3,18 +3,18 @@ import { useTable, useSortBy, useResizeColumns } from 'react-table'
 import { SortIcon } from 'components/common/Svg/SvgIcon'
 import colors from 'styles/colors'
 import { ChevronRight, ChevronLeft } from 'react-feather'
-import styled from 'styled-components'
-import classnames from 'classnames'
 import Pagination from 'rc-pagination'
+import Skeleton from 'components/common/Skeleton/Skeleton'
 interface Table {
     columns: any[]
     data: any[]
     total?: number
     skip?: number
     limit?: number
+    loading?: boolean
     onChangePage?: (page: number) => void
 }
-const DataTable = ({ columns, data, total = 0, skip = 0, limit = 10, onChangePage }: Table) => {
+const DataGrid = ({ columns, data, total = 0, skip = 0, limit = 10, onChangePage, loading }: Table) => {
     const table = useRef<any>(null)
     const container = useRef<any>(null)
     const mouseDown = useRef(false)
@@ -129,7 +129,7 @@ const DataTable = ({ columns, data, total = 0, skip = 0, limit = 10, onChangePag
                                                 className="px-2 border-t border-divider min-h-[54px] flex items-center "
                                                 {...cell.getCellProps({ style: { minWidth: cell.column.minWidth, width: cell.column.width } })}
                                             >
-                                                {cell.render('Cell')}
+                                                {loading ? <Skeleton className="min-h-[2rem]" /> : cell.render('Cell')}
                                             </td>
                                         )
                                     })}
@@ -159,8 +159,16 @@ const DataTable = ({ columns, data, total = 0, skip = 0, limit = 10, onChangePag
     )
 }
 
-const ItemPage = styled.div.attrs<any>(() => ({
-    className: classnames('flex items-center justify-center h-10 w-10 hover:text-red cursor-pointer'),
-}))<any>``
+const DataTable = ({ columns, data, total = 0, skip = 0, limit = 10, onChangePage, loading }: Table) => {
+    const loader = useMemo(() => {
+        const arr: any[] = []
+        for (let i = 1; i <= limit; i++) {
+            arr.push(i)
+        }
+        return arr
+    }, [limit])
+
+    return <DataGrid data={loading ? loader : data} total={total} limit={limit} skip={skip} columns={columns} loading={loading} onChangePage={onChangePage} />
+}
 
 export default DataTable

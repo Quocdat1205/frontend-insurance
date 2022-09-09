@@ -1,7 +1,6 @@
 import { Popover, Transition } from '@headlessui/react'
 import { NotificationsIcon } from 'components/common/Svg/SvgIcon'
 import React, { Fragment } from 'react'
-import InlineSVG from 'react-inlinesvg'
 
 const Notifications = () => {
     return (
@@ -9,9 +8,9 @@ const Notifications = () => {
             {({ open }) => (
                 <>
                     <Popover.Button type="button" className="inline-flex items-center focus:outline-none" aria-expanded="false">
-                        <div className="p-2 bg-hover rounded-[3px] relative">
+                        <div className="sm:p-2 sm:bg-hover rounded-[3px] relative">
                             <NotificationsIcon />
-                            <div className="bg-red w-2 h-2 rounded-[50%] absolute top-[30%] right-[30%]" />
+                            <div className="bg-red w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[50%] absolute top-[30%] right-[20%] sm:right-[30%]" />
                         </div>
                     </Popover.Button>
                     <Transition

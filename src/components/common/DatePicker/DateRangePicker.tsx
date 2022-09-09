@@ -1,6 +1,6 @@
 import { useTranslation } from 'next-i18next'
-import React, { useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'react-feather'
+import React, { useRef, useState, Fragment, useEffect } from 'react'
+import { ChevronLeft, ChevronRight, X } from 'react-feather'
 import colors from 'styles/colors'
 import { CalendarIcon } from 'components/common/Svg/SvgIcon'
 import vi from 'date-fns/locale/vi'
@@ -9,7 +9,9 @@ import { DateRangePicker } from 'react-date-range'
 import 'react-date-range/dist/styles.css' // main css file
 import 'react-date-range/dist/theme/default.css' // theme css file
 import { formatTime } from 'utils/utils'
-import Popover from '../Popover/Popover'
+import Button from 'components/common/Button/Button'
+import { Popover, Transition } from '@headlessui/react'
+import useOutsideAlerter from 'hooks/useOutsideAlerter'
 
 interface ReactDateRangePicker {
     placeholder?: string
@@ -27,6 +29,7 @@ interface ReactDateRangePicker {
     keyExp?: string
     renderContent?: any
     prefix?: string
+    isClearable?: boolean
 }
 const ReactDateRangePicker = (props: ReactDateRangePicker) => {
     const {
@@ -34,6 +37,7 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
         i18n: { language },
     } = useTranslation()
     const refDatePicker = useRef<any>(null)
+    const popoverRef = useRef(null)
     const {
         label,
         placeholder = label,
@@ -46,9 +50,22 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
         className,
         renderContent,
         prefix,
+        isClearable = false,
     } = props
 
     const wrapperRef = useRef<any>(null)
+    const [date, setDate] = useState(value)
+    const [showPicker, setShowPicker] = useState<boolean>(false)
+
+    const handleOutside = () => {
+        setShowPicker(false)
+    }
+
+    useOutsideAlerter(wrapperRef, handleOutside)
+
+    useEffect(() => {
+        setDate(value)
+    }, [value, showPicker])
 
     const navigatorRenderer = (focusedDate: any, changeShownDate: any, props: any) => {
         return (
@@ -63,47 +80,116 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
         )
     }
 
+    const _onChange = (e: any) => {
+        setDate(e[value.key])
+    }
+
+    const onConfirm = (close: any) => {
+        if (onChange) onChange(date)
+        setShowPicker(false)
+        // close()
+    }
+
+    const isClear = useRef<boolean>(false)
+    const onAction = (action: string) => {
+        if (action === 'clear') {
+            isClear.current = true
+            if (onChange) onChange({ ...date, startDate: null, endDate: new Date('') })
+        }
+        if (action === 'open') {
+            if (isClear.current) {
+                isClear.current = false
+                return
+            }
+            setShowPicker(!showPicker)
+        }
+    }
+
     return (
         <div className={`flex flex-col space-y-2 ${className}`}>
             <div className="text-sm">{label}</div>
-            <div ref={wrapperRef} className="date-range-picker relative flex items-center justify-between px-4 rounded-[3px]">
-                <Popover
-                    label={() => (
-                        <>
-                            <div className="w-full h-full flex items-center">
-                                <span>
-                                    {prefix} {value?.startDate ? formatTime(value?.startDate, dateFormat) + ' - ' + formatTime(value?.endDate, dateFormat) : ''}
-                                </span>
-                            </div>
-
-                            {showIcon && (
-                                <div className="cursor-pointer">
-                                    <CalendarIcon />
-                                </div>
-                            )}
-                        </>
-                    )}
-                    className="right-0"
-                >
-                    <div className="rounded-xl shadow-subMenu overflow-hidden mt-[10px]">
-                        {renderContent && renderContent()}
-                        <DateRangePicker
-                            className="relative"
-                            ranges={[value]}
-                            months={2}
-                            onChange={onChange}
-                            moveRangeOnFirstSelection={false}
-                            direction="horizontal"
-                            locale={language === 'vi' ? vi : en}
-                            staticRanges={[]}
-                            inputRanges={[]}
-                            weekStartsOn={0}
-                            rangeColors={[colors.red.red]}
-                            editableDateInputs={true}
-                            retainEndDateOnFirstSelection
-                            navigatorRenderer={navigatorRenderer}
-                        />
+            <div ref={wrapperRef} className="date-range-picker relative px-4 rounded-[3px]">
+                <div onClick={() => onAction('open')} className="flex items-center w-full space-x-2">
+                    <div className="w-full h-full flex items-center">
+                        <span>
+                            {prefix} {value?.startDate ? formatTime(value?.startDate, dateFormat) + ' - ' + formatTime(value?.endDate, dateFormat) : ''}
+                        </span>
                     </div>
+                    {isClearable && value?.startDate && (
+                        <div className="min-w-[1rem]" onClick={() => onAction('clear')}>
+                            <X size={16} />
+                        </div>
+                    )}
+
+                    {showIcon && (
+                        <div className="cursor-pointer">
+                            <CalendarIcon />
+                        </div>
+                    )}
+                </div>
+                <Popover className="absolute w-full">
+                    {({ open, close }) => {
+                        return (
+                            <>
+                                {/* <Popover.Button
+                                    onClick={() => setShowPicker(!open)}
+                                    className="inline-flex items-center focus:outline-none w-full space-x-2"
+                                    aria-expanded="false"
+                                >
+                                    <div className="w-full h-full flex items-center">
+                                        <span>
+                                            {prefix}{' '}
+                                            {value?.startDate ? formatTime(value?.startDate, dateFormat) + ' - ' + formatTime(value?.endDate, dateFormat) : ''}
+                                        </span>
+                                    </div>
+                                    {isClearable && <X size={20} onClick={() => onAction('clear')} />}
+
+                                    {showIcon && (
+                                        <div className="cursor-pointer">
+                                            <CalendarIcon />
+                                        </div>
+                                    )}
+                                </Popover.Button> */}
+                                <Transition
+                                    show={showPicker}
+                                    as={Fragment}
+                                    enter="transition ease-out duration-200"
+                                    enterFrom="opacity-0 translate-y-1"
+                                    enterTo="opacity-100 translate-y-0"
+                                    leave="transition ease-in duration-150"
+                                    leaveFrom="opacity-100 translate-y-0"
+                                    leaveTo="opacity-0 translate-y-1"
+                                >
+                                    <Popover.Panel static className={`${className} right-0 absolute z-10 mt-[2rem] bg-white`}>
+                                        <div className="rounded-xl shadow-subMenu overflow-hidden">
+                                            {renderContent && renderContent()}
+                                            <DateRangePicker
+                                                className="relative"
+                                                ranges={[date]}
+                                                months={2}
+                                                onChange={_onChange}
+                                                moveRangeOnFirstSelection={false}
+                                                direction="horizontal"
+                                                locale={language === 'vi' ? vi : en}
+                                                staticRanges={[]}
+                                                inputRanges={[]}
+                                                weekStartsOn={0}
+                                                rangeColors={[colors.red.red]}
+                                                editableDateInputs={true}
+                                                retainEndDateOnFirstSelection
+                                                navigatorRenderer={navigatorRenderer}
+                                            />
+                                            <div className="mx-6 mt-3 mb-8">
+                                                <Button onClick={() => onConfirm(close)} variants="primary" className="w-full text-sm h-[3rem]">
+                                                    {t('common:confirm')}
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </Popover.Panel>
+                                </Transition>
+                            </>
+                        )
+                    }}
                 </Popover>
             </div>
         </div>

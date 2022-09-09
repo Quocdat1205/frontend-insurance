@@ -2,6 +2,7 @@ import classnames from 'classnames'
 import useOutsideAlerter, { useOutside } from 'hooks/useOutsideAlerter'
 import useWindowSize from 'hooks/useWindowSize'
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
+import { X } from 'react-feather'
 import { PORTAL_MODAL_ID } from 'utils/constants'
 import Portal from './Portal'
 
@@ -12,13 +13,13 @@ interface Modal {
     className?: string
     onBackdropCb?: () => void
     portalId?: string
+    isMobile?: boolean
+    customHeader?: () => void
 }
 
-const Modal = ({ isVisible, portalId = PORTAL_MODAL_ID, children, containerClassName = '', className = '', onBackdropCb }: Modal) => {
+const Modal = ({ isVisible, portalId = PORTAL_MODAL_ID, children, containerClassName = '', className = '', onBackdropCb, isMobile, customHeader }: Modal) => {
     const wrapperRef = useRef<any>(null)
     const container = useRef<any>(null)
-    const { width } = useWindowSize()
-    const isMobile = width && width <= 640
     const [loading, setLoading] = useState<boolean>(false)
     const timer = useRef<any>(null)
 
@@ -61,8 +62,23 @@ const Modal = ({ isVisible, portalId = PORTAL_MODAL_ID, children, containerClass
                 ref={container}
             >
                 {loading && (
-                    <div ref={wrapperRef} className={`${className} h-max w-full absolute`}>
-                        {children}
+                    <div ref={wrapperRef} className={`${className} h-max w-full absolute bg-white`}>
+                        {isMobile ? (
+                            <div className="py-8 px-6">
+                                <>
+                                    {customHeader ? (
+                                        customHeader()
+                                    ) : (
+                                        <div className="flex items-center justify-end pb-6">
+                                            <X onClick={handleOutside} size={20} className="cursor-pointer" />
+                                        </div>
+                                    )}
+                                    {children}
+                                </>
+                            </div>
+                        ) : (
+                            children
+                        )}
                     </div>
                 )}
             </div>

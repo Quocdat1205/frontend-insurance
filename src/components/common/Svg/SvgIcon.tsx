@@ -62,10 +62,10 @@ export const NotificationsIcon = () => {
     )
 }
 
-export const TendencyIcon = () => {
+export const TendencyIcon = ({ color = '#52CC74', down = false }: any) => {
     return (
-        <svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7.04069 3.5415V4.95817H11.7086L3.49902 13.1678L4.49777 14.1665L12.7074 5.95692V10.6248H14.124V3.5415H7.04069Z" fill="#52CC74" />
+        <svg className={down ? 'rotate-180' : ''} width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.04069 3.5415V4.95817H11.7086L3.49902 13.1678L4.49777 14.1665L12.7074 5.95692V10.6248H14.124V3.5415H7.04069Z" fill={color} />
         </svg>
     )
 }
