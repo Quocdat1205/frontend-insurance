@@ -1,4 +1,4 @@
-import { wallets } from 'components/web3/Web3Types'
+import { BasicChainInformation, ExtendedChainInformation, wallets } from 'components/web3/Web3Types'
 import env from 'config/env'
 import { Toast } from 'types/types'
 
@@ -14,6 +14,37 @@ class Config {
         if (Config) {
             Config.web3.activate(wallet)
         }
+    }
+
+    static chains = String(Config.env.CHAINS)
+        .split(',')
+        .map((chain) => Number(chain))
+
+    static networks: { [chainId: number]: BasicChainInformation | ExtendedChainInformation } = {
+        1: {
+            urls: ['https://mainnet.infura.io/v3/f87b967bc65a41c0a1a25635493fa482'],
+            name: 'Mainnet',
+        },
+        4: {
+            urls: ['https://rinkeby.infura.io/v3/f87b967bc65a41c0a1a25635493fa482'],
+            name: 'Rinkeby',
+        },
+        42: {
+            urls: ['https://kovan.infura.io/ws/v3/f87b967bc65a41c0a1a25635493fa482'],
+            name: 'Kovan',
+        },
+        97: {
+            urls: ['https://data-seed-prebsc-1-s1.binance.org:8545'],
+            name: 'bscTestnet',
+        },
+        56: {
+            urls: ['https://bsc-dataseed.binance.org'],
+            name: 'mainnet',
+        },
+        69: {
+            urls: ['https://kovan-optimistic.etherscan.io'],
+            name: 'Optimism Kovan (testnet)',
+        },
     }
 
     static blogUrl: { nami_exchange: string; nami_today: string } = {

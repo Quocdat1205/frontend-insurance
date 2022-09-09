@@ -3,9 +3,6 @@ import isNil from 'lodash/isNil'
 import numeral from 'numeral'
 import Config from 'config/config'
 import GhostContentAPI from '@tryghost/content-api'
-//import { slugify } from '@tryghost/string'
-//import algoliasearch from 'algoliasearch'
-import { wallets } from 'components/web3/Web3Types'
 
 export const getS3Url = (url: string) => Config.env.CDN + url
 

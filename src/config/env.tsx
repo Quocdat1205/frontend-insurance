@@ -5,6 +5,7 @@ interface Env {
     CDN: string
     NODE_ENV: string
     BSC: string
+    CHAINS: string
 }
 
 const env: Env = {
@@ -14,6 +15,7 @@ const env: Env = {
     CDN: process.env.NEXT_PUBLIC_CDN ?? '',
     NODE_ENV: process.env.NEXT_PUBLIC_NODE_ENV ?? 'dev',
     BSC: process.env.NEXT_PUBLIC_BSCSCAN ?? '',
+    CHAINS: process.env.NEXT_PUBLIC_CHAINS ?? '',
 }
 
 export default env

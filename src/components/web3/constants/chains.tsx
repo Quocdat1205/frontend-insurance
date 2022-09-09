@@ -1,6 +1,6 @@
-import { ChainDataList } from '../Web3Types'
+import { ChainDataList as ChainType } from '../Web3Types'
 
-export const Chains: ChainDataList = {
+export const ChainDataList: ChainType = {
     1: {
         chainId: 1,
         chain: 'ETH',
