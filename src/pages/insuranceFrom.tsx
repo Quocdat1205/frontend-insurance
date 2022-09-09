@@ -3,14 +3,14 @@ import LayoutInsurance from 'components/layout/layoutInsurance'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import Button from 'components/common/Button/Button'
 import axios from 'axios'
-import { Popover, Switch, Tab } from '@headlessui/react'
+import { Menu, Popover, Switch, Tab } from '@headlessui/react'
 import { AcceptBuyInsurance } from '../components/screens/Insurance/AcceptBuyInsurance'
 import { GetStaticProps } from 'next'
 import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { CheckCircle, LeftArrow, InfoCircle, XMark, Dot } from 'components/common/Svg/SvgIcon'
+import { CheckCircle, LeftArrow, InfoCircle, XMark, Dot, ErrorCircleIcon, ErrorIcon, ErrorTriggersIcon } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -42,6 +42,10 @@ export const InsuranceFrom = () => {
     const [priceBNB, setPriceBNB] = useState(0)
     const [openChangeToken, setOpenChangeToken] = useState(false)
     const [active, setActive] = useState<boolean>(false)
+    const [nameNoti, setNameNoti] = useState('loading')
+    const [res, setRes] = useState<any>()
+    const [showDetails, setShowDetails] = useState(false)
+    const [unitMoney, setUnitMoney] = useState('USDT')
 
     const [userBalance, setUserBalance] = useState<number>(0)
     const [listCoin, setListCoin] = useState<ICoin[]>([])
@@ -94,6 +98,20 @@ export const InsuranceFrom = () => {
         { menuId: 'help', name: t('insurance:buy:help') },
     ]
 
+    const listTerminology = [
+        { name: 'Q-Covered', description: t('insurance:terminology:q_covered') },
+        { name: 'P-Market', description: t('insurance:terminology:p_market') },
+        { name: 'P-Claim', description: t('insurance:terminology:p_claim') },
+        { name: 'P-Expired', description: t('insurance:terminology:p_expired') },
+        { name: 'P-Refund', description: t('insurance:terminology:p_refund') },
+        { name: 'Period', description: t('insurance:terminology:period') },
+        { name: 'R-Claim', description: t('insurance:terminology:r_claim') },
+        { name: 'Q-Claim', description: t('insurance:terminology:q_claim') },
+        { name: 'Margin', description: t('insurance:terminology:margin') },
+        { name: 'T-Start', description: t('insurance:terminology:t_start') },
+        { name: 'T-Expired', description: t('insurance:terminology:t_expired') },
+    ]
+
     const Leverage = (p_market: number, p_stop: number) => {
         const leverage = Number((p_market / Math.abs(p_market - p_stop)).toFixed(2))
         return leverage < 1 ? 1 : leverage
@@ -112,7 +130,6 @@ export const InsuranceFrom = () => {
     }
 
     const validatePclaim = (value: number) => {
-        console.log(state.p_market + (2 * state.p_market) / 100, state.p_market + (70 * state.p_market) / 100)
         if (wallet.account) {
             if (value > state.p_market + (2 * state.p_market) / 100 && value < state.p_market + (70 * state.p_market) / 100) {
                 return setClear(true)
@@ -173,9 +190,48 @@ export const InsuranceFrom = () => {
             if (res.tab) {
                 setTab(res.tab)
             }
+            if (res.unitMoney) {
+                setUnitMoney(res.unitMoney || 'USDT')
+            }
+            if (res.index) {
+                setIndex(res.index || 1)
+            }
         }
         getPriceBNBUSDT(setPriceBNB)
+
+        try {
+            const result = wallet.getBalance()
+            result.then((balance: number) => {
+                const tmp = Number((balance * priceBNB) / state.p_market)
+                console.log('connect success')
+                setUserBalance(tmp)
+            })
+        } catch (error) {
+            return console.log(error)
+        }
     }, [stone])
+
+    useEffect(() => {
+        if (unitMoney) {
+            const data = localStorage.getItem('state')
+            if (data) {
+                const res = JSON.parse(data)
+                const newData = { ...res, unitMoney: unitMoney }
+                localStorage.setItem('state', JSON.stringify(newData))
+            }
+        }
+    }, [unitMoney])
+
+    useEffect(() => {
+        if (index) {
+            const data = localStorage.getItem('state')
+            if (data) {
+                const res = JSON.parse(data)
+                const newData = { ...res, index: index }
+                localStorage.setItem('state', JSON.stringify(newData))
+            }
+        }
+    }, [index])
 
     useEffect(() => {
         if (state.p_claim != 0) {
@@ -301,26 +357,7 @@ export const InsuranceFrom = () => {
         validatePclaim(state.p_claim)
     }, [state.q_covered, state.period, selectCoin, state.margin, state.p_claim, state.percent_margin])
 
-    useEffect(() => {
-        try {
-            setLoadings(true)
-            const result = wallet.getBalance()
-            result.then((balance: number) => {
-                const tmp = Number((balance * priceBNB) / state.p_market)
-                console.log('connect success')
-
-                setUserBalance(tmp)
-                return setLoadings(false)
-            })
-        } catch (error) {
-            return console.log(error)
-        }
-    }, [wallet])
-
-    const getBalance = async () => {
-        if (wallet.account) {
-        }
-    }
+    useEffect(() => {}, [wallet])
 
     useEffect(() => {
         if (state.p_claim > 0) {
@@ -333,8 +370,8 @@ export const InsuranceFrom = () => {
             {active && (
                 <div className="absolute w-full h-full bg-gray/[0.5] z-50 flex flex-col items-center justify-center">
                     <NotificationInsurance
-                        id=""
-                        name={'success'}
+                        id={res ? res.data._id : ''}
+                        name={nameNoti}
                         state={state}
                         active={active}
                         setActive={() => {
@@ -344,13 +381,50 @@ export const InsuranceFrom = () => {
                     />
                 </div>
             )}
+            {showDetails && (
+                <div className="absolute w-full h-full bg-gray/[0.5] z-50 flex flex-col items-center justify-center">
+                    <div className={` bg-white text-sm  w-[424px] mx-auto `}>
+                        <div
+                            className="m-[24px] flex flex-row-reverse"
+                            onClick={() => {
+                                setShowDetails(false)
+                            }}
+                        >
+                            <XMark></XMark>
+                        </div>
+                        <div className="flex flex-col justify-center items-center my-[24px]">
+                            <div className="font-medium text-xl">{t('insurance:buy:detailed_terminology')}</div>
+                            <div className="mt-[32px] divide-y divide-[#E5E7E8] text-[#22313F]">
+                                {listTerminology.map((item, key) => {
+                                    return (
+                                        <div key={key} className="w-[380px] flex flex-row justify-between items-center">
+                                            <span className="py-[24px]">{item.name}</span>
+                                            <span className="text-left w-[160px] py-[12px]">{item.description}</span>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             {
                 // head Insurance
                 !isMobile && (
                     <div className="mx-[80px] mt-[48px] mb-[20px] flex items-center justify-between" onClick={() => setDrop(false)}>
                         <div className="flex items-center font-semibold text-base">
                             <LeftArrow></LeftArrow>
-                            <span className={' text-[#22313F] hover:cursor-pointer'} onClick={() => router.push('/ ')}>
+                            <span
+                                className={' text-[#22313F] hover:cursor-pointer'}
+                                onClick={() => {
+                                    if (index == 1) {
+                                        return router.push('/ ')
+                                    }
+                                    if (index == 2) {
+                                        return setIndex(1)
+                                    }
+                                }}
+                            >
                                 {menu[2].name}
                             </span>
                         </div>
@@ -586,16 +660,68 @@ export const InsuranceFrom = () => {
                                                 idInput={''}
                                                 value={state.margin && state.margin}
                                                 onChange={(a: any) => {
-                                                    setState({ ...state, margin: a.target.value })
+                                                    setState({ ...state, margin: a.target.value, percent_margin: 0 })
                                                 }}
                                                 placeholder={''}
                                             ></Input>
                                             <div
                                                 className={
-                                                    'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px] select-none hover:cursor-pointer text-red'
+                                                    'bg-[#F7F8FA] w-[10%] shadow-none flex flex-row items-center justify-end px-[16px] select-none hover:cursor-pointer text-red'
                                                 }
                                             >
-                                                {'USDT'}
+                                                <span>{unitMoney}</span>
+                                                <div className="relative">
+                                                    <Menu>
+                                                        <Menu.Button className={'my-[16px] text-[#22313F] underline hover:cursor-pointer '}>
+                                                            <ChevronDown></ChevronDown>
+                                                        </Menu.Button>
+                                                        <Menu.Items
+                                                            className={'flex flex-col text-[#22313F] absolute z-50 top-[63px] right-[-15px] bg-white rounded'}
+                                                            style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                                                        >
+                                                            <Menu.Item>
+                                                                {({ active }) => (
+                                                                    <a
+                                                                        className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA]`}
+                                                                        onClick={() => {
+                                                                            setUnitMoney('USDT')
+                                                                        }}
+                                                                    >
+                                                                        <span>USDT</span>
+                                                                    </a>
+                                                                )}
+                                                            </Menu.Item>
+                                                            <Menu.Item>
+                                                                {({ active }) => (
+                                                                    <a
+                                                                        className={`${
+                                                                            active && 'bg-blue-500'
+                                                                        }  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
+                                                                        onClick={() => {
+                                                                            setUnitMoney('BUSD')
+                                                                        }}
+                                                                    >
+                                                                        <span>BUSD</span>
+                                                                    </a>
+                                                                )}
+                                                            </Menu.Item>
+                                                            <Menu.Item>
+                                                                {({ active }) => (
+                                                                    <a
+                                                                        className={`${
+                                                                            active && 'bg-blue-500'
+                                                                        }  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
+                                                                        onClick={() => {
+                                                                            setUnitMoney('USDC')
+                                                                        }}
+                                                                    >
+                                                                        <span>USDC</span>
+                                                                    </a>
+                                                                )}
+                                                            </Menu.Item>
+                                                        </Menu.Items>
+                                                    </Menu>
+                                                </div>
                                             </div>
                                         </div>
                                     )}
@@ -743,7 +869,7 @@ export const InsuranceFrom = () => {
                                                 }}
                                             ></input>
                                         </label>{' '}
-                                        <span className="text-[#EB2B3E]">USDT</span>
+                                        <span className="text-[#EB2B3E]">{unitMoney}</span>
                                     </div>
                                 )}
                             </div>
@@ -825,7 +951,7 @@ export const InsuranceFrom = () => {
                                         }}
                                         placeholder={`${menu[9].name}`}
                                     ></Input>
-                                    <div className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px]'}>USDT</div>
+                                    <div className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px]'}>{unitMoney}</div>
                                 </div>
                             </div>
                         )}
@@ -868,8 +994,13 @@ export const InsuranceFrom = () => {
                                         }}
                                         placeholder={`${menu[9].name}`}
                                     ></Input>
-                                    <div className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px]'}>USDT</div>
+                                    <div className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px]'}>{unitMoney}</div>
                                 </div>
+                                {!clear && state.p_claim != 0 && (
+                                    <span className="flex flex-row text-[#E5544B]">
+                                        <ErrorTriggersIcon /> <span className="pl-[6px]">{t('insurance:error:p_claim')}</span>
+                                    </span>
+                                )}
                             </div>
                         )}
 
@@ -952,7 +1083,7 @@ export const InsuranceFrom = () => {
                         <div className={'text-[#808890]'}>Q-Claim</div>
                         <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                             {state.q_claim}
-                            <span className={'text-[#EB2B3E] pl-[8px]'}>USDT</span>
+                            <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
                             <ChevronDown size={18} className={'ml-1 mt-1'}></ChevronDown>
                         </div>
                     </div>
@@ -964,7 +1095,7 @@ export const InsuranceFrom = () => {
                         <div className={'text-[#808890]'}>Margin</div>
                         <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                             {state.margin}
-                            <span className={'text-[#EB2B3E] pl-[8px]'}>USDT</span>
+                            <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
                             <ChevronDown size={18} className={'ml-1 mt-1'}></ChevronDown>
                         </div>
                     </div>
@@ -978,7 +1109,7 @@ export const InsuranceFrom = () => {
                         <CheckCircle></CheckCircle>
                         <span className={'font-semibold text-[#22313F] px-[4px]'}>
                             {`${t('insurance:buy:saved')} `}
-                            <span className={'text-[#EB2B3E]'}>1,000 USDT</span> {t('insurance:buy:sub_saved')}
+                            <span className={'text-[#EB2B3E]'}>1,000 {unitMoney}</span> {t('insurance:buy:sub_saved')}
                         </span>
                     </div>
                 )
@@ -1000,15 +1131,36 @@ export const InsuranceFrom = () => {
                     >
                         {menu[11].name}
                     </button>
-
-                    <span
-                        className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}
-                        onClick={() => {
-                            router.push('https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/')
-                        }}
-                    >
-                        {menu[12].name}
-                    </span>
+                    <Menu>
+                        <Menu.Button className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}>{menu[12].name}</Menu.Button>
+                        <Menu.Items
+                            className={'flex flex-col text-[#22313F]'}
+                            style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                        >
+                            <Menu.Item>
+                                {({ active }) => (
+                                    <a
+                                        className={`${active && 'bg-blue-500'}  py-[8px] pl-[16px] w-[300px] hover:bg-[#F7F8FA]`}
+                                        href="https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/"
+                                    >
+                                        <span>{t('insurance:buy:help1')}</span>
+                                    </a>
+                                )}
+                            </Menu.Item>
+                            <Menu.Item>
+                                {({ active }) => (
+                                    <a
+                                        className={`${active && 'bg-blue-500'}  py-[8px] pl-[16px] w-[300px] hover:bg-[#F7F8FA] hover:cursor-pointer`}
+                                        onClick={() => {
+                                            setShowDetails(true)
+                                        }}
+                                    >
+                                        <span>{t('insurance:buy:detailed_terminology')}</span>
+                                    </a>
+                                )}
+                            </Menu.Item>
+                        </Menu.Items>
+                    </Menu>
                 </div>
             )}
 
@@ -1018,7 +1170,7 @@ export const InsuranceFrom = () => {
                         <CheckCircle></CheckCircle>
                         <span className={'font-semibold text-[#22313F] px-[4px]'}>
                             {t('insurance:buy:saved')}
-                            <span className={'text-[#EB2B3E]'}>1,000 USDT</span> {t('insurance:buy:sub_saved')}
+                            <span className={'text-[#EB2B3E]'}>1,000 {unitMoney}</span> {t('insurance:buy:sub_saved')}
                         </span>
                     </div>
                     <div className={'flex flex-col w-full mt-[24px] hover:cursor-default'}>
@@ -1041,7 +1193,7 @@ export const InsuranceFrom = () => {
                             <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                                 {state.q_claim}
 
-                                <span className={'text-[#EB2B3E] pl-[8px]'}>USDT</span>
+                                <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
                             </div>
                         </div>
                         <div
@@ -1053,7 +1205,7 @@ export const InsuranceFrom = () => {
                             <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                                 {state.margin}
 
-                                <span className={'text-[#EB2B3E] pl-[8px]'}>USDT</span>
+                                <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
                             </div>
                         </div>
                     </div>
@@ -1092,6 +1244,9 @@ export const InsuranceFrom = () => {
                     checkUpgrade={checkUpgrade}
                     setCheckUpgrade={setCheckUpgrade}
                     getPrice={getPrice}
+                    handelSetActive={setActive}
+                    setNoti={setNameNoti}
+                    setRes={setRes}
                 ></AcceptBuyInsurance>
             )}
         </LayoutInsurance>

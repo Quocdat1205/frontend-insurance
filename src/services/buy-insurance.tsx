@@ -31,8 +31,10 @@ export const buyInsurance = async (props: {
                 p_claim,
                 period,
             },
-            { headers: { Authorization: AuthToken.data } },
+            { headers: { Authorization: `Bearer ${AuthToken.data}` } },
         )
+
+        console.log(data)
 
         return data
     } catch (error) {

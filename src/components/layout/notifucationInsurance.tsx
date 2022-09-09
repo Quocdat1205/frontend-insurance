@@ -1,12 +1,12 @@
 import Button from 'components/common/Button/Button'
 import { Input } from 'components/common/Input/input'
-import { SuccessIcon, XMark } from 'components/common/Svg/SvgIcon'
+import { Loading, SuccessIcon, XMark } from 'components/common/Svg/SvgIcon'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export type iProps = {
     id: string
-    name: 'success' | 'expired' | 'expired1' | 'email'
+    name: 'success' | 'expired' | 'expired1' | 'email' | 'loading' | string
     state: any
     active: boolean
     setActive: any
@@ -41,6 +41,12 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
             icon: <img src="/images/email.png" className="w-[100px] h-[100px]" />,
             description: `${t('insurance:final:get_noti')}`,
             reason: `${t('insurance:final:input_email')}`,
+        },
+        {
+            name: 'loading',
+            icon: <Loading />,
+            description: `${t('insurance:final:loading')}`,
+            reason: ``,
         },
     ]
 
@@ -100,18 +106,20 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                 </div>
                                             </>
                                         )}
-                                        <div className="flex justify-center items-center">
-                                            <Button
-                                                variants={'primary'}
-                                                className={`bg-[#EB2B3E] w-[80%] m-[24px] mt-[32px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
-                                            >
-                                                {index == 0
-                                                    ? `${t('insurance:final:complete')}`
-                                                    : index == 3
-                                                    ? `${t('insurance:final:confirm_email')}`
-                                                    : `${t('insurance:final:buy_again')}`}
-                                            </Button>
-                                        </div>
+                                        {name !== 'loanding' && (
+                                            <div className="flex justify-center items-center">
+                                                <Button
+                                                    variants={'primary'}
+                                                    className={`bg-[#EB2B3E] w-[80%] m-[24px] mt-[32px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
+                                                >
+                                                    {index == 0
+                                                        ? `${t('insurance:final:complete')}`
+                                                        : index == 3
+                                                        ? `${t('insurance:final:confirm_email')}`
+                                                        : `${t('insurance:final:buy_again')}`}
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )
@@ -126,9 +134,11 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                         if (item.name === name) {
                             return (
                                 <div key={index} className={` bg-white text-sm  w-full mx-auto `}>
-                                    <div className="m-[24px] flex flex-row-reverse" onClick={setActive}>
-                                        <XMark></XMark>
-                                    </div>
+                                    {name != 'loading' && (
+                                        <div className="m-[24px] flex flex-row-reverse" onClick={setActive}>
+                                            <XMark></XMark>
+                                        </div>
+                                    )}
                                     <div className="flex flex-col justify-center items-center my-[24px]">
                                         {noti[index].icon}
                                         <div className="text-center w-[70%] pt-[24px]">
@@ -177,23 +187,25 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                 </div>
                                             </>
                                         )}
-                                        <div className="flex justify-center items-center">
-                                            <Button
-                                                variants={'primary'}
-                                                className={`bg-[#EB2B3E] w-[80%] m-[24px] mt-[32px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
-                                                onClick={() => {
-                                                    if (index == 0) {
-                                                        setActive()
-                                                    }
-                                                }}
-                                            >
-                                                {index == 0
-                                                    ? `${t('insurance:final:complete')}`
-                                                    : index == 3
-                                                    ? `${t('insurance:final:confirm_email')}`
-                                                    : `${t('insurance:final:buy_again')}`}
-                                            </Button>
-                                        </div>
+                                        {name != 'loading' && (
+                                            <div className="flex justify-center items-center">
+                                                <Button
+                                                    variants={'primary'}
+                                                    className={`bg-[#EB2B3E] w-[80%] m-[24px] mt-[32px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
+                                                    onClick={() => {
+                                                        if (index == 0) {
+                                                            setActive()
+                                                        }
+                                                    }}
+                                                >
+                                                    {index == 0
+                                                        ? `${t('insurance:final:complete')}`
+                                                        : index == 3
+                                                        ? `${t('insurance:final:confirm_email')}`
+                                                        : `${t('insurance:final:buy_again')}`}
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )
