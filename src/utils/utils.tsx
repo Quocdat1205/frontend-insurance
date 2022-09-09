@@ -3,6 +3,9 @@ import isNil from 'lodash/isNil'
 import numeral from 'numeral'
 import Config from 'config/config'
 import GhostContentAPI from '@tryghost/content-api'
+//import { slugify } from '@tryghost/string'
+//import algoliasearch from 'algoliasearch'
+import { wallets } from 'components/web3/Web3Types'
 
 export const getS3Url = (url: string) => Config.env.CDN + url
 
@@ -55,8 +58,8 @@ export const getTimeAgo = (value: Date, options: any) => {
 export const parseNumber = (_number: any) => parseInt(_number)
 
 export const ghost = new GhostContentAPI({
-    url: process.env.NEXT_PUBLIC_BLOG_API_URL ?? '',
-    key: process.env.NEXT_PUBLIC_BLOG_API_CONTENT_KEY ?? '',
+    url: process.env.NEXT_PUBLIC_BLOG_API_URL || '',
+    key: process.env.NEXT_PUBLIC_BLOG_API_CONTENT_KEY || '',
     version: 'v3',
 })
 
@@ -81,4 +84,26 @@ export const getArticles = async (tag: string = '', limit: number = 10, language
 
     options.filter = filter.join('+')
     return await ghost.posts.browse(options)
+}
+
+export const timeMessage = (previous: any) => {
+    const current = Date.now()
+    const msPerMinute = 60 * 1000
+    const msPerHour = msPerMinute * 60
+    const msPerDay = msPerHour * 24
+    const msPerMonth = msPerDay * 30
+    const msPerYear = msPerDay * 365
+
+    const elapsed = current - previous
+
+    if (Math.round(elapsed / 1000) < 15) {
+        if (elapsed < msPerMinute) {
+            return Math.round(elapsed / 1000) + ' giây trước'
+        }
+    }
+    const date = new Date(previous)
+    let tempMinutes
+    date.getMinutes() < 10 ? (tempMinutes = `0${date.getMinutes()}`) : (tempMinutes = `${date.getMinutes()}`)
+
+    return date.getHours() + ':' + tempMinutes + ' ' + date.getDate() + '/' + (date.getMonth() + 1)
 }

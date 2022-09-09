@@ -1,5 +1,5 @@
 import classnames from 'classnames'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, {useMemo,useState } from 'react'
 import styled from 'styled-components'
 import { ChevronDown, ChevronUp } from 'react-feather'
 import useWindowSize from 'hooks/useWindowSize'

@@ -12,9 +12,9 @@ const Footer = ({ sponsor = true }) => {
         <footer className="footer pt-20 sm:pt-[7.5rem]">
             {sponsor && (
                 <BgSponsor>
-                    <div className="text-white font-bold text-sm sm:text-xl">{t('home:landing:products_sponsored_by')}</div>
+                    <div className="text-txtPrimary font-bold text-sm sm:text-xl">{t('home:landing:products_sponsored_by')}</div>
                     <div className="max-w-[230px]">
-                        <img src="/images/screens/landing-page/ic_logo_nami_foundation.png" />
+                        <img src="/images/screens/landing-page/ic_logo_nami_foundation_black.png" />
                     </div>
                 </BgSponsor>
             )}
@@ -53,14 +53,16 @@ const Footer = ({ sponsor = true }) => {
 const BgSponsor = styled.div.attrs({
     className: 'flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 space-x-8 justify-center bg-opacity-[0.4] py-8 sm:py-6',
 })`
-    background: linear-gradient(
+    background-color: #ffe4e9;
+    /* opacity: 0.4; */
+    /* background: linear-gradient(
         88.49deg,
         rgba(254, 235, 238, 0.4) -1.12%,
         rgba(255, 121, 135, 0.4) 16.3%,
         rgba(255, 55, 68, 0.4) 50.07%,
         rgba(255, 121, 135, 0.4) 82.97%,
         rgba(254, 235, 238, 0.4) 101.26%
-    );
+    ); */
 `
 
 export default Footer

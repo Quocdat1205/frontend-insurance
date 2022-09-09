@@ -2,9 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "fonts";
-@import "datepicker";
-@import "pagination";
+@import 'fonts';
+@import 'fonts';
+@import 'datepicker';
+@import 'pagination';
 
 html {
     @apply font-Manrope;
@@ -39,6 +40,11 @@ html {
     background-origin: padding-box, border-box;
     border: 1.5px solid transparent;
     // border-image-source: linear-gradient(88.09deg, #ce0014 0.48%, #e92828 52.94%, #ff5f6d 114.93%);
+}
+
+.border-transparent-red {
+    border: 1.5px solid red;
+    background: rgba(54, 25, 25, .00004);
 }
 
 .hover\:border-gradient-hover-red:hover {
@@ -134,4 +140,36 @@ html {
     &.isResizing:hover {
         // display: block;
     }
+}
+
+.ticket {
+    display: inline-block;
+    box-sizing: content-box;
+    // filter: drop-shadow(0 2px 5px rgba(black, 0.5));
+    position: relative;
+    height: 1em;
+    padding: 1em;
+    color: black;
+    font-size: 16px;
+    background-size: 50% 100%;
+    background-repeat: no-repeat;
+    background-image: radial-gradient(circle at 0 50%, rgba(white, 0) 20px, white (0.4em + 0.1em)),
+        radial-gradient(circle at 100% 50%, rgba(white, 0) 20px, white (0.4em + 0.1em));
+    background-position: top left, top right;
+}
+
+.dashedLine {
+    border: none;
+    border-top: 1px dashed #e5e7e8;
+    color: #fff;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type='number'] {
+    -moz-appearance: textfield;
 }

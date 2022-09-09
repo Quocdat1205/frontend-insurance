@@ -1,0 +1,105 @@
+.bg_banner_home {
+    background-image: url('/images/bg_banner_home.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.bg-gradient {
+    background: linear-gradient(88.09deg, #ce0014 0.48%, #e92828 52.94%, #ff5f6d 114.93%) !important;
+}
+
+.bg_section1 {
+    background-image: url('/images/bg_section_1.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.bg_footer {
+    background-image: url('/images/bg_footer.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.bg_recieve_email {
+    background-image: url('/images/bg_recieve_email.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.bg_statistic_1 {
+    @media screen and (min-width: 768px) {
+        background-image: url('/images/bg_statistic_1.png');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+    }
+}
+.bg_statistic_2 {
+    background-image: url('/images/bg_statistic_2.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.ins_container {
+    padding: 0 24px;
+    @media screen and (min-width: 768px) {
+        padding: 0 40px;
+    }
+    @media screen and (min-width: 1280px) {
+        padding: 0 80px;
+    }
+}
+
+// breadcrumb
+ul.breadcrumb {
+    padding: 10px 16px;
+    padding-left: 0px !important;
+    list-style: none;
+    background-color: #eee;
+}
+
+ul.breadcrumb li {
+    display: inline;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+}
+
+ul.breadcrumb li + li:before {
+    padding: 8px;
+    color: black;
+    content: '>\00a0';
+}
+
+ul.breadcrumb li a {
+    color: #808890;
+    text-decoration: none;
+}
+
+ul.breadcrumb li a:hover {
+    cursor: default;
+}
+//end breadcrumb
+
+//ICoin
+#iCoin::-webkit-outer-spin-button,
+#iCoin::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#iPClaim::-webkit-outer-spin-button,
+#iPClaim::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+//Insurance Select
+button#headlessui-listbox-button-\:r0\: {
+    width: 100%;
+}
+
+input#iCoin,
+input#pClaim {
+    box-shadow: none;
+}
+
+.amcharts-g3 {
+    animation: none;
+    animation-delay: 0ms;
+}

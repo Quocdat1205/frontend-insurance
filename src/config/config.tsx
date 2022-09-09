@@ -11,7 +11,9 @@ class Config {
     static web3: any
 
     static connectWallet = (wallet: string = wallets.metaMask) => {
-        Config.web3?.activate(wallet)
+        if (Config) {
+            Config.web3.activate(wallet)
+        }
     }
 
     static blogUrl: { nami_exchange: string; nami_today: string } = {
