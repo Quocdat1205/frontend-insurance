@@ -18,7 +18,7 @@ const Statistics = () => {
     const { t } = useTranslation()
 
     useEffect(() => {
-        if (account) getIndividualContract(30)
+        // if (account) getIndividualContract(30)
     }, [account])
 
     const onChangeDay = (_day: number) => {
@@ -76,7 +76,7 @@ const Statistics = () => {
             <div className="flex items-center flex-wrap pt-6 sm:gap-6">
                 <CardShadow
                     mobileNoShadow
-                    className="px-4 py-6 sm:p-6 flex sm:flex-col sm:space-y-4 space-x-2 sm:space-x-0 min-w-full sm:min-w-[400px] flex-1 border-b border-divider sm:border-none "
+                    className="px-4 py-6 sm:p-6 flex sm:flex-col sm:space-y-4 space-x-2 sm:space-x-0 min-w-full sm:min-w-[300px] flex-1 border-b border-divider sm:border-none "
                 >
                     <div className="flex items-center sm:space-x-2">
                         <img className="min-w-[36px] min-h-[36px] w-9 h-9 sm:h-6 sm:w-6" src="/images/icons/ic_q_claim.png" />
@@ -105,7 +105,7 @@ const Statistics = () => {
                 </CardShadow>
                 <CardShadow
                     mobileNoShadow
-                    className="px-4 py-6 sm:p-6 flex sm:flex-col sm:space-y-4 space-x-2 sm:space-x-0 min-w-full sm:min-w-[400px] flex-1 border-b border-divider sm:border-none "
+                    className="px-4 py-6 sm:p-6 flex sm:flex-col sm:space-y-4 space-x-2 sm:space-x-0 min-w-full sm:min-w-[300px] flex-1 border-b border-divider sm:border-none "
                 >
                     <div className="flex items-center sm:space-x-2">
                         <img className="min-w-[36px] min-h-[36px] w-9 h-9 sm:h-6 sm:w-6" src="/images/icons/ic_r_claim.png" />
@@ -136,7 +136,7 @@ const Statistics = () => {
                         </div>
                     </div>
                 </CardShadow>
-                <CardShadow mobileNoShadow className="px-4 py-6 sm:p-6 flex sm:flex-col sm:space-y-4 space-x-2 sm:space-x-0 min-w-full sm:min-w-[400px] flex-1">
+                <CardShadow mobileNoShadow className="px-4 py-6 sm:p-6 flex sm:flex-col sm:space-y-4 space-x-2 sm:space-x-0 min-w-full sm:min-w-[300px] flex-1">
                     <div className="flex items-center sm:space-x-2">
                         <img className="min-w-[36px] min-h-[36px] w-9 h-9 sm:h-6 sm:w-6" src="/images/icons/ic_noti_active.png" />
                         <span className="hidden sm:flex">{t('insurance_history:qty_of_signed')}</span>

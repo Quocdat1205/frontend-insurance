@@ -30,6 +30,7 @@ interface InsuranceContractMobile {
     renderContentStatus: (e: any) => void
     onLoadMore: () => void
     loading?: boolean
+    onBuyInsurance: () => void
 }
 
 const InsuranceContractMobile = ({
@@ -41,6 +42,7 @@ const InsuranceContractMobile = ({
     renderContentStatus,
     onLoadMore,
     loading,
+    onBuyInsurance,
     ...props
 }: InsuranceContractMobile) => {
     const [showFilter, setShowFilter] = useState(false)
@@ -66,7 +68,7 @@ const InsuranceContractMobile = ({
                     <FilterIcon />
                 </div>
             </div>
-            <BgDashed>
+            <BgDashed onClick={onBuyInsurance}>
                 <AddCircleIcon />
                 <span className="text-sm font-semibold text-red">{t('common:header:buy_covered')}</span>
             </BgDashed>
@@ -99,8 +101,8 @@ const InsuranceContractMobile = ({
                                 </div>
                                 <div className="flex items-center justify-center space-x-2 bg-pink-1 rounded-md">
                                     <AlarmIcon />
-                                    <span className="text-xs text-red font-semibold py-2">
-                                        {item?.period} ngày {formatTime(item?.createdAt, 'HH:mm:ss')}
+                                    <span className="text-xs text-red font-semibold py-2 lowercase">
+                                        {item?.period} {t('common:days')} {formatTime(item?.createdAt, 'HH:mm:ss')}
                                     </span>
                                 </div>
                                 <div className="flex justify-between flex-wrap">

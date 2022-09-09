@@ -94,58 +94,32 @@ const Assets = () => {
     )
 
     return (
-        <>
-            {isMobile ? (
-                <Swiper
-                    pagination={pagination}
-                    modules={[Pagination]}
-                    className="mySwiper !px-4 !py-8"
-                    slidesPerView={4}
-                    breakpoints={{
-                        300: {
-                            slidesPerView: 1.2,
-                            spaceBetween: 16,
-                        },
-                    }}
-                    autoplay={{
-                        delay: 3000,
-                        disableOnInteraction: false,
-                    }}
-                >
-                    {mount && renderNews()}
-                </Swiper>
-            ) : (
-                <div className="grid grid-rows-3 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-3 gap-6">
-                    <CardShadow className="p-6 flex flex-col space-y-6 w-full">
-                        <div className="flex items-center space-x-3">
-                            <img width="36" height="36" src="/images/icons/ic_bitcoin.png" />
-                            <span className="font-semibold text-xl sm:text-2xl">Bitcoin</span>
-                        </div>
-                        <Button onClick={() => onBuy('bitcoin')} variants="outlined" className="py-3">
-                            {t('home:landing:buy_covered')}
-                        </Button>
-                    </CardShadow>
-                    <CardShadow className="p-6 flex flex-col space-y-6">
-                        <div className="flex items-center space-x-3">
-                            <img width="36" height="36" src="/images/icons/ic_ethereum.png" />
-                            <span className="font-semibold text-xl sm:text-2xl">Ethereum</span>
-                        </div>
-                        <Button onClick={() => onBuy('ethereum')} variants="outlined" className="py-3">
-                            {t('home:landing:buy_covered')}
-                        </Button>
-                    </CardShadow>
-                    <CardShadow className="p-6 flex flex-col space-y-6">
-                        <div className="flex items-center space-x-3">
-                            <img width="36" height="36" src="/images/icons/ic_binance.png" />
-                            <span className="font-semibold text-xl sm:text-2xl">Binance Coin</span>
-                        </div>
-                        <Button onClick={() => onBuy('binance')} variants="outlined" className="py-3">
-                            {t('home:landing:buy_covered')}
-                        </Button>
-                    </CardShadow>
-                </div>
-            )}
-        </>
+        <Swiper
+            pagination={pagination}
+            modules={[Pagination]}
+            className="mySwiper !px-4 !py-6 !-mx-4"
+            slidesPerView={4}
+            breakpoints={{
+                300: {
+                    slidesPerView: 1.2,
+                    spaceBetween: 16,
+                },
+                640: {
+                    slidesPerView: 2.5,
+                    spaceBetween: 16,
+                },
+                820: {
+                    slidesPerView: 3,
+                    spaceBetween: 16,
+                },
+            }}
+            autoplay={{
+                delay: 3000,
+                disableOnInteraction: false,
+            }}
+        >
+            {mount && renderNews()}
+        </Swiper>
     )
 }
 

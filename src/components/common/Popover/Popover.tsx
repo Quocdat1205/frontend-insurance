@@ -18,6 +18,7 @@ const ReactPopover = ({ children, label, className, reference, containerClassNam
                         <Popover.Button type="button" className="inline-flex items-center focus:outline-none w-full" aria-expanded="false">
                             {label}
                         </Popover.Button>
+                        {/* <Popover.Overlay className="fixed inset-0 bg-red opacity-30" /> */}
                         <Transition
                             show={open && visible}
                             as={Fragment}

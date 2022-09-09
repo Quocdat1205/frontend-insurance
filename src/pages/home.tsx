@@ -16,7 +16,7 @@ const Home = ({ news }: any) => {
         <LayoutWeb3>
             <Slogan />
             <section className="pt-20 sm:pt-[7.5rem] px-4 max-w-screen-insurance m-auto">
-                <div className="text-2xl sm:text-5xl font-semibold mb-6">{t('home:home:new_insurance_assets')}</div>
+                <div className="text-2xl sm:text-5xl font-semibold">{t('home:home:new_insurance_assets')}</div>
                 <Assets />
             </section>
             <Banner />

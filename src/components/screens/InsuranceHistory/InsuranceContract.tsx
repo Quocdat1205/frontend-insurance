@@ -17,6 +17,7 @@ import { CalendarIcon } from 'components/common/Svg/SvgIcon'
 import Popover from 'components/common/Popover/Popover'
 import { isMobile as mobile } from 'react-device-detect'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 interface InsuranceContract {
     account: any
@@ -25,6 +26,7 @@ interface InsuranceContract {
 const InsuranceContract = ({ account }: InsuranceContract) => {
     const { t } = useTranslation()
     const { width } = useWindowSize()
+    const router = useRouter()
     const isMobile = width && width <= 640
     const assetsToken = useAppSelector((state: RootStore) => state.setting.assetsToken)
     const [loading, setLoading] = useState<boolean>(true)
@@ -44,8 +46,9 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
         endDate: new Date(''),
         key: 'selection',
     })
-    const [period, setPeriod] = useState('T-Start')
-    const firstTime = useRef(true)
+    const [period, setPeriod] = useState<string>('T-Start')
+    const firstTime = useRef<boolean>(true)
+    const timer = useRef<any>(null)
 
     useEffect(() => {
         if (!mobile && !firstTime.current) setFilter({ ...filter, skip: 0 })
@@ -53,7 +56,14 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
     }, [asset, state, period, date])
 
     useEffect(() => {
-        if (account) getInsurance()
+        clearTimeout(timer.current)
+        if (account) {
+            getInsurance()
+        } else {
+            timer.current = setTimeout(() => {
+                setLoading(false)
+            }, 500)
+        }
     }, [filter, account])
 
     const onChangePage = (page: number) => {
@@ -72,7 +82,7 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
         const mode = to ? period : null
         setLoading(true)
         try {
-            const { data, message } = await fetchApi({
+            const { data } = await fetchApi({
                 url: API_GET_INSURANCE_BY_ADDRESS,
                 options: { method: 'GET' },
                 params: {
@@ -85,15 +95,13 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
                     ...filter,
                 },
             })
-            const dataFiter = !mobile || !filter.skip ? data.insurance : dataSource.insurance.concat(data.insurance)
-            if (dataFiter.length < 10 && mobile) {
-                const _el = document.querySelector('#filter-contract')
-                if (_el) _el.scrollIntoView()
+            if (data) {
+                const dataFiter = !mobile || !filter.skip ? data?.insurance : dataSource.insurance.concat(data?.insurance)
+                setDataSource({
+                    count: data?.count,
+                    insurance: dataFiter,
+                })
             }
-            setDataSource({
-                count: data?.count,
-                insurance: dataFiter,
-            })
         } catch (e) {
             console.log(e)
         } finally {
@@ -307,6 +315,7 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
             Config.connectWallet()
             return
         }
+        router.push('/buy-covered')
     }
 
     const formatOptionLabel = (item: any) => {
@@ -340,6 +349,7 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
                 renderContentStatus={renderContentStatus}
                 onLoadMore={onLoadMore}
                 loading={loading}
+                onBuyInsurance={onBuyInsurance}
             />
         )
 
