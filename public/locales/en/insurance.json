@@ -32,7 +32,9 @@
         "connect_wallet": "Connect wallet",
         "connect_wallet_error": "Please connect your wallet to utilize this feature",
         "quality": "Quantity",
-        "title_change_margin": "and Margin is"
+        "title_change_margin": "and Margin is",
+        "detailed_terminology": "Detailed terminology",
+        "help1": "How to buy Cover"
     },
     "final": {
         "succes": "Successfully purchased Insurance Contract",
@@ -46,6 +48,23 @@
         "input_email": "Enter your email to get notified",
         "label_email": "Enter your email ",
         "hidden_noti": "Do not show again",
-        "confirm_email": "Get Notification"
+        "confirm_email": "Get Notification",
+        "loading": "Please wait a few minutes"
+    },
+    "terminology": {
+        "q_covered": "Quantity (Q) of the covered asset",
+        "p_market": "The current price (P) of the covered asset",
+        "p_claim": "Price (P) activates receiving Q-Claim",
+        "p_expired": "Price (P) triggers the insurance contract to expire",
+        "p_refund": "Price (P) triggers refund the covered",
+        "period": "Period of the insurance contract",
+        "r_claim": "Ratio (R) of Q-Claim to Margin",
+        "q_claim": "Quantity (Q) of insurance payout when reaching P-Claim",
+        "margin": "Margin of insurance contract",
+        "t_start": "Time (T) triggers the start of insurance contract",
+        "t_expired": "Time (T) triggers the expiration of insurance contract"
+    },
+    "error": {
+        "p_claim": "P-Claim invalid"
     }
 }
