@@ -18,7 +18,7 @@ const Statistics = () => {
     const { t } = useTranslation()
 
     useEffect(() => {
-        // if (account) getIndividualContract(30)
+        if (account) getIndividualContract(30)
     }, [account])
 
     const onChangeDay = (_day: number) => {
