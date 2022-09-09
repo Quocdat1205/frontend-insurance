@@ -1,6 +1,8 @@
-import React, { useMemo } from 'react'
-import Select from 'react-select'
+import React, { useMemo, CSSProperties } from 'react'
+import Select, { ClearIndicatorProps } from 'react-select'
 import colors from 'styles/colors'
+import { isMobile } from 'react-device-detect'
+import { X } from 'react-feather'
 
 const customStyles = {
     control: (styles: any, { isDisabled }: any) => ({
@@ -30,6 +32,9 @@ const customStyles = {
     menu: (provided: any, state: any) => ({
         ...provided,
         color: state.selectProps.menuColor,
+        width: '98%',
+        left: '50%',
+        transform: 'translate(-50%, 0)',
     }),
     singleValue: (provided: any, { isDisabled }: any) => ({
         ...provided,
@@ -62,20 +67,45 @@ const customStyles = {
     }),
 }
 
+const ClearIndicator = (props: ClearIndicatorProps<null, true>) => {
+    const {
+        children = <X size={16} />,
+        innerProps: { ref, ...restInnerProps },
+    } = props
+    return (
+        <div className="flex items-center justify-center h-full px-1" ref={ref} {...restInnerProps}>
+            {children}
+        </div>
+    )
+}
+
 interface Selectbox {
     label: string
     options: any[]
     placeholder?: string
     className?: string
     value?: any
-    onChange?: (e: any) => void
+    onChange?: (value: any, item: any) => void
     displayExpr: string
     valueExpr: string
     formatOptionLabel?: any
     labelClassName?: string
+    isClearable?: boolean
 }
 
-const Selectbox = ({ className, label, options, placeholder = label, value, displayExpr, valueExpr, labelClassName, ...props }: Selectbox) => {
+const Selectbox = ({
+    className,
+    label,
+    options,
+    placeholder = label,
+    onChange,
+    value,
+    displayExpr,
+    valueExpr,
+    labelClassName,
+    isClearable = false,
+    ...props
+}: Selectbox) => {
     const item = useMemo(() => {
         if (typeof value === 'string') {
             return options.find((rs: any) => valueExpr && rs[valueExpr] === value)
@@ -83,18 +113,26 @@ const Selectbox = ({ className, label, options, placeholder = label, value, disp
         return value
     }, [value, valueExpr])
 
+    const _onChange = (e: any) => {
+        if (onChange) onChange(e?.[valueExpr], e)
+    }
+
     return (
         <div className={`flex flex-col space-y-2 ${className}`}>
             <div className={`text-sm ${labelClassName}`}>{label}</div>
             <Select
                 {...props}
                 value={item}
+                onChange={_onChange}
                 placeholder={placeholder}
                 styles={customStyles}
                 options={options}
-                className='h-[2.75rem] sm:h-[3rem]'
+                className="h-[2.75rem] sm:h-[3rem]"
                 getOptionLabel={(option: any) => option && displayExpr && option[displayExpr]}
                 getOptionValue={(option: any) => option && valueExpr && option[valueExpr]}
+                maxMenuHeight={isMobile ? 168 : 500}
+                isClearable={isClearable}
+                components={{ ClearIndicator }}
             />
         </div>
     )

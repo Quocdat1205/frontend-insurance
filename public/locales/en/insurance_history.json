@@ -1,6 +1,8 @@
 {
     "my_cover": "My cover",
-    "guidelines": "guidelines",
+    "guidelines": "Guidelines",
+    "tracking_and_utilizing": "Tracking and utilizing my contract",
+    "detailed_terminology": "Detailed terminology",
     "individual_cover": "Individual Cover Stats",
     "qty_of_signed": "Quantity of signed contracts",
     "new_cover_assets": "New cover assets",
@@ -8,5 +10,14 @@
     "connecting_wallet_to_buy": "Connecting wallet to buy Insurance Contract.",
     "status": "Status",
     "choose_status": "Choose Status",
-    "insurance_contract": "Insurance Contract"
+    "insurance_contract": "Insurance Contract",
+    "price_reaching_date": "Price reaching date",
+    "status_2": "Status",
+    "reason": {
+        "p_claim_reached": "P-Claim reached",
+        "q_claim_received": "Q-Claim received",
+        "q_refund_received": "Q-Refund received",
+        "p_expired_reached": "P-Expired reached",
+        "expired": "Expired"
+    }
 }
