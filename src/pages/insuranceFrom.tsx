@@ -46,6 +46,7 @@ export const InsuranceFrom = () => {
     const [res, setRes] = useState<any>()
     const [showDetails, setShowDetails] = useState(false)
     const [unitMoney, setUnitMoney] = useState('USDT')
+    const [showCroll, setShowCroll] = useState(false)
 
     const [userBalance, setUserBalance] = useState<number>(0)
     const [listCoin, setListCoin] = useState<ICoin[]>([])
@@ -131,13 +132,18 @@ export const InsuranceFrom = () => {
 
     const validatePclaim = (value: number) => {
         if (wallet.account) {
+            console.log(value > state.p_market + (2 * state.p_market) / 100 && value < state.p_market + (70 * state.p_market) / 100)
+
             if (value > state.p_market + (2 * state.p_market) / 100 && value < state.p_market + (70 * state.p_market) / 100) {
+                console.log('ok')
+
                 return setClear(true)
-            }
-            if (value > state.p_market - (70 * state.p_market) / 100 && value < state.p_market - (2 * state.p_market) / 100) {
+            } else if (value > state.p_market - (70 * state.p_market) / 100 && value < state.p_market - (2 * state.p_market) / 100) {
+                console.log('ok')
                 return setClear(true)
+            } else {
+                return setClear(false)
             }
-            setClear(false)
         }
     }
 
@@ -408,6 +414,62 @@ export const InsuranceFrom = () => {
                     </div>
                 </div>
             )}
+            {openChangeToken && (
+                <div className="absolute w-full h-full bg-gray/[0.5] z-50 flex flex-col-reverse">
+                    <div className="bg-white h-[50%] w-full flex flex-col z-50">
+                        <div
+                            className="m-[24px] flex flex-row-reverse"
+                            onClick={() => {
+                                setOpenChangeToken(false)
+                            }}
+                        >
+                            <XMark></XMark>
+                        </div>
+                        <div className="m-[24px] font-semibold text-xl">{t('insurance:buy:asset')}</div>
+                        {listCoin &&
+                            listCoin.map((coin, key) => {
+                                let isPress = false
+                                console.log(coin)
+
+                                // @ts-ignore
+                                return !coin.disable ? (
+                                    <div
+                                        id={`${coin.id}`}
+                                        key={key}
+                                        onMouseDown={() => (isPress = true)}
+                                        onMouseUp={() => {
+                                            isPress = false
+                                            setSelectedCoin(coin)
+                                            setState({ ...state, symbol: { ...coin } })
+                                            setOpenChangeToken(false)
+                                        }}
+                                        className={`${
+                                            isPress ? 'bg-[#F2F3F5]' : 'hover:bg-[#F7F8FA]'
+                                        } flex flex-row justify-start w-full items-center p-3 font-medium`}
+                                    >
+                                        <img alt={''} src={`${coin.icon}`} width="36" height="36" className={'mr-[5px]'}></img>
+                                        <div className={'flex flex-row justify-between w-full'}>
+                                            <span className={'hover:cursor-default'}>{coin.name}</span>
+                                            {coin.id === selectCoin.id ? <Check size={18} className={'text-[#EB2B3E]'}></Check> : ''}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <a
+                                        id={`${coin.id}`}
+                                        key={key}
+                                        className={`hover:bg-[#F7F8FA] flex flex-row justify-start w-full items-center p-3 text-[#E5E7E8] font-medium`}
+                                    >
+                                        <img alt={''} src={`${coin.icon}`} width="36" height="36" className={'mr-[5px] grayscale hover:cursor-default'}></img>
+                                        <div className={'flex flex-row justify-between w-full'}>
+                                            <span>{coin.name}</span>
+                                            {coin.id === selectCoin.id ? <Check size={18} className={'text-[#EB2B3E]'}></Check> : ''}
+                                        </div>
+                                    </a>
+                                )
+                            })}
+                    </div>
+                </div>
+            )}
             {
                 // head Insurance
                 !isMobile && (
@@ -432,7 +494,7 @@ export const InsuranceFrom = () => {
                         <Popover className="relative">
                             <Popover.Button
                                 className={
-                                    'border border-[0.5] text-base border-[#F7F8FA] rounded-[6px] h-[40px] w-auto py-[8px] px-[12px] flex flex-row bg-[#F7F8FA] shadow'
+                                    'border border-[0.5] text-base border-[#F7F8FA] rounded-[6px] h-[40px] w-auto py-[8px] px-[12px] flex flex-row bg-[#F7F8FA] shadow focus-visible:outline-none'
                                 }
                                 onClick={() => setDrop(!isDrop)}
                             >
@@ -484,15 +546,21 @@ export const InsuranceFrom = () => {
                 ) : (
                     index == 1 && (
                         <div className={`h-[32px] flex flex-row justify-between w-full items-center mx-[16px] mt-[24px] mb-[16px]`}>
-                            <XMark></XMark>
-                            <div className={`h-[32px] flex flex-row`}>
+                            <div
+                                onClick={() => {
+                                    router.push('/home')
+                                }}
+                            >
+                                <XMark></XMark>
+                            </div>
+                            <div className={`h-[32px] flex flex-row mx-[16px]`}>
                                 <span
                                     className={'text-[#00ABF9] underline hover:cursor-pointer pr-[16px] flex items-center'}
                                     onClick={() => {
                                         router.push('https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/')
                                     }}
                                 >
-                                    {menu[12].name}
+                                    {t('insurance:buy:help_short')}
                                 </span>
                                 <div className="flex items-center">
                                     <Switch
@@ -828,12 +896,14 @@ export const InsuranceFrom = () => {
                                     </span>
                                 </div>
                                 <div className="flex flex-row">
-                                    <span className="pr-[4px]">{t('insurance:buy:quantity')} </span>{' '}
+                                    <span className="pr-[4px]">{t('insurance:buy:quality')} </span>{' '}
                                     <label className={`${state.q_covered == 0 ? 'text-[#B2B7BC]' : 'text-[#EB2B3E]'} max-w-[245] relative ml-[6xp]`}>
                                         {state.q_covered || 'Số tiền?'}
                                         <input
                                             type="number"
-                                            className={` text-white pl-[4px] focus-visible:outline-none w-0 border border-1 border-black`}
+                                            className={` text-white pl-[4px] focus-visible:outline-none w-0 border border-1 border-black ${
+                                                openChangeToken && 'opacity-0'
+                                            } `}
                                             placeholder=""
                                             name="name"
                                             id="name"
@@ -951,7 +1021,7 @@ export const InsuranceFrom = () => {
                                         }}
                                         placeholder={`${menu[9].name}`}
                                     ></Input>
-                                    <div className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px]'}>{unitMoney}</div>
+                                    <div className={'bg-[#F7F8FA] text-[#B2B7BC] w-[10%] shadow-none flex items-center justify-end px-[16px]'}>{unitMoney}</div>
                                 </div>
                             </div>
                         )}
@@ -1008,7 +1078,17 @@ export const InsuranceFrom = () => {
                         <div className={'mt-5 pl-[32px] pr-[32px] pb-[32px] text-sm text-[#808890]'}>
                             <span>Period ({menu[8].name})</span>
                             <Tab.Group>
-                                <Tab.List className={`flex flex-row justify-between mt-[20px]  ${isMobile ? 'overflow-scroll w-full' : 'w-[85%]'}`}>
+                                <Tab.List
+                                    className={`flex flex-row justify-between mt-[20px]  ${isMobile ? 'w-full' : 'w-[85%]'} ${
+                                        showCroll ? 'overflow-scroll' : ' overflow-hidden'
+                                    }`}
+                                    onMouseEnter={() => {
+                                        setShowCroll(true)
+                                    }}
+                                    onMouseLeave={() => {
+                                        setShowCroll(false)
+                                    }}
+                                >
                                     {listTabPeriod.map((item, key) => {
                                         return (
                                             <div
@@ -1168,7 +1248,7 @@ export const InsuranceFrom = () => {
                 <div onClick={() => setDrop(false)}>
                     <div className={'flex justify-center items-center mt-[24px]'}>
                         <CheckCircle></CheckCircle>
-                        <span className={'font-semibold text-[#22313F] px-[4px]'}>
+                        <span className={'text-sm text-[#22313F] px-[4px]'}>
                             {t('insurance:buy:saved')}
                             <span className={'text-[#EB2B3E]'}>1,000 {unitMoney}</span> {t('insurance:buy:sub_saved')}
                         </span>
@@ -1209,7 +1289,7 @@ export const InsuranceFrom = () => {
                             </div>
                         </div>
                     </div>
-                    <div className={`flex flex-col justify-center items-center`}>
+                    <div className={`flex flex-col justify-center items-center mb-[32px]`}>
                         <button
                             className={`${
                                 clear ? 'bg-red text-white border border-red' : 'text-white bg-[#E5E7E8] border border-[#E5E7E8]'
@@ -1223,15 +1303,6 @@ export const InsuranceFrom = () => {
                         >
                             {menu[11].name}
                         </button>
-
-                        <span
-                            className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}
-                            onClick={() => {
-                                router.push('https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/')
-                            }}
-                        >
-                            {menu[12].name}
-                        </span>
                     </div>
                 </div>
             )}
@@ -1247,6 +1318,7 @@ export const InsuranceFrom = () => {
                     handelSetActive={setActive}
                     setNoti={setNameNoti}
                     setRes={setRes}
+                    setIndex={setIndex}
                 ></AcceptBuyInsurance>
             )}
         </LayoutInsurance>
