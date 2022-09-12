@@ -19,7 +19,7 @@
         "accept_buy_sub": "điều khoản địch vụ",
         "notified": "Nhận 100% Margin khi P-Market đạt từ",
         "notified_sub": "vào ngày cuối kỳ hạn.",
-        "price_had_update": "Giá hiện tại đã được cập nhật",
+        "price_had_update": "Giá đã được cập nhật",
         "accept": "Xác nhận",
         "period": "Period",
         "increase_cover": "Gia tăng kỳ hạn và giá trị chi trả bảo hiểm",
@@ -67,6 +67,6 @@
         "t_expired": "Thời gian (T) kết thúc hợp đồng bảo hiểm"
     },
     "error": {
-        "p_claim": "P-Claim không hợp lệ"
+        "p_claim": "Error messenge"
     }
 }

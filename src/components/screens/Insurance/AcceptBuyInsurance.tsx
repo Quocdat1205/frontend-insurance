@@ -9,7 +9,6 @@ import { CheckBoxIcon, CheckCircle, ErrorCircleIcon, StartIcon, XMark } from 'co
 import { buyInsurance } from 'services/buy-insurance'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
-import NotificationInsurance from 'components/layout/notifucationInsurance'
 import { useRouter } from 'next/router'
 
 export type IProps = {
@@ -269,7 +268,7 @@ export const AcceptBuyInsurance = ({
                                 <div className="text-[#EB2B3E] bg-[#F7F8FA] rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
                                     <div className={'flex flex-row py-[14px]'}>
                                         <span className="mr-[6px]">
-                                            <ErrorCircleIcon />
+                                            <ErrorCircleIcon size={24} />
                                         </span>
                                         <span className=""> {t('insurance:buy:price_had_update')}</span>
                                     </div>
@@ -326,7 +325,7 @@ export const AcceptBuyInsurance = ({
                                                     console.log(e)
                                                 }}
                                             />
-                                            <label htmlFor="test1" className="select-none text-[#22313F]">
+                                            <label htmlFor="test1" className="select-none font-semibold text-base text-[#22313F]">
                                                 {t('insurance:buy:upgrade')}
                                             </label>
                                         </div>
@@ -443,7 +442,7 @@ export const AcceptBuyInsurance = ({
                         <div className="text-[#B2B7BC] text-xs py-[16px]">
                             *{t('insurance:buy:notified')} 10,000$ - 12,000$ {t('insurance:buy:notified_sub')}
                         </div>
-                        {!isUpdated && (
+                        {!isUpdated ? (
                             <div className="text-[#EB2B3E] bg-[#F7F8FA] rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
                                 <div className={'flex flex-row items-center py-[14px]'}>
                                     <span className="">
@@ -454,7 +453,7 @@ export const AcceptBuyInsurance = ({
                                 <div>
                                     <Button
                                         variants="outlined"
-                                        className="py-[8px] px-[24px] rounded-[8px] text-xs"
+                                        className={`py-[8px] rounded-[8px] px-[24px] text-xs tiny:px-[24px]`}
                                         onClick={() => {
                                             getPrice(state.symbol.symbol, state, setState)
                                             setUpdated(true)
@@ -466,19 +465,25 @@ export const AcceptBuyInsurance = ({
                                     </Button>
                                 </div>
                             </div>
+                        ) : (
+                            <div className="text-[#52CC74] bg-[#F7F8FA] rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
+                                <div className={'flex flex-row items-center py-[14px]'}>
+                                    <span className="">
+                                        <CheckCircle />
+                                    </span>
+                                    <span className="text-sm"> {t('insurance:buy:price_had_update')}</span>
+                                </div>
+                            </div>
                         )}
 
                         <div
                             className="rounded-[12px] p-[24px] flex flex-row items-center border-[#F7F8FA] border-1 relative"
                             style={{ boxShadow: '0px 6px 18px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
                         >
-                            <div
-                                className={'rounded-[99999px] mr-[24px] w-max h-max'}
-                                style={{ background: 'linear-gradient(180deg, #FFFFFF -56.68%, #E6E6E6 100%)' }}
-                            >
-                                <img src={'/images/logo.png'} width={68} height={68} className="py-[12px] px-[17px] w-[68px] h-[68px]" />
+                            <div className={'rounded-full min-w-max h-auto'} style={{ background: 'linear-gradient(180deg, #FFFFFF -56.68%, #E6E6E6 100%)' }}>
+                                <img src={'/images/logo.png'} className="flex items-center content-center py-[11px] px-[19px] w-auto h-[68px]" />
                             </div>
-                            <div className="flex flex-col select-none">
+                            <div className="flex flex-col w-full select-none ml-[24px]">
                                 <div>
                                     <div className="flex items-center mr-4 py-[8px] ">
                                         <input
@@ -517,9 +522,11 @@ export const AcceptBuyInsurance = ({
                                         background: 'linear-gradient(88.09deg, #CE0014 0.48%, #E92828 52.94%, #FF5F6D 114.93%)',
                                         borderRadius: '0px 0px 600px 600px',
                                     }}
-                                    className={'absolute top-0 right-[24px] w-[48px] h-[48px] flex justify-center items-center'}
+                                    className={`${
+                                        !isMobile ? 'w-[48px] h-[48px]' : 'w-[24px] h-[24px]'
+                                    } absolute top-0 right-[24px]  flex justify-center items-center`}
                                 >
-                                    <StartIcon />
+                                    <StartIcon size={!isMobile ? 36 : 24} />
                                 </div>
                             </div>
                         </div>
@@ -528,16 +535,27 @@ export const AcceptBuyInsurance = ({
             </div>
 
             <div className={'flex flex-col justify-center items-center mt-[89px] mx-[24px]'}>
-                <span className="text-center pb-[16px] text-sx">
-                    {t('insurance:buy:Term_of_Service')}{' '}
-                    <span
-                        className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}
-                        onClick={() => {
-                            router.push('https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/')
-                        }}
-                    >
-                        {t('insurance:buy:Term_of_Service_sub')}
-                    </span>
+                <span className="text-center pb-[16px] text-xs">
+                    {t('insurance:buy:Term_of_Service')}
+                    <div>
+                        <span
+                            className={`${language == 'en' ? '' : 'hidden'}`}
+                            onClick={() => {
+                                router.push('https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/')
+                            }}
+                        >
+                            {t('insurance:buy:Term_of_Service_of')}
+                        </span>
+                        <span
+                            className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}
+                            onClick={() => {
+                                router.push('https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/')
+                            }}
+                        >
+                            {t('insurance:buy:Term_of_Service_sub')}
+                        </span>
+                        <span className={`${language == 'vi' ? '' : 'hidden'}`}>{t('insurance:buy:Term_of_Service_of')}</span>
+                    </div>
                 </span>
                 <Button
                     variants={'primary'}

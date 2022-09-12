@@ -106,6 +106,7 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
         chart = am4core.create('chartdiv', am4charts.XYChart)
 
         if (chart) {
+            chart.responsive.enabled = true
             chart.data = test_data
             chart.logo.appeared = false
             chart.padding(0, 15, 0, 15)
@@ -143,10 +144,7 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
             series.interpolationDuration = 500
             series.defaultState.transitionDuration = 0
             series.tensionX = 0.8
-
-            chart.events.on('datavalidated', function () {
-                dateAxis.zoom({ start: 1 / 15, end: 1.2 }, false, true)
-            })
+            series.focusable = true
 
             //chart sub
             let subSeries = chart.series.push(new am4charts.LineSeries())
@@ -240,14 +238,22 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                 claimLabel.label.dx = 20
                 claimLabel.label.verticalCenter = 'middle'
                 claimLabel.label.fill = am4core.color('#EB2B3E')
+
                 claimLabel.label.html = `<div class="hover:cursor-pointer" style="color: ${
                     p_claim < state.p_market ? '#EB2B3E' : '#52CC74'
-                } ; border-radius: 800px; padding: 4px 16px; background-color: ${p_claim < state.p_market ? '#FFF1F2' : '#F1FFF5'}  ">P-Claim ${p_claim}</div>`
+                } ; border-radius: 800px; padding: 4px 16px; background-color: ${p_claim < state.p_market ? '#FFF1F2' : '#F1FFF5'}  ">P-Claim ${p_claim} ${
+                    p_claim > state.p_market
+                        ? `${(((p_claim - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                        : `${(((p_claim - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                }</div>`
                 claimLabel.id = 'g2'
 
                 //label claim
                 claimLabel.label.draggable = true
                 let interract = am4core.getInteraction()
+                // claimLabel.events.on('positionchanged', (e: any) => {
+                //     console.log(e.target)
+                // })
                 claimLabel.events.once('drag', (event: any) => {
                     interract.events.once('up', (e) => {
                         let point = am4core.utils.documentPointToSprite(e.pointer.point, chart.seriesContainer)

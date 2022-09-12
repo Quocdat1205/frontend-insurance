@@ -53,7 +53,7 @@ const commonColors = {
     },
     pink: {
         pink: '#FFF1F2',
-        1: '#FFF5F6'
+        1: '#FFF5F6',
     },
     gray: {
         gray: '#B2B7BC',
@@ -224,6 +224,7 @@ module.exports = {
                 insurance: '1280px',
                 layout: '1360px',
                 mb: '820px',
+                tiny: '355px',
             },
             spacing: {
                 128: '32rem',
