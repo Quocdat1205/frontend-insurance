@@ -9,9 +9,9 @@ interface ReactPopover {
     containerClassName?: string
     visible?: boolean
 }
-const ReactPopover = ({ children, label, className, reference, containerClassName, visible = true }: ReactPopover) => {
+const ReactPopover = ({ children, label, className, reference, containerClassName = '', visible = true }: ReactPopover) => {
     return (
-        <Popover ref={reference} className={`relative w-full ${containerClassName}`}>
+        <Popover ref={reference} className={`relative ${containerClassName}`}>
             {({ open, close }) => {
                 return (
                     <>

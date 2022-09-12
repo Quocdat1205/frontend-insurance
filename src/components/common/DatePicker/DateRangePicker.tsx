@@ -10,7 +10,7 @@ import 'react-date-range/dist/styles.css' // main css file
 import 'react-date-range/dist/theme/default.css' // theme css file
 import { formatTime } from 'utils/utils'
 import Button from 'components/common/Button/Button'
-import { Popover, Transition } from '@headlessui/react'
+import { Transition } from '@headlessui/react'
 import useOutsideAlerter from 'hooks/useOutsideAlerter'
 
 interface ReactDateRangePicker {
@@ -109,7 +109,7 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
         <div className={`flex flex-col space-y-2 ${className}`}>
             <div className="text-sm">{label}</div>
             <div ref={wrapperRef} className="date-range-picker relative px-4 rounded-[3px]">
-                <div onClick={() => onAction('open')} className="flex items-center w-full space-x-2">
+                <div onClick={() => onAction('open')} className="flex items-center w-full space-x-2 relative">
                     <div className="w-full h-full flex items-center">
                         <span>
                             {prefix} {value?.startDate ? formatTime(value?.startDate, dateFormat) + ' - ' + formatTime(value?.endDate, dateFormat) : ''}
@@ -127,70 +127,43 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
                         </div>
                     )}
                 </div>
-                <Popover className="absolute w-full">
-                    {({ open, close }) => {
-                        return (
-                            <>
-                                {/* <Popover.Button
-                                    onClick={() => setShowPicker(!open)}
-                                    className="inline-flex items-center focus:outline-none w-full space-x-2"
-                                    aria-expanded="false"
-                                >
-                                    <div className="w-full h-full flex items-center">
-                                        <span>
-                                            {prefix}{' '}
-                                            {value?.startDate ? formatTime(value?.startDate, dateFormat) + ' - ' + formatTime(value?.endDate, dateFormat) : ''}
-                                        </span>
-                                    </div>
-                                    {isClearable && <X size={20} onClick={() => onAction('clear')} />}
-
-                                    {showIcon && (
-                                        <div className="cursor-pointer">
-                                            <CalendarIcon />
-                                        </div>
-                                    )}
-                                </Popover.Button> */}
-                                <Transition
-                                    show={showPicker}
-                                    as={Fragment}
-                                    enter="transition ease-out duration-200"
-                                    enterFrom="opacity-0 translate-y-1"
-                                    enterTo="opacity-100 translate-y-0"
-                                    leave="transition ease-in duration-150"
-                                    leaveFrom="opacity-100 translate-y-0"
-                                    leaveTo="opacity-0 translate-y-1"
-                                >
-                                    <Popover.Panel static className={`${className} right-0 absolute z-10 mt-[2rem] bg-white`}>
-                                        <div className="rounded-xl shadow-subMenu overflow-hidden">
-                                            {renderContent && renderContent()}
-                                            <DateRangePicker
-                                                className="relative"
-                                                ranges={[date]}
-                                                months={2}
-                                                onChange={_onChange}
-                                                moveRangeOnFirstSelection={false}
-                                                direction="horizontal"
-                                                locale={language === 'vi' ? vi : en}
-                                                staticRanges={[]}
-                                                inputRanges={[]}
-                                                weekStartsOn={0}
-                                                rangeColors={[colors.red.red]}
-                                                editableDateInputs={true}
-                                                retainEndDateOnFirstSelection
-                                                navigatorRenderer={navigatorRenderer}
-                                            />
-                                            <div className="mx-6 mt-3 mb-8">
-                                                <Button onClick={() => onConfirm(close)} variants="primary" className="w-full text-sm h-[3rem]">
-                                                    {t('common:confirm')}
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </Popover.Panel>
-                                </Transition>
-                            </>
-                        )
-                    }}
-                </Popover>
+                <Transition
+                    show={showPicker}
+                    as={Fragment}
+                    enter="transition ease-out duration-200"
+                    enterFrom="opacity-0 translate-y-1"
+                    enterTo="opacity-100 translate-y-0"
+                    leave="transition ease-in duration-150"
+                    leaveFrom="opacity-100 translate-y-0"
+                    leaveTo="opacity-0 translate-y-1"
+                >
+                    <div className={`${className} right-0 absolute z-10 top-[3.5rem] bg-white`}>
+                        <div className="rounded-xl shadow-subMenu overflow-hidden">
+                            {renderContent && renderContent()}
+                            <DateRangePicker
+                                className="relative"
+                                ranges={[date]}
+                                months={2}
+                                onChange={_onChange}
+                                moveRangeOnFirstSelection={false}
+                                direction="horizontal"
+                                locale={language === 'vi' ? vi : en}
+                                staticRanges={[]}
+                                inputRanges={[]}
+                                weekStartsOn={0}
+                                rangeColors={[colors.red.red]}
+                                editableDateInputs={true}
+                                retainEndDateOnFirstSelection
+                                navigatorRenderer={navigatorRenderer}
+                            />
+                            <div className="mx-6 mt-3 mb-8">
+                                <Button onClick={() => onConfirm(close)} variants="primary" className="w-full text-sm h-[3rem]">
+                                    {t('common:confirm')}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </Transition>
             </div>
         </div>
     )

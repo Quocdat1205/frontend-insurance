@@ -47,16 +47,17 @@ const Header = () => {
                     {!isMobile && <Menu data={Config.homeMenu} onChange={onChangeMenu} />}
                     {!loading_account && (
                         <div className="flex items-center space-x-5 sm:space-x-6 cursor-pointer">
+                            {network && !isMobile && <Notifications />}
                             {account && network && (
                                 <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
                                     <img src={network.icon} width={24} height={24} />
                                     <div>{network.chain}</div>
-                                    <div className="rounded-[5px] bg-white overflow-hidden px-4 py-1">
+                                    <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1">
                                         {account.substr(0, isMobile ? 2 : 4) + '...' + account.substr(-4)}
                                     </div>
                                 </div>
                             )}
-                            {network && <Notifications />}
+                            {network && isMobile && <Notifications />}
                             {!isMobile && <ButtonLanguage />}
                             {!account && (
                                 <Button onClick={onConnect} className="font-semibold px-4 py-2 space-x-2">
@@ -78,11 +79,13 @@ const Header = () => {
                         <div className="mb-8">
                             <Menu data={Config.homeMenu} onChange={onChangeMenu} />
                         </div>
-                        <div className="mx-4">
-                            <Button onClick={onConnect} className="w-full font-semibold py-[0.875rem] leading-5 space-x-2">
-                                {t('home:home:connect_wallet')}
-                            </Button>
-                        </div>
+                        {!network && (
+                            <div className="mx-4">
+                                <Button onClick={onConnect} className="w-full font-semibold py-[0.875rem] leading-5 space-x-2">
+                                    {t('home:home:connect_wallet')}
+                                </Button>
+                            </div>
+                        )}
                     </div>
                     <ButtonLanguage className="mx-4" mobile />
                 </Drawer>

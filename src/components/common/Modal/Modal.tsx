@@ -15,9 +15,20 @@ interface Modal {
     portalId?: string
     isMobile?: boolean
     customHeader?: () => void
+    wrapClassName?: string
 }
 
-const Modal = ({ isVisible, portalId = PORTAL_MODAL_ID, children, containerClassName = '', className = '', onBackdropCb, isMobile, customHeader }: Modal) => {
+const Modal = ({
+    isVisible,
+    portalId = PORTAL_MODAL_ID,
+    children,
+    containerClassName = '',
+    className = '',
+    onBackdropCb,
+    isMobile,
+    customHeader,
+    wrapClassName = '',
+}: Modal) => {
     const wrapperRef = useRef<any>(null)
     const container = useRef<any>(null)
     const [loading, setLoading] = useState<boolean>(false)
@@ -64,7 +75,7 @@ const Modal = ({ isVisible, portalId = PORTAL_MODAL_ID, children, containerClass
                 {loading && (
                     <div ref={wrapperRef} className={`${className} h-max w-full absolute bg-white`}>
                         {isMobile ? (
-                            <div className="py-8 px-6">
+                            <div className={`py-8 px-6 ${wrapClassName}`}>
                                 <>
                                     {customHeader ? (
                                         customHeader()

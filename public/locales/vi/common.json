@@ -23,5 +23,7 @@
     "reason": "Nguyên nhân",
     "load_more": "Xem thêm",
     "filter_by": "Lọc kết quả theo",
-    "undo": "Hoàn tác"
+    "undo": "Hoàn tác",
+    "notification": "Thông báo",
+    "notice_message": "Hợp đồng bảo hiểm mã <span class='text-red'>{{id}}</span> đã kết thúc khi <span class='text-txtSecondary'>{{date}}</span>"
 }
