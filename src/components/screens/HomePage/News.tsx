@@ -76,7 +76,7 @@ const News = ({ news = [] }: any) => {
     }, [])
 
     const restProps = {
-        isMobile,
+        $isMobile: isMobile,
     }
     return (
         <section className="pt-20 sm:pt-[7.5rem] max-w-screen-insurance m-auto">
@@ -113,9 +113,13 @@ const News = ({ news = [] }: any) => {
     )
 }
 
-const StyledNews = styled(Swiper)<{isMobile: boolean}>`
+interface StyledNewsProps {
+    $isMobile?: boolean
+}
+
+const StyledNews = styled(Swiper)<StyledNewsProps>`
     & > .swiper-pagination {
-        display: ${(props) => (props.isMobile ? 'none' : '')};
+        display: ${({$isMobile}) => ($isMobile ? 'none' : '')};
     }
 `
 

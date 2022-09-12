@@ -1,4 +1,3 @@
-import { color } from '@amcharts/amcharts4/core'
 import colors from 'styles/colors'
 
 export const RightArrow = ({ size = 16, color = 'white' }: any) => {
@@ -134,6 +133,14 @@ export const CalendarIcon = ({ size = 20, color = '#22313F' }: any) => {
                 d="M2.49902 4.99984V6.6665V16.6665C2.49902 17.5857 3.24652 18.3332 4.16569 18.3332H15.8324C16.7515 18.3332 17.499 17.5857 17.499 16.6665V6.6665V4.99984C17.499 4.08067 16.7515 3.33317 15.8324 3.33317H14.1657V1.6665H12.499V3.33317H7.49902V1.6665H5.83236V3.33317H4.16569C3.24652 3.33317 2.49902 4.08067 2.49902 4.99984ZM15.834 16.6665H4.16569V6.6665H15.8324L15.834 16.6665Z"
                 fill={color}
             />
+        </svg>
+    )
+}
+
+export const FilterIcon = ({ size = 24, color = '#22313F' }: any) => {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill={color} d="M10 18H14V16H10V18ZM3 6V8H21V6H3ZM6 13H18V11H6V13Z" />
         </svg>
     )
 }
