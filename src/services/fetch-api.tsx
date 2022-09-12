@@ -21,7 +21,7 @@ const fetchApi = async ({ url, options, params, cancelToken, timeout }: any = ma
         }
 
         const opts = merge(defaultOptions, options)
-        if (opts && opts.method === 'GET') {
+        if (opts && (opts.method === 'GET' || opts.method === 'PUT')) {
             opts.params = params
         } else {
             opts.data = params

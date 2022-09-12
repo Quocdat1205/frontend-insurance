@@ -6,10 +6,11 @@ import useOutsideAlerter from 'hooks/useOutsideAlerter'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import { useTranslation } from 'next-i18next'
 import React, { Fragment, useEffect, useRef, useState } from 'react'
-import { API_CHECK_NOTICE, API_GET_NOTICE } from 'services/apis'
+import { API_CHECK_NOTICE, API_GET_NOTICE, API_UPDATE_NOTICE } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { getTimeAgo } from 'utils/utils'
 import { isMobile } from 'react-device-detect'
+import { renderContentStatus } from 'components/screens/InsuranceHistory/InsuranceContract'
 import { X } from 'react-feather'
 
 const Notifications = () => {
@@ -19,6 +20,8 @@ const Notifications = () => {
     const [loading, setLoading] = useState<boolean>(true)
     const wrapperRef = useRef<any>(null)
     const [hasNotice, setHasNotice] = useState<boolean>(false)
+    const [showNotiDetail, setShowNotiDetail] = useState<boolean>(false)
+    const rowData = useRef(null)
     const filter = useRef({
         skip: 0,
         limit: 10,
@@ -64,6 +67,21 @@ const Notifications = () => {
         }
     }
 
+    const updateNotice = async (id: number) => {
+        try {
+            await fetchApi({
+                url: API_UPDATE_NOTICE,
+                options: { method: 'PUT' },
+                params: {
+                    _id: id,
+                },
+            })
+        } catch (e) {
+            console.log(e)
+        } finally {
+        }
+    }
+
     const getNotice = async () => {
         setLoading(true)
         try {
@@ -103,13 +121,19 @@ const Notifications = () => {
         ))
     }
 
+    const onShowDetail = (item: any) => {
+        if (!item?.isConfirm) updateNotice(item?._id)
+        rowData.current = item
+        setShowNotiDetail(true)
+        setVisible(false)
+    }
+
     const renderNoti = () => {
         return loading
             ? loader()
             : dataSource.list_notice?.map((item: any, index: number) => {
-                  const _expire = Number(item?.expired) * 1000
                   return (
-                      <div key={index} className="flex items-center sm:px-6 py-4 space-x-4 mb:hover:bg-hover">
+                      <div onClick={() => onShowDetail(item)} key={index} className="flex items-center sm:px-6 py-4 space-x-4 mb:hover:bg-hover">
                           <div className="min-w-[40px] min-h-[40px]">
                               <img src={`/images/icons/${item?.isConfirm ? 'ic_noti_active' : 'ic_noti_inactive'}.png`} width="40" height="40" />
                           </div>
@@ -132,9 +156,9 @@ const Notifications = () => {
     }
 
     return (
-        <div className="relative">
-            <NotiDetailModal />
-            <div onClick={() => setVisible(true)} ref={wrapperRef} className="sm:p-2 hover:bg-hover rounded-[3px] relative">
+        <div ref={wrapperRef} className="relative">
+            <NotiDetailModal data={rowData.current} visible={showNotiDetail} onClose={() => setShowNotiDetail(false)} t={t} />
+            <div onClick={() => setVisible(true)} className="sm:p-2 hover:bg-hover rounded-[3px] relative">
                 <NotificationsIcon />
                 {hasNotice && <div className="bg-red w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[50%] absolute top-[30%] right-[20%] sm:right-[30%]" />}
             </div>
@@ -175,17 +199,15 @@ const Notifications = () => {
     )
 }
 
-const NotiDetailModal = ({ visible, onClose }: any) => {
+const NotiDetailModal = ({ visible, onClose, data, t }: any) => {
     return (
         <Modal
             isMobile
-            containerClassName="flex-col justify-end !bg-transparent"
-            className="h-[calc(100%-4rem)]"
-            wrapClassName="!px-4 !py-8"
             isVisible={visible}
             onBackdropCb={onClose}
+            className="rounded-xl bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         >
-            <div className="overflow-hidden relative flex flex-col space-y-2">{}</div>
+            <div className="overflow-hidden relative sm:-m-6"> {renderContentStatus(data, t)}</div>
         </Modal>
     )
 }

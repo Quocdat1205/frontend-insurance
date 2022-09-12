@@ -27,7 +27,7 @@ interface InsuranceContractMobile {
     period: string
     setPeriod: (e: string) => void
     formatOptionLabel: (e: any) => void
-    renderContentStatus: (e: any) => void
+    renderContentStatus: (e: any, t: any) => void
     onLoadMore: () => void
     loading?: boolean
     onBuyInsurance: () => void
@@ -61,7 +61,13 @@ const InsuranceContractMobile = ({
 
     return (
         <div id="filter-contract" className="bg-hover -mx-4 px-4 sm:px-0 sm:mx-0 pb-8 pt-4">
-            <StatusModal data={rowData.current} visible={showStatusModal} onClose={() => setShowStatusModal(false)} renderContentStatus={renderContentStatus} />
+            <StatusModal
+                data={rowData.current}
+                visible={showStatusModal}
+                onClose={() => setShowStatusModal(false)}
+                renderContentStatus={renderContentStatus}
+                t={t}
+            />
             <div className="flex items-center justify-between sticky top-[calc(4rem-1px)] bg-hover py-4">
                 <div className="font-semibold">{t('insurance_history:insurance_contract')}</div>
                 <div onClick={() => setShowFilter(true)} className="cursor-pointer">
@@ -97,7 +103,7 @@ const InsuranceContractMobile = ({
                                         </div>
                                     </div>
 
-                                    <div onClick={() => onShowStatusModal(item)}> {renderStatus(item)}</div>
+                                    <div onClick={() => onShowStatusModal(item)}> {renderStatus(item, t)}</div>
                                 </div>
                                 <div className="flex items-center justify-center space-x-2 bg-pink-1 rounded-md">
                                     <AlarmIcon />
@@ -161,11 +167,11 @@ const BgDashed = styled.div.attrs({
     background-image: ${({ stroke = 2 }) =>
         `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='12' ry='12' stroke='%23E5E7E8' stroke-width='${stroke}' stroke-dasharray='4 %2c 6' stroke-dashoffset='0' stroke-linecap='round'/%3e%3c/svg%3e")`};
 `
-const StatusModal = ({ visible, onClose, renderContentStatus, data }: any) => {
+const StatusModal = ({ visible, onClose, renderContentStatus, data, t }: any) => {
     if (!data) return null
     return (
         <Modal isMobile containerClassName="flex-col justify-end" isVisible={visible} onBackdropCb={onClose}>
-            {renderContentStatus(data)}
+            {renderContentStatus(data, t)}
         </Modal>
     )
 }

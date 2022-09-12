@@ -17,7 +17,7 @@ const InsuranceHistory = () => {
 
     return (
         <>
-            {showTerminologyModal && <TerminologyModal visible={showTerminologyModal} onClose={() => setShowTerminologyModal(false)} t={t} />}
+            <TerminologyModal visible={showTerminologyModal} onClose={() => setShowTerminologyModal(false)} t={t} />
             <GuidelineModal visible={showGuideModal} onClose={() => setShowGuideModal(false)} t={t} />
             <div className="px-4 sm:px-10 pt-12 sm:pt-[4.25rem] max-w-screen-layout m-auto">
                 <div className="flex items-center justify-between">
