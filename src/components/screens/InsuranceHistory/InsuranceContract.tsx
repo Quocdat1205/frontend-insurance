@@ -138,6 +138,7 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
         let bg = 'bg-gradient-blue text-blue-5'
         switch (state) {
             case stateInsurance.EXPIRED:
+            case stateInsurance.LIQUIDATED:
                 bg = 'bg-gradient-gray text-gray'
                 break
             case stateInsurance.CLAIM_WAITING:

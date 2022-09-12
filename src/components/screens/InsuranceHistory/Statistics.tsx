@@ -33,7 +33,7 @@ const Statistics = () => {
             const { data } = await fetchApi({
                 url: API_GET_INDIVIDUAL_CONTRACT,
                 options: { method: 'GET' },
-                params: { owner: account, date: 3 },
+                params: { owner: account, date: _day },
             })
             setDataSource(data)
         } catch (e) {

@@ -6,7 +6,8 @@
         "claim_waiting": "Claim waiting",
         "expired": "Expired",
         "claimed": "Claimed",
-        "refunded": "Refunded"
+        "refunded": "Refunded",
+        "liquidated": "Liquidated"
     },
     "header": {
         "home": "Home",
@@ -26,6 +27,15 @@
     "load_more": "Load More",
     "filter_by": "Filter By",
     "undo": "Undo",
-    "notification": "Notification",
-    "notice_message": "Hợp đồng bảo hiểm mã <span class='text-red'>{{id}}</span> đã kết thúc khi <span class='text-txtSecondary'>{{date}}</span>"
+    "notification": {
+        "notification": "Notification",
+        "notice_message": "Insurance contract <span class='text-red'>{{id}}</span> {{status}}",
+        "status": {
+            "expired": "Expired",
+            "claimed": "Received Q-Claim succesfully",
+            "refunded": "Is refunded Margin",
+            "liquidated": "Is liquidated",
+            "claim_waiting": "Claim waiting"
+        }
+    }
 }
