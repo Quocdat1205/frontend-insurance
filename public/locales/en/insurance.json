@@ -8,6 +8,7 @@
         "change_margin": "Customize Margin",
         "covered_history": "Cover History",
         "help": "How to get covered",
+        "help_short": "Guide",
         "quality_and_type": "Q-Covered",
         "continue": "Continue",
         "saved": "Save",
@@ -34,7 +35,8 @@
         "quality": "Quantity",
         "title_change_margin": "and Margin is",
         "detailed_terminology": "Detailed terminology",
-        "help1": "How to buy Cover"
+        "help1": "How to buy Cover",
+        "asset": "Asset"
     },
     "final": {
         "succes": "Successfully purchased Insurance Contract",

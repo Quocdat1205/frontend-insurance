@@ -8,6 +8,7 @@
         "change_margin": "Tùy chỉnh Margin",
         "insurance_history": "Lịch sử bảo hiểm",
         "help": "Hướng dẫn mua bảo hiểm",
+        "help_short": "Hướng dẫn",
         "quality_and_type": "Q-Covered",
         "continue": "Tiếp tục",
         "saved": "Tiết kiệm",
@@ -34,7 +35,8 @@
         "quality": "Số lượng",
         "title_change_margin": "và Margin là",
         "detailed_terminology": "Thuật ngữ chi tiết",
-        "help1": "Cách mua bảo hiểm"
+        "help1": "Cách mua bảo hiểm",
+        "asset": "Loại tài sản"
     },
     "final": {
         "succes": "Mua bảo hiểm thành công",

@@ -5,7 +5,7 @@ import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatPriceToWeiValue } from 'utils/format'
-import { CheckBoxIcon, CheckCircle, ErrorCircleIcon, StartIcon } from 'components/common/Svg/SvgIcon'
+import { CheckBoxIcon, CheckCircle, ErrorCircleIcon, StartIcon, XMark } from 'components/common/Svg/SvgIcon'
 import { buyInsurance } from 'services/buy-insurance'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
@@ -22,6 +22,7 @@ export type IProps = {
     setNoti: any
     handelSetActive: any
     setRes: any
+    setIndex: any
 }
 
 export type IBuyInsurance = {
@@ -34,7 +35,18 @@ export type IBuyInsurance = {
     _expire: any
 }
 
-export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setCheckUpgrade, getPrice, setNoti, handelSetActive, setRes }: Partial<IProps>) => {
+export const AcceptBuyInsurance = ({
+    state,
+    setState,
+    menu,
+    checkUpgrade,
+    setCheckUpgrade,
+    getPrice,
+    setNoti,
+    handelSetActive,
+    setRes,
+    setIndex,
+}: Partial<IProps>) => {
     const {
         t,
         i18n: { language },
@@ -48,10 +60,16 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
         fetch()
     }, [])
 
-    const fetch = async () => {
-        const e = await wallet.contractCaller.insuranceContract.contract.filters.EBuyInsurance()
+    console.log(wallet)
 
-        const filter = await wallet.contractCaller.insuranceContract.contract.queryFilter(e, 22658137, 22658137 + 1000)
+    const fetch = async () => {
+        try {
+            const e = await wallet.contractCaller.insuranceContract.contract.filters.EBuyInsurance()
+
+            const filter = await wallet.contractCaller.insuranceContract.contract.queryFilter(e, 22658137, 22658137 + 1000)
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     const [isUpdated, setUpdated] = useState<boolean>(false)
@@ -211,7 +229,7 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                                 <div className={'font-semibold'}>
                                     <span className={`${checkUpgrade ? 'line-through text-[#808890] text-xs pr-[8px]' : 'pr-[8px]'}`}>{state.r_claim} %</span>
                                     <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>
-                                        {(state.q_claim + (state.q_claim * 5) / 100) / state.margin} %
+                                        {((state.q_claim + (state.q_claim * 5) / 100) / state.margin).toFixed(2)} %
                                     </span>
                                 </div>
                             </div>
@@ -220,7 +238,7 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                                 <div className={'font-semibold '}>
                                     <span className={`${checkUpgrade ? 'line-through text-[#808890] pr-[8px] text-xs' : 'pr-[8px]'}`}>{state.q_claim}</span>{' '}
                                     <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
-                                        {state.q_claim + (state.q_claim * 5) / 100}
+                                        {(state.q_claim + (state.q_claim * 5) / 100).toFixed(2)}
                                     </span>{' '}
                                     <span className={'text-[#EB2B3E]'}>USDT</span>
                                 </div>
@@ -362,15 +380,22 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
         </>
     ) : (
         <div className="relative">
-            {/* <NotificationInsurance id="" name={'success'} state={state} active={active} setActive={setActive} isMobile={true} /> */}
             <div className="relative flex flex-col w-full">
+                <div
+                    className="mt-[32px] mx-[24px] flex flex-row-reverse"
+                    onClick={() => {
+                        setIndex(1)
+                    }}
+                >
+                    <XMark></XMark>
+                </div>
                 <div className="relative bg-white w-full mx-[24px]" style={{ borderRadius: '5px 5px 0 0' }}>
-                    <div className={'flex flex-col w-[100%] mt-[24px] items-center'}>
+                    <div className={'flex flex-col w-[100%] mt-[24px] '}>
                         <div className={'font-semibold text-xl'}>
                             <span>{t('insurance:buy:info_covered')}</span>
                         </div>
                         <div className="flex flex-row">
-                            <span className={'font-semibold text-[#22313F]'}>
+                            <span className={'text-sm text-[#22313F]'}>
                                 {`${t('insurance:buy:saved')} `}
                                 <span className={'text-[#EB2B3E] px-[4px]'}>1,000 USDT</span> {t('insurance:buy:sub_saved')}
                             </span>
@@ -420,16 +445,16 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                         </div>
                         {!isUpdated && (
                             <div className="text-[#EB2B3E] bg-[#F7F8FA] rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
-                                <div className={'flex flex-row py-[14px]'}>
+                                <div className={'flex flex-row items-center py-[14px]'}>
                                     <span className="">
-                                        <ErrorCircleIcon />
+                                        <ErrorCircleIcon size={16} />
                                     </span>
-                                    <span className=""> {t('insurance:buy:price_had_update')}</span>
+                                    <span className="text-sm"> {t('insurance:buy:price_had_update')}</span>
                                 </div>
                                 <div>
                                     <Button
                                         variants="outlined"
-                                        className="py-[8px] px-[24px] rounded-[8px]"
+                                        className="py-[8px] px-[24px] rounded-[8px] text-xs"
                                         onClick={() => {
                                             getPrice(state.symbol.symbol, state, setState)
                                             setUpdated(true)
@@ -447,8 +472,11 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                             className="rounded-[12px] p-[24px] flex flex-row items-center border-[#F7F8FA] border-1 relative"
                             style={{ boxShadow: '0px 6px 18px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
                         >
-                            <div className={'rounded-[99999px] mr-[24px]'} style={{ background: 'linear-gradient(180deg, #FFFFFF -56.68%, #E6E6E6 100%)' }}>
-                                <img src={'/images/logo.png'} className="py-[12px] px-[17px]" />
+                            <div
+                                className={'rounded-[99999px] mr-[24px] w-max h-max'}
+                                style={{ background: 'linear-gradient(180deg, #FFFFFF -56.68%, #E6E6E6 100%)' }}
+                            >
+                                <img src={'/images/logo.png'} width={68} height={68} className="py-[12px] px-[17px] w-[68px] h-[68px]" />
                             </div>
                             <div className="flex flex-col select-none">
                                 <div>
@@ -466,7 +494,7 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                                         <CheckBoxIcon
                                             bgColor="#F7F8FA"
                                             dotColor="#F7F8FA"
-                                            size={24}
+                                            size={26}
                                             borderColor="#E5E7E8"
                                             checked={checkUpgrade}
                                             checkBgColor="#F7F8FA"
@@ -478,12 +506,12 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
                                                 console.log(e)
                                             }}
                                         />
-                                        <label htmlFor="test1" className="select-none text-[#22313F] font-medium">
+                                        <label htmlFor="test1" className="select-none text-sm text-[#22313F] font-medium">
                                             {t('insurance:buy:upgrade')}
                                         </label>
                                     </div>
                                 </div>
-                                <span className="select-none text-[#22313F] font-medium">{t('insurance:buy:upgrade_info')}</span>
+                                <span className="select-none text-[#22313F] text-xs font-medium">{t('insurance:buy:upgrade_info')}</span>
                                 <div
                                     style={{
                                         background: 'linear-gradient(88.09deg, #CE0014 0.48%, #E92828 52.94%, #FF5F6D 114.93%)',
@@ -500,7 +528,7 @@ export const AcceptBuyInsurance = ({ state, setState, menu, checkUpgrade, setChe
             </div>
 
             <div className={'flex flex-col justify-center items-center mt-[89px] mx-[24px]'}>
-                <span className="text-center pb-[16px]">
+                <span className="text-center pb-[16px] text-sx">
                     {t('insurance:buy:Term_of_Service')}{' '}
                     <span
                         className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}
