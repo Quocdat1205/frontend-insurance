@@ -10,7 +10,7 @@ import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { CheckCircle, LeftArrow, InfoCircle, XMark, ErrorTriggersIcon } from 'components/common/Svg/SvgIcon'
+import { CheckCircle, LeftArrow, InfoCircle, XMark, ErrorTriggersIcon, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -370,7 +370,7 @@ export const InsuranceFrom = () => {
         }
     }, [state.p_claim])
 
-    return !loadings ? (
+    return wallet.account && !loadings ? (
         <LayoutInsurance handleClick={() => setDrop(false)}>
             {active && (
                 <Modal
@@ -481,7 +481,7 @@ export const InsuranceFrom = () => {
             {
                 // head Insurance
                 !isMobile && (
-                    <div className="mx-[80px] mt-[48px] mb-[20px] flex items-center justify-between" onClick={() => setDrop(false)}>
+                    <div className="max-w-screen-layout mx-auto px-[80px] mt-[48px] mb-[20px] flex items-center justify-between" onClick={() => setDrop(false)}>
                         <div className="flex items-center font-semibold text-base">
                             <LeftArrow></LeftArrow>
                             <span
@@ -553,7 +553,7 @@ export const InsuranceFrom = () => {
                     </div>
                 ) : (
                     index == 1 && (
-                        <div className={`h-[32px] flex flex-row justify-between w-full items-center mx-[16px] mt-[24px] mb-[16px]`}>
+                        <div className={`h-[32px] flex flex-row justify-between items-center mx-[16px] mt-[24px] mb-[16px]`}>
                             <div
                                 onClick={() => {
                                     router.push('/home')
@@ -624,7 +624,11 @@ export const InsuranceFrom = () => {
                         {/*head*/}
                         {!isMobile ? (
                             <>
-                                <div className={'pb-[8px] pl-[32px] pt-[32px] text-[14px] leading-5 text-[#808890] flex flex-row justify-start items-center'}>
+                                <div
+                                    className={
+                                        'max-w-screen-layout pb-[8px] pl-[32px] pt-[32px] text-[14px] leading-5 text-[#808890] flex flex-row justify-start items-center'
+                                    }
+                                >
                                     <div className={'w-1/2'}>{menu[7].name}</div>
                                     <div className={'w-1/2'}>{tab == 4 ? 'R-Claim' : tab == 5 ? 'Q-Claim' : tab == 6 && 'Margin'}</div>
                                 </div>
@@ -1090,7 +1094,7 @@ export const InsuranceFrom = () => {
                                     <div className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px]'}>{unitMoney}</div>
                                 </div>
                                 {!clear && state.p_claim != 0 && (
-                                    <span className="flex flex-row text-[#E5544B]">
+                                    <span className="flex flex-row text-[#E5544B] mt-[8px]">
                                         <ErrorTriggersIcon /> <span className="pl-[6px]">{t('insurance:error:p_claim')}</span>
                                     </span>
                                 )}
@@ -1436,7 +1440,102 @@ export const InsuranceFrom = () => {
             )}
         </LayoutInsurance>
     ) : (
-        <div></div>
+        <>
+            {showDetails && (
+                <Modal
+                    portalId="modal"
+                    isVisible={true}
+                    onBackdropCb={() => {}}
+                    className="rounded-xl p-6 bg-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                >
+                    <div className={` bg-white text-sm  mx-auto `}>
+                        <div
+                            className="mt-[32px] mx-[24px] flex flex-row-reverse"
+                            onClick={() => {
+                                setShowDetails(false)
+                            }}
+                        >
+                            <XMark></XMark>
+                        </div>
+                        <div className="flex flex-col justify-center items-center my-[24px]">
+                            <div className="font-medium text-xl">{t('insurance:buy:detailed_terminology')}</div>
+                            <div className="mt-[32px] divide-y divide-[#E5E7E8] text-[#22313F]">
+                                {listTerminology.map((item, key) => {
+                                    return (
+                                        <div key={key} className="w-[380px] flex flex-row justify-between items-center">
+                                            <span className="py-[24px]">{item.name}</span>
+                                            <span className="text-left w-[160px] py-[12px]">{item.description}</span>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+            <div style={{ background: 'linear-gradient(180deg, rgba(244, 63, 94, 0.15) 0%, rgba(254, 205, 211, 0) 100%)' }}>
+                <div className="px-[16px] pt-[8px]" onClick={() => router.push('/home')}>
+                    <XMark />
+                </div>
+                <div className="flex flex-col items-center px-[60px] pt-[8px]">
+                    <img src={'/images/buyInsurance.png'} width="269" height="212" className="w-[269px] h-auto" />
+                </div>
+            </div>
+            <div className="flex flex-col items-center pt-[16px]">
+                <span>Nami Insurance</span>
+                <span>An tâm đầu tư - Nhận ngay tỉ lệ chi trả trong mơ</span>
+            </div>
+            <div className="px-[24px] flex flex-col justify-center mt-[32px] mb-[49px]">
+                <div className="flex flex-row">
+                    <div className="pr-[16px]">
+                        <BxDollarCircle />
+                    </div>
+                    <div className="flex flex-col pr-[7px]">
+                        <span className="text-[#22313F] text-sm font-semibold">Chọn tài sản và số lượng tài sản</span>
+                        <span className="text-sm text-[#808890]">Bạn có thể chọn loại tài sản và điền số lượng tài sản bất kì mà bạn muốn bảo vệ</span>
+                    </div>
+                </div>
+                <div className="flex flex-row my-[24px]">
+                    <div className="pr-[16px]">
+                        <BxLineChartDown />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-[#22313F] text-sm font-semibold">Chọn P-Claim</span>
+                        <span className="text-sm text-[#808890]">
+                            Bạn có thể chọn nhanh P-Claim bằng cách nhấn và kéo thanh ngang trên biểu đồ giá theo phương dọc
+                        </span>
+                    </div>
+                </div>
+                <div className="flex flex-row">
+                    <div className="pr-[16px]">
+                        <BxCaledarCheck />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-[#22313F] text-sm font-semibold">Chọn kỳ hạn mong muốn</span>
+                        <span className="text-sm text-[#808890]">Chọn Kỳ hạn (Period) cho hợp đồng bảo hiểm của bạn và tối ưu hóa lợi ích đầu tư.</span>
+                    </div>
+                </div>
+            </div>
+            <div className="flex justify-center mb-[16px]">
+                <Button
+                    variants={'primary'}
+                    className={`bg-[#EB2B3E] text-sm font-semibold h-[48px] w-[95%] tiny:w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
+                    onClick={() => {
+                        Config.connectWallet()
+                    }}
+                >
+                    {t('common:please_connect_your_wallet')}
+                </Button>
+            </div>
+            <div
+                className={` hover:cursor-pointer flex justify-center text-[#EB2B3E] text-[14px] line-height-[19px] underline`}
+                onClick={() => {
+                    setShowDetails(true)
+                }}
+            >
+                <span>{t('insurance:buy:detailed_terminology')}</span>
+            </div>
+        </>
     )
 }
 

@@ -379,7 +379,7 @@ export const AcceptBuyInsurance = ({
         </>
     ) : (
         <div className="relative">
-            <div className="relative flex flex-col w-full">
+            <div className="relative flex flex-col">
                 <div
                     className="mt-[32px] mx-[24px] flex flex-row-reverse"
                     onClick={() => {
@@ -388,8 +388,8 @@ export const AcceptBuyInsurance = ({
                 >
                     <XMark></XMark>
                 </div>
-                <div className="relative bg-white w-full mx-[24px]" style={{ borderRadius: '5px 5px 0 0' }}>
-                    <div className={'flex flex-col w-[100%] mt-[24px] '}>
+                <div className="relative bg-white mx-[24px]" style={{ borderRadius: '5px 5px 0 0' }}>
+                    <div className={'flex flex-col mt-[24px] '}>
                         <div className={'font-semibold text-xl'}>
                             <span>{t('insurance:buy:info_covered')}</span>
                         </div>
