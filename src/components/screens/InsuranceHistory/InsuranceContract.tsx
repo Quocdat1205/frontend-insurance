@@ -23,6 +23,96 @@ interface InsuranceContract {
     account: any
 }
 
+const renderStatus = (data: any, t: any) => {
+    let bg = 'bg-gradient-blue text-blue-5'
+    switch (data?.state) {
+        case stateInsurance.EXPIRED:
+        case stateInsurance.LIQUIDATED:
+            bg = 'bg-gradient-gray text-gray'
+            break
+        case stateInsurance.CLAIM_WAITING:
+            bg = 'bg-gradient-yellow text-yellow-5'
+            break
+        case stateInsurance.REFUNDED:
+        case stateInsurance.CLAIMED:
+            bg = 'bg-gradient-green text-success'
+            break
+        default:
+            break
+    }
+    return (
+        <div className={`px-3 cursor-pointer text-xs sm:text-sm font-semibold py-[6px] rounded-[600px] ${bg}`}>
+            {t(`common:status:${String(data?.state).toLowerCase()}`)}
+        </div>
+    )
+}
+
+const renderReason = (data: any, t: any) => {
+    if (data?.state === stateInsurance.AVAILABLE) return
+    let reason = ''
+    switch (data?.state) {
+        case stateInsurance.REFUNDED:
+            reason = 'insurance_history:reason:q_refund_received'
+            break
+        case stateInsurance.CLAIM_WAITING:
+            reason = 'insurance_history:reason:p_claim_reached'
+            break
+        case stateInsurance.CLAIMED:
+            reason = 'insurance_history:reason:q_claim_received'
+            break
+        case stateInsurance.EXPIRED:
+            reason = 'insurance_history:reason:p_expired_reached'
+            break
+        default:
+            break
+    }
+    return (
+        <div className="flex items-center justify-between">
+            <div className="text-txtSecondary">{t('common:reason')}</div>
+            <div className="font-semibold">{t(reason)}</div>
+        </div>
+    )
+}
+
+export const renderContentStatus = (data: any, t: any) => {
+    return (
+        <div className="overflow-hidden font-normal ">
+            <div className="sm:p-6 flex flex-col">
+                <div className="text-xl leading-8 font-semibold sm:leading-7 sm:font-medium">
+                    {t('common:insurance')} <span className="text-red">{data?._id}</span>
+                </div>
+                {data?.state !== stateInsurance.AVAILABLE && (
+                    <div className="text-txtSecondary flex items-center space-x-2 mt-2 sm:mt-3 text-sm sm:text-base">
+                        <CalendarIcon color={colors.txtSecondary} size={16} />
+                        <span>
+                            {t('insurance_history:price_reaching_date')}: {formatTime(data?.updatedAt, 'dd/MM/yyyy')}
+                        </span>
+                    </div>
+                )}
+                <div className="h-[1px] w-full bg-divider mt-6 mb-4" />
+                <div className="flex flex-col space-y-2 text-sm sm:text-base">
+                    <div className="flex items-center justify-between">
+                        <div className="text-txtSecondary">{t('insurance_history:status_2')}</div>
+                        <div>{renderStatus(data, t)}</div>
+                    </div>
+                    {renderReason(data, t)}
+                    <div className="flex items-center justify-between">
+                        <div className="text-txtSecondary">Q-Claim</div>
+                        <div className="font-semibold">{formatCurrency(data?.q_claim, 4, 1e4)}</div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <div className="text-txtSecondary">R-Claim</div>
+                        <div className="font-semibold">{formatNumber(data?.q_claim / data?.margin, 2)}%</div>
+                    </div>
+                </div>
+                <Button variants="primary" className="py-3 mt-8">
+                    {t('common:buy_back')}
+                </Button>
+            </div>
+        </div>
+    )
+}
+
 const InsuranceContract = ({ account }: InsuranceContract) => {
     const { t } = useTranslation()
     const { width } = useWindowSize()
@@ -134,96 +224,6 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
         )
     }
 
-    const renderStatus = ({ state }: any) => {
-        let bg = 'bg-gradient-blue text-blue-5'
-        switch (state) {
-            case stateInsurance.EXPIRED:
-            case stateInsurance.LIQUIDATED:
-                bg = 'bg-gradient-gray text-gray'
-                break
-            case stateInsurance.CLAIM_WAITING:
-                bg = 'bg-gradient-yellow text-yellow-5'
-                break
-            case stateInsurance.REFUNDED:
-            case stateInsurance.CLAIMED:
-                bg = 'bg-gradient-green text-success'
-                break
-            default:
-                break
-        }
-        return (
-            <div className={`px-3 cursor-pointer text-xs sm:text-sm font-semibold py-[6px] rounded-[600px] ${bg}`}>
-                {t(`common:status:${String(state).toLowerCase()}`)}
-            </div>
-        )
-    }
-
-    const renderReason = ({ state }: any) => {
-        if (state === stateInsurance.AVAILABLE) return
-        let reason = ''
-        switch (state) {
-            case stateInsurance.REFUNDED:
-                reason = 'insurance_history:reason:q_refund_received'
-                break
-            case stateInsurance.CLAIM_WAITING:
-                reason = 'insurance_history:reason:p_claim_reached'
-                break
-            case stateInsurance.CLAIMED:
-                reason = 'insurance_history:reason:q_claim_received'
-                break
-            case stateInsurance.EXPIRED:
-                reason = 'insurance_history:reason:p_expired_reached'
-                break
-            default:
-                break
-        }
-        return (
-            <div className="flex items-center justify-between">
-                <div className="text-txtSecondary">{t('common:reason')}</div>
-                <div className="font-semibold">{t(reason)}</div>
-            </div>
-        )
-    }
-
-    const renderContentStatus = (data: any) => {
-        return (
-            <div className="overflow-hidden font-normal ">
-                <div className="sm:p-6 flex flex-col">
-                    <div className="text-xl leading-8 font-semibold sm:leading-7 sm:font-medium">
-                        {t('common:insurance')} <span className="text-red">{data?._id}</span>
-                    </div>
-                    {data?.state !== stateInsurance.AVAILABLE && (
-                        <div className="text-txtSecondary flex items-center space-x-2 mt-2 sm:mt-3 text-sm sm:text-base">
-                            <CalendarIcon color={colors.txtSecondary} size={16} />
-                            <span>
-                                {t('insurance_history:price_reaching_date')}: {formatTime(data?.updatedAt, 'dd/MM/yyyy')}
-                            </span>
-                        </div>
-                    )}
-                    <div className="h-[1px] w-full bg-divider mt-6 mb-4" />
-                    <div className="flex flex-col space-y-2 text-sm sm:text-base">
-                        <div className="flex items-center justify-between">
-                            <div className="text-txtSecondary">{t('insurance_history:status_2')}</div>
-                            <div>{renderStatus(data)}</div>
-                        </div>
-                        {renderReason(data)}
-                        <div className="flex items-center justify-between">
-                            <div className="text-txtSecondary">Q-Claim</div>
-                            <div className="font-semibold">{formatCurrency(data?.q_claim, 4, 1e4)}</div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <div className="text-txtSecondary">R-Claim</div>
-                            <div className="font-semibold">{formatNumber(data?.q_claim / data?.margin, 2)}%</div>
-                        </div>
-                    </div>
-                    <Button variants="primary" className="py-3 mt-8">
-                        {t('common:buy_back')}
-                    </Button>
-                </div>
-            </div>
-        )
-    }
-
     const columns = React.useMemo(
         () => [
             {
@@ -265,9 +265,9 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
                         className={`${
                             e.row?.index < 5 ? 'top-0' : 'bottom-0'
                         } absolute right-full mr-4 z-10 mt-0 shadow-subMenu rounded-xl min-w-[448px] py-1 bg-white`}
-                        label={renderStatus(e.row.original)}
+                        label={renderStatus(e.row.original, t)}
                     >
-                        {renderContentStatus(e.row.original)}
+                        {renderContentStatus(e.row.original, t)}
                     </Popover>
                 ),
             },
