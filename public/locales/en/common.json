@@ -25,5 +25,7 @@
     "reason": "Reason",
     "load_more": "Load More",
     "filter_by": "Filter By",
-    "undo": "Undo"
+    "undo": "Undo",
+    "notification": "Notification",
+    "notice_message": "Hợp đồng bảo hiểm mã <span class='text-red'>{{id}}</span> đã kết thúc khi <span class='text-txtSecondary'>{{date}}</span>"
 }

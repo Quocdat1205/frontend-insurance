@@ -1,48 +1,176 @@
-import { Popover, Transition } from '@headlessui/react'
+import { Transition } from '@headlessui/react'
+import Modal from 'components/common/Modal/Modal'
+import Skeleton from 'components/common/Skeleton/Skeleton'
 import { NotificationsIcon } from 'components/common/Svg/SvgIcon'
-import React, { Fragment } from 'react'
+import useOutsideAlerter from 'hooks/useOutsideAlerter'
+import useWeb3Wallet from 'hooks/useWeb3Wallet'
+import { useTranslation } from 'next-i18next'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
+import { API_CHECK_NOTICE, API_GET_NOTICE } from 'services/apis'
+import fetchApi from 'services/fetch-api'
+import { formatTime, getTimeAgo } from 'utils/utils'
+import { isMobile } from 'react-device-detect'
+import { X } from 'react-feather'
 
 const Notifications = () => {
+    const { account } = useWeb3Wallet()
+    const { t } = useTranslation()
+    const [visible, setVisible] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(true)
+    const wrapperRef = useRef<any>(null)
+    const [hasNotice, setHasNotice] = useState<boolean>(false)
+    const filter = useRef({
+        skip: 0,
+        limit: 10,
+        isAll: false,
+    })
+    const [dataSource, setDataSource] = useState({
+        list_notice: [],
+        count: 0,
+    })
+
+    const handleOutside = () => {
+        if (!isMobile) setVisible(false)
+    }
+
+    useOutsideAlerter(wrapperRef, handleOutside)
+
+    useEffect(() => {
+        if (visible) {
+            filter.current.skip = 0
+            getNotice()
+        }
+    }, [visible])
+
+    useEffect(() => {
+        checkNotice()
+    }, [])
+
+    const checkNotice = async () => {
+        try {
+            const { data } = await fetchApi({
+                url: API_CHECK_NOTICE,
+                options: { method: 'GET' },
+                params: {
+                    owner: account,
+                },
+            })
+            if (data) {
+                setHasNotice(data)
+            }
+        } catch (e) {
+            console.log(e)
+        } finally {
+        }
+    }
+
+    const getNotice = async () => {
+        setLoading(true)
+        try {
+            const { data } = await fetchApi({
+                url: API_GET_NOTICE,
+                options: { method: 'GET' },
+                params: {
+                    owner: account,
+                    ...filter.current,
+                },
+            })
+            if (data) {
+                const dataFiter = !filter.current.skip ? data?.list_notice : dataSource.list_notice.concat(data?.list_notice)
+                setDataSource({
+                    count: data?.count,
+                    list_notice: dataFiter,
+                })
+            }
+        } catch (e) {
+            console.log(e)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const loader = () => {
+        return [1, 2, 3, 4].map((index: number) => (
+            <div key={index} className="flex items-center sm:px-6 py-4 space-x-4 hover:bg-hover">
+                <div className="min-w-[40px] min-h-[40px]">
+                    <Skeleton circle className="w-10 h-10" />
+                </div>
+                <div className="flex flex-col space-y-[2px]">
+                    <Skeleton className="w-40 h-3" />
+                    <Skeleton className="w-10 h-1" />
+                </div>
+            </div>
+        ))
+    }
+
+    const renderNoti = () => {
+        return loading
+            ? loader()
+            : dataSource.list_notice?.map((item: any, index: number) => {
+                  const _expire = Number(item?.expired) * 1000
+                  return (
+                      <div key={index} className="flex items-center sm:px-6 py-4 space-x-4 mb:hover:bg-hover">
+                          <div className="min-w-[40px] min-h-[40px]">
+                              <img src={`/images/icons/${item?.isConfirm ? 'ic_noti_active' : 'ic_noti_inactive'}.png`} width="40" height="40" />
+                          </div>
+                          <div className="flex flex-col space-y-[2px]">
+                              <div
+                                  className="text-sm"
+                                  dangerouslySetInnerHTML={{
+                                      __html: t('common:notice_message', {
+                                          id: item?._id,
+                                          date: formatTime(_expire, 'dd/MM/yyyy HH:mm:ss'),
+                                      }),
+                                  }}
+                              ></div>
+                              <span className="text-xs leading-[1rem] text-gray">{getTimeAgo(item?.createdAt)}</span>
+                          </div>
+                          {!item?.isConfirm && <div className="min-w-[6px] min-h-[6px] bg-red rounded-[50%]" />}
+                      </div>
+                  )
+              })
+    }
+
     return (
-        <Popover className="relative">
-            {({ open }) => (
-                <>
-                    <Popover.Button type="button" className="inline-flex items-center focus:outline-none" aria-expanded="false">
-                        <div className="sm:p-2 sm:bg-hover rounded-[3px] relative">
-                            <NotificationsIcon />
-                            <div className="bg-red w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[50%] absolute top-[30%] right-[20%] sm:right-[30%]" />
+        <div className="relative">
+            <div onClick={() => setVisible(true)} ref={wrapperRef} className="sm:p-2 hover:bg-hover rounded-[3px] relative">
+                <NotificationsIcon />
+                {hasNotice && <div className="bg-red w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[50%] absolute top-[30%] right-[20%] sm:right-[30%]" />}
+            </div>
+            {isMobile ? (
+                <Modal
+                    isMobile
+                    containerClassName="flex-col justify-end !bg-transparent"
+                    className="h-[calc(100%-4rem)]"
+                    wrapClassName="!px-4 !py-8"
+                    isVisible={visible}
+                    onBackdropCb={() => setVisible(false)}
+                    customHeader={() => (
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="font-medium text-2xl">{t('common:notification')}</div>
+                            <X onClick={() => setVisible(false)} size={20} className="cursor-pointer" />
                         </div>
-                    </Popover.Button>
-                    <Transition
-                        show={open}
-                        as={Fragment}
-                        enter="transition ease-out duration-200"
-                        enterFrom="opacity-0 translate-y-1"
-                        enterTo="opacity-100 translate-y-0"
-                        leave="transition ease-in duration-150"
-                        leaveFrom="opacity-100 translate-y-0"
-                        leaveTo="opacity-0 translate-y-1"
-                    >
-                        <Popover.Panel static className="absolute z-10 mt-3 shadow-subMenu rounded-xl min-w-[360px] py-1 bg-white">
-                            <div className="overflow-hidden font-normal">
-                                <div className="flex items-center px-6 py-4 space-x-4">
-                                    <div className="min-w-[40px] min-h-[40px]">
-                                        <img src="/images/icons/ic_noti_active.png" width="40" height="40" />
-                                    </div>
-                                    <div className="flex flex-col space-y-[2px]">
-                                        <div className="text-sm">
-                                            Hợp đồng bảo hiểm mã <span className="text-red">22160725070001</span> đã kết thúc khi thông báo chưa đọc
-                                        </div>
-                                        <span className="text-xs leading-[1rem] text-gray">Bây giờ</span>
-                                    </div>
-                                    <div className="min-w-[6px] min-h-[6px] bg-red rounded-[50%]" />
-                                </div>
-                            </div>
-                        </Popover.Panel>
-                    </Transition>
-                </>
+                    )}
+                >
+                    <div className="overflow-hidden relative flex flex-col space-y-2">{renderNoti()}</div>
+                </Modal>
+            ) : (
+                <Transition
+                    show={visible}
+                    as={Fragment}
+                    enter="transition ease-out duration-200"
+                    enterFrom="opacity-0 translate-y-1"
+                    enterTo="opacity-100 translate-y-0"
+                    leave="transition ease-in duration-150"
+                    leaveFrom="opacity-100 translate-y-0"
+                    leaveTo="opacity-0 translate-y-1"
+                >
+                    <div className={'absolute z-10 mt-3 left-0 shadow-subMenu rounded-xl min-w-[360px] py-1 bg-white'}>
+                        <div className="overflow-hidden font-normal">{renderNoti()}</div>
+                    </div>
+                </Transition>
             )}
-        </Popover>
+        </div>
     )
 }
 

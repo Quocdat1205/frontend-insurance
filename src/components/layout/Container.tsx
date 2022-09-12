@@ -13,6 +13,12 @@ const Container = ({ children }: Container) => {
     const dispath = useAppDispatch()
 
     useEffect(() => {
+        let vh = window.innerHeight * 0.01
+        document.documentElement.style.setProperty('--vh', `${vh}px`)
+        let vw = window.innerWidth
+        if (vw <= 360) {
+            document.documentElement.style.setProperty('font-size', '14px')
+        }
         dispath(getListAssetToken())
     }, [])
 

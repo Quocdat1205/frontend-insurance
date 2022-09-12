@@ -79,7 +79,7 @@ const Menu = ({ data, onChange }: Menu) => {
                     </div>
                 )}
                 {hasChildren && (
-                    <ul className="w-full sm:w-max bg-hover mb:bg-white sm:-mx-8 mb:absolute relative flex flex-col mb:py-4 mb:space-y-2 mb:rounded-b-xl mb:shadow-subMenu mb:top-[calc(100%+1px)] h-max sm:left-12 mb:min-w-[244px]">
+                    <ul className="w-full sm:w-max bg-hover mb:bg-white sm:-mx-8 mb:absolute relative flex flex-col mb:py-4 mb:space-y-2 mb:rounded-b-xl mb:shadow-subMenu mb:top-full h-max sm:left-12 mb:min-w-[244px]">
                         {menu.children.map((menu: any, idx: number) => renderMenu(menu, idx, true))}
                     </ul>
                 )}

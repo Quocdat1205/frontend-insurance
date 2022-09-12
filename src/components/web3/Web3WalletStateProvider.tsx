@@ -40,7 +40,7 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
             }, 1000)
         } else {
             if (Config.chains.find((rs: number) => rs !== chainId) && chainId && isActive) {
-                switchNetwork(69)
+                switchNetwork(Config.chains[0])
             }
         }
     }, [isActive, loading_account, chainId])

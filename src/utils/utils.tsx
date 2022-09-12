@@ -35,7 +35,7 @@ export const formatCurrency = (n: number, digits = 4, e: number = 1e3) => {
     return n
 }
 
-export const formatTime = (value: Date, f = 'yyyy-MM-dd HH:mm') => {
+export const formatTime = (value: Date | number, f = 'yyyy-MM-dd HH:mm') => {
     if (value) {
         const date = value instanceof Date ? value : new Date(value)
         return format(date, f)
@@ -43,7 +43,7 @@ export const formatTime = (value: Date, f = 'yyyy-MM-dd HH:mm') => {
     return null
 }
 
-export const getTimeAgo = (value: Date, options: any) => {
+export const getTimeAgo = (value: Date, options?: any) => {
     if (!value) return null
     const date = value instanceof Date ? value : new Date(value)
     if (options) {

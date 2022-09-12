@@ -261,8 +261,9 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
                 minWidth: 190,
                 Cell: (e: any) => (
                     <Popover
-                        // containerClassName="!absolute"
-                        className="top-0 absolute right-full mr-4 z-10 mt-0 shadow-subMenu rounded-xl min-w-[448px] py-1 bg-white"
+                        className={`${
+                            e.row?.index < 5 ? 'top-0' : 'bottom-0'
+                        } absolute right-full mr-4 z-10 mt-0 shadow-subMenu rounded-xl min-w-[448px] py-1 bg-white`}
                         label={renderStatus(e.row.original)}
                     >
                         {renderContentStatus(e.row.original)}
