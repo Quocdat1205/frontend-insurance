@@ -8,7 +8,7 @@ import { useTranslation } from 'next-i18next'
 import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { API_CHECK_NOTICE, API_GET_NOTICE } from 'services/apis'
 import fetchApi from 'services/fetch-api'
-import { formatTime, getTimeAgo } from 'utils/utils'
+import { getTimeAgo } from 'utils/utils'
 import { isMobile } from 'react-device-detect'
 import { X } from 'react-feather'
 
@@ -117,9 +117,9 @@ const Notifications = () => {
                               <div
                                   className="text-sm"
                                   dangerouslySetInnerHTML={{
-                                      __html: t('common:notice_message', {
+                                      __html: t('common:notification:notice_message', {
                                           id: item?._id,
-                                          date: formatTime(_expire, 'dd/MM/yyyy HH:mm:ss'),
+                                          status: t(`common:notification:status:${String(item?.state).toLowerCase()}`),
                                       }),
                                   }}
                               ></div>
@@ -133,6 +133,7 @@ const Notifications = () => {
 
     return (
         <div className="relative">
+            <NotiDetailModal />
             <div onClick={() => setVisible(true)} ref={wrapperRef} className="sm:p-2 hover:bg-hover rounded-[3px] relative">
                 <NotificationsIcon />
                 {hasNotice && <div className="bg-red w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[50%] absolute top-[30%] right-[20%] sm:right-[30%]" />}
@@ -147,7 +148,7 @@ const Notifications = () => {
                     onBackdropCb={() => setVisible(false)}
                     customHeader={() => (
                         <div className="flex items-center justify-between mb-6">
-                            <div className="font-medium text-2xl">{t('common:notification')}</div>
+                            <div className="font-medium text-2xl">{t('common:notification:title')}</div>
                             <X onClick={() => setVisible(false)} size={20} className="cursor-pointer" />
                         </div>
                     )}
@@ -171,6 +172,21 @@ const Notifications = () => {
                 </Transition>
             )}
         </div>
+    )
+}
+
+const NotiDetailModal = ({ visible, onClose }: any) => {
+    return (
+        <Modal
+            isMobile
+            containerClassName="flex-col justify-end !bg-transparent"
+            className="h-[calc(100%-4rem)]"
+            wrapClassName="!px-4 !py-8"
+            isVisible={visible}
+            onBackdropCb={onClose}
+        >
+            <div className="overflow-hidden relative flex flex-col space-y-2">{}</div>
+        </Modal>
     )
 }
 

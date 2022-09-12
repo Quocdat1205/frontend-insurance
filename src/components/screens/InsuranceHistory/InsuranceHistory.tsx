@@ -13,9 +13,11 @@ const InsuranceHistory = () => {
     const { account } = useWeb3Wallet()
     const { t } = useTranslation()
     const [showGuideModal, setShowGuideModal] = useState<boolean>(false)
+    const [showTerminologyModal, setShowTerminologyModal] = useState<boolean>(false)
 
     return (
         <>
+            {showTerminologyModal && <TerminologyModal visible={showTerminologyModal} onClose={() => setShowTerminologyModal(false)} t={t} />}
             <GuidelineModal visible={showGuideModal} onClose={() => setShowGuideModal(false)} t={t} />
             <div className="px-4 sm:px-10 pt-12 sm:pt-[4.25rem] max-w-screen-layout m-auto">
                 <div className="flex items-center justify-between">
@@ -32,7 +34,9 @@ const InsuranceHistory = () => {
                     >
                         <div className="flex flex-col w-full py-1">
                             <div className="py-2 px-4 hover:bg-hover cursor-pointer">{t('insurance_history:tracking_and_utilizing')}</div>
-                            <div className="py-2 px-4 hover:bg-hover cursor-pointer">{t('insurance_history:detailed_terminology')}</div>
+                            <div onClick={() => setShowTerminologyModal(true)} className="py-2 px-4 hover:bg-hover cursor-pointer">
+                                {t('insurance_history:detailed_terminology')}
+                            </div>
                         </div>
                     </Popover>
                 </div>
@@ -53,6 +57,22 @@ const GuidelineModal = ({ visible, onClose, t }: any) => {
     return (
         <Modal isMobile containerClassName="flex-col justify-end" isVisible={visible} onBackdropCb={onClose}>
             <div className="text-xl leading-8 font-semibold mb-6">{t('insurance_history:guidelines')}</div>
+            <div className="flex flex-col text-sm divide-solid divide-y divide-divider">
+                <div className="py-4">{t('insurance_history:tracking_and_utilizing')}</div>
+                <div className="py-4">{t('insurance_history:detailed_terminology')}</div>
+            </div>
+        </Modal>
+    )
+}
+
+const TerminologyModal = ({ visible, onClose, t }: any) => {
+    return (
+        <Modal
+            isVisible={visible}
+            onBackdropCb={onClose}
+            className="rounded-xl p-6 bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        >
+            <div className="text-xl leading-8 font-medium mb-8 text-center">{t('insurance_history:detailed_terminology')}</div>
             <div className="flex flex-col text-sm divide-solid divide-y divide-divider">
                 <div className="py-4">{t('insurance_history:tracking_and_utilizing')}</div>
                 <div className="py-4">{t('insurance_history:detailed_terminology')}</div>

@@ -19,6 +19,7 @@ export const stateInsurance: any = {
     CLAIM_WAITING: 'Claim_waiting',
     CLAIMED: 'Claimed',
     EXPIRED: 'Expired',
+    LIQUIDATED: 'Liquidated',
 }
 
 export const months: any = [

@@ -6,7 +6,8 @@
         "claim_waiting": "Chờ chi trả",
         "expired": "Đã hết hạn",
         "claimed": "Đã chi trả",
-        "refunded": "Đã chuyển nhượng"
+        "refunded": "Đã chuyển nhượng",
+        "liquidated": "Bị Thanh lý"
     },
     "header": {
         "home": "Trang chủ",
@@ -24,6 +25,15 @@
     "load_more": "Xem thêm",
     "filter_by": "Lọc kết quả theo",
     "undo": "Hoàn tác",
-    "notification": "Thông báo",
-    "notice_message": "Hợp đồng bảo hiểm mã <span class='text-red'>{{id}}</span> đã kết thúc khi <span class='text-txtSecondary'>{{date}}</span>"
+    "notification": {
+        "title": "Thông báo",
+        "notice_message": "Hợp đồng bảo hiểm <span class='text-red'>{{id}}</span> {{status}}",
+        "status": {
+            "expired": "Đã hết hạn",
+            "claimed": "Nhận Q-Claim thành công",
+            "refunded": "Nhận hoàn trả Margin",
+            "liquidated": "Bị thanh lý",
+            "claim_waiting": "Chờ chi trả"
+        }
+    }
 }
