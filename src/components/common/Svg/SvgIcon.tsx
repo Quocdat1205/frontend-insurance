@@ -1,4 +1,3 @@
-import { color } from '@amcharts/amcharts4/core'
 import colors from 'styles/colors'
 
 export const RightArrow = ({ size = 16, color = 'white' }: any) => {
@@ -279,9 +278,9 @@ export const ErrorTriggersIcon = () => {
     )
 }
 
-export const StartIcon = () => {
+export const StartIcon = ({ size }: any) => {
     return (
-        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width={size} height={size} viewBox={`0 0 36 36`} fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0 0H36V18C36 27.9411 27.9411 36 18 36C8.05888 36 0 27.9411 0 18V0Z" fill="url(#paint0_linear_1019_5325)" />
             <path
                 d="M18 8L20.2451 14.9098H27.5106L21.6327 19.1803L23.8779 26.0902L18 21.8197L12.1221 26.0902L14.3673 19.1803L8.48944 14.9098H15.7549L18 8Z"

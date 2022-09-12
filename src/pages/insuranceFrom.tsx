@@ -10,7 +10,7 @@ import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { CheckCircle, LeftArrow, InfoCircle, XMark, Dot, ErrorCircleIcon, ErrorIcon, ErrorTriggersIcon } from 'components/common/Svg/SvgIcon'
+import { CheckCircle, LeftArrow, InfoCircle, XMark, ErrorTriggersIcon } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -20,6 +20,7 @@ import { Suspense } from 'react'
 import store from 'redux/store'
 import Config from 'config/config'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
+import { formatNumber } from 'utils/utils'
 //chart
 const ChartComponent = dynamic(() => import('../components/common/Chart/chartComponent'), { ssr: false, suspense: true })
 
@@ -132,14 +133,11 @@ export const InsuranceFrom = () => {
 
     const validatePclaim = (value: number) => {
         if (wallet.account) {
-            console.log(value > state.p_market + (2 * state.p_market) / 100 && value < state.p_market + (70 * state.p_market) / 100)
+            // console.log(value > state.p_market + (2 * state.p_market) / 100 && value < state.p_market + (70 * state.p_market) / 100)
 
             if (value > state.p_market + (2 * state.p_market) / 100 && value < state.p_market + (70 * state.p_market) / 100) {
-                console.log('ok')
-
                 return setClear(true)
             } else if (value > state.p_market - (70 * state.p_market) / 100 && value < state.p_market - (2 * state.p_market) / 100) {
-                console.log('ok')
                 return setClear(true)
             } else {
                 return setClear(false)
@@ -429,7 +427,6 @@ export const InsuranceFrom = () => {
                         {listCoin &&
                             listCoin.map((coin, key) => {
                                 let isPress = false
-                                console.log(coin)
 
                                 // @ts-ignore
                                 return !coin.disable ? (
@@ -629,10 +626,10 @@ export const InsuranceFrom = () => {
                                             type={'number'}
                                             inputName={'Loại tài sản và số lượng tài sản'}
                                             idInput={'iCoin'}
-                                            value={state.q_covered && state.q_covered}
+                                            value={formatNumber(state.q_covered) || 0}
                                             onChange={(a: any) => {
                                                 if (a.target.value > userBalance) {
-                                                    return setState({ ...state, q_covered: userBalance })
+                                                    setState({ ...state, q_covered: userBalance })
                                                 } else {
                                                     setState({ ...state, q_covered: a.target.value })
                                                 }
@@ -898,7 +895,7 @@ export const InsuranceFrom = () => {
                                 <div className="flex flex-row">
                                     <span className="pr-[4px]">{t('insurance:buy:quality')} </span>{' '}
                                     <label className={`${state.q_covered == 0 ? 'text-[#B2B7BC]' : 'text-[#EB2B3E]'} max-w-[245] relative ml-[6xp]`}>
-                                        {state.q_covered || 'Số tiền?'}
+                                        {state.q_covered > 0 ? formatNumber(state.q_covered) : 'Số tiền?'}
                                         <input
                                             type="number"
                                             className={` text-white pl-[4px] focus-visible:outline-none w-0 border border-1 border-black ${
@@ -909,7 +906,7 @@ export const InsuranceFrom = () => {
                                             id="name"
                                             onChange={(a: any) => {
                                                 if (a.target.value > userBalance) {
-                                                    return setState({ ...state, q_covered: userBalance })
+                                                    setState({ ...state, q_covered: userBalance })
                                                 } else {
                                                     setState({ ...state, q_covered: a.target.value })
                                                 }
@@ -1005,9 +1002,13 @@ export const InsuranceFrom = () => {
                                         </span>
                                     }
                                 </span>
-                                <div className={'mt-[8px] flex justify-between border-collapse rounded-[3px] shadow-none '}>
+                                <div
+                                    className={`mt-[8px] flex justify-between border-collapse rounded-[3px] shadow-none ${
+                                        !clear && 'border border-1 border-red'
+                                    }`}
+                                >
                                     <Input
-                                        className={'w-[90%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none'}
+                                        className={'w-[90%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none '}
                                         type={'number'}
                                         inputName={'P-Claim'}
                                         idInput={'iPClaim'}
@@ -1048,9 +1049,13 @@ export const InsuranceFrom = () => {
                                         </span>
                                     }
                                 </span>
-                                <div className={'mt-[8px] flex justify-between border-collapse rounded-[3px] shadow-none text-base '}>
+                                <div
+                                    className={`mt-[8px] flex justify-between border-collapse rounded-[3px] shadow-none text-base ${
+                                        !clear && 'border border-1 border-red'
+                                    }`}
+                                >
                                     <Input
-                                        className={'w-[90%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none'}
+                                        className={'w-[90%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none '}
                                         type={'number'}
                                         inputName={'P-Claim'}
                                         idInput={'iPClaim'}
@@ -1161,10 +1166,55 @@ export const InsuranceFrom = () => {
                         } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] mx-[12px]`}
                     >
                         <div className={'text-[#808890]'}>Q-Claim</div>
-                        <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
+                        <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
                             {state.q_claim}
                             <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
-                            <ChevronDown size={18} className={'ml-1 mt-1'}></ChevronDown>
+                            <Menu>
+                                <Menu.Button className={'text-[#22313F] underline hover:cursor-pointer '}>
+                                    <ChevronDown></ChevronDown>
+                                </Menu.Button>
+                                <Menu.Items
+                                    className={'flex flex-col text-[#22313F] absolute z-50 top-[28px] right-[5px] bg-white rounded'}
+                                    style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                                >
+                                    <Menu.Item>
+                                        {({ active }) => (
+                                            <a
+                                                className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA]`}
+                                                onClick={() => {
+                                                    setUnitMoney('USDT')
+                                                }}
+                                            >
+                                                <span>USDT</span>
+                                            </a>
+                                        )}
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                        {({ active }) => (
+                                            <a
+                                                className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
+                                                onClick={() => {
+                                                    setUnitMoney('BUSD')
+                                                }}
+                                            >
+                                                <span>BUSD</span>
+                                            </a>
+                                        )}
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                        {({ active }) => (
+                                            <a
+                                                className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
+                                                onClick={() => {
+                                                    setUnitMoney('USDC')
+                                                }}
+                                            >
+                                                <span>USDC</span>
+                                            </a>
+                                        )}
+                                    </Menu.Item>
+                                </Menu.Items>
+                            </Menu>
                         </div>
                     </div>
                     <div
@@ -1173,10 +1223,55 @@ export const InsuranceFrom = () => {
                         } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] `}
                     >
                         <div className={'text-[#808890]'}>Margin</div>
-                        <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
+                        <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
                             {state.margin}
                             <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
-                            <ChevronDown size={18} className={'ml-1 mt-1'}></ChevronDown>
+                            <Menu>
+                                <Menu.Button className={' text-[#22313F] underline hover:cursor-pointer '}>
+                                    <ChevronDown></ChevronDown>
+                                </Menu.Button>
+                                <Menu.Items
+                                    className={'flex flex-col text-[#22313F] absolute z-50 top-[28px] right-[5px] bg-white rounded'}
+                                    style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                                >
+                                    <Menu.Item>
+                                        {({ active }) => (
+                                            <a
+                                                className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA]`}
+                                                onClick={() => {
+                                                    setUnitMoney('USDT')
+                                                }}
+                                            >
+                                                <span>USDT</span>
+                                            </a>
+                                        )}
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                        {({ active }) => (
+                                            <a
+                                                className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
+                                                onClick={() => {
+                                                    setUnitMoney('BUSD')
+                                                }}
+                                            >
+                                                <span>BUSD</span>
+                                            </a>
+                                        )}
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                        {({ active }) => (
+                                            <a
+                                                className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
+                                                onClick={() => {
+                                                    setUnitMoney('USDC')
+                                                }}
+                                            >
+                                                <span>USDC</span>
+                                            </a>
+                                        )}
+                                    </Menu.Item>
+                                </Menu.Items>
+                            </Menu>
                         </div>
                     </div>
                 </div>

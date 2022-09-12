@@ -19,7 +19,7 @@
         "accept_buy_sub": "the terms of service",
         "notified": "Get 100% of margin amount when asset price reaches",
         "notified_sub": "at the last day of period.",
-        "price_had_update": "Updated Current Price",
+        "price_had_update": "Updated Price",
         "accept": "Confirm",
         "period": "Period",
         "increase_cover": "Increase the cover period and the payout value",
@@ -67,6 +67,6 @@
         "t_expired": "Time (T) triggers the expiration of insurance contract"
     },
     "error": {
-        "p_claim": "P-Claim invalid"
+        "p_claim": "Error messenge"
     }
 }
