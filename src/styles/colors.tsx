@@ -60,6 +60,7 @@ const colors = {
     error: '#E5544B',
     success: '#52CC74',
     hover: '#F7F8FA',
+    skeleton: '#F0F0F1',
 }
 
 export default colors

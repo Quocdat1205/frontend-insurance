@@ -1,13 +1,29 @@
+import Breadcrumbs from 'components/layout/Breadcrumbs'
+import LayoutWeb3 from 'components/layout/LayoutWeb3'
+import InsuranceContractLoading from 'components/screens/InsuranceHistory/InsuranceContractLoading'
 import Config from 'config/config'
+import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import dynamic from 'next/dynamic'
 const InsuranceHistory = dynamic(() => import('components/screens/InsuranceHistory/InsuranceHistory'), {
     ssr: false,
+    loading: () => <InsuranceContractLoading />,
 })
 const Insurance = ({ slug }: any) => {
+    const { t } = useTranslation()
+
     switch (slug) {
         case 'insurance-history':
-            return <InsuranceHistory />
+            return (
+                <LayoutWeb3 sponsor={false}>
+                    <Breadcrumbs>
+                        <div>{t('common:header:home')}</div>
+                        <div>{t('common:header:buy_covered')}</div>
+                        <div>{t('common:header:insurance_history')}</div>
+                    </Breadcrumbs>
+                    <InsuranceHistory />
+                </LayoutWeb3>
+            )
     }
 }
 export const getServerSideProps = async ({ locale, query }: any) => {

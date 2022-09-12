@@ -206,6 +206,7 @@ $height: 32px;
         .rdrDayToday {
             .rdrDayNumber {
                 span {
+                    @apply text-red;
                     font-weight: bold;
                 }
                 span:after {
@@ -220,7 +221,7 @@ $height: 32px;
         .rdrWeekDay {
             height: $height;
             width: $width;
-            @apply max-w-[3rem] sm:min-w-[42px] text-xs font-semibold text-gray flex items-center justify-center ;
+            @apply max-w-[3rem] sm:min-w-[42px] text-xs font-semibold text-gray flex items-center justify-center;
         }
     }
     .rdrMonthAndYearPickers {

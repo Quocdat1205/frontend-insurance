@@ -11,12 +11,19 @@
     "header": {
         "home": "Home",
         "buy_covered": "Buy Cover",
-        "insurance_history": "Insurance history"
+        "insurance_history": "Insurance History"
     },
-    "days": "days",
-    "asset_type": "Asset type",
+    "days": "Days",
+    "asset_type": "Asset Type",
     "choose_asset_type": "Choose Asset type",
     "status_ins": "Status",
     "choose_status": "Choose Status",
-    "insurance": "Insurance"
+    "insurance": "Insurance",
+    "confirm": "Confirm",
+    "filter": "Filter",
+    "buy_back": "Buy Back",
+    "reason": "Reason",
+    "load_more": "Load More",
+    "filter_by": "Filter By",
+    "undo": "Undo"
 }

@@ -175,6 +175,7 @@ module.exports = {
             hover: '#F7F8FA',
             error: '#E5544B',
             success: '#52CC74',
+            skeleton: '#F0F0F1',
             bgModal: commonColors.bgModal,
             red: {
                 DEFAULT: commonColors.red.red,

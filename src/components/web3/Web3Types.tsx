@@ -1,14 +1,15 @@
 import { MetaMask } from '@web3-react/metamask'
 import type { AddEthereumChainParameter, Connector } from '@web3-react/types'
 import { WalletConnect } from '@web3-react/walletconnect'
+import Config from 'config/config'
 import { BigNumber, ethers } from 'ethers'
 
-interface BasicChainInformation {
+export interface BasicChainInformation {
     urls: string[]
     name: string
 }
 
-interface ExtendedChainInformation extends BasicChainInformation {
+export interface ExtendedChainInformation extends BasicChainInformation {
     nativeCurrency: AddEthereumChainParameter['nativeCurrency']
     blockExplorerUrls: AddEthereumChainParameter['blockExplorerUrls']
 }
@@ -58,31 +59,12 @@ export const getConnectorInfo = (connector: Connector): ConnectorInfo => {
     }
 }
 
-export const CHAINS: {
-    [chainId: number]: BasicChainInformation | ExtendedChainInformation
-} = {
-    1: {
-        urls: ['https://mainnet.infura.io/v3/f87b967bc65a41c0a1a25635493fa482'],
-        name: 'Mainnet',
-    },
-
-    4: {
-        urls: ['https://rinkeby.infura.io/v3/f87b967bc65a41c0a1a25635493fa482'],
-        name: 'Rinkeby',
-    },
-
-    42: {
-        urls: ['https://kovan.infura.io/ws/v3/f87b967bc65a41c0a1a25635493fa482'],
-        name: 'Kovan',
-    },
-}
-
 function isExtendedChainInformation(chainInformation: BasicChainInformation | ExtendedChainInformation): chainInformation is ExtendedChainInformation {
     return !!(chainInformation as ExtendedChainInformation).nativeCurrency
 }
 
 export function getAddChainParameters(chainId: number): AddEthereumChainParameter | number {
-    const chainInformation = CHAINS[chainId]
+    const chainInformation = Config.networks[chainId]
     if (isExtendedChainInformation(chainInformation)) {
         return {
             chainId,

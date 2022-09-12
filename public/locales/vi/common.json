@@ -16,5 +16,12 @@
     "days": "Ngày",
     "asset_type": "Loại tài sản",
     "choose_asset_type": "Chọn loại tài sản",
-    "insurance": "Hợp đồng"
+    "insurance": "Hợp đồng",
+    "confirm": "Chọn",
+    "filter": "Lọc",
+    "buy_back": "Mua lại",
+    "reason": "Nguyên nhân",
+    "load_more": "Xem thêm",
+    "filter_by": "Lọc kết quả theo",
+    "undo": "Hoàn tác"
 }
