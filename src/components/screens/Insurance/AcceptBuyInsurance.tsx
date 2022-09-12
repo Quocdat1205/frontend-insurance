@@ -407,7 +407,7 @@ export const AcceptBuyInsurance = ({
                         <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
                             <div className={'text-[#808890]'}>R-Claim</div>
                             <div className={'font-semibold'}>
-                                <span className={`${checkUpgrade ? 'line-through text-[#808890]' : 'pr-[2px]'}`}>{state.r_claim}</span>{' '}
+                                <span className={`${checkUpgrade ? 'line-through text-[#808890]' : 'pr-[8px]'}`}>{state.r_claim}</span>{' '}
                                 <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>
                                     {(state.q_claim + (state.q_claim * 5) / 100) / state.margin}
                                 </span>{' '}
@@ -425,9 +425,9 @@ export const AcceptBuyInsurance = ({
                             </div>
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
-                            <div className={'text-[#808890]'}>Margin</div>
+                            <div className={'text-[#808890] pr-[8px]'}>Margin</div>
                             <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                <span className={'pr-[2px]'}>{state.margin}</span> <span className={'text-[#EB2B3E]'}>USDT</span>
+                                <span className={'pr-[2px]'}>{state.margin}</span> <span className={'text-[#EB2B3E] pl-[14px]'}>USDT</span>
                             </div>
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px]">
@@ -445,7 +445,7 @@ export const AcceptBuyInsurance = ({
                         {!isUpdated ? (
                             <div className="text-[#EB2B3E] bg-[#F7F8FA] rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
                                 <div className={'flex flex-row items-center py-[14px]'}>
-                                    <span className="">
+                                    <span className="pr-[8px]">
                                         <ErrorCircleIcon size={16} />
                                     </span>
                                     <span className="text-sm"> {t('insurance:buy:price_had_update')}</span>
@@ -468,7 +468,7 @@ export const AcceptBuyInsurance = ({
                         ) : (
                             <div className="text-[#52CC74] bg-[#F7F8FA] rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
                                 <div className={'flex flex-row items-center py-[14px]'}>
-                                    <span className="">
+                                    <span className="pr-[8px]">
                                         <CheckCircle />
                                     </span>
                                     <span className="text-sm"> {t('insurance:buy:price_had_update')}</span>
@@ -485,7 +485,7 @@ export const AcceptBuyInsurance = ({
                             </div>
                             <div className="flex flex-col w-full select-none ml-[24px]">
                                 <div>
-                                    <div className="flex items-center mr-4 py-[8px] ">
+                                    <div className="flex items-center mr-4 sm:py-[8px] ">
                                         <input
                                             className={'hover:cursor-pointer hidden'}
                                             type="radio"
@@ -511,7 +511,7 @@ export const AcceptBuyInsurance = ({
                                                 console.log(e)
                                             }}
                                         />
-                                        <label htmlFor="test1" className="select-none text-sm text-[#22313F] font-medium">
+                                        <label htmlFor="test1" className="select-none text-sm text-[#22313F] font-semibold">
                                             {t('insurance:buy:upgrade')}
                                         </label>
                                     </div>

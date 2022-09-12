@@ -106,7 +106,7 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                 </div>
                                             </>
                                         )}
-                                        {name !== 'loanding' && (
+                                        {name !== 'loading' && (
                                             <div className="flex justify-center items-center">
                                                 <Button
                                                     variants={'primary'}
@@ -129,12 +129,12 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
             </>
         ) : (
             <>
-                <div className="w-[450px]  z-50 flex flex-col-reverse">
+                <div className="z-50 flex flex-col-reverse">
                     {noti.map((item, index) => {
                         if (item.name === name) {
                             return (
                                 <div key={index} className={` bg-white text-sm  w-full mx-auto `}>
-                                    {name != 'loading' && (
+                                    {name != 'loading' && name != 'success' && (
                                         <div className="m-[24px] flex flex-row-reverse" onClick={setActive}>
                                             <XMark></XMark>
                                         </div>

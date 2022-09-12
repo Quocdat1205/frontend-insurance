@@ -21,6 +21,7 @@ import store from 'redux/store'
 import Config from 'config/config'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
 import { formatNumber } from 'utils/utils'
+import Modal from 'components/common/Modal/Modal'
 //chart
 const ChartComponent = dynamic(() => import('../components/common/Chart/chartComponent'), { ssr: false, suspense: true })
 
@@ -372,10 +373,15 @@ export const InsuranceFrom = () => {
     return !loadings ? (
         <LayoutInsurance handleClick={() => setDrop(false)}>
             {active && (
-                <div className="absolute w-full h-full bg-gray/[0.5] z-50 flex flex-col items-center justify-center">
+                <Modal
+                    portalId="modal"
+                    isVisible={!isMobile}
+                    onBackdropCb={() => {}}
+                    className="rounded-xl p-6 bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                >
                     <NotificationInsurance
                         id={res ? res.data._id : ''}
-                        name={nameNoti}
+                        name={'loading'}
                         state={state}
                         active={active}
                         setActive={() => {
@@ -383,10 +389,15 @@ export const InsuranceFrom = () => {
                         }}
                         isMobile={false}
                     />
-                </div>
+                </Modal>
             )}
             {showDetails && (
-                <div className="absolute w-full h-full bg-gray/[0.5] z-50 flex flex-col items-center justify-center">
+                <Modal
+                    portalId="modal"
+                    isVisible={true}
+                    onBackdropCb={() => {}}
+                    className="rounded-xl p-6 bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                >
                     <div className={` bg-white text-sm  w-[424px] mx-auto `}>
                         <div
                             className="m-[24px] flex flex-row-reverse"
@@ -410,7 +421,7 @@ export const InsuranceFrom = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </Modal>
             )}
             {openChangeToken && (
                 <div className="absolute w-full h-full bg-gray/[0.5] z-50 flex flex-col-reverse">
@@ -945,7 +956,7 @@ export const InsuranceFrom = () => {
                         {/*end head*/}
 
                         {/*body*/}
-                        <div className={'pl-[32px] pr-[32px] flex flex-row relative'}>
+                        <div className={'px-[32px] flex flex-row relative'}>
                             <Suspense fallback={`Loading...`}>
                                 <ChartComponent
                                     data={dataChart}
@@ -956,7 +967,14 @@ export const InsuranceFrom = () => {
                                     setP_Market={(data: number) => setState({ ...state, p_market: data })}
                                 ></ChartComponent>
                             </Suspense>
-                            <svg className={`absolute right-[34px]`} width="10" height="458" viewBox="0 0 2 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg
+                                className={`absolute lg:right-[34px] right-[0px]`}
+                                width="10"
+                                height="auto"
+                                viewBox="0 0 2 240"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
                                 <line x1="1" y1="3.5011e-08" x2="0.999987" y2="240" stroke="#B2B7BC" strokeWidth="150" strokeDasharray="0.74 3.72"></line>
                             </svg>
                         </div>
@@ -1085,12 +1103,12 @@ export const InsuranceFrom = () => {
                             <Tab.Group>
                                 <Tab.List
                                     className={`flex flex-row justify-between mt-[20px]  ${isMobile ? 'w-full' : 'w-[85%]'} ${
-                                        showCroll ? 'overflow-scroll' : ' overflow-hidden'
+                                        isMobile && showCroll ? 'overflow-scroll' : ' overflow-hidden'
                                     }`}
-                                    onMouseEnter={() => {
+                                    onTouchStart={() => {
                                         setShowCroll(true)
                                     }}
-                                    onMouseLeave={() => {
+                                    onTouchEnd={() => {
                                         setShowCroll(false)
                                     }}
                                 >
@@ -1101,7 +1119,7 @@ export const InsuranceFrom = () => {
                                                 className={`${
                                                     state.period == item && 'bg-[#FFF1F2] text-[#EB2B3E]'
                                                 } bg-[#F7F8FA] rounded-[300px] p-3 h-[32px] w-[49px] flex justify-center items-center hover:cursor-pointer ${
-                                                    isMobile && !(item == 15) && 'mr-[24px]'
+                                                    isMobile && !(item == 15) && 'mr-[12px]'
                                                 }`}
                                                 onClick={() => setState({ ...state, period: item })}
                                             >
