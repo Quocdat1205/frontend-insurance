@@ -453,7 +453,7 @@ export const AcceptBuyInsurance = ({
                                 <div>
                                     <Button
                                         variants="outlined"
-                                        className={`py-[8px] rounded-[8px] px-[24px] text-xs tiny:px-[24px]`}
+                                        className={`py-[8px] rounded-[8px] px-[6px] text-xs tiny:px-[24px]`}
                                         onClick={() => {
                                             getPrice(state.symbol.symbol, state, setState)
                                             setUpdated(true)
@@ -561,7 +561,7 @@ export const AcceptBuyInsurance = ({
                     variants={'primary'}
                     className={`${
                         !isCanBuy ? 'bg-[#E5E7E8]' : 'bg-[#EB2B3E]'
-                    }  h-[48px] w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
+                    }  h-[48px] w-[95%] tiny:w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                     onClick={() => {
                         createContract()
                     }}
