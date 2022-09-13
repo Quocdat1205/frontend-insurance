@@ -16,6 +16,6 @@ export interface Toast {
 }
 
 export interface IconSvg {
-    size: number
-    color: string
+    size?: number
+    color?: string
 }
