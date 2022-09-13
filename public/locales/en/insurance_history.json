@@ -10,14 +10,5 @@
     "connecting_wallet_to_buy": "Connecting wallet to buy Insurance Contract.",
     "status": "Status",
     "choose_status": "Choose Status",
-    "insurance_contract": "Insurance Contract",
-    "price_reaching_date": "Price reaching date",
-    "status_2": "Status",
-    "reason": {
-        "p_claim_reached": "P-Claim reached",
-        "q_claim_received": "Q-Claim received",
-        "q_refund_received": "Q-Refund received",
-        "p_expired_reached": "P-Expired reached",
-        "expired": "Expired"
-    }
+    "insurance_contract": "Insurance Contract"
 }

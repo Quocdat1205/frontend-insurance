@@ -35,5 +35,17 @@
             "liquidated": "Bị thanh lý",
             "claim_waiting": "Chờ chi trả"
         }
+    },
+    "insurance_history": {
+        "price_reaching_date": "Ngày chạm giá",
+        "status_2": "Trạng thái HĐBH",
+        "reason": {
+            "p_claim_reached": "Đã chạm P-Claim",
+            "q_claim_received": "Đã nhận Q-Claim",
+            "q_refund_received": "Đã nhận Q-Refund",
+            "p_expired_reached": "Chạm giá P-Expired",
+            "expired": "Hết hạn",
+            "liquidated": "Bị thanh lý"
+        }
     }
 }

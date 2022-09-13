@@ -10,14 +10,5 @@
     "connecting_wallet_to_buy": "Kết nối ví để mua hợp đồng bảo hiểm ngay.",
     "status": "Trạng thái hợp đồng",
     "choose_status": "Chọn trạng thái hợp đồng",
-    "insurance_contract": "Hợp đồng bảo hiểm",
-    "price_reaching_date": "Ngày chạm giá",
-    "status_2": "Trạng thái HĐBH",
-    "reason": {
-        "p_claim_reached": "Đã chạm P-Claim",
-        "q_claim_received": "Đã nhận Q-Claim",
-        "q_refund_received": "Đã nhận Q-Refund",
-        "p_expired_reached": "Chạm giá P-Expired",
-        "expired": "Hết hạn"
-    }
+    "insurance_contract": "Hợp đồng bảo hiểm"
 }

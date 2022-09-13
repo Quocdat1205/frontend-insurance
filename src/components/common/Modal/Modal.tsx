@@ -1,6 +1,5 @@
 import classnames from 'classnames'
-import useOutsideAlerter, { useOutside } from 'hooks/useOutsideAlerter'
-import useWindowSize from 'hooks/useWindowSize'
+import useOutsideAlerter from 'hooks/useOutsideAlerter'
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { X } from 'react-feather'
 import { PORTAL_MODAL_ID } from 'utils/constants'
@@ -75,7 +74,7 @@ const Modal = ({
                 ref={container}
             >
                 <div
-                    className={classnames('h-full relative ease-in transition-all flex duration-300 mx-4', {
+                    className={classnames('h-full relative ease-in transition-all flex duration-300', {
                         'translate-y-full': !isVisible,
                         'translate-y-0': isVisible,
                         'flex flex-col justify-end': isMobile,
