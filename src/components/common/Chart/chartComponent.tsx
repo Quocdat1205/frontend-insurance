@@ -2,6 +2,7 @@ import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themes_animated from '@amcharts/amcharts4/themes/animated'
 import { useEffect, useState, useRef } from 'react'
+import { useRouter } from 'next/router'
 
 export type iProps = {
     p_expired?: any
@@ -89,6 +90,8 @@ export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number)
 
 export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, state, isMobile }: iProps) => {
     const [dataChart, setDataChart] = useState([])
+    const [PClaim, setPClaim] = useState(p_claim)
+    const router = useRouter()
     let chart: any
     // const ref = useRef<any>(null)
 
@@ -100,6 +103,7 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
         InitChart(dataChart)
         // ref.current.renderer
         setP_Market(chart.data[chart.data.length - 1]?.value)
+        setPClaim(PClaim)
     }, [dataChart, p_claim, p_expired, state.period])
 
     const InitChart = async (test_data: Idata[]) => {
@@ -229,7 +233,6 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
             if (p_claim) {
                 //chart claim
 
-                const timeBegin = new Date(chart.data[chart.data.length - 1]?.date)
                 const timeEnd = new Date()
                 timeEnd.setDate(timeEnd.getDate() + 5)
 
@@ -254,24 +257,30 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                 claimLabel.label.fill = am4core.color('#EB2B3E')
 
                 claimLabel.label.html = `<div class="hover:cursor-pointer" style="color: ${
-                    p_claim < state.p_market ? '#EB2B3E' : '#52CC74'
-                } ; border-radius: 800px; padding: 4px 16px; background-color: ${p_claim < state.p_market ? '#FFF1F2' : '#F1FFF5'}  ">P-Claim ${p_claim} ${
-                    p_claim > state.p_market
-                        ? `${(((p_claim - state.p_market) / state.p_market) * 100).toFixed(2)}%`
-                        : `${(((p_claim - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                    latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : '#52CC74'
+                } ; border-radius: 800px; padding: 4px 16px; background-color: ${
+                    latitudeClaim.data[0].value < state.p_market ? '#FFF1F2' : '#F1FFF5'
+                }  ">P-Claim ${latitudeClaim.data[0].value} ${
+                    latitudeClaim.data[0].value > state.p_market
+                        ? `${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                        : `${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
                 }</div>`
                 claimLabel.id = 'g2'
 
                 //label claim
+                claimLabel.cursorOverStyle = am4core.MouseCursorStyle.verticalResize
                 claimLabel.label.draggable = true
-                let interract = am4core.getInteraction()
 
-                claimLabel.events.once('drag', (event: any) => {
-                    interract.events.once('up', (event: any) => {
-                        let point = am4core.utils.documentPointToSprite(chart.cursor.point, chart.seriesContainer)
-                        return setP_Claim(valueAxis.yToValue(point?.y).toFixed(2))
-                    })
+                // let interract = am4core.getInteraction()
+                claimLabel.events.on('drag', (event: any) => {
+                    let value = valueAxis.yToValue(event.target.pixelY)
+                    console.log(latitudeClaim.data[0].value)
+                    event.target.dataItem.valueY = value
                 })
+
+                // bullet.events.on('dragstop', (event: any) => {
+                //     handleDrag(event)
+                // })
 
                 handleTrendLineStatus(chart, p_claim)
             }

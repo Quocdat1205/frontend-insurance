@@ -560,7 +560,15 @@ export const InsuranceFrom = () => {
                                         </span>
                                     </span>
                                 </div>
-                                <div className={'w-1/2'}>{tab == 4 ? 'R-Claim' : tab == 5 ? 'Q-Claim' : tab == 6 && 'Margin'}</div>
+                                <div className={'w-1/2 flex flex-row'}>
+                                    {tab == 6 && 'Margin'}{' '}
+                                    <span className={'tooltip'}>
+                                        <InfoCircle></InfoCircle>
+                                        <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                            {t('insurance:terminology:margin')}
+                                        </span>
+                                    </span>
+                                </div>
                             </div>
                             <div className={'pb-[8px] pl-[32px] pr-[32px] h-[70px] flex justify-between'}>
                                 <div className={`${tab > 3 ? 'w-[50%] mr-[12px]' : 'w-full'} flex justify-between border-collapse rounded-[3px] shadow-none`}>
@@ -1558,7 +1566,15 @@ export const InsuranceFrom = () => {
                     {/* Period */}
                     {index == 1 && (
                         <div className={'mt-5 pl-[32px] pr-[32px] pb-[32px] text-sm text-[#808890]'}>
-                            <span>Period ({menu[8].name})</span>
+                            <span className="flex flex-row">
+                                Period ({menu[8].name}){' '}
+                                <span className={'tooltip'}>
+                                    <InfoCircle></InfoCircle>
+                                    <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                        {t('insurance:terminology:period')}
+                                    </span>
+                                </span>
+                            </span>
                             <Tab.Group>
                                 <Tab.List
                                     className={`flex flex-row justify-between mt-[20px]  ${isMobile ? 'w-full' : 'w-[85%]'} ${
@@ -1595,18 +1611,12 @@ export const InsuranceFrom = () => {
                         <div className={'my-[24px] px-[32px]'}>
                             <span className={'flex flex-row items-center '}>
                                 <span className={'text-[#808890] text-sm mr-[4px]'}>P-Claim</span>
-                                {
-                                    <span className={'tooltip_p_claim relative'} onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}>
-                                        <InfoCircle></InfoCircle>
-                                        <span
-                                            className={`${
-                                                isHover ? 'visible' : 'hidden'
-                                            } tooltip_p_claim_text px-[8px] py-[4px] shadow-lg w-[400px] bg-[white] text-[black] text-center rounded-[6px] border border-0.5 border-[#e5e7e8] absolute z-10 left-[28px] top-[-33px]`}
-                                        >
-                                            {menu[10]?.name}
-                                        </span>
+                                <span className={'tooltip'}>
+                                    <InfoCircle></InfoCircle>
+                                    <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                        {t('insurance:terminology:p_claim')}
                                     </span>
-                                }
+                                </span>
                             </span>
                             <div
                                 className={`mt-[8px] flex justify-between border-collapse rounded-[3px] shadow-none ${!clear && 'border border-1 border-red'}`}
@@ -1632,7 +1642,15 @@ export const InsuranceFrom = () => {
                     )}
                     {tab == 6 && (
                         <div className={'mt-5 pl-[32px] pr-[32px] pb-[32px]'}>
-                            <span>Margin</span>
+                            <span className={'flex flex-row'}>
+                                Margin{' '}
+                                <span className={'tooltip'}>
+                                    <InfoCircle></InfoCircle>
+                                    <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                        {t('insurance:terminology:margin')}
+                                    </span>
+                                </span>
+                            </span>
                             <Tab.Group>
                                 <Tab.List className={`flex flex-row justify-between mt-[20px]  ${isMobile ? 'overflow-scroll w-full' : 'w-[85%]'}`}>
                                     {[2, 5, 7, 10].map((item, key) => {
@@ -1675,7 +1693,15 @@ export const InsuranceFrom = () => {
                                         tab == 4 ? 'hidden' : ''
                                     } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[16px] mx-[12px]`}
                                 >
-                                    <div className={'text-[#808890]'}>R-Claim</div>
+                                    <div className={'text-[#808890] flex flex-row'}>
+                                        R-Claim{' '}
+                                        <span className={'tooltip'}>
+                                            <InfoCircle></InfoCircle>
+                                            <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                                {t('insurance:terminology:r_claim')}
+                                            </span>
+                                        </span>
+                                    </div>
                                     <div className={'font-semibold'}>
                                         <span>{state.r_claim.toFixed(2) || 0}%</span>
                                     </div>
@@ -1685,7 +1711,15 @@ export const InsuranceFrom = () => {
                                         tab == 5 ? 'hidden' : ''
                                     } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[16px] mx-[12px]`}
                                 >
-                                    <div className={'text-[#808890]'}>Q-Claim</div>
+                                    <div className={'text-[#808890] flex flex-row'}>
+                                        Q-Claim{' '}
+                                        <span className={'tooltip'}>
+                                            <InfoCircle></InfoCircle>
+                                            <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                                {t('insurance:terminology:q_claim')}
+                                            </span>
+                                        </span>
+                                    </div>
                                     <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
                                         {state.q_claim.toFixed(8) || 0}
                                         <span
@@ -1701,7 +1735,15 @@ export const InsuranceFrom = () => {
                                         tab == 6 ? 'hidden' : ''
                                     } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[16px] mx-[12px]`}
                                 >
-                                    <div className={'text-[#808890]'}>Margin</div>
+                                    <div className={'text-[#808890] flex flex-row'}>
+                                        Margin{' '}
+                                        <span className={'tooltip'}>
+                                            <InfoCircle></InfoCircle>
+                                            <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                                {t('insurance:terminology:margin')}
+                                            </span>
+                                        </span>
+                                    </div>
                                     <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                                         {state.margin > 0 ? Number(state.margin).toFixed(8) : 0}
 
