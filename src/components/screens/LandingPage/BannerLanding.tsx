@@ -55,7 +55,7 @@ const BannerLanding = () => {
             <div className="max-w-screen-insurance m-auto text-center flex flex-col space-y-12 sm:space-y-6">
                 <div className="flex flex-col space-y-2">
                     <div className="leading-5 sm:leading-6">{t('home:landing:total_q_claim')}</div>
-                    <div className="text-red text-[2.5rem] leading-[3.5rem] sm:leading-10 font-bold sm:font-semibold" data-aos="fade-up" data-aos-delay={DURATION_AOS}>{formatNumber(general?.q_claim, 4)}</div>
+                    <div className="text-red text-[2.25rem] leading-[3.25rem] sm:leading-10 font-bold sm:font-semibold" data-aos="fade-up" data-aos-delay={DURATION_AOS}>{formatNumber(general?.q_claim, 4)}</div>
                 </div>
                 <div className="grid grid-rows-4 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-4 grid-flow-col sm:gap-x-6 lg:gap-6">
                     {list.map((item: any, index: number) => (
@@ -75,8 +75,8 @@ const BannerLanding = () => {
 
 const Item = styled.div.attrs<any>({
     className: classnames(
-        'shadow-banner pt-6 pb-9 last:pb-6 -mb-3 lg:m-0 first:mt-0 sm:!p-4 w-full ',
-        'text-center flex flex-col lg:items-start items-center space-y-2 sm:even:mb-0 last:m-0',
+        'shadow-banner pt-6 pb-9 last:pb-6 -mb-3 lg:m-0 first:mt-0 sm:!p-x4 sm:py-12 w-full ',
+        'text-center flex flex-col items-center space-y-[2px] sm:even:mb-0 last:m-0',
     ),
 })`
     backdrop-filter: blur(5px);

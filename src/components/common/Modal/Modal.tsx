@@ -1,5 +1,5 @@
 import classnames from 'classnames'
-import useOutsideAlerter from 'hooks/useOutsideAlerter'
+import useOutsideAlerter, { useOutside } from 'hooks/useOutsideAlerter'
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { X } from 'react-feather'
 import { PORTAL_MODAL_ID } from 'utils/constants'
@@ -37,7 +37,8 @@ const Modal = ({
         if (isVisible && onBackdropCb) onBackdropCb()
     }
 
-    useOutsideAlerter(wrapperRef, handleOutside)
+    useOutside(wrapperRef, handleOutside, container)
+    // useOutsideAlerter(wrapperRef, handleOutside)
 
     useEffect(() => {
         clearTimeout(timer.current)
@@ -81,23 +82,26 @@ const Modal = ({
                     })}
                 >
                     {loading && (
-                        <div ref={wrapperRef} className={`${className} w-full absolute bg-white`}>
-                            {isMobile ? (
-                                <div className={`py-8 px-6 ${wrapClassName}`}>
-                                    <>
-                                        {customHeader ? (
-                                            customHeader()
-                                        ) : (
-                                            <div className="flex items-center justify-end pb-6">
-                                                <X onClick={handleOutside} size={20} className="cursor-pointer" />
-                                            </div>
-                                        )}
-                                        {children}
-                                    </>
-                                </div>
-                            ) : (
-                                children
+                        <div
+                            ref={wrapperRef}
+                            className={classnames(
+                                'w-full absolute bg-white rounded-xl',
+                                { 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2': !isMobile },
+                                className,
                             )}
+                        >
+                            <div className={`py-8 px-6 ${wrapClassName}`}>
+                                <>
+                                    {customHeader ? (
+                                        customHeader()
+                                    ) : (
+                                        <div className="flex items-center justify-end pb-6 sm:pb-2">
+                                            <X onClick={handleOutside} size={20} className="cursor-pointer" />
+                                        </div>
+                                    )}
+                                    {children}
+                                </>
+                            </div>
                         </div>
                     )}
                 </div>

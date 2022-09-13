@@ -2,7 +2,7 @@ import classnames from 'classnames'
 import Button from 'components/common/Button/Button'
 import Modal from 'components/common/Modal/Modal'
 import Selectbox from 'components/common/Selectbox/Selectbox'
-import { CalendarIcon, RightArrow } from 'components/common/Svg/SvgIcon'
+import { CalendarIcon, InfoCircle, RightArrow } from 'components/common/Svg/SvgIcon'
 import React, { useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'react-feather'
 import colors from 'styles/colors'
@@ -11,6 +11,7 @@ import en from 'date-fns/locale/en-US'
 import { useTranslation } from 'next-i18next'
 import { DateRangePicker } from 'react-date-range'
 import { formatTime } from 'utils/utils'
+import Tooltip from 'components/common/Tooltip/Tooltip'
 
 interface InsuranceFilterMobile {
     visible: boolean
@@ -154,7 +155,7 @@ const InsuranceFilterMobile = (props: InsuranceFilterMobile) => {
                         isClearable={true}
                     />
                     <div>
-                        <div className="text-sm font-semibold">{t('insurance_history:status')}</div>
+                        <div className="text-sm font-semibold text-txtSecondary">{t('insurance_history:status')}</div>
                         <div className="flex items-center flex-wrap">
                             {optionsState.map((item, index) => (
                                 <div
@@ -169,15 +170,27 @@ const InsuranceFilterMobile = (props: InsuranceFilterMobile) => {
                             ))}
                         </div>
                     </div>
-                    <div onClick={() => onAction('open')}>
-                        <div className="flex items-center justify-between w-full px-4 rounded-[3px] bg-hover h-[2.75rem] sm:h-[3rem]">
-                            <div className="w-full flex items-center text-sm sm:text-base">
-                                {period} {date?.startDate ? formatTime(date?.startDate, 'dd/MM/yyyy') + ' - ' + formatTime(date?.endDate, 'dd/MM/yyyy') : ''}
+                    <div>
+                        <div className="text-sm font-semibold text-txtSecondary mb-2">
+                            <div className="text-txtSecondary flex items-center space-x-2">
+                                <span>Period</span>
+                                <div data-tip={t('insurance:terminology:period')} data-for={'period'}>
+                                    <InfoCircle size={14} color={colors.txtSecondary} />
+                                    <Tooltip className="max-w-[200px]" id={'period'} placement="right" />
+                                </div>
                             </div>
-                            <div className="flex items-center space-x-2">
-                                {date?.startDate && <X size={16} onClick={() => onAction('clear')} />}
-                                <div className="cursor-pointer">
-                                    <CalendarIcon />
+                        </div>
+                        <div onClick={() => onAction('open')}>
+                            <div className="flex items-center justify-between w-full px-4 rounded-[3px] bg-hover h-[2.75rem] sm:h-[3rem]">
+                                <div className="w-full flex items-center text-sm sm:text-base">
+                                    {period}{' '}
+                                    {date?.startDate ? formatTime(date?.startDate, 'dd/MM/yyyy') + ' - ' + formatTime(date?.endDate, 'dd/MM/yyyy') : ''}
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    {date?.startDate && <X size={16} onClick={() => onAction('clear')} />}
+                                    <div className="cursor-pointer">
+                                        <CalendarIcon />
+                                    </div>
                                 </div>
                             </div>
                         </div>

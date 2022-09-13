@@ -201,13 +201,8 @@ const Notifications = () => {
 
 const NotiDetailModal = ({ visible, onClose, data, t, isMobile }: any) => {
     return (
-        <Modal
-            isMobile={true}
-            isVisible={visible}
-            onBackdropCb={onClose}
-            className={!isMobile ? 'rounded-xl bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2' : ''}
-        >
-            <div className="overflow-hidden relative sm:-m-6"> {renderContentStatus(data, t)}</div>
+        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} className={'max-w-[424px]'}>
+            <div className="overflow-hidden relative sm:-mx-6"> {renderContentStatus(data, t)}</div>
         </Modal>
     )
 }

@@ -156,6 +156,13 @@ module.exports = {
                 },
             ], // Heading 3 32px,
             '5xl': [
+                '2.25rem',
+                {
+                    letterSpacing: '0.5px',
+                    lineHeight: '3.25rem',
+                },
+            ], //  36
+            '6xl': [
                 '2.5rem',
                 {
                     letterSpacing: '0.5px',
@@ -235,7 +242,7 @@ module.exports = {
             dropShadow: {},
             boxShadow: {
                 banner: '0px -4px 10px rgba(235, 43, 62, 0.1)',
-                card: '0px 6px 18px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.31)',
+                card: '0px 6px 18px rgba(9, 30, 66, 0.05)',
                 subMenu: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)',
             },
             cursor: {

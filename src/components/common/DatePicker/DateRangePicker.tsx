@@ -25,7 +25,7 @@ interface ReactDateRangePicker {
     showIcon?: boolean
     className?: any
     shrink?: boolean
-    label?: string
+    label?: any
     keyExp?: string
     renderContent?: any
     prefix?: string
@@ -107,7 +107,7 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
 
     return (
         <div className={`flex flex-col space-y-2 ${className}`}>
-            <div className="text-sm">{label}</div>
+            <div className="text-sm text-txtSecondary">{label}</div>
             <div ref={wrapperRef} className="date-range-picker relative px-4 rounded-[3px]">
                 <div onClick={() => onAction('open')} className="flex items-center w-full space-x-2 relative">
                     <div className="w-full h-full flex items-center">

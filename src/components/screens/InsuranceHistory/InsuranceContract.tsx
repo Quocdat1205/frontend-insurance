@@ -13,11 +13,12 @@ import { formatCurrency, formatNumber, formatTime } from 'utils/utils'
 import InsuranceContractMobile from './InsuranceContractMobile'
 import { useAppSelector, RootStore } from 'redux/store'
 import colors from 'styles/colors'
-import { CalendarIcon } from 'components/common/Svg/SvgIcon'
+import { CalendarIcon, InfoCircle } from 'components/common/Svg/SvgIcon'
 import Popover from 'components/common/Popover/Popover'
 import { isMobile as mobile } from 'react-device-detect'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import Tooltip from 'components/common/Tooltip/Tooltip'
 
 interface InsuranceContract {
     account: any
@@ -100,11 +101,23 @@ export const renderContentStatus = (data: any, t: any) => {
                     </div>
                     {renderReason(data, t)}
                     <div className="flex items-center justify-between">
-                        <div className="text-txtSecondary">Q-Claim</div>
+                        <div className="text-txtSecondary flex items-center space-x-2">
+                            <span>Q-Claim</span>
+                            <div data-tip={t('insurance:terminology:q_claim')} data-for={'q-claim'}>
+                                <InfoCircle size={14} color={colors.txtSecondary} />
+                                <Tooltip className="max-w-[200px]" id={'q-claim'} placement="right" />
+                            </div>
+                        </div>
                         <div className="font-semibold">{formatCurrency(data?.q_claim, 4, 1e4)}</div>
                     </div>
                     <div className="flex items-center justify-between">
-                        <div className="text-txtSecondary">R-Claim</div>
+                        <div className="text-txtSecondary flex items-center space-x-2">
+                            <span>R-Claim</span>
+                            <div data-tip={t('insurance:terminology:r_claim')} data-for={'r-claim'}>
+                                <InfoCircle size={14} color={colors.txtSecondary} />
+                                <Tooltip className="max-w-[200px]" id={'r-claim'} placement="right" />
+                            </div>
+                        </div>
                         <div className="font-semibold">{formatNumber(data?.q_claim / data?.margin, 2)}%</div>
                     </div>
                 </div>
@@ -227,6 +240,18 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
         )
     }
 
+    const renderHeaderTooltip = (name: string, content: string, id: string) => {
+        return (
+            <div className="flex items-center space-x-2">
+                <span>{name}</span>
+                <div data-tip={content} data-for={id}>
+                    <InfoCircle size={14} color={colors.txtSecondary} />
+                    <Tooltip id={id} placement="top" />
+                </div>
+            </div>
+        )
+    }
+
     const columns = React.useMemo(
         () => [
             {
@@ -236,25 +261,25 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
                 Cell: (e: any) => renderAsset(e),
             },
             {
-                Header: 'Period',
+                Header: () => renderHeaderTooltip('Period', t('insurance:terminology:period'), 'period'),
                 accessor: 'period',
                 minWidth: 130,
                 Cell: (e: any) => renderPeriod(e),
             },
             {
-                Header: 'Q-Claim',
+                Header: () => renderHeaderTooltip('Q-Claim', t('insurance:terminology:q_claim'), 'q_claim'),
                 accessor: 'q_claim',
                 minWidth: 150,
                 Cell: (e: any) => <div>{formatCurrency(e.value, 4, 1e4)} USDT</div>,
             },
             {
-                Header: 'P-Claim',
+                Header: renderHeaderTooltip('P-Claim', t('insurance:terminology:p_claim'), 'p_claim'),
                 accessor: 'p_claim',
                 minWidth: 150,
                 Cell: (e: any) => <div>{formatCurrency(e.value, 4, 1e4)} USDT</div>,
             },
             {
-                Header: 'Margin',
+                Header: renderHeaderTooltip('Margin', t('insurance:terminology:margin'), 'margin'),
                 accessor: 'margin',
                 minWidth: 150,
                 Cell: (e: any) => <div>{formatCurrency(e.value, 4, 1e4)} USDT</div>,
@@ -332,6 +357,18 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
         )
     }
 
+    const renderLabelPicker = () => {
+        return (
+            <div className="flex items-center space-x-2">
+                <span>Period</span>
+                <div data-tip={t('insurance:terminology:period')} data-for="period">
+                    <InfoCircle size={14} color={colors.txtSecondary} />
+                    <Tooltip id="period" placement="top" />
+                </div>
+            </div>
+        )
+    }
+
     if (isMobile && account)
         return (
             <InsuranceContractMobile
@@ -389,7 +426,7 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
                         renderContent={renderContentPicker}
                         className="md:col-span-2 lg:col-span-1"
                         value={date}
-                        label="Period"
+                        label={renderLabelPicker()}
                         prefix={period}
                         onChange={(e: any) => setDate(e)}
                         isClearable={true}

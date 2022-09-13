@@ -2,10 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-@import 'fonts';
-@import 'fonts';
-@import 'datepicker';
-@import 'pagination';
+@import "fonts";
+@import "fonts";
+@import "datepicker";
+@import "pagination";
 
 html {
     @apply font-Manrope;
@@ -169,7 +169,7 @@ input::-webkit-inner-spin-button {
     margin: 0;
 }
 
-input[type='number'] {
+input[type="number"] {
     -moz-appearance: textfield;
 }
 
@@ -194,4 +194,32 @@ input[type='number'] {
 /* Show the tooltip text when you mouse over the tooltip container */
 .tooltip:hover .tooltiptext {
     visibility: visible;
+}
+
+.guideline {
+    rect:not(.reactour__mask--disable-interaction) {
+        fill: #3d4252;
+        opacity: 0.3;
+    }
+
+    .reactour__mask--disable-interaction {
+        stroke-width: 3;
+        stroke-linejoin: round;
+        stroke: white;
+        rx: 6px;
+    }
+
+    #mask-main {
+        circle {
+            display: none;
+        }
+    }
+}
+
+.reactour__helper--is-open {
+    background-color: white;
+    padding: 16px !important;
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 26px) !important;
+    margin: 16px 0;
 }

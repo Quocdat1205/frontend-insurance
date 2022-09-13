@@ -34,7 +34,7 @@ const FeaturesLanding = () => {
     return (
         <section className="px-4 lg:px-20">
             <div className="max-w-screen-insurance m-auto text-center flex flex-col justify-center items-center pt-20 sm:pt-[7.5rem]">
-                <div className="text-2xl sm:text-[2.5rem] leading-8 sm:leading-10 font-semibold mb-4">{t('home:landing:unique_features')}</div>
+                <div className="text-2xl sm:text-5xl leading-8 font-semibold mb-4">{t('home:landing:unique_features')}</div>
                 <div className="max-w-[632px] text-[0.875rem] lg:text-[1rem]">{t('home:landing:unique_features_content')}</div>
                 <div className="flex flex-wrap space-y-6 sm:space-y-0 sm:gap-6 mt-7 sm:mt-9">
                     {features.map((item: any, index: number) => (
@@ -43,7 +43,7 @@ const FeaturesLanding = () => {
                                 <img src={item.img} className="max-w-[120px]" />
                             </div>
                             <div className="flex flex-col space-y-2 mt-4 sm:mt-9 sm:text-left">
-                                <div className="text-xl sm:text-2xl leading-7 sm:leading-9 font-medium text-red">{item.title}</div>
+                                <div className="text-xl sm:text-xl font-medium text-red">{item.title}</div>
                                 <div className="text-sm">{item.content}</div>
                             </div>
                         </Item>

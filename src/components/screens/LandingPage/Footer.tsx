@@ -9,7 +9,7 @@ interface Footer {
 const Footer = ({ sponsor = true }) => {
     const { t } = useTranslation()
     return (
-        <footer className="footer pt-20 sm:pt-[7.5rem]">
+        <footer className="footer pt-20 sm:pt-[11.75rem]">
             {sponsor && (
                 <BgSponsor>
                     <div className="text-txtPrimary font-bold text-sm sm:text-xl">{t('home:landing:products_sponsored_by')}</div>
