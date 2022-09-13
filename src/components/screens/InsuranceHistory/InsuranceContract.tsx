@@ -52,16 +52,19 @@ const renderReason = (data: any, t: any) => {
     let reason = ''
     switch (data?.state) {
         case stateInsurance.REFUNDED:
-            reason = 'insurance_history:reason:q_refund_received'
+            reason = 'common:insurance_history:reason:q_refund_received'
+            break
+        case stateInsurance.LIQUIDATED:
+            reason = 'common:insurance_history:reason:liquidated'
             break
         case stateInsurance.CLAIM_WAITING:
-            reason = 'insurance_history:reason:p_claim_reached'
+            reason = 'common:insurance_history:reason:p_claim_reached'
             break
         case stateInsurance.CLAIMED:
-            reason = 'insurance_history:reason:q_claim_received'
+            reason = 'common:insurance_history:reason:q_claim_received'
             break
         case stateInsurance.EXPIRED:
-            reason = 'insurance_history:reason:p_expired_reached'
+            reason = 'common:insurance_history:reason:p_expired_reached'
             break
         default:
             break
@@ -85,14 +88,14 @@ export const renderContentStatus = (data: any, t: any) => {
                     <div className="text-txtSecondary flex items-center space-x-2 mt-2 sm:mt-3 text-sm sm:text-base">
                         <CalendarIcon color={colors.txtSecondary} size={16} />
                         <span>
-                            {t('insurance_history:price_reaching_date')}: {formatTime(data?.updatedAt, 'dd/MM/yyyy')}
+                            {t('common:insurance_history:price_reaching_date')}: {formatTime(data?.updatedAt, 'dd/MM/yyyy')}
                         </span>
                     </div>
                 )}
                 <div className="h-[1px] w-full bg-divider mt-6 mb-4" />
                 <div className="flex flex-col space-y-2 text-sm sm:text-base">
                     <div className="flex items-center justify-between">
-                        <div className="text-txtSecondary">{t('insurance_history:status_2')}</div>
+                        <div className="text-txtSecondary">{t('common:insurance_history:status_2')}</div>
                         <div>{renderStatus(data, t)}</div>
                     </div>
                     {renderReason(data, t)}
@@ -257,7 +260,7 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
                 Cell: (e: any) => <div>{formatCurrency(e.value, 4, 1e4)} USDT</div>,
             },
             {
-                Header: t('insurance_history:status_2'),
+                Header: t('common:insurance_history:status_2'),
                 accessor: 'state',
                 minWidth: 190,
                 Cell: (e: any) => (

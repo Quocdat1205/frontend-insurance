@@ -37,5 +37,17 @@
             "liquidated": "Is liquidated",
             "claim_waiting": "Claim waiting"
         }
+    },
+    "insurance_history": {
+        "price_reaching_date": "Price reaching date",
+        "status_2": "Status",
+        "reason": {
+            "p_claim_reached": "P-Claim reached",
+            "q_claim_received": "Q-Claim received",
+            "q_refund_received": "Q-Refund received",
+            "p_expired_reached": "P-Expired reached",
+            "expired": "Expired",
+            "liquidated": "Liquidated"
+        }
     }
 }
