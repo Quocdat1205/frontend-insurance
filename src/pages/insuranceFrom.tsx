@@ -368,7 +368,7 @@ export const InsuranceFrom = () => {
     }, [state.p_claim])
 
     return !isMobile ? (
-        !loadings && (
+        !loadings ? (
             <LayoutInsurance handleClick={() => setDrop(false)}>
                 {active && (
                     <Modal
@@ -1127,6 +1127,8 @@ export const InsuranceFrom = () => {
                     ></AcceptBuyInsurance>
                 )}
             </LayoutInsurance>
+        ) : (
+            <></>
         )
     ) : (
         <>
