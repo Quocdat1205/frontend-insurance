@@ -5,7 +5,7 @@ import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatPriceToWeiValue } from 'utils/format'
-import { CheckBoxIcon, CheckCircle, ErrorCircleIcon, StartIcon, XMark } from 'components/common/Svg/SvgIcon'
+import { CheckBoxIcon, CheckCircle, ErrorCircleIcon, InfoCircle, StartIcon, XMark } from 'components/common/Svg/SvgIcon'
 import { buyInsurance } from 'services/buy-insurance'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
@@ -224,7 +224,15 @@ export const AcceptBuyInsurance = ({
                     <div className={''}>
                         <div className="p-[32px] pb-[24px] pt-0">
                             <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
-                                <div className={'text-[#808890]'}>R-Claim</div>
+                                <div className={'text-[#808890] flex flex-row'}>
+                                    R-Claim{' '}
+                                    <span className={'tooltip'}>
+                                        <InfoCircle></InfoCircle>
+                                        <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                            {t('insurance:terminology:r_claim')}
+                                        </span>
+                                    </span>
+                                </div>
                                 <div className={'font-semibold'}>
                                     <span className={`${checkUpgrade ? 'line-through text-[#808890] text-xs pr-[8px]' : 'pr-[8px]'}`}>{state.r_claim} %</span>
                                     <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>
@@ -233,7 +241,15 @@ export const AcceptBuyInsurance = ({
                                 </div>
                             </div>
                             <div className="flex flex-row justify-between py-[8px] px-[8px]">
-                                <div className={'text-[#808890]'}>Q-Claim</div>
+                                <div className={'text-[#808890] flex flex-row'}>
+                                    Q-Claim{' '}
+                                    <span className={'tooltip'}>
+                                        <InfoCircle></InfoCircle>
+                                        <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                            {t('insurance:terminology:q_claim')}
+                                        </span>
+                                    </span>
+                                </div>
                                 <div className={'font-semibold '}>
                                     <span className={`${checkUpgrade ? 'line-through text-[#808890] pr-[8px] text-xs' : 'pr-[8px]'}`}>{state.q_claim}</span>{' '}
                                     <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
@@ -243,13 +259,29 @@ export const AcceptBuyInsurance = ({
                                 </div>
                             </div>
                             <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
-                                <div className={'text-[#808890]'}>Margin</div>
+                                <div className={'text-[#808890] flex flex-row'}>
+                                    Margin{' '}
+                                    <span className={'tooltip'}>
+                                        <InfoCircle></InfoCircle>
+                                        <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                            {t('insurance:terminology:margin')}
+                                        </span>
+                                    </span>
+                                </div>
                                 <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                                     <span className={'pr-[8px]'}>{state.margin}</span> <span className={'text-[#EB2B3E]'}>USDT</span>
                                 </div>
                             </div>
                             <div className="flex flex-row justify-between py-[8px] px-[8px]">
-                                <div className={'text-[#808890]'}>Period</div>
+                                <div className={'text-[#808890] flex flex-row'}>
+                                    Period{' '}
+                                    <span className={'tooltip'}>
+                                        <InfoCircle></InfoCircle>
+                                        <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                            {t('insurance:terminology:period')}
+                                        </span>
+                                    </span>
+                                </div>
                                 <div className={'font-semibold'}>
                                     <span>
                                         <span className={`${checkUpgrade ? 'line-through text-[#808890] text-xs' : 'pr-[2px]'}`}>
@@ -405,7 +437,15 @@ export const AcceptBuyInsurance = ({
                 <div className="bg-[white] my-[24px]">
                     <div className="mx-[24px]">
                         <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
-                            <div className={'text-[#808890]'}>R-Claim</div>
+                            <div className={'text-[#808890] flex flex-row'}>
+                                R-Claim{' '}
+                                <span className={'tooltip'}>
+                                    <InfoCircle></InfoCircle>
+                                    <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                        {t('insurance:terminology:r_claim')}
+                                    </span>
+                                </span>
+                            </div>
                             <div className={'font-semibold'}>
                                 <span className={`${checkUpgrade ? 'line-through text-[#808890]' : 'pr-[8px]'}`}>{state.r_claim}</span>{' '}
                                 <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>
@@ -415,7 +455,15 @@ export const AcceptBuyInsurance = ({
                             </div>
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px]">
-                            <div className={'text-[#808890]'}>Q-Claim</div>
+                            <div className={'text-[#808890] flex flex-row'}>
+                                Q-Claim{' '}
+                                <span className={'tooltip'}>
+                                    <InfoCircle></InfoCircle>
+                                    <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                        {t('insurance:terminology:q_claim')}
+                                    </span>
+                                </span>
+                            </div>
                             <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                                 <span className={`${checkUpgrade ? 'line-through text-[#808890] pr-[8px]' : 'pr-[8px]'}`}>{state.q_claim}</span>{' '}
                                 <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
@@ -425,13 +473,29 @@ export const AcceptBuyInsurance = ({
                             </div>
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
-                            <div className={'text-[#808890] pr-[8px]'}>Margin</div>
+                            <div className={'text-[#808890] pr-[8px] flex flex-row'}>
+                                Margin{' '}
+                                <span className={'tooltip'}>
+                                    <InfoCircle></InfoCircle>
+                                    <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                        {t('insurance:terminology:margin')}
+                                    </span>
+                                </span>
+                            </div>
                             <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                                 <span className={'pr-[2px]'}>{state.margin}</span> <span className={'text-[#EB2B3E] pl-[14px]'}>USDT</span>
                             </div>
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px]">
-                            <div className={'text-[#808890]'}>Period</div>
+                            <div className={'text-[#808890] flex flex-row'}>
+                                Period{' '}
+                                <span className={'tooltip'}>
+                                    <InfoCircle></InfoCircle>
+                                    <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
+                                        {t('insurance:terminology:period')}
+                                    </span>
+                                </span>
+                            </div>
                             <div className={'font-semibold'}>
                                 <span>
                                     <span className={`${checkUpgrade ? 'line-through text-[#808890]' : 'pr-[2px]'}`}>{state.period}</span>{' '}
