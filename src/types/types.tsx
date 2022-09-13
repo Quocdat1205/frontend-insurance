@@ -14,3 +14,8 @@ export interface OptionNotify {
 export interface Toast {
     show: (type: string, messages: string, option?: OptionNotify) => void
 }
+
+export interface IconSvg {
+    size: number
+    color: string
+}

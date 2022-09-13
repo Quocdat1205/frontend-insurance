@@ -1,5 +1,5 @@
 import CardShadow from 'components/common/Card/CardShadow'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Assets from 'components/screens/HomePage/Assets'
 import InsuranceContract from 'components/screens/InsuranceHistory/InsuranceContract'
 import Statistics from 'components/screens/InsuranceHistory/Statistics'
@@ -8,19 +8,32 @@ import { useTranslation } from 'next-i18next'
 import Modal from 'components/common/Modal/Modal'
 import Popover from 'components/common/Popover/Popover'
 import { isMobile } from 'react-device-detect'
+import Guideline from './Guideline'
 
 const InsuranceHistory = () => {
     const { account } = useWeb3Wallet()
     const { t } = useTranslation()
     const [showGuideModal, setShowGuideModal] = useState<boolean>(false)
     const [showTerminologyModal, setShowTerminologyModal] = useState<boolean>(false)
+    const [showGuide, setShowGuide] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (showGuide) setShowGuideModal(false)
+    }, [showGuide])
 
     return (
         <>
-            <TerminologyModal visible={showTerminologyModal} onClose={() => setShowTerminologyModal(false)} t={t} />
-            <GuidelineModal visible={showGuideModal} onClose={() => setShowGuideModal(false)} t={t} />
+            {/* <Guideline start={showGuide} setStart={setShowGuide} /> */}
+            <TerminologyModal isMobile={isMobile} visible={showTerminologyModal} onClose={() => setShowTerminologyModal(false)} t={t} />
+            <GuidelineModal
+                visible={showGuideModal}
+                onClose={() => setShowGuideModal(false)}
+                t={t}
+                onShowTerminologyModal={() => setShowTerminologyModal(true)}
+                onShowGuildline={() => setShowGuide(true)}
+            />
             <div className="px-4 sm:px-10 pt-12 sm:pt-[4.25rem] max-w-screen-layout m-auto">
-                <div className="flex items-center justify-between">
+                <div className={`${account ? 'pb-8 sm:pb-12' : ''} flex items-center justify-between`}>
                     <div className="text-2xl sm:text-4xl font-semibold">{t('insurance_history:my_cover')}</div>
                     <Popover
                         visible={!isMobile}
@@ -53,29 +66,79 @@ const InsuranceHistory = () => {
     )
 }
 
-const GuidelineModal = ({ visible, onClose, t }: any) => {
+const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGuildline }: any) => {
     return (
         <Modal isMobile containerClassName="flex-col justify-end" isVisible={visible} onBackdropCb={onClose}>
             <div className="text-xl leading-8 font-semibold mb-6">{t('insurance_history:guidelines')}</div>
             <div className="flex flex-col text-sm divide-solid divide-y divide-divider">
-                <div className="py-4">{t('insurance_history:tracking_and_utilizing')}</div>
-                <div className="py-4">{t('insurance_history:detailed_terminology')}</div>
+                <div onClick={onShowGuildline} className="py-4">
+                    {t('insurance_history:tracking_and_utilizing')}
+                </div>
+                <div onClick={onShowTerminologyModal} className="py-4">
+                    {t('insurance_history:detailed_terminology')}
+                </div>
             </div>
         </Modal>
     )
 }
 
-const TerminologyModal = ({ visible, onClose, t }: any) => {
+const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
+    const terms = [
+        {
+            title: 'Q-Covered',
+            description: t('insurance:terminology:q_covered'),
+        },
+        {
+            title: 'P-Market',
+            description: t('insurance:terminology:p_market'),
+        },
+        {
+            title: 'P-Claim',
+            description: t('insurance:terminology:p_claim'),
+        },
+        {
+            title: 'P-Expired',
+            description: t('insurance:terminology:p_expired'),
+        },
+        {
+            title: 'P-Refund',
+            description: t('insurance:terminology:p_refund'),
+        },
+        {
+            title: 'Period',
+            description: t('insurance:terminology:period'),
+        },
+        {
+            title: 'R-Claim',
+            description: t('insurance:terminology:r_claim'),
+        },
+        {
+            title: 'Q-Claim',
+            description: t('insurance:terminology:q_claim'),
+        },
+        {
+            title: 'Margin',
+            description: t('insurance:terminology:margin'),
+        },
+        {
+            title: 'T-Start',
+            description: t('insurance:terminology:t_start'),
+        },
+        {
+            title: 'T-Expired',
+            description: t('insurance:terminology:t_expired'),
+        },
+    ]
     return (
-        <Modal
-            isVisible={visible}
-            onBackdropCb={onClose}
-            className="rounded-xl p-6 bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        >
-            <div className="text-xl leading-8 font-medium mb-8 text-center">{t('insurance_history:detailed_terminology')}</div>
-            <div className="flex flex-col text-sm divide-solid divide-y divide-divider">
-                <div className="py-4">{t('insurance_history:tracking_and_utilizing')}</div>
-                <div className="py-4">{t('insurance_history:detailed_terminology')}</div>
+        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'max-w-[424px]'} containerClassName="z-[100]">
+            <div className="text-xl font-medium mb-8 text-center">{t('insurance_history:detailed_terminology')}</div>
+            <div className="flex flex-col text-sm divide-solid divide-y divide-divider max-h-[70vh] overflow-auto -mx-6 px-6">
+                {terms.map((item: any, index: number) => (
+                    <div key={index} className="py-3 flex items-center">
+                        <div className="whitespace-nowrap min-w-[30%]">{item.title}</div>
+                        <div>{item.description}</div>
+                    </div>
+                ))}
             </div>
         </Modal>
     )
