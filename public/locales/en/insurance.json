@@ -68,5 +68,20 @@
     },
     "error": {
         "p_claim": "Error messenge"
+    },
+    "unit": {
+        "margin": "Unit asset Margin",
+        "q_claim": "Unit asset Q-Claim"
+    },
+    "mobile_login": {
+        "sub_title1": " Ease in investment",
+        "sub_title2": "Obtain the fast money of your desires.",
+        "token": "Select Q-Covered",
+        "token_detail": "You can select the asset type and enter the amount of assets you want to get covered",
+        "p_claim": "Select P-claim",
+        "p_claim_detail": "You can promptly select the P-claim by clicking and dragging the horizontal bar on the price chart vertically",
+        "period": "Select Period",
+        "period_detial": "Select the period for your insurance contract ",
+        "connect_wallet": "Connect wallet to start"
     }
 }

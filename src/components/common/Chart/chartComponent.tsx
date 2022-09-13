@@ -13,6 +13,7 @@ export type iProps = {
     setP_Market?: any
     setP_Claim?: any
     ref?: any
+    isMobile?: boolean
 }
 
 export type Idata = {
@@ -86,7 +87,7 @@ export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number)
     }
 }
 
-export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, state }: iProps) => {
+export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, state, isMobile }: iProps) => {
     const [dataChart, setDataChart] = useState([])
     let chart: any
     // const ref = useRef<any>(null)
@@ -110,6 +111,18 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
             chart.data = test_data
             chart.logo.appeared = false
             chart.padding(0, 15, 0, 15)
+            //cursor
+            chart.cursor = new am4charts.XYCursor()
+            chart.cursor.lineX.disabled = true
+            chart.cursor.behavior = 'none'
+            chart.cursor.fullWidthLineX = true
+            chart.cursor.fullWidthLineY = true
+            chart.cursor.lineX.fillOpacity = 0.05
+            chart.cursor.lineY.fillOpacity = 0.05
+            chart.events.on('ready', function (event: any) {
+                valueAxis.min = valueAxis.minZoomed
+                valueAxis.max = valueAxis.maxZoomed
+            })
 
             let dateAxis = chart.xAxes.push(new am4charts.DateAxis())
             dateAxis.renderer.grid.template.location = 0
@@ -136,6 +149,7 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
             valueAxis.renderer.axisFills.template.disabled = true
             valueAxis.renderer.ticks.template.disabled = true
             valueAxis.hidden = true
+            valueAxis.tooltip.disabled = false
 
             let series = chart.series.push(new am4charts.LineSeries())
             series.dataFields.dateX = 'date'
@@ -251,23 +265,16 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                 //label claim
                 claimLabel.label.draggable = true
                 let interract = am4core.getInteraction()
-                // claimLabel.events.on('positionchanged', (e: any) => {
-                //     console.log(e.target)
-                // })
+
                 claimLabel.events.once('drag', (event: any) => {
-                    interract.events.once('up', (e) => {
-                        let point = am4core.utils.documentPointToSprite(e.pointer.point, chart.seriesContainer)
+                    interract.events.once('up', (event: any) => {
+                        let point = am4core.utils.documentPointToSprite(chart.cursor.point, chart.seriesContainer)
                         return setP_Claim(valueAxis.yToValue(point?.y).toFixed(2))
                     })
                 })
 
                 handleTrendLineStatus(chart, p_claim)
             }
-
-            //cursor
-            chart.cursor = new am4charts.XYCursor()
-            chart.cursor.lineX.disabled = true
-            chart.cursor.behavior = 'none'
         }
     }
 

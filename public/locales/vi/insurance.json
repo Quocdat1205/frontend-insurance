@@ -68,5 +68,20 @@
     },
     "error": {
         "p_claim": "Error messenge"
+    },
+    "unit": {
+        "margin": "Đơn vị Margin",
+        "q_claim": "Đơn vị Q-Claim"
+    },
+    "mobile_login": {
+        "sub_title1": "An tâm đầu tư",
+        "sub_title2": "Nhận ngay chi trả trong mơ",
+        "token": "Chọn Tài sản cần bảo hiểm",
+        "token_detail": "Bạn có thể chọn loại tài sản và điền số lượng tài sản bất kỳ mà bạn muốn bảo vệ",
+        "p_claim": "Chọn P-claim",
+        "p_claim_detail": "Bạn có thể chọn nhanh P-claim bằng cách nhấn và kéo thanh ngang trên biểu đồ giá theo phương dọc",
+        "period": "Chọn Period",
+        "period_detial": "Chọn kỳ hạn (period) cho hợp đồng bảo hiểm của bạn",
+        "connect_wallet": "Kết nối ví để bắt đầu"
     }
 }
