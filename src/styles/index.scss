@@ -44,7 +44,7 @@ html {
 
 .border-transparent-red {
     border: 1.5px solid red;
-    background: rgba(54, 25, 25, .00004);
+    background: rgba(54, 25, 25, 0.00004);
 }
 
 .hover\:border-gradient-hover-red:hover {
@@ -145,16 +145,15 @@ html {
 .ticket {
     display: inline-block;
     box-sizing: content-box;
-    // filter: drop-shadow(0 2px 5px rgba(black, 0.5));
     position: relative;
-    height: 1em;
+    height: 32px;
     padding: 1em;
     color: black;
     font-size: 16px;
     background-size: 50% 100%;
     background-repeat: no-repeat;
-    background-image: radial-gradient(circle at 0 50%, rgba(white, 0) 20px, white (0.4em + 0.1em)),
-        radial-gradient(circle at 100% 50%, rgba(white, 0) 20px, white (0.4em + 0.1em));
+    background-image: radial-gradient(circle at 0 50%, rgba(white, 0) 18px, white (0.4em + 0.1em)),
+        radial-gradient(circle at 100% 50%, rgba(white, 0) 18px, white (0.4em + 0.1em));
     background-position: top left, top right;
 }
 
@@ -172,4 +171,27 @@ input::-webkit-inner-spin-button {
 
 input[type='number'] {
     -moz-appearance: textfield;
+}
+
+/* Tooltip container */
+.tooltip {
+    position: relative;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    color: #000;
+    background-color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
 }

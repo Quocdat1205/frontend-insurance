@@ -1,4 +1,3 @@
-import { color } from '@amcharts/amcharts4/core'
 import colors from 'styles/colors'
 
 export const RightArrow = ({ size = 16, color = 'white' }: any) => {
@@ -246,9 +245,9 @@ export const CheckBoxIcon = ({
     )
 }
 
-export const ErrorCircleIcon = () => {
+export const ErrorCircleIcon = ({ size }: any) => {
     return (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
                 d="M11.953 2C6.465 2 2 6.486 2 12C2 17.514 6.486 22 12 22C17.514 22 22 17.514 22 12C22 6.486 17.493 2 11.953 2ZM12 20C7.589 20 4 16.411 4 12C4 7.589 7.567 4 11.953 4C16.391 4 20 7.589 20 12C20 16.411 16.411 20 12 20Z"
                 fill="#EB2B3E"
@@ -258,9 +257,30 @@ export const ErrorCircleIcon = () => {
     )
 }
 
-export const StartIcon = () => {
+export const ErrorTriggersIcon = () => {
     return (
-        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="20" height="20" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <mask id="mask0_1911_3818" style={{ maskType: 'alpha' }} maskUnits="userSpaceOnUse" x="0" y="0" width="12" height="12">
+                <path
+                    d="M8.05 11.5H3.95C3.8 11.5 3.7 11.45 3.6 11.35L0.65 8.4C0.55 8.35 0.5 8.2 0.5 8.05V3.95C0.5 3.8 0.55 3.7 0.65 3.6L3.6 0.65C3.65 0.55 3.8 0.5 3.95 0.5H8.1C8.25 0.5 8.35 0.55 8.45 0.65L11.4 3.6C11.45 3.65 11.5 3.8 11.5 3.95V8.1C11.5 8.25 11.45 8.35 11.35 8.45L8.4 11.4C8.35 11.45 8.2 11.5 8.05 11.5ZM4.15 10.5H7.9L10.55 7.85V4.15L7.85 1.5H4.15L1.5 4.15V7.9L4.15 10.5Z"
+                    fill="#DE350B"
+                />
+                <path d="M6 6.5C5.7 6.5 5.5 6.3 5.5 6V4C5.5 3.7 5.7 3.5 6 3.5C6.3 3.5 6.5 3.7 6.5 4V6C6.5 6.3 6.3 6.5 6 6.5Z" fill="#DE350B" />
+                <path
+                    d="M6 8.5C5.85 8.5 5.75 8.45 5.65 8.35C5.55 8.25 5.5 8.15 5.5 8C5.5 7.95 5.5 7.85 5.55 7.8C5.6 7.75 5.6 7.7 5.65 7.65C5.8 7.5 6 7.45 6.2 7.55C6.25 7.55 6.25 7.55 6.3 7.6C6.3 7.6 6.35 7.65 6.4 7.65C6.45 7.7 6.5 7.75 6.5 7.8C6.5 7.85 6.5 7.95 6.5 8C6.5 8.05 6.5 8.15 6.45 8.2C6.4 8.25 6.4 8.3 6.35 8.35C6.25 8.45 6.15 8.5 6 8.5Z"
+                    fill="#DE350B"
+                />
+            </mask>
+            <g mask="url(#mask0_1911_3818)">
+                <rect width="12" height="12" fill="#E5544B" />
+            </g>
+        </svg>
+    )
+}
+
+export const StartIcon = ({ size }: any) => {
+    return (
+        <svg width={size} height={size} viewBox={`0 0 36 36`} fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0 0H36V18C36 27.9411 27.9411 36 18 36C8.05888 36 0 27.9411 0 18V0Z" fill="url(#paint0_linear_1019_5325)" />
             <path
                 d="M18 8L20.2451 14.9098H27.5106L21.6327 19.1803L23.8779 26.0902L18 21.8197L12.1221 26.0902L14.3673 19.1803L8.48944 14.9098H15.7549L18 8Z"
@@ -292,6 +312,121 @@ export const Dot = (color: any, className: any) => {
     return (
         <svg width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
             <rect x="0.143066" y="0.143066" width="5.71429" height="5.71429" rx="2.85714" fill={color} />
+        </svg>
+    )
+}
+
+export const Loading = () => {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlnsXlink="http://www.w3.org/1999/xlink"
+            style={{ margin: 'auto', background: 'none', display: 'black', shapeRendering: 'auto' }}
+            width="200px"
+            height="200px"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="xMidYMid"
+        >
+            <rect x="17.5" y="30" width="15" height="40" fill="#00c8bc">
+                <animate
+                    attributeName="y"
+                    repeatCount="indefinite"
+                    dur="1s"
+                    calcMode="spline"
+                    keyTimes="0;0.5;1"
+                    values="18;30;30"
+                    keySplines="0 0.5 0.5 1;0 0.5 0.5 1"
+                    begin="-0.2s"
+                ></animate>
+                <animate
+                    attributeName="height"
+                    repeatCount="indefinite"
+                    dur="1s"
+                    calcMode="spline"
+                    keyTimes="0;0.5;1"
+                    values="64;40;40"
+                    keySplines="0 0.5 0.5 1;0 0.5 0.5 1"
+                    begin="-0.2s"
+                ></animate>
+            </rect>
+            <rect x="42.5" y="30" width="15" height="40" fill="#00c8bc">
+                <animate
+                    attributeName="y"
+                    repeatCount="indefinite"
+                    dur="1s"
+                    calcMode="spline"
+                    keyTimes="0;0.5;1"
+                    values="20.999999999999996;30;30"
+                    keySplines="0 0.5 0.5 1;0 0.5 0.5 1"
+                    begin="-0.1s"
+                ></animate>
+                <animate
+                    attributeName="height"
+                    repeatCount="indefinite"
+                    dur="1s"
+                    calcMode="spline"
+                    keyTimes="0;0.5;1"
+                    values="58.00000000000001;40;40"
+                    keySplines="0 0.5 0.5 1;0 0.5 0.5 1"
+                    begin="-0.1s"
+                ></animate>
+            </rect>
+            <rect x="67.5" y="30" width="15" height="40" fill="#00c8bc">
+                <animate
+                    attributeName="y"
+                    repeatCount="indefinite"
+                    dur="1s"
+                    calcMode="spline"
+                    keyTimes="0;0.5;1"
+                    values="20.999999999999996;30;30"
+                    keySplines="0 0.5 0.5 1;0 0.5 0.5 1"
+                ></animate>
+                <animate
+                    attributeName="height"
+                    repeatCount="indefinite"
+                    dur="1s"
+                    calcMode="spline"
+                    keyTimes="0;0.5;1"
+                    values="58.00000000000001;40;40"
+                    keySplines="0 0.5 0.5 1;0 0.5 0.5 1"
+                ></animate>
+            </rect>
+        </svg>
+    )
+}
+
+export const BxDollarCircle = () => {
+    return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M12 2C6.486 2 2 6.486 2 12C2 17.514 6.486 22 12 22C17.514 22 22 17.514 22 12C22 6.486 17.514 2 12 2ZM12 20C7.589 20 4 16.411 4 12C4 7.589 7.589 4 12 4C16.411 4 20 7.589 20 12C20 16.411 16.411 20 12 20Z"
+                fill="#22313F"
+            />
+            <path
+                d="M12 10.9997C10 10.9997 10 10.3737 10 9.99972C10 9.51572 10.701 8.99972 12 8.99972C13.185 8.99972 13.386 9.63772 13.4 10.0177L14.4 9.99972H15.4C15.4 8.97372 14.734 7.53072 13 7.12072V6.01172H11V7.08472C9.029 7.41572 8 8.71172 8 9.99972C8 11.1197 8.52 12.9997 12 12.9997C14 12.9997 14 13.6757 14 13.9997C14 14.4147 13.38 14.9997 12 14.9997C10.159 14.9997 10.011 14.1427 10 13.9997H8C8 14.9177 8.661 16.5527 11 16.9197V17.9997H13V16.9147C14.971 16.5837 16 15.2877 16 13.9997C16 12.8797 15.48 10.9997 12 10.9997Z"
+                fill="#22313F"
+            />
+        </svg>
+    )
+}
+
+export const BxLineChartDown = () => {
+    return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 3H3V21H21V19H5V3Z" fill="#22313F" />
+            <path d="M13 12.586L8.70697 8.29297L7.29297 9.70697L13 15.414L16 12.414L20.293 16.707L21.707 15.293L16 9.58597L13 12.586Z" fill="#22313F" />
+        </svg>
+    )
+}
+
+export const BxCaledarCheck = () => {
+    return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M19 4H17V2H15V4H9V2H7V4H5C3.897 4 3 4.897 3 6V8V20C3 21.103 3.897 22 5 22H19C20.103 22 21 21.103 21 20V8V6C21 4.897 20.103 4 19 4ZM19.002 20H5V8H19L19.002 20Z"
+                fill="#22313F"
+            />
+            <path d="M11 17.414L16.707 11.707L15.293 10.293L11 14.586L8.70697 12.293L7.29297 13.707L11 17.414Z" fill="#22313F" />
         </svg>
     )
 }

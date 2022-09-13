@@ -13,6 +13,7 @@ export type iProps = {
     setP_Market?: any
     setP_Claim?: any
     ref?: any
+    isMobile?: boolean
 }
 
 export type Idata = {
@@ -20,7 +21,7 @@ export type Idata = {
     date: any
 }
 
-const handleTrendLine = (chart: am4charts.XYChart, p_claim: number) => {
+export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number) => {
     let trend = chart.series.push(new am4charts.LineSeries())
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
@@ -59,7 +60,7 @@ const handleTrendLine = (chart: am4charts.XYChart, p_claim: number) => {
     }
 }
 
-const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number) => {
+export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number) => {
     let trend = chart.series.push(new am4charts.LineSeries())
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
@@ -75,8 +76,8 @@ const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number) => {
 
         trend.data = [
             {
-                date: chart.data[chart.data.length - 1].date,
-                value: chart.data[chart.data.length - 1].value,
+                date: chart.data[chart.data.length - 1]?.date,
+                value: chart.data[chart.data.length - 1]?.value,
             },
             {
                 date: timeEnd,
@@ -86,10 +87,10 @@ const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number) => {
     }
 }
 
-const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP_Market, setP_Claim, state }: iProps) => {
+export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, state, isMobile }: iProps) => {
     const [dataChart, setDataChart] = useState([])
     let chart: any
-    const ref = useRef<any>(null)
+    // const ref = useRef<any>(null)
 
     useEffect(() => {
         if (data && data.length > 0) setDataChart(data)
@@ -97,7 +98,7 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
 
     useEffect(() => {
         InitChart(dataChart)
-        ref.current.renderer
+        // ref.current.renderer
         setP_Market(chart.data[chart.data.length - 1]?.value)
     }, [dataChart, p_claim, p_expired, state.period])
 
@@ -106,9 +107,22 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
         chart = am4core.create('chartdiv', am4charts.XYChart)
 
         if (chart) {
+            chart.responsive.enabled = true
             chart.data = test_data
             chart.logo.appeared = false
             chart.padding(0, 15, 0, 15)
+            //cursor
+            chart.cursor = new am4charts.XYCursor()
+            chart.cursor.lineX.disabled = true
+            chart.cursor.behavior = 'none'
+            chart.cursor.fullWidthLineX = true
+            chart.cursor.fullWidthLineY = true
+            chart.cursor.lineX.fillOpacity = 0.05
+            chart.cursor.lineY.fillOpacity = 0.05
+            chart.events.on('ready', function (event: any) {
+                valueAxis.min = valueAxis.minZoomed
+                valueAxis.max = valueAxis.maxZoomed
+            })
 
             let dateAxis = chart.xAxes.push(new am4charts.DateAxis())
             dateAxis.renderer.grid.template.location = 0
@@ -135,6 +149,7 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
             valueAxis.renderer.axisFills.template.disabled = true
             valueAxis.renderer.ticks.template.disabled = true
             valueAxis.hidden = true
+            valueAxis.tooltip.disabled = false
 
             let series = chart.series.push(new am4charts.LineSeries())
             series.dataFields.dateX = 'date'
@@ -143,10 +158,7 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
             series.interpolationDuration = 500
             series.defaultState.transitionDuration = 0
             series.tensionX = 0.8
-
-            chart.events.on('datavalidated', function () {
-                dateAxis.zoom({ start: 1 / 15, end: 1.2 }, false, true)
-            })
+            series.focusable = true
 
             //chart sub
             let subSeries = chart.series.push(new am4charts.LineSeries())
@@ -240,30 +252,33 @@ const ChartComponent = ({ p_expired, p_market, p_claim, data, setP_Expired, setP
                 claimLabel.label.dx = 20
                 claimLabel.label.verticalCenter = 'middle'
                 claimLabel.label.fill = am4core.color('#EB2B3E')
-                claimLabel.label.html = `<div class="hover:cursor-pointer" style="color: #EB2B3E; border-radius: 800px; padding: 4px 16px; background-color: #FFF1F2">P-Claim ${p_claim}</div>`
+
+                claimLabel.label.html = `<div class="hover:cursor-pointer" style="color: ${
+                    p_claim < state.p_market ? '#EB2B3E' : '#52CC74'
+                } ; border-radius: 800px; padding: 4px 16px; background-color: ${p_claim < state.p_market ? '#FFF1F2' : '#F1FFF5'}  ">P-Claim ${p_claim} ${
+                    p_claim > state.p_market
+                        ? `${(((p_claim - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                        : `${(((p_claim - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                }</div>`
                 claimLabel.id = 'g2'
 
                 //label claim
                 claimLabel.label.draggable = true
                 let interract = am4core.getInteraction()
+
                 claimLabel.events.once('drag', (event: any) => {
-                    interract.events.once('up', (e) => {
-                        let point = am4core.utils.documentPointToSprite(e.pointer.point, chart.seriesContainer)
-                        return setP_Claim(valueAxis.yToValue(point?.y))
+                    interract.events.once('up', (event: any) => {
+                        let point = am4core.utils.documentPointToSprite(chart.cursor.point, chart.seriesContainer)
+                        return setP_Claim(valueAxis.yToValue(point?.y).toFixed(2))
                     })
                 })
 
                 handleTrendLineStatus(chart, p_claim)
             }
-
-            //cursor
-            chart.cursor = new am4charts.XYCursor()
-            chart.cursor.lineX.disabled = true
-            chart.cursor.behavior = 'none'
         }
     }
 
-    return <div ref={ref} id="chartdiv" style={{ width: '100%', height: '500px' }} className={'relative'} />
+    return <div id="chartdiv" style={{ width: '100%', height: '500px' }} className={'relative'}></div>
 }
 
 export default ChartComponent

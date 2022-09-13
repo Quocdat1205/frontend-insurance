@@ -1,5 +1,5 @@
 export type ICoin = {
-    id: number
+    id: string
     name: string
     icon: string
     disable?: boolean
