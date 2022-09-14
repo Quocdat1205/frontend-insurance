@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux'
 import * as types from 'redux/actions/types'
-import { API_GET_LIST_TOKEN } from 'services/apis'
+import { API_GET_LIST_TOKEN ,API_GET_CONFIG_ASSET} from 'services/apis'
 import fetchApi from 'services/fetch-api'
 
 export const onLoading = (data: boolean) => async (dispatch: Dispatch) => {
@@ -25,5 +25,19 @@ export const getListAssetToken = () => async (dispatch: Dispatch) => {
         }
     } catch (error) {
         console.log('getListToken', error)
+    }
+}
+
+export const getConfigAsset = () => async (dispatch: Dispatch) => {
+    try {
+        const data = await fetchApi({ url: API_GET_CONFIG_ASSET })
+        if (data) {
+            dispatch({
+                type: types.SET_CONFIG_ASSET,
+                payload: data,
+            })
+        }
+    } catch (error) {
+        console.log('getConfigAsset', error)
     }
 }

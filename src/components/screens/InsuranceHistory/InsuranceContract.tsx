@@ -19,9 +19,11 @@ import { isMobile as mobile } from 'react-device-detect'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import Tooltip from 'components/common/Tooltip/Tooltip'
+import { StateInsurance } from 'types/types'
 
 interface InsuranceContract {
     account: any
+    showGuide: boolean
 }
 
 const renderStatus = (data: any, t: any) => {
@@ -129,7 +131,7 @@ export const renderContentStatus = (data: any, t: any) => {
     )
 }
 
-const InsuranceContract = ({ account }: InsuranceContract) => {
+const InsuranceContract = ({ account, showGuide }: InsuranceContract) => {
     const { t } = useTranslation()
     const { width } = useWindowSize()
     const router = useRouter()
@@ -216,8 +218,8 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
     }
 
     const optionsState = useMemo(() => {
-        return Object.keys(stateInsurance).reduce((acc: any, key: any) => {
-            acc.push({ name: t(`common:status:${String(key).toLowerCase()}`), value: stateInsurance[key] })
+        return Object.keys(stateInsurance).reduce((acc: any[], key: string) => {
+            acc.push({ name: t(`common:status:${String(key).toLowerCase()}`), value: stateInsurance[key as keyof StateInsurance] })
             return acc
         }, [])
     }, [])
@@ -392,6 +394,7 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
                 onLoadMore={onLoadMore}
                 loading={loading}
                 onBuyInsurance={onBuyInsurance}
+                showGuide={showGuide}
             />
         )
 

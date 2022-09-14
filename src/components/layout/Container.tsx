@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect } from 'react'
-import { getListAssetToken } from 'redux/actions/setting'
+import { getConfigAsset, getListAssetToken } from 'redux/actions/setting'
 import { useAppDispatch } from 'redux/store'
 import Toast from 'components/layout/Toast'
 import Config from 'config/config'
@@ -20,6 +20,7 @@ const Container = ({ children }: Container) => {
             document.documentElement.style.setProperty('font-size', '14px')
         }
         dispath(getListAssetToken())
+        dispath(getConfigAsset())
     }, [])
 
     return (

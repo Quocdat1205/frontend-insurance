@@ -19,3 +19,12 @@ export interface IconSvg {
     size?: number
     color?: string
 }
+
+export interface StateInsurance {
+    AVAILABLE?: string
+    REFUNDED?: string
+    CLAIM_WAITING?: string
+    CLAIMED?: string
+    EXPIRED?: string
+    LIQUIDATED?: string
+}

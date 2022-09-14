@@ -1,10 +1,11 @@
 import { useTranslation } from 'next-i18next'
-import React, { useMemo, useRef } from 'react'
-import colors from 'styles/colors'
+import React, { useEffect, useMemo, useRef } from 'react'
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock'
 import Tour from 'reactour'
 import styled from 'styled-components'
 import { X } from 'react-feather'
+import { LeftArrow } from 'components/common/Svg/SvgIcon'
+import Button from 'components/common/Button/Button'
 
 interface Guideline {
     start: boolean
@@ -16,20 +17,67 @@ const Guideline = ({ start, setStart }: Guideline) => {
     const refGuide = useRef<any>(null)
 
     const getCurrentStep = (e: number) => {
+        if (e === 0) {
+            const _el = document.querySelector('#tour_statistics')
+            if (_el) _el.scrollIntoView()
+        }
+        if (e === 1) {
+            const _el = document.querySelector('#filter-contract')
+            if (_el) _el.scrollIntoView()
+        }
         step.current = e
+    }
+
+    useEffect(() => {
+        if (start) {
+            const _el = document.querySelector('#tour_statistics')
+            if (_el) _el.scrollIntoView()
+        }
+    }, [start])
+
+    const contentStep1 = () => {
+        return (
+            <>
+                <div>*Q-Claim: {t('insurance:terminology:q_claim')}</div>
+                <div>*R-Claim: {t('insurance:terminology:r_claim')}</div>
+            </>
+        )
+    }
+    const contentStep2 = () => {
+        return (
+            <>
+                <div>*P-Claim: {t('insurance:terminology:p_claim')}</div>
+                <div>*Q-Claim: {t('insurance:terminology:q_claim')}</div>
+                <div>*Margin: {t('insurance:terminology:margin')}</div>
+            </>
+        )
     }
 
     const tourConfig: any = useMemo(() => {
         return [
             {
-                selector: '[data-tut="statistics"]',
-                content: (props: any) => <Content {...props} top onClose={onClose} />,
+                selector: '[data-tut="tour_statistics"]',
+                content: (props: any) => (
+                    <Content title={t('insurance_history:guidelines:step_title_1')} content={contentStep1()} {...props} top onClose={onClose} />
+                ),
+                position: 'bottom',
+            },
+            {
+                selector: '[data-tut="tour_insurance_contract"]',
+                content: (props: any) => (
+                    <Content title={t('insurance_history:guidelines:step_title_2')} content={contentStep2()} {...props} top onClose={onClose} />
+                ),
+                position: 'bottom',
+            },
+            {
+                selector: '[data-tut="tour_guideline"]',
+                content: (props: any) => <Content title={t('insurance_history:guidelines:step_title_3')} {...props} top onClose={onClose} />,
                 position: 'bottom',
             },
         ]
     }, [])
 
-    const onClose = (e: any) => {
+    const onClose = (e: boolean) => {
         if (!e) {
             if (refGuide.current.state.current === tourConfig.length - 1) {
                 setStart(false)
@@ -58,7 +106,6 @@ const Guideline = ({ start, setStart }: Guideline) => {
             showNavigation={false}
             showButtons={false}
             showNumber={false}
-            scrollDuration={300}
             ref={refGuide}
             onAfterOpen={disableBodyScroll}
             onBeforeClose={enableBodyScroll}
@@ -67,31 +114,32 @@ const Guideline = ({ start, setStart }: Guideline) => {
     )
 }
 
-const Content = ({ title, text, step, onClose, top, goTo, ...props }: any) => {
+const Content = ({ title, content, step, onClose, top, goTo, ...props }: any) => {
     const { t } = useTranslation()
     return (
-        <div className="flex flex-col items-center font-inter justify-center" onClick={() => onClose(false)}>
+        <div className="">
             <div className="relative">
-                <View id={`guideline-step-${step}`}>
+                <div id={`guideline-step-${step}`} className="flex flex-col space-y-3">
                     <div className="flex items-center justify-between">
-                        <label className="text-onus-base font-semibold text-sm">{t(`futures:mobile:guide:step_title_${step}`)}</label>
-                        <div className="cursor-pointer text-white" onClick={() => onClose(true)}>
-                            <X width={20} />
+                        {step > 1 ? (
+                            <div className="cursor-pointer" onClick={() => goTo(step - 2)}>
+                                <LeftArrow />
+                            </div>
+                        ) : (
+                            <div />
+                        )}
+                        <div className="text-sm text-red font-medium">{step + '/3'}</div>
+                        <div className="cursor-pointer" onClick={() => onClose(true)}>
+                            <X width={16} />
                         </div>
                     </div>
-                    <div className="mt-[8px] mb-[16px] text-onus-white text-xs">{t(`futures:mobile:guide:step_${step}`)}</div>
-                    <div className="flex items-center justify-between font-medium text-white">
-                        <div className="text-sm text-onus-white">
-                            {t('futures:mobile:guide:step')} {step + '/'}
-                            <span className="text-[10px]">8</span>
-                        </div>
+                    <div className="text-sm">
+                        <div className="mb-4">{title}</div>
+                        <div className="mb-3">{content}</div>
                     </div>
-                </View>
-                <div
-                    className="absolute bottom-6 right-4 min-w-[60px] px-[10px] bg-onus-base rounded-[4.33333px] text-center text-[10px] text-onus-white"
-                    onClick={() => step === 8 && onClose(true)}
-                >
-                    {t(step === 8 ? 'common:close' : 'futures:mobile:guide:next')}
+                    <Button onClick={() => onClose(step === 3)} variants="primary" className="text-xs py-2 w-full">
+                        {t(step === 3 ? 'insurance_history:guidelines:got_it' : 'common:next')}
+                    </Button>
                 </div>
             </div>
         </div>
@@ -99,13 +147,7 @@ const Content = ({ title, text, step, onClose, top, goTo, ...props }: any) => {
 }
 
 const View = styled.div.attrs({
-    className: 'my-[10px] bg-onus-bgModal3 font-inter flex flex-col justify-between',
-})`
-    width: 294px;
-    ${'' /* background-color:${colors.darkBlue1}; */}
-    opacity: 0.8;
-    border-radius: 8px;
-    padding: 16px;
-`
+    className: '',
+})``
 
 export default Guideline
