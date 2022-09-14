@@ -1,6 +1,5 @@
 import classnames from 'classnames'
 import useOutsideAlerter, { useOutside } from 'hooks/useOutsideAlerter'
-import useWindowSize from 'hooks/useWindowSize'
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { X } from 'react-feather'
 import { PORTAL_MODAL_ID } from 'utils/constants'
@@ -38,7 +37,8 @@ const Modal = ({
         if (isVisible && onBackdropCb) onBackdropCb()
     }
 
-    useOutsideAlerter(wrapperRef, handleOutside)
+    useOutside(wrapperRef, handleOutside, container)
+    // useOutsideAlerter(wrapperRef, handleOutside)
 
     useEffect(() => {
         clearTimeout(timer.current)
@@ -65,33 +65,46 @@ const Modal = ({
             <div
                 className={classnames(
                     'fixed top-0 left-0 z-[99] w-full h-full overflow-hidden bg-bgModal/[0.3]',
-                    'ease-in transition-all flex duration-300 z-30',
-                    { 'invisible translate-y-full': !isVisible },
-                    { 'visible translate-y-0': isVisible },
+                    'z-30',
+                    {
+                        invisible: !isVisible,
+                        visible: isVisible,
+                    },
                     containerClassName,
                 )}
                 ref={container}
             >
-                {loading && (
-                    <div ref={wrapperRef} className={`${className} h-max w-full absolute bg-white`}>
-                        {isMobile ? (
+                <div
+                    className={classnames('h-full relative ease-in transition-all flex duration-300', {
+                        'translate-y-full': !isVisible,
+                        'translate-y-0': isVisible,
+                        'flex flex-col justify-end': isMobile,
+                    })}
+                >
+                    {loading && (
+                        <div
+                            ref={wrapperRef}
+                            className={classnames(
+                                'w-full absolute bg-white',
+                                { 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl': !isMobile },
+                                className,
+                            )}
+                        >
                             <div className={`py-8 px-6 ${wrapClassName}`}>
                                 <>
                                     {customHeader ? (
                                         customHeader()
                                     ) : (
-                                        <div className="flex items-center justify-end pb-6">
+                                        <div className="flex items-center justify-end pb-6 sm:pb-2">
                                             <X onClick={handleOutside} size={20} className="cursor-pointer" />
                                         </div>
                                     )}
                                     {children}
                                 </>
                             </div>
-                        ) : (
-                            children
-                        )}
-                    </div>
-                )}
+                        </div>
+                    )}
+                </div>
             </div>
         </Portal>
     )

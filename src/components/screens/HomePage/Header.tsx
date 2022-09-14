@@ -44,7 +44,11 @@ const Header = () => {
                     <img src="/images/ic_logo.png" />
                 </div>
                 <div className="w-full flex items-center justify-end mb:justify-between  py-3 mb:py-0 text-sm font-semibold">
-                    {!isMobile && <Menu data={Config.homeMenu} onChange={onChangeMenu} />}
+                    {!isMobile && (
+                        <div className="hidden mb:block">
+                            <Menu data={Config.homeMenu} onChange={onChangeMenu} />
+                        </div>
+                    )}
                     {!loading_account && (
                         <div className="flex items-center space-x-5 sm:space-x-6 cursor-pointer">
                             {network && !isMobile && <Notifications />}

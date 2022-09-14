@@ -39,7 +39,7 @@ const Drawer = ({ visible, onClose, children }: any) => {
         <Portal portalId="PORTAL_MODAL">
             <div
                 className={classnames(
-                    'flex flex-col fixed top-[56px] right-0 h-[calc(100%-56px)] w-full z-[20] bg-shadow/[0.3] overflow-hidden',
+                    'flex flex-col fixed top-[4rem] right-0 h-[calc(100%-4rem)] w-full z-[20] bg-shadow/[0.3] overflow-hidden',
                     'ease-in-out transition-all flex items-end duration-300 z-30',
                     { invisible: !visible },
                     { visible: visible },

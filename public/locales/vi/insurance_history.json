@@ -1,23 +1,20 @@
 {
     "my_cover": "Hợp đồng của tôi",
-    "guidelines": "Hướng dẫn",
     "tracking_and_utilizing": "Cách theo dõi và sử dụng hợp đồng của tôi",
-    "detailed_terminology": "Thuật ngữ chi tiểt",
+    "detailed_terminology": "Thuật ngữ chi tiết",
     "individual_cover": "Thống kê bảo hiểm cá nhân",
-    "qty_of_signed": "Số hợp đồng đã ký",
+    "qty_of_signed": "Số hợp đồng",
     "new_cover_assets": "Các sản phẩm bảo hiểm mới nhất của Nami",
     "you_have_no_insurance": "Bạn hiện không có hợp đồng bảo hiểm nào.",
     "connecting_wallet_to_buy": "Kết nối ví để mua hợp đồng bảo hiểm ngay.",
     "status": "Trạng thái hợp đồng",
     "choose_status": "Chọn trạng thái hợp đồng",
     "insurance_contract": "Hợp đồng bảo hiểm",
-    "price_reaching_date": "Ngày chạm giá",
-    "status_2": "Trạng thái HĐBH",
-    "reason": {
-        "p_claim_reached": "Đã chạm P-Claim",
-        "q_claim_received": "Đã nhận Q-Claim",
-        "q_refund_received": "Đã nhận Q-Refund",
-        "p_expired_reached": "Chạm giá P-Expired",
-        "expired": "Hết hạn"
+    "guidelines": {
+        "title": "Hướng dẫn",
+        "step_title_1": "Xem Thống kê hợp đồng bảo hiểm của tôi",
+        "step_title_2": "Xem chi tiết hợp đồng bảo hiểm",
+        "step_title_3": "Ấn 'Hướng dẫn' nếu bạn gặp khó khăn khi sử dụng Nami Insurance",
+        "got_it": "Đã hiểu"
     }
 }

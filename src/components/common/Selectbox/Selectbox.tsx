@@ -119,7 +119,7 @@ const Selectbox = ({
 
     return (
         <div className={`flex flex-col space-y-2 ${className}`}>
-            <div className={`text-sm ${labelClassName}`}>{label}</div>
+            <div className={`text-xs sm:text-sm text-txtSecondary ${labelClassName}`}>{label}</div>
             <Select
                 {...props}
                 value={item}

@@ -1,6 +1,5 @@
 {
     "my_cover": "My cover",
-    "guidelines": "Guidelines",
     "tracking_and_utilizing": "Tracking and utilizing my contract",
     "detailed_terminology": "Detailed terminology",
     "individual_cover": "Individual Cover Stats",
@@ -11,13 +10,11 @@
     "status": "Status",
     "choose_status": "Choose Status",
     "insurance_contract": "Insurance Contract",
-    "price_reaching_date": "Price reaching date",
-    "status_2": "Status",
-    "reason": {
-        "p_claim_reached": "P-Claim reached",
-        "q_claim_received": "Q-Claim received",
-        "q_refund_received": "Q-Refund received",
-        "p_expired_reached": "P-Expired reached",
-        "expired": "Expired"
+    "guidelines": {
+        "title": "Guidelines",
+        "step_title_1": "View my Insurance Contract Stats",
+        "step_title_2": "View Insurance Contract details",
+        "step_title_3": "Press 'tutorial' if you are having trouble using Nami Insurance.",
+        "got_it": "Got it"
     }
 }

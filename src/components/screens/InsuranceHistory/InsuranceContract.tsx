@@ -13,17 +13,125 @@ import { formatCurrency, formatNumber, formatTime } from 'utils/utils'
 import InsuranceContractMobile from './InsuranceContractMobile'
 import { useAppSelector, RootStore } from 'redux/store'
 import colors from 'styles/colors'
-import { CalendarIcon } from 'components/common/Svg/SvgIcon'
+import { CalendarIcon, InfoCircle } from 'components/common/Svg/SvgIcon'
 import Popover from 'components/common/Popover/Popover'
 import { isMobile as mobile } from 'react-device-detect'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import Tooltip from 'components/common/Tooltip/Tooltip'
+import { StateInsurance } from 'types/types'
 
 interface InsuranceContract {
     account: any
+    showGuide: boolean
 }
 
-const InsuranceContract = ({ account }: InsuranceContract) => {
+const renderStatus = (data: any, t: any) => {
+    let bg = 'bg-gradient-blue text-blue-5'
+    switch (data?.state) {
+        case stateInsurance.EXPIRED:
+        case stateInsurance.LIQUIDATED:
+            bg = 'bg-gradient-gray text-gray'
+            break
+        case stateInsurance.CLAIM_WAITING:
+            bg = 'bg-gradient-yellow text-yellow-5'
+            break
+        case stateInsurance.REFUNDED:
+        case stateInsurance.CLAIMED:
+            bg = 'bg-gradient-green text-success'
+            break
+        default:
+            break
+    }
+    return (
+        <div className={`px-3 cursor-pointer text-xs sm:text-sm font-semibold py-[6px] rounded-[600px] ${bg}`}>
+            {t(`common:status:${String(data?.state).toLowerCase()}`)}
+        </div>
+    )
+}
+
+const renderReason = (data: any, t: any) => {
+    if (data?.state === stateInsurance.AVAILABLE) return
+    let reason = ''
+    switch (data?.state) {
+        case stateInsurance.REFUNDED:
+            reason = 'common:insurance_history:reason:q_refund_received'
+            break
+        case stateInsurance.LIQUIDATED:
+            reason = 'common:insurance_history:reason:liquidated'
+            break
+        case stateInsurance.CLAIM_WAITING:
+            reason = 'common:insurance_history:reason:p_claim_reached'
+            break
+        case stateInsurance.CLAIMED:
+            reason = 'common:insurance_history:reason:q_claim_received'
+            break
+        case stateInsurance.EXPIRED:
+            reason = 'common:insurance_history:reason:p_expired_reached'
+            break
+        default:
+            break
+    }
+    return (
+        <div className="flex items-center justify-between">
+            <div className="text-txtSecondary">{t('common:reason')}</div>
+            <div className="font-semibold">{t(reason)}</div>
+        </div>
+    )
+}
+
+export const renderContentStatus = (data: any, t: any) => {
+    return (
+        <div className="overflow-hidden font-normal ">
+            <div className="sm:p-6 flex flex-col">
+                <div className="text-xl leading-8 font-semibold sm:leading-7 sm:font-medium">
+                    {t('common:insurance')} <span className="text-red">{data?._id}</span>
+                </div>
+                {data?.state !== stateInsurance.AVAILABLE && (
+                    <div className="text-txtSecondary flex items-center space-x-2 mt-2 sm:mt-3 text-sm sm:text-base">
+                        <CalendarIcon color={colors.txtSecondary} size={16} />
+                        <span>
+                            {t('common:insurance_history:price_reaching_date')}: {formatTime(data?.updatedAt, 'dd/MM/yyyy')}
+                        </span>
+                    </div>
+                )}
+                <div className="h-[1px] w-full bg-divider mt-6 mb-4" />
+                <div className="flex flex-col space-y-2 text-sm sm:text-base">
+                    <div className="flex items-center justify-between">
+                        <div className="text-txtSecondary">{t('common:insurance_history:status_2')}</div>
+                        <div>{renderStatus(data, t)}</div>
+                    </div>
+                    {renderReason(data, t)}
+                    <div className="flex items-center justify-between">
+                        <div className="text-txtSecondary flex items-center space-x-2">
+                            <span>Q-Claim</span>
+                            <div data-tip={t('insurance:terminology:q_claim')} data-for={'q-claim'}>
+                                <InfoCircle size={14} color={colors.txtSecondary} />
+                                <Tooltip className="max-w-[200px]" id={'q-claim'} placement="right" />
+                            </div>
+                        </div>
+                        <div className="font-semibold">{formatCurrency(data?.q_claim, 4, 1e4)}</div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <div className="text-txtSecondary flex items-center space-x-2">
+                            <span>R-Claim</span>
+                            <div data-tip={t('insurance:terminology:r_claim')} data-for={'r-claim'}>
+                                <InfoCircle size={14} color={colors.txtSecondary} />
+                                <Tooltip className="max-w-[200px]" id={'r-claim'} placement="right" />
+                            </div>
+                        </div>
+                        <div className="font-semibold">{formatNumber(data?.q_claim / data?.margin, 2)}%</div>
+                    </div>
+                </div>
+                <Button variants="primary" className="py-3 mt-8">
+                    {t('common:buy_back')}
+                </Button>
+            </div>
+        </div>
+    )
+}
+
+const InsuranceContract = ({ account, showGuide }: InsuranceContract) => {
     const { t } = useTranslation()
     const { width } = useWindowSize()
     const router = useRouter()
@@ -110,8 +218,8 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
     }
 
     const optionsState = useMemo(() => {
-        return Object.keys(stateInsurance).reduce((acc: any, key: any) => {
-            acc.push({ name: t(`common:status:${String(key).toLowerCase()}`), value: stateInsurance[key] })
+        return Object.keys(stateInsurance).reduce((acc: any[], key: string) => {
+            acc.push({ name: t(`common:status:${String(key).toLowerCase()}`), value: stateInsurance[key as keyof StateInsurance] })
             return acc
         }, [])
     }, [])
@@ -134,90 +242,13 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
         )
     }
 
-    const renderStatus = ({ state }: any) => {
-        let bg = 'bg-gradient-blue text-blue-5'
-        switch (state) {
-            case stateInsurance.EXPIRED:
-                bg = 'bg-gradient-gray text-gray'
-                break
-            case stateInsurance.CLAIM_WAITING:
-                bg = 'bg-gradient-yellow text-yellow-5'
-                break
-            case stateInsurance.REFUNDED:
-            case stateInsurance.CLAIMED:
-                bg = 'bg-gradient-green text-success'
-                break
-            default:
-                break
-        }
+    const renderHeaderTooltip = (name: string, content: string, id: string) => {
         return (
-            <div className={`px-3 cursor-pointer text-xs sm:text-sm font-semibold py-[6px] rounded-[600px] ${bg}`}>
-                {t(`common:status:${String(state).toLowerCase()}`)}
-            </div>
-        )
-    }
-
-    const renderReason = ({ state }: any) => {
-        if (state === stateInsurance.AVAILABLE) return
-        let reason = ''
-        switch (state) {
-            case stateInsurance.REFUNDED:
-                reason = 'insurance_history:reason:q_refund_received'
-                break
-            case stateInsurance.CLAIM_WAITING:
-                reason = 'insurance_history:reason:p_claim_reached'
-                break
-            case stateInsurance.CLAIMED:
-                reason = 'insurance_history:reason:q_claim_received'
-                break
-            case stateInsurance.EXPIRED:
-                reason = 'insurance_history:reason:p_expired_reached'
-                break
-            default:
-                break
-        }
-        return (
-            <div className="flex items-center justify-between">
-                <div className="text-txtSecondary">{t('common:reason')}</div>
-                <div className="font-semibold">{t(reason)}</div>
-            </div>
-        )
-    }
-
-    const renderContentStatus = (data: any) => {
-        return (
-            <div className="overflow-hidden font-normal ">
-                <div className="sm:p-6 flex flex-col">
-                    <div className="text-xl leading-8 font-semibold sm:leading-7 sm:font-medium">
-                        {t('common:insurance')} <span className="text-red">{data?._id}</span>
-                    </div>
-                    {data?.state !== stateInsurance.AVAILABLE && (
-                        <div className="text-txtSecondary flex items-center space-x-2 mt-2 sm:mt-3 text-sm sm:text-base">
-                            <CalendarIcon color={colors.txtSecondary} size={16} />
-                            <span>
-                                {t('insurance_history:price_reaching_date')}: {formatTime(data?.updatedAt, 'dd/MM/yyyy')}
-                            </span>
-                        </div>
-                    )}
-                    <div className="h-[1px] w-full bg-divider mt-6 mb-4" />
-                    <div className="flex flex-col space-y-2 text-sm sm:text-base">
-                        <div className="flex items-center justify-between">
-                            <div className="text-txtSecondary">{t('insurance_history:status_2')}</div>
-                            <div>{renderStatus(data)}</div>
-                        </div>
-                        {renderReason(data)}
-                        <div className="flex items-center justify-between">
-                            <div className="text-txtSecondary">Q-Claim</div>
-                            <div className="font-semibold">{formatCurrency(data?.q_claim, 4, 1e4)}</div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <div className="text-txtSecondary">R-Claim</div>
-                            <div className="font-semibold">{formatNumber(data?.q_claim / data?.margin, 2)}%</div>
-                        </div>
-                    </div>
-                    <Button variants="primary" className="py-3 mt-8">
-                        {t('common:buy_back')}
-                    </Button>
+            <div className="flex items-center space-x-2">
+                <span>{name}</span>
+                <div data-tip={content} data-for={id}>
+                    <InfoCircle size={14} color={colors.txtSecondary} />
+                    <Tooltip id={id} placement="top" />
                 </div>
             </div>
         )
@@ -232,31 +263,31 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
                 Cell: (e: any) => renderAsset(e),
             },
             {
-                Header: 'Period',
+                Header: () => renderHeaderTooltip('Period', t('insurance:terminology:period'), 'period'),
                 accessor: 'period',
                 minWidth: 130,
                 Cell: (e: any) => renderPeriod(e),
             },
             {
-                Header: 'Q-Claim',
+                Header: () => renderHeaderTooltip('Q-Claim', t('insurance:terminology:q_claim'), 'q_claim'),
                 accessor: 'q_claim',
                 minWidth: 150,
                 Cell: (e: any) => <div>{formatCurrency(e.value, 4, 1e4)} USDT</div>,
             },
             {
-                Header: 'P-Claim',
+                Header: renderHeaderTooltip('P-Claim', t('insurance:terminology:p_claim'), 'p_claim'),
                 accessor: 'p_claim',
                 minWidth: 150,
                 Cell: (e: any) => <div>{formatCurrency(e.value, 4, 1e4)} USDT</div>,
             },
             {
-                Header: 'Margin',
+                Header: renderHeaderTooltip('Margin', t('insurance:terminology:margin'), 'margin'),
                 accessor: 'margin',
                 minWidth: 150,
                 Cell: (e: any) => <div>{formatCurrency(e.value, 4, 1e4)} USDT</div>,
             },
             {
-                Header: t('insurance_history:status_2'),
+                Header: t('common:insurance_history:status_2'),
                 accessor: 'state',
                 minWidth: 190,
                 Cell: (e: any) => (
@@ -264,9 +295,9 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
                         className={`${
                             e.row?.index < 5 ? 'top-0' : 'bottom-0'
                         } absolute right-full mr-4 z-10 mt-0 shadow-subMenu rounded-xl min-w-[448px] py-1 bg-white`}
-                        label={renderStatus(e.row.original)}
+                        label={renderStatus(e.row.original, t)}
                     >
-                        {renderContentStatus(e.row.original)}
+                        {renderContentStatus(e.row.original, t)}
                     </Popover>
                 ),
             },
@@ -328,6 +359,18 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
         )
     }
 
+    const renderLabelPicker = () => {
+        return (
+            <div className="flex items-center space-x-2">
+                <span>Period</span>
+                <div data-tip={t('insurance:terminology:period')} data-for="period">
+                    <InfoCircle size={14} color={colors.txtSecondary} />
+                    <Tooltip id="period" placement="top" />
+                </div>
+            </div>
+        )
+    }
+
     if (isMobile && account)
         return (
             <InsuranceContractMobile
@@ -351,6 +394,7 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
                 onLoadMore={onLoadMore}
                 loading={loading}
                 onBuyInsurance={onBuyInsurance}
+                showGuide={showGuide}
             />
         )
 
@@ -385,7 +429,7 @@ const InsuranceContract = ({ account }: InsuranceContract) => {
                         renderContent={renderContentPicker}
                         className="md:col-span-2 lg:col-span-1"
                         value={date}
-                        label="Period"
+                        label={renderLabelPicker()}
                         prefix={period}
                         onChange={(e: any) => setDate(e)}
                         isClearable={true}

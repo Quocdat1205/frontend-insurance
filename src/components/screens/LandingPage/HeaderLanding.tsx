@@ -27,14 +27,16 @@ const HeaderLanding = () => {
 
     return (
         <header className="header-landing px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[10]">
-            <div className="max-w-screen-layout m-auto flex items-center justify-between">
+            <div className="max-w-screen-layout m-auto flex items-center justify-between min-h-[3.5rem]">
                 <div className="w-[75px]">
                     <img src="/images/ic_logo.png" />
                 </div>
                 <div className="flex items-center space-x-6 py-3 mb:py-0 text-sm font-semibold">
                     {!isMobile ? (
                         <>
-                            <Menu data={menu} />
+                            <div className="hidden mb:flex">
+                                <Menu data={menu} />
+                            </div>
                             <ButtonLanguage />
                             <Button onClick={() => router.push('/home')} className="px-6 py-2 flex items-center space-x-2">
                                 <span>{t('home:landing:access')}</span>

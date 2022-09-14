@@ -13,7 +13,7 @@ const Button = ({ variants = 'gradient', children, className, onClick, disable }
     return (
         <button
             className={classNames(
-                'flex items-center justify-center rounded-lg px-auto py-auto font-semibold',
+                'flex items-center justify-center rounded-lg px-auto py-auto font-semibold max-h-[3rem]',
                 {
                     'bg-gradient text-white': variants === 'gradient',
                     'border border-red text-red bg-pink': variants === 'outlined',
