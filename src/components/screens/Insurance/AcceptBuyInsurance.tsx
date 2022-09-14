@@ -242,8 +242,8 @@ export const AcceptBuyInsurance = ({
                             </div>
                             <div className="flex flex-row justify-between py-[8px] px-[8px]">
                                 <div className={'text-[#808890] flex flex-row'}>
-                                    Q-Claim{' '}
-                                    <span className={'tooltip'}>
+                                    <span>Q-Claim</span>
+                                    <span className={'tooltip ml-[4px]'}>
                                         <InfoCircle></InfoCircle>
                                         <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
                                             {t('insurance:terminology:q_claim')}

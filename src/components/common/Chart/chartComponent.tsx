@@ -249,6 +249,9 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                 let bulletClaim = latitudeClaim.bullets.push(new am4charts.CircleBullet())
                 bulletClaim.fill = am4core.color('white')
                 bulletClaim.stroke = am4core.color('#EB2B3E')
+                bulletClaim.properties.alwaysShowTooltip = true
+
+                // bulletClaim.tooltip.disable = false
 
                 let claimLabel = latitudeClaim.bullets.push(new am4charts.LabelBullet())
                 claimLabel.label.horizontalCenter = 'left'
@@ -256,7 +259,7 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                 claimLabel.label.verticalCenter = 'middle'
                 claimLabel.label.fill = am4core.color('#EB2B3E')
 
-                claimLabel.label.html = `<div class="hover:cursor-pointer" style="color: ${
+                claimLabel.label.html = `<div id="claimLabel" class="hover:cursor-pointer" style="color: ${
                     latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : '#52CC74'
                 } ; border-radius: 800px; padding: 4px 16px; background-color: ${
                     latitudeClaim.data[0].value < state.p_market ? '#FFF1F2' : '#F1FFF5'
@@ -265,7 +268,6 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                         ? `${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
                         : `${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
                 }</div>`
-                claimLabel.id = 'g2'
 
                 //label claim
                 claimLabel.cursorOverStyle = am4core.MouseCursorStyle.verticalResize
@@ -274,13 +276,25 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                 // let interract = am4core.getInteraction()
                 claimLabel.events.on('drag', (event: any) => {
                     let value = valueAxis.yToValue(event.target.pixelY)
-                    console.log(latitudeClaim.data[0].value)
                     event.target.dataItem.valueY = value
+                    const claimLabel = document.getElementById('claimLabel')
+                    if (claimLabel) {
+                        if (value < state.p_market) {
+                            claimLabel.style.color = '#EB2B3E'
+                            claimLabel.style.backgroundColor = '#FFF1F2'
+                            claimLabel.innerHTML = `P-Claim ${value} ${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                        } else {
+                            claimLabel.style.color = '#52CC74'
+                            claimLabel.style.backgroundColor = '#F1FFF5'
+                            claimLabel.innerHTML = `P-Claim ${value} ${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                        }
+                    }
                 })
 
-                // bullet.events.on('dragstop', (event: any) => {
-                //     handleDrag(event)
-                // })
+                claimLabel.events.on('dragstop', (event: any) => {
+                    let value = valueAxis.yToValue(event.target.pixelY)
+                    setP_Claim(value)
+                })
 
                 handleTrendLineStatus(chart, p_claim)
             }
