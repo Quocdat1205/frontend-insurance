@@ -16,7 +16,7 @@ export const buyInsurance = async (props: {
     try {
         const { owner, transaction_hash, id_sc, asset_covered, asset_refund, margin, q_covered, p_claim, period } = props
 
-        const AuthToken = await axios.get(`${Config.env.API_URL}${API_GET_GET_TOKEN}`, { params: { walletAddress: owner } })
+        const AuthToken = await axios.get(`${Config.env.API_URL}${API_GET_GET_TOKEN}`, { params: { owner: owner.toLowerCase() } })
 
         const { data } = await axios.post(
             `${Config.env.API_URL}${API_GET_BUY_INSURANCE}`,

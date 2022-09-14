@@ -21,6 +21,8 @@ import store from 'redux/store'
 import Config from 'config/config'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
 import Modal from 'components/common/Modal/Modal'
+import Tooltip from 'components/common/Tooltip/Tooltip'
+import colors from 'styles/colors'
 //chart
 const ChartComponent = dynamic(() => import('../components/common/Chart/chartComponent'), { ssr: false, suspense: true })
 
@@ -46,7 +48,7 @@ export const InsuranceFrom = () => {
     const [priceBNB, setPriceBNB] = useState(0)
     const [openChangeToken, setOpenChangeToken] = useState(false)
     const [active, setActive] = useState<boolean>(false)
-    const [nameNoti, setNameNoti] = useState('loading')
+    const [nameNoti, setNameNoti] = useState<'success' | 'expired' | 'expired1' | 'email' | 'loading'>('loading')
     const [res, setRes] = useState<any>()
     const [showDetails, setShowDetails] = useState(false)
     const [unitMoney, setUnitMoney] = useState('USDT')
@@ -176,8 +178,8 @@ export const InsuranceFrom = () => {
 
     useEffect(() => {
         setLoadings(true)
+        let list: ICoin[] = []
         if (stone.setting.assetsToken.length > 0) {
-            let list: ICoin[] = []
             stone.setting.assetsToken.map(async (token: any) => {
                 list.push({
                     id: token._id,
@@ -195,35 +197,35 @@ export const InsuranceFrom = () => {
             const res = JSON.parse(data)
             setSelectedCoin({
                 ...selectCoin,
-                icon: res.symbol.icon,
-                id: res.symbol.id,
-                name: res.symbol.name,
-                symbol: res.symbol.symbol,
-                type: res.symbol.type,
+                icon: res.symbol.icon || list[0].icon,
+                id: res.symbol.id || list[0].id,
+                name: res.symbol.name || list[0].name,
+                symbol: res.symbol.symbol || list[0].symbol,
+                type: res.symbol.type || list[0].type,
             })
             setState({
                 ...state,
                 symbol: {
                     ...state.symbol,
-                    icon: res.symbol.icon,
-                    id: res.symbol.id,
-                    name: res.symbol.name,
-                    symbol: res.symbol.symbol,
-                    type: res.symbol.type,
+                    icon: res.symbol.icon || list[0].icon,
+                    id: res.symbol.id || list[0].id,
+                    name: res.symbol.name || list[0].name,
+                    symbol: res.symbol.symbol || list[0].symbol,
+                    type: res.symbol.type || list[0].type,
                 },
             })
             setState({
                 ...state,
-                percent_margin: res.percent_margin,
-                period: res.period,
-                p_claim: res.p_claim,
-                q_claim: res.q_claim,
-                r_claim: res.r_claim,
-                q_covered: res.q_covered,
+                percent_margin: res.percent_margin || 0,
+                period: res.period || 2,
+                p_claim: res.p_claim || 0,
+                q_claim: res.q_claim || 0,
+                r_claim: res.r_claim || 0,
+                q_covered: res.q_covered || 0,
             })
 
             if (res.tab) {
-                setTab(res.tab)
+                setTab(res.tab || 3)
             }
             if (res.unitMoney) {
                 setUnitMoney(res.unitMoney || 'USDT')
@@ -563,24 +565,20 @@ export const InsuranceFrom = () => {
                                         'max-w-screen-layout pb-[8px] pl-[32px] pt-[32px] text-[14px] leading-5 text-[#808890] flex flex-row justify-start items-center'
                                     }
                                 >
-                                    <div className={'w-1/2 flex flex-row'}>
-                                        {menu[7].name}{' '}
-                                        <span className={'tooltip'}>
-                                            <InfoCircle></InfoCircle>
-                                            <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
-                                                {t('insurance:terminology:q_covered')}
-                                            </span>
-                                        </span>
+                                    <div className={'w-1/2 flex flex-row items-center'}>
+                                        <span className={'mr-[6px]'}>{menu[7].name}</span>
+                                        <div data-tip={t('insurance:terminology:q_covered')} data-for={`q-covered`}>
+                                            <InfoCircle size={14} color={colors.txtSecondary} />
+                                            <Tooltip className="max-w-[200px]" id={'q-covered'} placement="right" />
+                                        </div>
                                     </div>
                                     {tab == 6 && (
-                                        <div className={'w-1/2 flex flex-row'}>
-                                            Margin
-                                            <span className={'tooltip'}>
-                                                <InfoCircle></InfoCircle>
-                                                <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
-                                                    {t('insurance:terminology:margin')}
-                                                </span>
-                                            </span>
+                                        <div className={'w-1/2 flex flex-row items-center'}>
+                                            <span className={'mr-[6px]'}>Margin</span>
+                                            <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
+                                                <InfoCircle size={14} color={colors.txtSecondary} />
+                                                <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -906,15 +904,11 @@ export const InsuranceFrom = () => {
                                 {
                                     <div className={'my-[24px] px-[32px] text-sm text-[#808890]'}>
                                         <span className={'flex flex-row items-center mr-[4px]'}>
-                                            P-Claim
-                                            {
-                                                <span className={'tooltip'}>
-                                                    <InfoCircle></InfoCircle>
-                                                    <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
-                                                        {t('insurance:terminology:p_claim')}
-                                                    </span>
-                                                </span>
-                                            }
+                                            <span className={'mr-[6px]'}>P-Claim</span>
+                                            <div data-tip={t('insurance:terminology:p_claim')} data-for={`p_claim`}>
+                                                <InfoCircle size={14} color={colors.txtSecondary} />
+                                                <Tooltip className="max-w-[200px]" id={'p_claim'} placement="right" />
+                                            </div>
                                         </span>
                                         <div
                                             className={`mt-[8px] flex justify-between border-collapse rounded-[3px] shadow-none text-base ${
@@ -950,16 +944,12 @@ export const InsuranceFrom = () => {
 
                                 {/* Period */}
                                 <div className={'mt-5 pl-[32px] pr-[32px] pb-[32px] text-sm text-[#808890]'}>
-                                    <span className="flex flex-row">
-                                        Period ({menu[8].name}){' '}
-                                        {
-                                            <span className={'tooltip'}>
-                                                <InfoCircle></InfoCircle>
-                                                <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
-                                                    {t('insurance:terminology:period')}
-                                                </span>
-                                            </span>
-                                        }
+                                    <span className="flex flex-row items-center">
+                                        <span className={'mr-[6px]'}>Period ({menu[8].name})</span>
+                                        <div data-tip={t('insurance:terminology:period')} data-for={`period`}>
+                                            <InfoCircle size={14} color={colors.txtSecondary} />
+                                            <Tooltip className="max-w-[200px]" id={'period'} placement="right" />
+                                        </div>
                                     </span>
                                     <Tab.Group>
                                         <Tab.List
@@ -1006,14 +996,12 @@ export const InsuranceFrom = () => {
                                     tab == 4 ? 'hidden' : ''
                                 } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px]`}
                             >
-                                <div className={'text-[#808890] flex flex-row'}>
-                                    R-Claim
-                                    <span className={'tooltip'}>
-                                        <InfoCircle></InfoCircle>
-                                        <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
-                                            {t('insurance:terminology:r_claim')}
-                                        </span>
-                                    </span>
+                                <div className={'text-[#808890] flex flex-row items-center'}>
+                                    <span className={'mr-[6px]'}>R-Claim</span>
+                                    <div data-tip={t('insurance:terminology:r_claim')} data-for={`r_claim`}>
+                                        <InfoCircle size={14} color={colors.txtSecondary} />
+                                        <Tooltip className="max-w-[200px]" id={'r_claim'} placement="right" />
+                                    </div>
                                 </div>
                                 <div className={'font-semibold'}>
                                     <span>{state.r_claim > 0 ? Number(state.r_claim).toFixed(2) : 0}%</span>
@@ -1024,14 +1012,12 @@ export const InsuranceFrom = () => {
                                     tab == 5 ? 'hidden' : ''
                                 } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] mx-[12px]`}
                             >
-                                <div className={'text-[#808890] flex flex-row'}>
-                                    Q-Claim
-                                    <span className={'tooltip'}>
-                                        <InfoCircle></InfoCircle>
-                                        <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
-                                            {t('insurance:terminology:q_claim')}
-                                        </span>
-                                    </span>
+                                <div className={'text-[#808890] flex flex-row items-center'}>
+                                    <span className={'mr-[6px]'}>Q-Claim</span>
+                                    <div data-tip={t('insurance:terminology:q_claim')} data-for={`q_claim`}>
+                                        <InfoCircle size={14} color={colors.txtSecondary} />
+                                        <Tooltip className="max-w-[200px]" id={'q_claim'} placement="right" />
+                                    </div>
                                 </div>
                                 <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
                                     {state.q_claim > 0 ? Number(state.q_claim).toFixed(8) : 0}
@@ -1089,14 +1075,12 @@ export const InsuranceFrom = () => {
                                     tab == 6 ? 'hidden' : ''
                                 } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] `}
                             >
-                                <div className={'text-[#808890] flex flex-row'}>
-                                    Margin{' '}
-                                    <span className={'tooltip'}>
-                                        <InfoCircle></InfoCircle>
-                                        <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
-                                            {t('insurance:terminology:margin')}
-                                        </span>
-                                    </span>
+                                <div className={'text-[#808890] flex flex-row items-center'}>
+                                    <span className={'mr-[6px]'}>Margin</span>
+                                    <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
+                                        <InfoCircle size={14} color={colors.txtSecondary} />
+                                        <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
+                                    </div>
                                 </div>
                                 <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
                                     {state.margin > 0 ? Number(state.margin).toFixed(8) : 0}
@@ -1424,27 +1408,27 @@ export const InsuranceFrom = () => {
                                 </div>
                             </div>
                         )}
-                        {
+                        {active && (
                             <Modal
                                 portalId="modal"
-                                isVisible={active}
+                                isVisible={true}
                                 onBackdropCb={() => {}}
-                                className="rounded-xl p-6 bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                                className="!rounded-[0px] bg-white w-full absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-0"
                             >
                                 <NotificationInsurance
                                     id={res ? res.data._id : ''}
-                                    name={'loading'}
+                                    name={`${nameNoti}`}
                                     state={state}
                                     active={active}
                                     setActive={() => {
                                         setActive(false)
                                     }}
-                                    isMobile={true}
+                                    isMobile={false}
                                 />
                             </Modal>
-                        }
+                        )}
                         {index == 1 && (
-                            <div className={`h-[32px] flex flex-row justify-between items-center mx-[16px] mt-[24px] mb-[16px]`}>
+                            <div className={`h-[32px] flex flex-row justify-between items-center mx-[16px] mt-[24px] mb-[16px] sticky top-0 bg-white/[1] z-50`}>
                                 <div
                                     onClick={() => {
                                         router.push('/home')
@@ -1607,14 +1591,12 @@ export const InsuranceFrom = () => {
                         {/* Period */}
                         {index == 1 && (
                             <div className={'mt-5 pl-[32px] pr-[32px] pb-[32px] text-sm text-[#808890]'}>
-                                <span className="flex flex-row">
-                                    Period ({menu[8].name}){' '}
-                                    <span className={'tooltip'}>
-                                        <InfoCircle></InfoCircle>
-                                        <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
-                                            {t('insurance:terminology:period')}
-                                        </span>
-                                    </span>
+                                <span className="flex flex-row items-center">
+                                    <span className={'mr-[6px]'}>Period ({menu[8].name})</span>
+                                    <div data-tip={t('insurance:terminology:period')} data-for={`period`}>
+                                        <InfoCircle size={14} color={colors.txtSecondary} />
+                                        <Tooltip className="max-w-[200px]" id={'period'} placement="right" />
+                                    </div>
                                 </span>
                                 <Tab.Group>
                                     <Tab.List
@@ -1651,13 +1633,11 @@ export const InsuranceFrom = () => {
                         {index == 1 && (
                             <div className={'my-[24px] px-[32px]'}>
                                 <span className={'flex flex-row items-center '}>
-                                    <span className={'text-[#808890] text-sm mr-[4px]'}>P-Claim</span>
-                                    <span className={'tooltip'}>
-                                        <InfoCircle></InfoCircle>
-                                        <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
-                                            {t('insurance:terminology:p_claim')}
-                                        </span>
-                                    </span>
+                                    <span className={'mr-[6px] text-[#808890] text-sm'}>P-Claim</span>
+                                    <div data-tip={t('insurance:terminology:p_claim')} data-for={`p_claim`}>
+                                        <InfoCircle size={14} color={colors.txtSecondary} />
+                                        <Tooltip className="max-w-[200px]" id={'p_claim'} placement="right" />
+                                    </div>
                                 </span>
                                 <div
                                     className={`mt-[8px] flex justify-between border-collapse rounded-[3px] shadow-none ${
@@ -1683,16 +1663,14 @@ export const InsuranceFrom = () => {
                                 </div>
                             </div>
                         )}
-                        {tab == 6 && (
+                        {tab == 6 && index == 1 && (
                             <div className={'mt-5 pl-[32px] pr-[32px] pb-[32px]'}>
-                                <span className={'flex flex-row'}>
-                                    Margin{' '}
-                                    <span className={'tooltip'}>
-                                        <InfoCircle></InfoCircle>
-                                        <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
-                                            {t('insurance:terminology:margin')}
-                                        </span>
-                                    </span>
+                                <span className={'flex flex-row items-center'}>
+                                    <span className={'mr-[6px] text-[#808890] text-sm'}>Margin</span>
+                                    <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
+                                        <InfoCircle size={14} color={colors.txtSecondary} />
+                                        <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
+                                    </div>
                                 </span>
                                 <Tab.Group>
                                     <Tab.List className={`flex flex-row justify-between mt-[20px]  ${isMobile ? 'overflow-scroll w-full' : 'w-[85%]'}`}>
@@ -1730,20 +1708,18 @@ export const InsuranceFrom = () => {
                                         <span className={'text-[#EB2B3E]'}>1,000 {unitMoney}</span> {t('insurance:buy:sub_saved')}
                                     </span>
                                 </div>
-                                <div className={'flex flex-col  mt-[24px] hover:cursor-default'}>
+                                <div className={'flex flex-col mt-[24px] hover:cursor-default'}>
                                     <div
                                         className={`${
                                             tab == 4 ? 'hidden' : ''
                                         } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[16px] mx-[12px]`}
                                     >
-                                        <div className={'text-[#808890] flex flex-row'}>
-                                            R-Claim{' '}
-                                            <span className={'tooltip'}>
-                                                <InfoCircle></InfoCircle>
-                                                <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
-                                                    {t('insurance:terminology:r_claim')}
-                                                </span>
-                                            </span>
+                                        <div className={'text-[#808890] flex flex-row items-center'}>
+                                            <span className={'mr-[6px]'}>R-Claim</span>
+                                            <div data-tip={t('insurance:terminology:r_claim')} data-for={`r_claim`}>
+                                                <InfoCircle size={14} color={colors.txtSecondary} />
+                                                <Tooltip className="max-w-[200px]" id={'r_claim'} placement="right" />
+                                            </div>
                                         </div>
                                         <div className={'font-semibold'}>
                                             <span>{state.r_claim.toFixed(2) || 0}%</span>
@@ -1754,14 +1730,12 @@ export const InsuranceFrom = () => {
                                             tab == 5 ? 'hidden' : ''
                                         } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[16px] mx-[12px]`}
                                     >
-                                        <div className={'text-[#808890] flex flex-row'}>
-                                            Q-Claim{' '}
-                                            <span className={'tooltip'}>
-                                                <InfoCircle></InfoCircle>
-                                                <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
-                                                    {t('insurance:terminology:q_claim')}
-                                                </span>
-                                            </span>
+                                        <div className={'text-[#808890] flex flex-row items-center'}>
+                                            <span className={'mr-[6px]'}>Q-Claim</span>
+                                            <div data-tip={t('insurance:terminology:q_claim')} data-for={`q_claim`}>
+                                                <InfoCircle size={14} color={colors.txtSecondary} />
+                                                <Tooltip className="max-w-[200px]" id={'q_claim'} placement="right" />
+                                            </div>
                                         </div>
                                         <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
                                             {state.q_claim.toFixed(8) || 0}
@@ -1778,14 +1752,12 @@ export const InsuranceFrom = () => {
                                             tab == 6 ? 'hidden' : ''
                                         } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[16px] mx-[12px]`}
                                     >
-                                        <div className={'text-[#808890] flex flex-row'}>
-                                            Margin{' '}
-                                            <span className={'tooltip'}>
-                                                <InfoCircle></InfoCircle>
-                                                <span className="tooltiptext shadow-lg px-[8px] py-[4px] left-[30px] bottom-0 rounded-[6px] border border-0.5 border-[#e5e7e8]">
-                                                    {t('insurance:terminology:margin')}
-                                                </span>
-                                            </span>
+                                        <div className={'text-[#808890] flex flex-row items-center'}>
+                                            <span className={'mr-[6px]'}>Margin</span>
+                                            <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
+                                                <InfoCircle size={14} color={colors.txtSecondary} />
+                                                <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
+                                            </div>
                                         </div>
                                         <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                                             {state.margin > 0 ? Number(state.margin).toFixed(8) : 0}

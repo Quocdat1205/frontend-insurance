@@ -1,6 +1,7 @@
 import Button from 'components/common/Button/Button'
 import { Input } from 'components/common/Input/input'
 import { Loading, SuccessIcon, XMark } from 'components/common/Svg/SvgIcon'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -15,6 +16,7 @@ export type iProps = {
 
 const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }: iProps) => {
     const { t } = useTranslation()
+    const router = useRouter()
     const [email, setEmail] = useState()
     const noti = [
         {
@@ -72,14 +74,14 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                 <div className="flex flex-row justify-between py-[16px] px-[8px]">
                                                     <div className={'text-[#808890]'}>Q-Claim</div>
                                                     <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                                        {state.q_claim}
+                                                        {state.q_claim.toFixed(2)}
                                                         <span className={'text-[#EB2B3E]'}>USDT</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row justify-between py-[16px] px-[8px] ">
                                                     <div className={'text-[#808890]'}>R-Claim</div>
                                                     <div className={'font-semibold'}>
-                                                        <span>{state.r_claim}%</span>
+                                                        <span>{state.r_claim.toFixed(2)}%</span>
                                                     </div>
                                                 </div>
                                             </>
@@ -111,6 +113,18 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                 <Button
                                                     variants={'primary'}
                                                     className={`bg-[#EB2B3E] w-[80%] m-[24px] mt-[32px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
+                                                    onClick={() => {
+                                                        localStorage.setItem(
+                                                            'state',
+                                                            JSON.stringify({
+                                                                icon: undefined,
+                                                                id: undefined,
+                                                                name: undefined,
+                                                                symbol: undefined,
+                                                                type: undefined,
+                                                            }),
+                                                        )
+                                                    }}
                                                 >
                                                     {index == 0
                                                         ? `${t('insurance:final:complete')}`
@@ -129,11 +143,11 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
             </>
         ) : (
             <>
-                <div className="z-50 flex flex-col-reverse">
+                <div className="z-50 flex flex-col-reverse ">
                     {noti.map((item, index) => {
                         if (item.name === name) {
                             return (
-                                <div key={index} className={` bg-white text-sm  w-full mx-auto `}>
+                                <div key={index} className={` bg-white text-sm w-full mx-auto `}>
                                     {name != 'loading' && name != 'success' && (
                                         <div className="m-[24px] flex flex-row-reverse" onClick={setActive}>
                                             <XMark></XMark>
@@ -194,12 +208,22 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                     className={`bg-[#EB2B3E] w-[80%] m-[24px] mt-[32px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                                                     onClick={() => {
                                                         if (index == 0) {
-                                                            setActive()
+                                                            router.push('/buy-covered/insurance-history')
+                                                            localStorage.setItem(
+                                                                'state',
+                                                                JSON.stringify({
+                                                                    icon: undefined,
+                                                                    id: undefined,
+                                                                    name: undefined,
+                                                                    symbol: undefined,
+                                                                    type: undefined,
+                                                                }),
+                                                            )
                                                         }
                                                     }}
                                                 >
                                                     {index == 0
-                                                        ? `${t('insurance:final:complete')}`
+                                                        ? `Xem hợp đồng chi tiết`
                                                         : index == 3
                                                         ? `${t('insurance:final:confirm_email')}`
                                                         : `${t('insurance:final:buy_again')}`}

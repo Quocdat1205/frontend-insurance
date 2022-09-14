@@ -20,6 +20,12 @@ export const INSURANCE_ABI = [
     },
     {
         anonymous: false,
+        inputs: [{ indexed: false, internalType: 'uint256', name: 'quantity_nain_eligible_for_incentives', type: 'uint256' }],
+        name: 'EUpdateQuantityNainEligibleForIncentives',
+        type: 'event',
+    },
+    {
+        anonymous: false,
         inputs: [{ indexed: false, internalType: 'uint256', name: 'idInsurance', type: 'uint256' }],
         name: 'EUpdateStateInsurance',
         type: 'event',
@@ -42,6 +48,7 @@ export const INSURANCE_ABI = [
             { internalType: 'uint256', name: '_p_market', type: 'uint256' },
             { internalType: 'uint256', name: '_p_claim', type: 'uint256' },
             { internalType: 'uint256', name: '_period', type: 'uint256' },
+            { internalType: 'bool', name: '_isUseNain', type: 'bool' },
         ],
         name: 'createInsurance',
         outputs: [
@@ -68,11 +75,8 @@ export const INSURANCE_ABI = [
         type: 'function',
     },
     {
-        inputs: [
-            { internalType: 'address', name: '_receipient', type: 'address' },
-            { internalType: 'uint256', name: '_amount', type: 'uint256' },
-        ],
-        name: 'depositToken',
+        inputs: [{ internalType: 'uint256', name: '_amount', type: 'uint256' }],
+        name: 'depositTokens',
         outputs: [],
         stateMutability: 'nonpayable',
         type: 'function',
@@ -104,6 +108,13 @@ export const INSURANCE_ABI = [
         type: 'function',
     },
     { inputs: [], name: 'owner', outputs: [{ internalType: 'address', name: '', type: 'address' }], stateMutability: 'view', type: 'function' },
+    {
+        inputs: [],
+        name: 'quantity_nain_eligible_for_incentives',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+    },
     { inputs: [], name: 'renounceOwnership', outputs: [], stateMutability: 'nonpayable', type: 'function' },
     { inputs: [], name: 'totalInsurance', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], stateMutability: 'view', type: 'function' },
     {
