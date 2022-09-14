@@ -33,14 +33,16 @@ const HeaderLanding = () => {
                 </div>
                 <div className="flex items-center space-x-6 py-3 mb:py-0 text-sm font-semibold">
                     {!isMobile ? (
-                        <div className="hidden mb:block">
-                            <Menu data={menu} />
+                        <>
+                            <div className="hidden mb:flex">
+                                <Menu data={menu} />
+                            </div>
                             <ButtonLanguage />
                             <Button onClick={() => router.push('/home')} className="px-6 py-2 flex items-center space-x-2">
                                 <span>{t('home:landing:access')}</span>
                                 <RightArrow />
                             </Button>
-                        </div>
+                        </>
                     ) : (
                         <>
                             <Button onClick={() => router.push('/home')} className="px-4 py-2 leading-[1rem] flex items-center space-x-2">
