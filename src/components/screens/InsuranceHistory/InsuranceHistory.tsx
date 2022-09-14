@@ -8,9 +8,12 @@ import { useTranslation } from 'next-i18next'
 import Modal from 'components/common/Modal/Modal'
 import Popover from 'components/common/Popover/Popover'
 import { isMobile } from 'react-device-detect'
-import Guideline from './Guideline'
 import { API_CHECK_GUIDE_LINE, API_UPDATE_GUIDE_LINE } from 'services/apis'
 import fetchApi from 'services/fetch-api'
+import dynamic from 'next/dynamic'
+const Guideline = dynamic(() => import('components/screens/InsuranceHistory/Guideline'), {
+    ssr: false,
+})
 
 const InsuranceHistory = () => {
     const { account } = useWeb3Wallet()
