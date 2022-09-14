@@ -151,11 +151,10 @@ const InsuranceFilterMobile = (props: InsuranceFilterMobile) => {
                         valueExpr="symbol"
                         formatOptionLabel={formatOptionLabel}
                         options={assetsToken}
-                        labelClassName="font-semibold"
                         isClearable={true}
                     />
                     <div>
-                        <div className="text-sm font-semibold text-txtSecondary">{t('insurance_history:status')}</div>
+                        <div className="text-xs text-txtSecondary">{t('insurance_history:status')}</div>
                         <div className="flex items-center flex-wrap">
                             {optionsState.map((item, index) => (
                                 <div
@@ -171,9 +170,9 @@ const InsuranceFilterMobile = (props: InsuranceFilterMobile) => {
                         </div>
                     </div>
                     <div>
-                        <div className="text-sm font-semibold text-txtSecondary mb-2">
-                            <div className="text-txtSecondary flex items-center space-x-2">
-                                <span>Period</span>
+                        <div className="text-sm mb-2">
+                            <div className="flex items-center space-x-2">
+                                <span className="text-xs text-txtSecondary">Period</span>
                                 <div data-tip={t('insurance:terminology:period')} data-for={'period'}>
                                     <InfoCircle size={14} color={colors.txtSecondary} />
                                     <Tooltip className="max-w-[200px]" id={'period'} placement="right" />

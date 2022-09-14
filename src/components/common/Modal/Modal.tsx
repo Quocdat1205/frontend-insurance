@@ -85,8 +85,8 @@ const Modal = ({
                         <div
                             ref={wrapperRef}
                             className={classnames(
-                                'w-full absolute bg-white rounded-xl',
-                                { 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2': !isMobile },
+                                'w-full absolute bg-white',
+                                { 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl': !isMobile },
                                 className,
                             )}
                         >

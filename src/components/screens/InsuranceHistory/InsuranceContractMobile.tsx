@@ -9,6 +9,7 @@ import { X } from 'react-feather'
 import styled from 'styled-components'
 import { formatCurrency, formatTime } from 'utils/utils'
 import InsuranceFilterMobile from './InsuranceFilterMobile'
+import { stateInsurance } from 'utils/constants'
 
 interface InsuranceContractMobile {
     filter: any
@@ -31,6 +32,7 @@ interface InsuranceContractMobile {
     onLoadMore: () => void
     loading?: boolean
     onBuyInsurance: () => void
+    showGuide: boolean
 }
 
 const InsuranceContractMobile = ({
@@ -43,6 +45,7 @@ const InsuranceContractMobile = ({
     onLoadMore,
     loading,
     onBuyInsurance,
+    showGuide,
     ...props
 }: InsuranceContractMobile) => {
     const [showFilter, setShowFilter] = useState(false)
@@ -80,16 +83,60 @@ const InsuranceContractMobile = ({
             </BgDashed>
             <InsuranceFilterMobile assetsToken={assetsToken} visible={showFilter} onClose={() => setShowFilter(false)} filter={filter} {...props} />
             <div className="flex flex-col space-y-6">
-                {dataSource?.insurance?.length <= 0 ? (
-                    <div className="w-full flex flex-col items-center justify-center pb-4 ">
-                        <img className="max-w-[230px] sm:max-w-[310px]" src="/images/icons/bg_noData.png" />
-                        <div className="text-sm text-center px-4">{t('insurance_history:you_have_no_insurance')}</div>
-                    </div>
+                {!loading && dataSource?.insurance?.length <= 0 ? (
+                    showGuide ? (
+                        <div data-tut={'tour_insurance_contract'} className="p-4 bg-white rounded-xl flex flex-col space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                    <img className="rounded-[50%]" src="/images/icons/ic_binance.png" width={32} height={32} />
+                                    <div className="flex flex-col space-y-1">
+                                        <div className="font-medium">Binance Coin</div>
+                                        <div className="text-xs text-txtSecondary">22160725070001</div>
+                                    </div>
+                                </div>
+
+                                <div>{renderStatus({ state: stateInsurance.AVAILABLE }, t)}</div>
+                            </div>
+                            <div className="flex items-center justify-center space-x-2 bg-pink-1 rounded-md">
+                                <AlarmIcon />
+                                <span className="text-xs text-red font-semibold py-2 lowercase">7 ngày 12:30:23</span>
+                            </div>
+                            <div className="flex justify-between flex-wrap">
+                                <Item>
+                                    <div className="text-txtSecondary text-xs whitespace-nowrap">{t('common:insurance')}</div>
+                                    <span className="text-xs font-semibold text-red underline">2216072507</span>
+                                </Item>
+                                <Item>
+                                    <div className="text-txtSecondary text-xs">P-Claim</div>
+                                    <span className="text-xs font-semibold">100.123K USDT</span>
+                                </Item>
+                                <Item className="h-[1px] border-b border-divider my-2"></Item>
+                                <Item className="h-[1px] border-b border-divider my-2"></Item>
+                                <Item>
+                                    <div className="text-txtSecondary text-xs">Margin</div>
+                                    <span className="text-xs font-semibold">1.1234K USDT</span>
+                                </Item>
+                                <Item>
+                                    <div className="text-txtSecondary text-xs">Q-Claim</div>
+                                    <span className="text-xs font-semibold">8.123K USDT</span>
+                                </Item>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="w-full flex flex-col items-center justify-center pb-4 ">
+                            <img className="max-w-[230px] sm:max-w-[310px]" src="/images/icons/bg_noData.png" />
+                            <div className="text-sm text-center px-4">{t('insurance_history:you_have_no_insurance')}</div>
+                        </div>
+                    )
                 ) : (
                     dataSource?.insurance?.map((item: any, index: number) => {
                         const asset = assetsToken?.find((rs: any) => rs.symbol === item?.asset_covered)
                         return (
-                            <div key={index} className="p-4 bg-white rounded-xl flex flex-col space-y-4">
+                            <div
+                                data-tut={index === 0 ? 'tour_insurance_contract' : ''}
+                                key={index}
+                                className="p-4 bg-white rounded-xl flex flex-col space-y-4"
+                            >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-3">
                                         <img className="rounded-[50%]" src={asset?.attachment} width={32} height={32} />

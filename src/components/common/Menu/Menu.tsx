@@ -1,10 +1,11 @@
 import classnames from 'classnames'
-import React, {useMemo,useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { ChevronDown, ChevronUp } from 'react-feather'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
 import { useTranslation } from 'next-i18next'
+import { isMobile as mobile } from 'react-device-detect'
 
 interface Menu {
     data: any[]
@@ -14,7 +15,7 @@ interface Menu {
 const Menu = ({ data, onChange }: Menu) => {
     const { width } = useWindowSize()
     const { t } = useTranslation()
-    const isMobile = width && width < screens.drawer
+    const isMobile = (width && width < screens.drawer) || mobile
     const [active, setActive] = useState<any>(null)
 
     const onToggleMenu = (e: any, menu: any) => {

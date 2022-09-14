@@ -49,5 +49,6 @@
             "expired": "Expired",
             "liquidated": "Liquidated"
         }
-    }
+    },
+    "next": "Next"
 }

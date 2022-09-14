@@ -55,13 +55,17 @@ const Statistics = () => {
         const q_claim_ratio = !q_claim ? -100 : !q_claim_comp ? 100 : (q_claim / q_claim_comp) * 100
         const r_claim_ratio = !q_margin ? -100 : !q_margin_comp ? 100 : (q_margin / q_margin_comp) * 100
         const sum_contract_ratio = !sum_contract ? -100 : !sum_contract_comp ? 100 : (sum_contract / sum_contract_comp) * 100
-        return { q_claim: q_claim_ratio, r_claim: r_claim_ratio, sum_contract: sum_contract_ratio }
+        return {
+            q_claim: q_claim_ratio && (q_claim_comp || q_claim),
+            r_claim: r_claim_ratio && (q_margin_comp || q_margin),
+            sum_contract: sum_contract_ratio && (sum_contract_comp || sum_contract),
+        }
     }, [dataSource])
 
     return (
-        <div data-tut="statistics">
-            <div className="flex sm:items-center flex-col sm:flex-row sm:justify-between">
-                <div className="sm:text-2xl font-medium">{t('insurance_history:individual_cover')}</div>
+        <>
+            <div id="tour_statistics" className="flex sm:items-center flex-col sm:flex-row sm:justify-between pt-8 sm:pt-12">
+                <div className="sm:text-xl font-medium">{t('insurance_history:individual_cover')}</div>
                 <div className="flex items-center space-x-3 sm:space-x-4 text-sm mt-4 sm:mt-0">
                     <Day onClick={() => onChangeDay(30)} active={day === 30}>
                         30 {t('common:days')}
@@ -74,7 +78,7 @@ const Statistics = () => {
                     </Day>
                 </div>
             </div>
-            <div className="flex items-center flex-wrap pt-6 sm:gap-6">
+            <div data-tut="tour_statistics" className="flex items-center flex-wrap pt-6 sm:gap-6">
                 <CardShadow
                     mobileNoShadow
                     className="px-4 py-6 sm:p-6 flex sm:flex-col sm:space-y-4 space-x-2 sm:space-x-0 min-w-full sm:min-w-[300px] flex-1 border-b border-divider sm:border-none "
@@ -105,7 +109,9 @@ const Statistics = () => {
                                 {loading ? (
                                     <Skeleton circle className="w-3 h-3" />
                                 ) : (
-                                    <TendencyIcon down={general.q_claim <= 0} color={general.q_claim > 0 ? colors.success : colors.error} />
+                                    !!general.q_claim && (
+                                        <TendencyIcon down={general.q_claim <= 0} color={general.q_claim > 0 ? colors.success : colors.error} />
+                                    )
                                 )}
                                 {loading ? (
                                     <Skeleton className="min-w-[35px] min-h-[24px]" />
@@ -150,7 +156,9 @@ const Statistics = () => {
                                 {loading ? (
                                     <Skeleton circle className="w-3 h-3" />
                                 ) : (
-                                    <TendencyIcon down={general.r_claim <= 0} color={general.r_claim > 0 ? colors.success : colors.error} />
+                                    !!general.r_claim && (
+                                        <TendencyIcon down={general.r_claim <= 0} color={general.r_claim > 0 ? colors.success : colors.error} />
+                                    )
                                 )}
                                 {loading ? (
                                     <Skeleton className="min-w-[35px] min-h-[24px]" />
@@ -176,7 +184,9 @@ const Statistics = () => {
                                 {loading ? (
                                     <Skeleton circle className="w-3 h-3" />
                                 ) : (
-                                    <TendencyIcon down={general.sum_contract <= 0} color={general.sum_contract > 0 ? colors.success : colors.error} />
+                                    !!general.sum_contract && (
+                                        <TendencyIcon down={general.sum_contract <= 0} color={general.sum_contract > 0 ? colors.success : colors.error} />
+                                    )
                                 )}
                                 {loading ? (
                                     <Skeleton className="min-w-[35px] min-h-[24px]" />
@@ -190,7 +200,7 @@ const Statistics = () => {
                     </div>
                 </CardShadow>
             </div>
-        </div>
+        </>
     )
 }
 

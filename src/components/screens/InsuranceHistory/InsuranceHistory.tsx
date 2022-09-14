@@ -9,6 +9,8 @@ import Modal from 'components/common/Modal/Modal'
 import Popover from 'components/common/Popover/Popover'
 import { isMobile } from 'react-device-detect'
 import Guideline from './Guideline'
+import { API_CHECK_GUIDE_LINE } from 'services/apis'
+import fetchApi from 'services/fetch-api'
 
 const InsuranceHistory = () => {
     const { account } = useWeb3Wallet()
@@ -18,12 +20,34 @@ const InsuranceHistory = () => {
     const [showGuide, setShowGuide] = useState<boolean>(false)
 
     useEffect(() => {
-        if (showGuide) setShowGuideModal(false)
+        if (showGuide) {
+            setShowGuideModal(false)
+        }
     }, [showGuide])
+
+    // useEffect(() => {
+    //     if (account) checkGuideLine()
+    // }, [account])
+
+    const checkGuideLine = async () => {
+        try {
+            const { data } = await fetchApi({
+                url: API_CHECK_GUIDE_LINE,
+                options: { method: 'GET' },
+                params: {
+                    owner: account,
+                },
+            })
+            if (!data) setShowGuide(true)
+        } catch (e) {
+            console.log(e)
+        } finally {
+        }
+    }
 
     return (
         <>
-            {/* <Guideline start={showGuide} setStart={setShowGuide} /> */}
+            <Guideline start={showGuide} setStart={setShowGuide} />
             <TerminologyModal isMobile={isMobile} visible={showTerminologyModal} onClose={() => setShowTerminologyModal(false)} t={t} />
             <GuidelineModal
                 visible={showGuideModal}
@@ -33,14 +57,18 @@ const InsuranceHistory = () => {
                 onShowGuildline={() => setShowGuide(true)}
             />
             <div className="px-4 sm:px-10 pt-12 sm:pt-[4.25rem] max-w-screen-layout m-auto">
-                <div className={`${account ? 'pb-8 sm:pb-12' : ''} flex items-center justify-between`}>
+                <div className={`flex items-center justify-between`}>
                     <div className="text-2xl sm:text-4xl font-semibold">{t('insurance_history:my_cover')}</div>
                     <Popover
                         visible={!isMobile}
                         containerClassName="w-max"
                         label={() => (
-                            <div onClick={() => isMobile && setShowGuideModal(true)} className="text-sm sm:text-base text-blue underline">
-                                {t('insurance_history:guidelines')}
+                            <div
+                                data-tut="tour_guideline"
+                                onClick={() => isMobile && setShowGuideModal(true)}
+                                className="text-sm sm:text-base text-blue underline"
+                            >
+                                {t('insurance_history:guidelines:title')}
                             </div>
                         )}
                         className="right-0 shadow-subMenu rounded-[3px] w-max"
@@ -55,7 +83,7 @@ const InsuranceHistory = () => {
                 </div>
                 {account && <Statistics />}
                 <CardShadow mobileNoShadow className="sm:mt-12 sm:p-8">
-                    <InsuranceContract account={account} />
+                    <InsuranceContract showGuide={showGuide} account={account} />
                 </CardShadow>
                 <div className="pt-[30px] sm:pt-12">
                     <div className="sm:text-2xl font-semibold">{t('insurance_history:new_cover_assets')}</div>
@@ -69,7 +97,7 @@ const InsuranceHistory = () => {
 const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGuildline }: any) => {
     return (
         <Modal isMobile containerClassName="flex-col justify-end" isVisible={visible} onBackdropCb={onClose}>
-            <div className="text-xl leading-8 font-semibold mb-6">{t('insurance_history:guidelines')}</div>
+            <div className="text-xl leading-8 font-semibold mb-6">{t('insurance_history:guidelines:title')}</div>
             <div className="flex flex-col text-sm divide-solid divide-y divide-divider">
                 <div onClick={onShowGuildline} className="py-4">
                     {t('insurance_history:tracking_and_utilizing')}

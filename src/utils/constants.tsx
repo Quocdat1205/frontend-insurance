@@ -1,3 +1,5 @@
+import { StateInsurance } from 'types/types'
+
 export const PORTAL_MODAL_ID: string = 'PORTAL_MODAL'
 
 export const screens = {
@@ -13,7 +15,7 @@ export const PATHS = {
     // Add news path here
 }
 
-export const stateInsurance: any = {
+export const stateInsurance: StateInsurance = {
     AVAILABLE: 'Available',
     REFUNDED: 'Refunded',
     CLAIM_WAITING: 'Claim_waiting',
