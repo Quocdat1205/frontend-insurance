@@ -56,6 +56,7 @@ export const AcceptBuyInsurance = ({
     const router = useRouter()
     const { width } = useWindowSize()
     const isMobile = width && width < screens.drawer
+    const [isUseNain, setIsUseNain] = useState(false)
 
     useEffect(() => {
         fetch()
@@ -75,7 +76,6 @@ export const AcceptBuyInsurance = ({
 
     const [isUpdated, setUpdated] = useState<boolean>(false)
     const [isCanBuy, setCanBuy] = useState<boolean>(false)
-    const [active, setActive] = useState<boolean>(false)
 
     const onConnectWallet = () => {
         try {
@@ -118,6 +118,7 @@ export const AcceptBuyInsurance = ({
                     p_market: formatPriceToWeiValue(data.data[0].p),
                     p_claim: formatPriceToWeiValue(state.p_claim),
                     period: state.period,
+                    isUseNain: checkUpgrade,
                 }
 
                 const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
@@ -128,6 +129,7 @@ export const AcceptBuyInsurance = ({
                     dataPost.p_market,
                     dataPost.p_claim,
                     dataPost.period,
+                    dataPost.isUseNain,
                     { value: dataPost.margin },
                 )
                 await buy.wait()
@@ -148,6 +150,7 @@ export const AcceptBuyInsurance = ({
                     p_market: formatPriceToWeiValue(data.data[0].p),
                     p_claim: formatPriceToWeiValue(state.p_claim),
                     period: state.period + 2,
+                    isUseNain: checkUpgrade,
                 }
                 const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
                     dataPost.buyer,
@@ -157,6 +160,7 @@ export const AcceptBuyInsurance = ({
                     dataPost.p_market,
                     dataPost.p_claim,
                     dataPost.period,
+                    dataPost.isUseNain,
                     { value: dataPost.margin },
                 )
                 await buy.wait()

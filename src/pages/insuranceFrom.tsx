@@ -10,7 +10,17 @@ import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { CheckCircle, LeftArrow, InfoCircle, XMark, ErrorTriggersIcon, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
+import {
+    CheckCircle,
+    LeftArrow,
+    InfoCircle,
+    XMark,
+    ErrorTriggersIcon,
+    BxDollarCircle,
+    BxLineChartDown,
+    BxCaledarCheck,
+    Loading,
+} from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -23,6 +33,9 @@ import NotificationInsurance from 'components/layout/notifucationInsurance'
 import Modal from 'components/common/Modal/Modal'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
+const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
+    ssr: false,
+})
 //chart
 const ChartComponent = dynamic(() => import('../components/common/Chart/chartComponent'), { ssr: false, suspense: true })
 
@@ -54,6 +67,7 @@ export const InsuranceFrom = () => {
     const [unitMoney, setUnitMoney] = useState('USDT')
     const [showCroll, setShowCroll] = useState(false)
     const [errorPCalim, setErrorPCalim] = useState(false)
+    const [showGuide, setShowGuide] = useState<boolean>(true)
     const [showChangeUnit, setShowChangeUnit] = useState({
         isShow: false,
         name: '',
@@ -178,8 +192,8 @@ export const InsuranceFrom = () => {
 
     useEffect(() => {
         setLoadings(true)
-        let list: ICoin[] = []
         if (stone.setting.assetsToken.length > 0) {
+            let list: ICoin[] = []
             stone.setting.assetsToken.map(async (token: any) => {
                 list.push({
                     id: token._id,
@@ -197,42 +211,75 @@ export const InsuranceFrom = () => {
             const res = JSON.parse(data)
             setSelectedCoin({
                 ...selectCoin,
-                icon: res.symbol.icon || list[0].icon,
-                id: res.symbol.id || list[0].id,
-                name: res.symbol.name || list[0].name,
-                symbol: res.symbol.symbol || list[0].symbol,
-                type: res.symbol.type || list[0].type,
+                icon: res.symbol.icon,
+                id: res.symbol.id,
+                name: res.symbol.name,
+                symbol: res.symbol.symbol,
+                type: res.symbol.type,
             })
             setState({
                 ...state,
                 symbol: {
                     ...state.symbol,
-                    icon: res.symbol.icon || list[0].icon,
-                    id: res.symbol.id || list[0].id,
-                    name: res.symbol.name || list[0].name,
-                    symbol: res.symbol.symbol || list[0].symbol,
-                    type: res.symbol.type || list[0].type,
+                    icon: res.symbol.icon,
+                    id: res.symbol.id,
+                    name: res.symbol.name,
+                    symbol: res.symbol.symbol,
+                    type: res.symbol.type,
                 },
             })
             setState({
                 ...state,
-                percent_margin: res.percent_margin || 0,
-                period: res.period || 2,
-                p_claim: res.p_claim || 0,
-                q_claim: res.q_claim || 0,
-                r_claim: res.r_claim || 0,
-                q_covered: res.q_covered || 0,
+                percent_margin: res.percent_margin,
+                period: res.period,
+                p_claim: res.p_claim,
+                q_claim: res.q_claim,
+                r_claim: res.r_claim,
+                q_covered: res.q_covered,
             })
 
             if (res.tab) {
-                setTab(res.tab || 3)
+                setTab(res.tab)
             }
             if (res.unitMoney) {
-                setUnitMoney(res.unitMoney || 'USDT')
+                setUnitMoney(res.unitMoney)
             }
             if (res.index) {
-                setIndex(res.index || 1)
+                setIndex(res.index)
             }
+        } else {
+            setSelectedCoin({
+                ...selectCoin,
+                icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
+                id: '63187ae8c2ad72eac4d0f363',
+                name: 'Binance',
+                symbol: 'BNBUSDT',
+                type: 'BNB',
+            })
+            setState({
+                ...state,
+                timeframe: '',
+                margin: 0,
+                percent_margin: 0,
+                symbol: {
+                    icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
+                    id: '63187ae8c2ad72eac4d0f363',
+                    name: 'Binance',
+                    symbol: 'BNBUSDT',
+                    type: 'BNB',
+                },
+                period: 2,
+                p_claim: 0,
+                q_claim: 0,
+                r_claim: 0,
+                q_covered: 0,
+                p_market: 0,
+                t_market: new Date(),
+                p_expired: 0,
+            })
+            setTab(3)
+            setUnitMoney('USDT')
+            setIndex(1)
         }
         getPriceBNBUSDT(setPriceBNB)
 
@@ -392,8 +439,6 @@ export const InsuranceFrom = () => {
         }
         validatePclaim(state.p_claim)
     }, [state.q_covered, state.period, selectCoin, state.margin, state.p_claim, state.percent_margin])
-
-    useEffect(() => {}, [wallet])
 
     useEffect(() => {
         if (state.p_claim > 0) {
@@ -1214,7 +1259,9 @@ export const InsuranceFrom = () => {
                 </LayoutInsurance>
             </>
         ) : (
-            <>
+            <div>
+                {/* <Guide start={showGuide} setStart={setShowGuide} /> */}
+
                 {!wallet.account ? (
                     <>
                         {showDetails && (
@@ -1428,7 +1475,7 @@ export const InsuranceFrom = () => {
                             </Modal>
                         )}
                         {index == 1 && (
-                            <div className={`h-[32px] flex flex-row justify-between items-center mx-[16px] mt-[24px] mb-[16px] sticky top-0 bg-white/[1] z-50`}>
+                            <div className={`h-[32px] flex flex-row justify-between items-center mx-[16px] mt-[24px] mb-[16px] sticky top-0 bg-white z-50`}>
                                 <div
                                     onClick={() => {
                                         router.push('/home')
@@ -1470,7 +1517,10 @@ export const InsuranceFrom = () => {
                         )}
 
                         {index == 1 && (
-                            <div className=" my-[24px] w-full mx-auto flex flex-wrap flex-col justify-center content-center font-medium text-2xl relative">
+                            <div
+                                id="tour_statistics"
+                                className=" my-[24px] w-full mx-auto flex flex-wrap flex-col justify-center content-center font-medium text-2xl relative "
+                            >
                                 <div>
                                     <span>{t('insurance:buy:buy_covered')} </span>{' '}
                                     <span
@@ -1804,10 +1854,10 @@ export const InsuranceFrom = () => {
                         )}
                     </>
                 )}
-            </>
+            </div>
         )
     ) : (
-        <></>
+        <Loading />
     )
 }
 
