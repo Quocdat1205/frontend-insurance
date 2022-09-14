@@ -1,5 +1,5 @@
 import CardShadow from 'components/common/Card/CardShadow'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Assets from 'components/screens/HomePage/Assets'
 import InsuranceContract from 'components/screens/InsuranceHistory/InsuranceContract'
 import Statistics from 'components/screens/InsuranceHistory/Statistics'
@@ -9,7 +9,7 @@ import Modal from 'components/common/Modal/Modal'
 import Popover from 'components/common/Popover/Popover'
 import { isMobile } from 'react-device-detect'
 import Guideline from './Guideline'
-import { API_CHECK_GUIDE_LINE } from 'services/apis'
+import { API_CHECK_GUIDE_LINE, API_UPDATE_GUIDE_LINE } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 
 const InsuranceHistory = () => {
@@ -25,11 +25,13 @@ const InsuranceHistory = () => {
         }
     }, [showGuide])
 
-    // useEffect(() => {
-    //     if (account) checkGuideLine()
-    // }, [account])
+    useEffect(() => {
+        if (account && isMobile) checkGuideLine()
+    }, [account])
 
+    const timer = useRef<any>(null)
     const checkGuideLine = async () => {
+        clearTimeout(timer.current)
         try {
             const { data } = await fetchApi({
                 url: API_CHECK_GUIDE_LINE,
@@ -38,7 +40,27 @@ const InsuranceHistory = () => {
                     owner: account,
                 },
             })
-            if (!data) setShowGuide(true)
+            if (!data) {
+                timer.current = setTimeout(() => {
+                    setShowGuide(true)
+                    updateGuideLine()
+                }, 1000)
+            }
+        } catch (e) {
+            console.log(e)
+        } finally {
+        }
+    }
+
+    const updateGuideLine = async () => {
+        try {
+            await fetchApi({
+                url: API_UPDATE_GUIDE_LINE,
+                options: { method: 'GET' },
+                params: {
+                    owner: account,
+                },
+            })
         } catch (e) {
             console.log(e)
         } finally {
