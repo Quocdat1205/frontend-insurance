@@ -101,8 +101,8 @@ const InsuranceHistory = () => {
                             )}
                             className="right-0 shadow-subMenu rounded-[3px] w-max"
                         >
-                            <div className="flex flex-col w-full py-1">
-                                <div onClick={() => refPopover.current?.close()} className="py-2 px-4 hover:bg-hover cursor-pointer">
+                            <div className="flex flex-col w-full py-1 text-sm">
+                                <div onClick={() => refPopover.current?.close()} className="py-[10px] px-4 hover:bg-hover cursor-pointer">
                                     {t('insurance_history:tracking_and_utilizing')}
                                 </div>
                                 <div
@@ -110,7 +110,7 @@ const InsuranceHistory = () => {
                                         setShowTerminologyModal(true)
                                         refPopover.current?.close()
                                     }}
-                                    className="py-2 px-4 hover:bg-hover cursor-pointer"
+                                    className="py-[10px] px-4 hover:bg-hover cursor-pointer"
                                 >
                                     {t('insurance_history:detailed_terminology')}
                                 </div>
@@ -122,7 +122,7 @@ const InsuranceHistory = () => {
                         <InsuranceContract showGuide={showGuide} account={account} />
                     </CardShadow>
                     <div className="pt-[30px] sm:pt-12">
-                        <div className="sm:text-2xl font-semibold">{t('insurance_history:new_cover_assets')}</div>
+                        <div className="sm:text-2xl font-medium">{t('insurance_history:new_cover_assets')}</div>
                         <Assets />
                     </div>
                 </div>

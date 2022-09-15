@@ -13,10 +13,13 @@ import { isMobile } from 'react-device-detect'
 import { renderContentStatus } from 'components/screens/InsuranceHistory/InsuranceContract'
 import { X } from 'react-feather'
 import Spinner from 'components/common/Loader/Spinner'
+import useWindowSize from 'hooks/useWindowSize'
+import { screens } from 'utils/constants'
 
 const Notifications = () => {
     const { account } = useWeb3Wallet()
     const { t } = useTranslation()
+    const { width } = useWindowSize()
     const [visible, setVisible] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(true)
     const [isLoadMore, setIsLoadMore] = useState<boolean>(false)
@@ -217,8 +220,12 @@ const Notifications = () => {
                     leaveFrom="opacity-100 translate-y-0"
                     leaveTo="opacity-0 translate-y-1"
                 >
-                    <div className={'absolute z-10 mt-3 left-0 shadow-subMenu rounded-xl min-w-[360px] py-1 bg-white'}>
-                        <div className="font-normal sm:max-h-[500px] overflow-auto">
+                    <div
+                        className={`absolute z-10 mt-3 ${
+                            width && width > screens.drawer ? 'left-0' : 'right-0'
+                        }  shadow-subMenu rounded-xl min-w-[360px] py-1 bg-white`}
+                    >
+                        <div className="font-normal sm:max-h-[500px] overflow-auto px-4 sm:px-0">
                             {renderNoti()}
                             {totalPage > 1 && !loading && hasNext && (
                                 <div onClick={onLoadMore} className="text-red underline text-sm my-3 flex text-center justify-center cursor-pointer">

@@ -36,23 +36,28 @@ const Drawer = ({ visible, onClose, children }: any) => {
     useOutside(wrapperRef, handleOutside, container)
 
     return (
-        <Portal portalId="PORTAL_MODAL">
+        <Portal portalId="Drawer">
             <div
                 className={classnames(
-                    'flex flex-col fixed top-[4rem] right-0 h-[calc(100%-4rem)] w-full z-[20] bg-shadow/[0.3] overflow-hidden',
-                    'ease-in-out transition-all flex items-end duration-300 z-30',
+                    'flex flex-col fixed top-[4rem] h-[calc(100%-4rem--1px)] w-full z-[20] bg-shadow/[0.3] overflow-hidden',
                     { invisible: !visible },
                     { visible: visible },
-                    { 'translate-x-full': !visible },
-                    { 'translate-x-0': visible },
                 )}
                 ref={container}
             >
                 <div
-                    ref={wrapperRef}
-                    className="text-sm font-semibold flex flex-col justify-between flex-1 w-[284px] min-h-0 bg-white border-t border-divider py-8"
+                    className={classnames(
+                        'ease-in-out transition-all flex items-end duration-300 h-full right-0 fixed',
+                        { 'translate-x-full': !visible },
+                        { 'translate-x-0': visible },
+                    )}
                 >
-                    {children}
+                    <div
+                        ref={wrapperRef}
+                        className="text-sm font-semibold flex flex-col justify-between flex-1 w-[284px] h-full min-h-0 bg-white py-8"
+                    >
+                        {children}
+                    </div>
                 </div>
             </div>
         </Portal>

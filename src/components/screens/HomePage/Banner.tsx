@@ -57,10 +57,10 @@ const Banner = () => {
             </div>
             <Background isMobile={isMobile}>
                 <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto text-center flex flex-col space-y-8 sm:space-y-6">
-                    <div className="flex flex-col space-y-[2px]">
+                    <div className="flex flex-col space-y-2">
                         <div className="leading-5 sm:leading-6">{t('home:landing:total_q_claim')}</div>
                         <div
-                            className="text-red text-[2.5rem] leading-[3.5rem] sm:leading-10 font-bold sm:font-semibold"
+                            className="text-red text-[2.5rem] sm:text-5xl leading-[3.5rem] font-bold sm:font-semibold"
                             data-aos="fade-up"
                             data-aos-delay={DURATION_AOS}
                         >

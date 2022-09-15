@@ -7,7 +7,8 @@
 @import "datepicker";
 @import "pagination";
 
-html {
+html,
+body {
     @apply font-Manrope;
     @apply text-txtPrimary;
 }
@@ -58,6 +59,13 @@ html {
 
 @layer utilities {
     .active-menu > ul {
+        &:not(.menu-1) {
+            opacity: 1 !important;
+            z-index: 1;
+            top: -16px;
+            left: 100%;
+            height: auto;
+        }
         max-height: 500px !important;
         transform: scaleY(1) !important;
         display: flex !important;
@@ -68,8 +76,13 @@ html {
 .sidebar-menu {
     user-select: none;
     .sub-menu > ul {
+        &:not(.menu-1) {
+            opacity: 0;
+            left: 0;
+            height: 0;
+        }
         max-height: 0;
-        overflow: hidden;
+        // overflow: hidden;
         transform: scaleY(0);
         transform-origin: top;
         transition: transform 0.2s ease-in-out;
@@ -242,5 +255,31 @@ input[type="number"] {
     &::before {
         right: 12px;
         left: unset;
+    }
+}
+
+.scroll-table {
+    &::-webkit-scrollbar {
+        width: 6px !important;
+        border-radius: 4px !important;
+        height: 6px;
+    }
+
+    /* Track */
+    &::-webkit-scrollbar-track {
+        background: #f8f8f8 !important;
+        border-radius: 4px !important;
+    }
+
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+        border-radius: 4px !important;
+        background: #e5e7e8 !important;
+        height: 6px !important;
+    }
+
+    /* Handle on hover */
+    &::-webkit-scrollbar-thumb:hover {
+        background: #e5e7e8 !important;
     }
 }
