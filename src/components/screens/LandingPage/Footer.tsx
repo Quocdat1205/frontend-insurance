@@ -19,7 +19,7 @@ const Footer = ({ sponsor = true }) => {
                 </BgSponsor>
             )}
             <div className="bg-white-2 px-10 py-12 ">
-                <div className="max-w-screen-layout m-auto">
+                <div className="max-w-screen-layout 4xl:max-w-screen-4xl m-auto">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between">
                         <div className="w-[121px]">
                             <img src="/images/ic_logo.png" />

@@ -48,7 +48,7 @@ const RegisterLanding = () => {
     return (
         <section className="px-4 lg:px-20">
             <SuccessModal isVisible={visible} onClose={() => setVisible(false)} t={t} />
-            <div className="max-w-screen-insurance m-auto register-landing flex items-center justify-center pt-20 sm:pt-[10.5rem]">
+            <div className="max-w-[1062px] m-auto register-landing flex items-center justify-center pt-20 sm:pt-[10.5rem]">
                 <Background isMobile={isMobile}>
                     <div className="font-semibold text-2xl sm:text-[2.5rem] leading-8 sm:leading-10 mb-2 text-red">{t('home:landing:stay_up_to_date')}</div>
                     <div className="text-center sm:text-left px-5 sm:px-0 text-sm sm:text-base">

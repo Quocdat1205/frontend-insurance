@@ -135,7 +135,7 @@ const InsuranceContract = ({ account, showGuide }: InsuranceContract) => {
     const { t } = useTranslation()
     const { width } = useWindowSize()
     const router = useRouter()
-    const isMobile = width && width <= 640
+    const isMobile = width && width <= 640 || mobile
     const assetsToken = useAppSelector((state: RootStore) => state.setting.assetsToken)
     const [loading, setLoading] = useState<boolean>(true)
     const [dataSource, setDataSource] = useState<any>({
@@ -181,6 +181,7 @@ const InsuranceContract = ({ account, showGuide }: InsuranceContract) => {
 
     const onLoadMore = () => {
         if (loading) return
+        setLoading(true)
         setFilter({ ...filter, skip: filter.limit + filter.skip })
     }
 
@@ -204,7 +205,7 @@ const InsuranceContract = ({ account, showGuide }: InsuranceContract) => {
                 },
             })
             if (data) {
-                const dataFiter = !mobile || !filter.skip ? data?.insurance : dataSource.insurance.concat(data?.insurance)
+                const dataFiter = !isMobile || !filter.skip ? data?.insurance : dataSource.insurance.concat(data?.insurance)
                 setDataSource({
                     count: data?.count,
                     insurance: dataFiter,
@@ -303,19 +304,20 @@ const InsuranceContract = ({ account, showGuide }: InsuranceContract) => {
             },
             {
                 Header: t('common:insurance'),
-                accessor: '_id',
+                accessor: 'transaction_hash',
                 minWidth: 120,
-                Cell: (e: any) => <div className="underline text-red font-light cursor-pointer">{e.value}</div>,
+                Cell: (e: any) => (
+                    <div className="underline text-red font-light cursor-pointer">
+                        <Link href={Config.env.BSC + '/' + e.value}>
+                            <a target="_blank">{e.value}</a>
+                        </Link>
+                    </div>
+                ),
             },
             {
                 Header: 'HashID',
-                accessor: 'transaction_hash',
+                accessor: '_id',
                 minWidth: 150,
-                Cell: (e: any) => (
-                    <Link href={Config.env.BSC + '/' + e.value}>
-                        <a target="_blank">{e.value}</a>
-                    </Link>
-                ),
             },
         ],
         [assetsToken],

@@ -79,36 +79,38 @@ const News = ({ news = [] }: any) => {
         $isMobile: isMobile,
     }
     return (
-        <section className="pt-20 sm:pt-[7.5rem] max-w-screen-insurance m-auto">
-            <div className="text-2xl sm:text-5xl font-semibold -mb-2 px-4">{t('home:home:news')}</div>
-            <StyledNews
-                pagination={pagination}
-                modules={modules}
-                // modules={[Pagination, Autoplay]}
-                className="mySwiper !px-4 !py-8"
-                slidesPerView={4}
-                breakpoints={{
-                    300: {
-                        slidesPerView: 1.2,
-                        spaceBetween: 16,
-                    },
-                    640: {
-                        slidesPerView: 2,
-                        spaceBetween: 16,
-                    },
-                    1080: {
-                        slidesPerView: 4,
-                        spaceBetween: 24,
-                    },
-                }}
-                autoplay={{
-                    delay: 3000,
-                    disableOnInteraction: false,
-                }}
-                {...restProps}
-            >
-                {mount && renderNews()}
-            </StyledNews>
+        <section className="pt-20 sm:pt-[7.5rem] px-4 lg:px-20">
+            <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto">
+                <div className="text-2xl sm:text-5xl font-semibold -mb-2 ">{t('home:home:news')}</div>
+                <StyledNews
+                    pagination={pagination}
+                    modules={modules}
+                    // modules={[Pagination, Autoplay]}
+                    className="mySwiper !px-4 !py-8"
+                    slidesPerView={4}
+                    breakpoints={{
+                        300: {
+                            slidesPerView: 1.2,
+                            spaceBetween: 16,
+                        },
+                        640: {
+                            slidesPerView: 2,
+                            spaceBetween: 16,
+                        },
+                        1080: {
+                            slidesPerView: 4,
+                            spaceBetween: 24,
+                        },
+                    }}
+                    autoplay={{
+                        delay: 3000,
+                        disableOnInteraction: false,
+                    }}
+                    {...restProps}
+                >
+                    {mount && renderNews()}
+                </StyledNews>
+            </div>
         </section>
     )
 }
@@ -119,7 +121,7 @@ interface StyledNewsProps {
 
 const StyledNews = styled(Swiper)<StyledNewsProps>`
     & > .swiper-pagination {
-        display: ${({$isMobile}) => ($isMobile ? 'none' : '')};
+        display: ${({ $isMobile }) => ($isMobile ? 'none' : '')};
     }
 `
 

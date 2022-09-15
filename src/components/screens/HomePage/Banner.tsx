@@ -52,10 +52,11 @@ const Banner = () => {
 
     return (
         <section className="pt-20 sm:pt-[7.5rem]">
-            <div className="text-2xl sm:text-5xl font-semibold mb-6 px-4 max-w-screen-insurance m-auto">{t('home:home:statistics')}</div>
-
+            <div className="px-4 lg:px-20 ">
+                <div className="text-2xl sm:text-5xl font-semibold mb-6 max-w-screen-insurance m-auto">{t('home:home:statistics')}</div>
+            </div>
             <Background isMobile={isMobile}>
-                <div className="max-w-screen-insurance m-auto text-center flex flex-col space-y-8 sm:space-y-6">
+                <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto text-center flex flex-col space-y-8 sm:space-y-6">
                     <div className="flex flex-col space-y-[2px]">
                         <div className="leading-5 sm:leading-6">{t('home:landing:total_q_claim')}</div>
                         <div
@@ -99,7 +100,7 @@ const Item = styled.div.attrs<any>({
     border-bottom: 0;
 `
 const Background = styled.div.attrs({
-    className: 'pt-8 px-4',
+    className: 'pt-8 px-4 lg:px-20 ',
 })<any>`
     background-image: ${({ isMobile }) => `url(${`/images/screens/home/banner_alt${isMobile ? '_mobile' : ''}.png`})`};
     background-position: top;

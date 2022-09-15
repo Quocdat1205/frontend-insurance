@@ -1,17 +1,25 @@
 import { Popover, Transition } from '@headlessui/react'
-import React, { Fragment, ReactNode } from 'react'
+import React, { Fragment, ReactNode, forwardRef, useImperativeHandle, useRef } from 'react'
 
 interface ReactPopover {
     children: ReactNode
     label: any
     className?: string
-    reference?: any
     containerClassName?: string
     visible?: boolean
 }
-const ReactPopover = ({ children, label, className, reference, containerClassName = '', visible = true }: ReactPopover) => {
+const ReactPopover = forwardRef(({ children, label, className, containerClassName = '', visible = true }: ReactPopover, ref) => {
+    const refPopover = useRef<HTMLDivElement>(null)
+    useImperativeHandle(ref, () => ({
+        close: onClose,
+    }))
+
+    const onClose = () => {
+        refPopover.current?.click()
+    }
+
     return (
-        <Popover ref={reference} className={`relative ${containerClassName}`}>
+        <Popover ref={refPopover} className={`relative ${containerClassName}`}>
             {({ open, close }) => {
                 return (
                     <>
@@ -38,6 +46,6 @@ const ReactPopover = ({ children, label, className, reference, containerClassNam
             }}
         </Popover>
     )
-}
+})
 
 export default ReactPopover

@@ -21,6 +21,7 @@ const InsuranceHistory = () => {
     const [showGuideModal, setShowGuideModal] = useState<boolean>(false)
     const [showTerminologyModal, setShowTerminologyModal] = useState<boolean>(false)
     const [showGuide, setShowGuide] = useState<boolean>(false)
+    const refPopover = useRef<any>(null)
 
     useEffect(() => {
         if (showGuide) {
@@ -81,38 +82,49 @@ const InsuranceHistory = () => {
                 onShowTerminologyModal={() => setShowTerminologyModal(true)}
                 onShowGuildline={() => setShowGuide(true)}
             />
-            <div className="px-4 sm:px-10 pt-12 sm:pt-[4.25rem] max-w-screen-layout m-auto">
-                <div className={`flex items-center justify-between`}>
-                    <div className="text-2xl sm:text-4xl font-semibold">{t('insurance_history:my_cover')}</div>
-                    <Popover
-                        visible={!isMobile}
-                        containerClassName="w-max"
-                        label={() => (
-                            <div
-                                data-tut="tour_guideline"
-                                onClick={() => isMobile && setShowGuideModal(true)}
-                                className="text-sm sm:text-base text-blue underline"
-                            >
-                                {t('insurance_history:guidelines:title')}
+            <div className="px-4 sm:px-10 lg:px-20">
+                <div className="pt-12 sm:pt-[4.25rem] max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
+                    <div className={`flex items-center justify-between`}>
+                        <div className="text-2xl sm:text-4xl font-semibold">{t('insurance_history:my_cover')}</div>
+                        <Popover
+                            ref={refPopover}
+                            visible={!isMobile}
+                            containerClassName="w-max"
+                            label={() => (
+                                <div
+                                    data-tut="tour_guideline"
+                                    onClick={() => isMobile && setShowGuideModal(true)}
+                                    className="text-sm sm:text-base text-blue underline"
+                                >
+                                    {t('insurance_history:guidelines:title')}
+                                </div>
+                            )}
+                            className="right-0 shadow-subMenu rounded-[3px] w-max"
+                        >
+                            <div className="flex flex-col w-full py-1">
+                                <div onClick={() => refPopover.current?.close()} className="py-2 px-4 hover:bg-hover cursor-pointer">
+                                    {t('insurance_history:tracking_and_utilizing')}
+                                </div>
+                                <div
+                                    onClick={() => {
+                                        setShowTerminologyModal(true)
+                                        refPopover.current?.close()
+                                    }}
+                                    className="py-2 px-4 hover:bg-hover cursor-pointer"
+                                >
+                                    {t('insurance_history:detailed_terminology')}
+                                </div>
                             </div>
-                        )}
-                        className="right-0 shadow-subMenu rounded-[3px] w-max"
-                    >
-                        <div className="flex flex-col w-full py-1">
-                            <div className="py-2 px-4 hover:bg-hover cursor-pointer">{t('insurance_history:tracking_and_utilizing')}</div>
-                            <div onClick={() => setShowTerminologyModal(true)} className="py-2 px-4 hover:bg-hover cursor-pointer">
-                                {t('insurance_history:detailed_terminology')}
-                            </div>
-                        </div>
-                    </Popover>
-                </div>
-                {account && <Statistics />}
-                <CardShadow mobileNoShadow className="sm:mt-12 sm:p-8">
-                    <InsuranceContract showGuide={showGuide} account={account} />
-                </CardShadow>
-                <div className="pt-[30px] sm:pt-12">
-                    <div className="sm:text-2xl font-semibold">{t('insurance_history:new_cover_assets')}</div>
-                    <Assets />
+                        </Popover>
+                    </div>
+                    {account && <Statistics />}
+                    <CardShadow mobileNoShadow className="sm:mt-12 sm:p-8">
+                        <InsuranceContract showGuide={showGuide} account={account} />
+                    </CardShadow>
+                    <div className="pt-[30px] sm:pt-12">
+                        <div className="sm:text-2xl font-semibold">{t('insurance_history:new_cover_assets')}</div>
+                        <Assets />
+                    </div>
                 </div>
             </div>
         </>
