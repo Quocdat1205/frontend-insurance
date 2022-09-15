@@ -65,9 +65,9 @@ export const InsuranceFrom = () => {
     const [res, setRes] = useState<any>()
     const [showDetails, setShowDetails] = useState(false)
     const [unitMoney, setUnitMoney] = useState('USDT')
-    const [changeUnit, setChangeUnit] = useState(false)
-    const [changeUnit1, setChangeUnit1] = useState(false)
-    const [changeUnit2, setChangeUnit2] = useState(false)
+    const [changeUnit, setChangeUnit] = useState<boolean>(false)
+    const [changeUnit1, setChangeUnit1] = useState<boolean>(false)
+    const [changeUnit2, setChangeUnit2] = useState<boolean>(false)
     const [showCroll, setShowCroll] = useState(false)
     const [errorPCalim, setErrorPCalim] = useState(false)
     const [showGuide, setShowGuide] = useState<boolean>(true)
@@ -80,22 +80,22 @@ export const InsuranceFrom = () => {
     const [userBalance, setUserBalance] = useState<number>(0)
     const [listCoin, setListCoin] = useState<ICoin[]>([])
     const [selectCoin, setSelectedCoin] = useState<ICoin>({
-        icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
-        id: '63187ae8c2ad72eac4d0f363',
-        name: 'Binance',
-        symbol: 'BNBUSDT',
-        type: 'BNB',
+        icon: '',
+        id: '',
+        name: '',
+        symbol: '',
+        type: '',
     })
     const [state, setState] = useState({
         timeframe: '',
         margin: 0,
         percent_margin: 0,
         symbol: {
-            icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
-            id: '63187ae8c2ad72eac4d0f363',
-            name: 'Binance',
-            symbol: 'BNBUSDT',
-            type: 'BNB',
+            icon: '',
+            id: '',
+            name: '',
+            symbol: '',
+            type: '',
         },
         period: 2,
         p_claim: 0,
@@ -106,6 +106,14 @@ export const InsuranceFrom = () => {
         t_market: new Date(),
         p_expired: 0,
     })
+
+    const defaultToken = {
+        icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
+        id: '63187ae8c2ad72eac4d0f363',
+        name: 'Binance',
+        symbol: 'BNBUSDT',
+        type: 'BNB',
+    }
 
     const [dataChart, setDataChart] = useState()
 
@@ -154,7 +162,7 @@ export const InsuranceFrom = () => {
             const p_stop = Number(((p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2))
             return Math.abs(p_stop) / 100
         } else {
-            const p_stop = Number(((p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2))
+            const p_stop = Number(((p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2))
             return Math.abs(p_stop) / 100
         }
     }
@@ -195,105 +203,71 @@ export const InsuranceFrom = () => {
     }
 
     useEffect(() => {
-        setLoadings(true)
-        if (stone.setting.assetsToken.length > 0) {
-            let list: ICoin[] = []
-            stone.setting.assetsToken.map(async (token: any) => {
-                list.push({
-                    id: token._id,
-                    name: token.name,
-                    icon: token.attachment,
-                    symbol: `${token.symbol}USDT`,
-                    type: token.symbol,
+        try {
+            const result = wallet.getBalance()
+            result.then((balance: number) => {
+                const tmp = balance / state.p_market
+                console.log('connect success')
+                setUserBalance(tmp)
+            })
+
+            setLoadings(true)
+            if (stone.setting.assetsToken.length > 0) {
+                let list: ICoin[] = []
+                stone.setting.assetsToken.map(async (token: any) => {
+                    list.push({
+                        id: token._id,
+                        name: token.name,
+                        icon: token.attachment,
+                        symbol: `${token.symbol}USDT`,
+                        type: token.symbol,
+                    })
                 })
-            })
-            setListCoin(list)
-            setLoadings(false)
-        }
-        const data = localStorage.getItem('state')
-        if (data) {
-            const res = JSON.parse(data)
-            setSelectedCoin({
-                ...selectCoin,
-                icon: res.symbol.icon,
-                id: res.symbol.id,
-                name: res.symbol.name,
-                symbol: res.symbol.symbol,
-                type: res.symbol.type,
-            })
-            setState({
-                ...state,
-                symbol: {
-                    ...state.symbol,
+                setListCoin(list)
+                setLoadings(false)
+            }
+
+            getPriceBNBUSDT(setPriceBNB)
+
+            const data = localStorage.getItem('state')
+
+            if (data) {
+                const res = JSON.parse(data)
+                setSelectedCoin({
+                    ...selectCoin,
                     icon: res.symbol.icon,
                     id: res.symbol.id,
                     name: res.symbol.name,
                     symbol: res.symbol.symbol,
                     type: res.symbol.type,
-                },
-            })
-            setState({
-                ...state,
-                percent_margin: res.percent_margin,
-                period: res.period,
-                p_claim: res.p_claim,
-                q_claim: res.q_claim,
-                r_claim: res.r_claim,
-                q_covered: res.q_covered,
-            })
+                })
+                setState({
+                    ...state,
+                    percent_margin: res.percent_margin,
+                    period: res.period,
+                    p_claim: res.p_claim,
+                    q_claim: res.q_claim,
+                    r_claim: res.r_claim,
+                    q_covered: res.q_covered,
+                    symbol: {
+                        icon: res.symbol.icon,
+                        id: res.symbol.id,
+                        name: res.symbol.name,
+                        symbol: res.symbol.symbol,
+                        type: res.symbol.type,
+                    },
+                })
 
-            if (res.tab) {
-                setTab(res.tab)
+                if (res.tab) {
+                    setTab(res.tab)
+                }
+                if (res.unitMoney) {
+                    setUnitMoney(res.unitMoney)
+                }
+                if (res.index) {
+                    setIndex(res.index)
+                }
             }
-            if (res.unitMoney) {
-                setUnitMoney(res.unitMoney)
-            }
-            if (res.index) {
-                setIndex(res.index)
-            }
-        } else {
-            setSelectedCoin({
-                ...selectCoin,
-                icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
-                id: '63187ae8c2ad72eac4d0f363',
-                name: 'Binance',
-                symbol: 'BNBUSDT',
-                type: 'BNB',
-            })
-            setState({
-                ...state,
-                timeframe: '',
-                margin: 0,
-                percent_margin: 0,
-                symbol: {
-                    icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
-                    id: '63187ae8c2ad72eac4d0f363',
-                    name: 'Binance',
-                    symbol: 'BNBUSDT',
-                    type: 'BNB',
-                },
-                period: 2,
-                p_claim: 0,
-                q_claim: 0,
-                r_claim: 0,
-                q_covered: 0,
-                p_market: 0,
-                t_market: new Date(),
-                p_expired: 0,
-            })
-            setTab(3)
-            setUnitMoney('USDT')
-            setIndex(1)
-        }
-        getPriceBNBUSDT(setPriceBNB)
-
-        try {
-            const result = wallet.getBalance()
-            result.then((balance: number) => {
-                const tmp = Number((balance * priceBNB) / state.p_market)
-                console.log('connect success')
-                setUserBalance(tmp)
-            })
         } catch (error) {
             return console.log(error)
         }
@@ -327,7 +301,7 @@ export const InsuranceFrom = () => {
             const dataSave = { ...state, index: index, tab: tab }
             return localStorage.setItem('state', JSON.stringify(dataSave))
         }
-    }, [state])
+    }, [state.p_claim])
 
     useEffect(() => {
         if (state.q_covered > 0) {
@@ -362,6 +336,12 @@ export const InsuranceFrom = () => {
     useEffect(() => {
         if (selectCoin) {
             getPrice(selectCoin.symbol, state, setState)
+            const data = localStorage.getItem('state')
+            if (data) {
+                const res = JSON.parse(data)
+                const newData = { ...res, symbol: { ...selectCoin } }
+                return localStorage.setItem('state', JSON.stringify(newData))
+            }
         }
     }, [selectCoin])
 
@@ -415,7 +395,7 @@ export const InsuranceFrom = () => {
 
         if (tab == 3) {
             if (state.period || state.q_covered || state.p_claim) {
-                const margin = Number((8 * state.q_covered * state.p_market) / 100)
+                const margin = Number((10 * state.q_covered * state.p_market) / 100)
                 const userCapital = margin
                 const systemCapital = userCapital
                 const hedge_capital = userCapital + systemCapital
@@ -423,8 +403,8 @@ export const InsuranceFrom = () => {
                 const p_stop = P_stop(state.p_market, state.p_claim, hedge)
                 const laverage = Leverage(state.p_market, p_stop)
                 const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-                const q_claim = Number(ratio_profit * hedge_capital * laverage)
-                setState({ ...state, q_claim: q_claim, r_claim: Number(q_claim / margin), p_expired: Math.floor(p_stop), margin: margin })
+                const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
+                setState({ ...state, q_claim: q_claim, r_claim: Number(q_claim / margin) * 100, p_expired: Math.floor(p_stop), margin: margin })
             }
         }
 
@@ -437,8 +417,8 @@ export const InsuranceFrom = () => {
                 const p_stop = P_stop(state.p_market, state.p_claim, hedge)
                 const laverage = Leverage(state.p_market, p_stop)
                 const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-                const q_claim = Number(ratio_profit * hedge_capital * laverage)
-                setState({ ...state, q_claim: q_claim, r_claim: Number(q_claim / state.margin), p_expired: Math.floor(p_stop) })
+                const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + state.margin
+                setState({ ...state, q_claim: q_claim, r_claim: Number(q_claim / state.margin) * 100, p_expired: Math.floor(p_stop) })
             }
         }
         validatePclaim(state.p_claim)
@@ -517,19 +497,16 @@ export const InsuranceFrom = () => {
                     {
                         // head Insurance
                         <div
-                            className="max-w-screen-layout mx-auto px-[80px] mt-[48px] mb-[20px] flex items-center justify-between"
+                            className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto px-[80px] mt-[48px] mb-[20px] flex items-center justify-between"
                             onClick={() => {
                                 setDrop(false)
                                 setChosing(false)
-                                setChangeUnit(false)
-                                setChangeUnit1(false)
-                                setChangeUnit2(false)
                             }}
                         >
                             <div className="flex items-center font-semibold text-base">
                                 <LeftArrow></LeftArrow>
                                 <span
-                                    className={' text-[#22313F] hover:cursor-pointer'}
+                                    className={' text-[#22313F] hover:cursor-pointer ml-[8px]'}
                                     onClick={() => {
                                         if (index == 1) {
                                             return router.push('/ ')
@@ -590,13 +567,10 @@ export const InsuranceFrom = () => {
                         //title
 
                         <div
-                            className={'flex flex-col justify-center items-center mb-[32px] '}
+                            className={'flex flex-col justify-center items-center mb-[32px] max-w-screen-layout 4xl:max-w-screen-3xl m-auto'}
                             onClick={() => {
                                 setDrop(false)
                                 setChosing(false)
-                                setChangeUnit(false)
-                                setChangeUnit1(false)
-                                setChangeUnit2(false)
                             }}
                         >
                             <div>{index}/2</div>
@@ -610,13 +584,10 @@ export const InsuranceFrom = () => {
                         !wallet.account
                             ? !isMobile && (
                                   <div
-                                      className="w-full flex flex-col justify-center items-center"
+                                      className="w-full flex flex-col justify-center items-center max-w-screen-layout 4xl:max-w-screen-3xl m-auto"
                                       onClick={() => {
                                           setDrop(false)
                                           setChosing(false)
-                                          setChangeUnit(false)
-                                          setChangeUnit1(false)
-                                          setChangeUnit2(false)
                                       }}
                                   >
                                       <Button
@@ -636,22 +607,19 @@ export const InsuranceFrom = () => {
                         //chart
                         index == 1 && (
                             <div
-                                className={`${!isMobile ? 'shadow border border-1 border-[#E5E7E8] max-w-6xl m-auto h-auto rounded-[12px] mt-[32px]' : ''}`}
+                                className={`${
+                                    !isMobile
+                                        ? 'shadow border border-1 border-[#E5E7E8] h-auto rounded-[12px] mt-[32px] max-w-screen-md lg:max-w-screen-md xl:max-w-screen-lg m-auto'
+                                        : ''
+                                }`}
                                 onClick={() => {
                                     setDrop(false)
                                     setChosing(false)
-                                    setChangeUnit(false)
-                                    setChangeUnit1(false)
-                                    setChangeUnit2(false)
                                 }}
                             >
                                 {/*head*/}
 
-                                <div
-                                    className={
-                                        'max-w-screen-layout pb-[8px] pl-[32px] pt-[32px] text-[14px] leading-5 text-[#808890] flex flex-row justify-start items-center'
-                                    }
-                                >
+                                <div className={' pb-[8px] pl-[32px] pt-[32px] text-[14px] leading-5 text-[#808890] flex flex-row justify-start items-center'}>
                                     <div className={'w-1/2 flex flex-row items-center'}>
                                         <span className={'mr-[8px]'}>{menu[7].name}</span>
                                         <div data-tip={t('insurance:terminology:q_covered')} data-for={`q-covered`}>
@@ -680,11 +648,9 @@ export const InsuranceFrom = () => {
                                             idInput={'iCoin'}
                                             value={state.q_covered ? Number(Number(state.q_covered).toFixed(8)) : 0}
                                             onChange={(a: any) => {
-                                                console.log(state.q_covered)
-
                                                 setState({
                                                     ...state,
-                                                    q_covered: Number(a.target.value),
+                                                    q_covered: Number(a.target.value.replace(/^00+/, '0')),
                                                 })
 
                                                 setPercentInsurance(0)
@@ -692,6 +658,16 @@ export const InsuranceFrom = () => {
                                             placeholder={'0'}
                                         ></Input>
                                         <Popover className="relative w-[25%] outline-none bg-[#F7F8FA] focus:ring-0 rounded-none shadow-none flex items-center justify-center pr-[21px]">
+                                            {state.q_covered > userBalance && (
+                                                <div className="absolute right-0 top-[-50px] text-xs z-[100] w-max border border-1 border-[#EB2B3E] p-[8px] rounded-md tooltip">
+                                                    <div className="flex flex-row items-center justify-center">
+                                                        <div className="mr-[8px] items-center justify-center">
+                                                            <ErrorTriggersIcon />
+                                                        </div>
+                                                        <div>{`Số dư khả dụng: ${userBalance}`}</div>
+                                                    </div>
+                                                </div>
+                                            )}
                                             <Popover.Button
                                                 id={'popoverInsurance'}
                                                 className={'flex flex-row justify-end w-full items-center focus:border-0 focus:ring-0 active:border-0'}
@@ -699,9 +675,15 @@ export const InsuranceFrom = () => {
                                                     setChosing(!chosing)
                                                 }}
                                             >
-                                                <img alt={''} src={`${selectCoin.icon}`} width="36" height="36" className={'mr-[4px]'}></img>
+                                                <img
+                                                    alt={''}
+                                                    src={`${selectCoin ? selectCoin.icon : defaultToken.icon}`}
+                                                    width="20"
+                                                    height="20"
+                                                    className={'mr-[4px]'}
+                                                ></img>
                                                 <span className={'w-[104px] flex flex-start font-semibold text-[#EB2B3E] text-base'}>
-                                                    {selectCoin && selectCoin.name}
+                                                    {selectCoin ? selectCoin.name : defaultToken.name}
                                                 </span>
                                                 {!chosing ? (
                                                     <ChevronDown size={18} className={'mt-1 text-[#22313F]'}></ChevronDown>
@@ -732,8 +714,16 @@ export const InsuranceFrom = () => {
                                                                             isPress ? 'bg-[#F2F3F5]' : 'hover:bg-[#F7F8FA]'
                                                                         } flex flex-row justify-start w-full items-center p-3 font-medium`}
                                                                     >
-                                                                        <img alt={''} src={`${coin.icon}`} width="36" height="36" className={'mr-[5px]'}></img>
-                                                                        <div className={'flex flex-row justify-between w-full'}>
+                                                                        <div className="max-w-[20px] mr-[8px] max-h-[20px]">
+                                                                            <img
+                                                                                alt={''}
+                                                                                src={`${coin.icon}`}
+                                                                                width="20"
+                                                                                height="20"
+                                                                                className={'mr-[5px] '}
+                                                                            ></img>
+                                                                        </div>
+                                                                        <div className={'flex flex-row justify-between w-full text-sm'}>
                                                                             <span className={'hover:cursor-default'}>{coin.name}</span>
                                                                             {coin.id === selectCoin.id ? (
                                                                                 <Check size={18} className={'text-[#EB2B3E]'}></Check>
@@ -787,7 +777,7 @@ export const InsuranceFrom = () => {
                                                 idInput={''}
                                                 value={state.margin > 0 ? Number(state.margin).toFixed(8) : 0}
                                                 onChange={(a: any) => {
-                                                    setState({ ...state, margin: a.target.value, percent_margin: 0 })
+                                                    setState({ ...state, margin: a.target.value.replace(/^00+/, '0'), percent_margin: 0 })
                                                 }}
                                                 placeholder={''}
                                             ></Input>
@@ -805,7 +795,7 @@ export const InsuranceFrom = () => {
                                                                 setChangeUnit2(!changeUnit2)
                                                             }}
                                                         >
-                                                            {!changeUnit2 ? <ChevronDown /> : <ChevronUp />}
+                                                            {!changeUnit2 ? <ChevronDown></ChevronDown> : <ChevronUp></ChevronUp>}
                                                         </Menu.Button>
                                                         <Menu.Items
                                                             className={'flex flex-col text-[#22313F] absolute z-50 top-[63px] right-[-15px] bg-white rounded'}
@@ -962,25 +952,25 @@ export const InsuranceFrom = () => {
                                             setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
                                             setP_Market={(data: number) => setState({ ...state, p_market: data })}
                                         ></ChartComponent>
+                                        <svg
+                                            className={`absolute lg:right-[34px] right-[32px] z-50`}
+                                            width="10"
+                                            height={500}
+                                            viewBox="0 0 2 240"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <line
+                                                x1="1"
+                                                y1="3.5011e-08"
+                                                x2="0.999987"
+                                                y2="240"
+                                                stroke="#B2B7BC"
+                                                strokeWidth="150"
+                                                strokeDasharray="0.74 3.72"
+                                            ></line>
+                                        </svg>
                                     </Suspense>
-                                    <svg
-                                        className={`absolute lg:right-[34px] right-[0px]`}
-                                        width="10"
-                                        height="100%"
-                                        viewBox="0 0 2 240"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <line
-                                            x1="1"
-                                            y1="3.5011e-08"
-                                            x2="0.999987"
-                                            y2="240"
-                                            stroke="#B2B7BC"
-                                            strokeWidth="150"
-                                            strokeDasharray="0.74 3.72"
-                                        ></line>
-                                    </svg>
                                 </div>
                                 {/*end body*/}
 
@@ -1027,11 +1017,7 @@ export const InsuranceFrom = () => {
                                                 idInput={'iPClaim'}
                                                 value={state.p_claim}
                                                 onChange={(a: any) => {
-                                                    if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
-                                                        setState({ ...state, p_claim: 0 })
-                                                    } else {
-                                                        setState({ ...state, p_claim: a.target.value.replace(/^0+/, '') })
-                                                    }
+                                                    setState({ ...state, p_claim: a.target.value.replace(/^00+/, '0') })
                                                 }}
                                                 placeholder={`${menu[9].name}`}
                                             ></Input>
@@ -1091,13 +1077,12 @@ export const InsuranceFrom = () => {
                     {/*Only Show Claim And Margin*/}
                     {index == 1 && (
                         <div
-                            className={'max-w-6xl m-auto flex flex-row justify-center items-center mt-[24px] hover:cursor-default'}
+                            className={
+                                'max-w-screen-md lg:max-w-screen-md xl:max-w-screen-lg m-auto flex flex-row justify-center items-center mt-[24px] hover:cursor-default z-50'
+                            }
                             onClick={() => {
                                 setDrop(false)
                                 setChosing(false)
-                                setChangeUnit(false)
-                                setChangeUnit1(false)
-                                setChangeUnit2(false)
                             }}
                         >
                             <div
@@ -1119,7 +1104,7 @@ export const InsuranceFrom = () => {
                             <div
                                 className={`${
                                     tab == 5 ? 'hidden' : ''
-                                } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] mx-[12px]`}
+                                } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] mx-[8px] xl:mx-[12px]`}
                             >
                                 <div className={'text-[#808890] flex flex-row items-center'}>
                                     <span className={'mr-[8px]'}>Q-Claim</span>
@@ -1128,63 +1113,73 @@ export const InsuranceFrom = () => {
                                         <Tooltip className="max-w-[200px]" id={'q_claim'} placement="right" />
                                     </div>
                                 </div>
-                                <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
-                                    {state.q_claim > 0 ? Number(state.q_claim).toFixed(8) : 0}
+                                <div className={'font-semibold flex flex-row justify-center items-center hover:cursor-pointer relative max-h-[24px]'}>
+                                    {state.q_claim > 0 ? Number(state.q_claim).toFixed(2) : 0}
                                     <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
-                                    <Menu>
-                                        <Menu.Button
-                                            className={'text-[#22313F] underline hover:cursor-pointer '}
-                                            onClick={() => {
-                                                setChangeUnit(!changeUnit)
-                                            }}
-                                        >
-                                            {changeUnit ? <ChevronUp /> : <ChevronDown />}
-                                        </Menu.Button>
-                                        <Menu.Items
-                                            className={'flex flex-col text-[#22313F] absolute z-50 top-[28px] right-[5px] bg-white rounded'}
-                                            style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
-                                        >
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <a
-                                                        className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA]`}
-                                                        onClick={() => {
-                                                            setUnitMoney('USDT')
-                                                            setChangeUnit(false)
-                                                        }}
-                                                    >
-                                                        <span>USDT</span>
-                                                    </a>
+                                    <div className="relative">
+                                        <Menu>
+                                            <Menu.Button
+                                                className={'my-[16px] text-[#22313F] underline hover:cursor-pointer '}
+                                                onClick={() => {
+                                                    setChangeUnit(!changeUnit)
+                                                }}
+                                            >
+                                                {!changeUnit ? (
+                                                    <ChevronDown width={16} height={16}></ChevronDown>
+                                                ) : (
+                                                    <ChevronUp width={16} height={16}></ChevronUp>
                                                 )}
-                                            </Menu.Item>
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <a
-                                                        className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
-                                                        onClick={() => {
-                                                            setChangeUnit(false)
-                                                            setUnitMoney('BUSD')
-                                                        }}
-                                                    >
-                                                        <span>BUSD</span>
-                                                    </a>
-                                                )}
-                                            </Menu.Item>
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <a
-                                                        className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
-                                                        onClick={() => {
-                                                            setChangeUnit(false)
-                                                            setUnitMoney('USDC')
-                                                        }}
-                                                    >
-                                                        <span>USDC</span>
-                                                    </a>
-                                                )}
-                                            </Menu.Item>
-                                        </Menu.Items>
-                                    </Menu>
+                                            </Menu.Button>
+                                            <Menu.Items
+                                                className={'flex flex-col text-[#22313F] absolute z-50 top-[63px] right-[-15px] bg-white rounded'}
+                                                style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                                            >
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <a
+                                                            className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA]`}
+                                                            onClick={() => {
+                                                                setUnitMoney('USDT')
+                                                                setChangeUnit(false)
+                                                            }}
+                                                        >
+                                                            <span>USDT</span>
+                                                        </a>
+                                                    )}
+                                                </Menu.Item>
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <a
+                                                            className={`${
+                                                                active && 'bg-blue-500'
+                                                            }  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
+                                                            onClick={() => {
+                                                                setUnitMoney('BUSD')
+                                                                setChangeUnit(false)
+                                                            }}
+                                                        >
+                                                            <span>BUSD</span>
+                                                        </a>
+                                                    )}
+                                                </Menu.Item>
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <a
+                                                            className={`${
+                                                                active && 'bg-blue-500'
+                                                            }  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
+                                                            onClick={() => {
+                                                                setUnitMoney('USDC')
+                                                                setChangeUnit(false)
+                                                            }}
+                                                        >
+                                                            <span>USDC</span>
+                                                        </a>
+                                                    )}
+                                                </Menu.Item>
+                                            </Menu.Items>
+                                        </Menu>
+                                    </div>
                                 </div>
                             </div>
                             <div
@@ -1199,63 +1194,73 @@ export const InsuranceFrom = () => {
                                         <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
                                     </div>
                                 </div>
-                                <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
-                                    {state.margin > 0 ? Number(state.margin).toFixed(8) : 0}
+                                <div className={'font-semibold flex flex-row items-center justify-center hover:cursor-pointer relative max-h-[24px]'}>
+                                    {state.margin > 0 ? Number(state.margin).toFixed(2) : 0}
                                     <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
-                                    <Menu>
-                                        <Menu.Button
-                                            className={' text-[#22313F] underline hover:cursor-pointer '}
-                                            onClick={() => {
-                                                setChangeUnit1(!changeUnit1)
-                                            }}
-                                        >
-                                            {changeUnit1 ? <ChevronUp /> : <ChevronDown />}
-                                        </Menu.Button>
-                                        <Menu.Items
-                                            className={'flex flex-col text-[#22313F] absolute z-50 top-[28px] right-[5px] bg-white rounded'}
-                                            style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
-                                        >
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <a
-                                                        className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA]`}
-                                                        onClick={() => {
-                                                            setUnitMoney('USDT')
-                                                            setChangeUnit1(false)
-                                                        }}
-                                                    >
-                                                        <span>USDT</span>
-                                                    </a>
+                                    <div className="relative">
+                                        <Menu>
+                                            <Menu.Button
+                                                className={' my-[16px] text-[#22313F] text-[18px] underline hover:cursor-pointer '}
+                                                onClick={() => {
+                                                    setChangeUnit1(!changeUnit1)
+                                                }}
+                                            >
+                                                {!changeUnit1 ? (
+                                                    <ChevronDown width={16} height={16}></ChevronDown>
+                                                ) : (
+                                                    <ChevronUp width={16} height={16}></ChevronUp>
                                                 )}
-                                            </Menu.Item>
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <a
-                                                        className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
-                                                        onClick={() => {
-                                                            setChangeUnit1(false)
-                                                            setUnitMoney('BUSD')
-                                                        }}
-                                                    >
-                                                        <span>BUSD</span>
-                                                    </a>
-                                                )}
-                                            </Menu.Item>
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <a
-                                                        className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
-                                                        onClick={() => {
-                                                            setChangeUnit1(false)
-                                                            setUnitMoney('USDC')
-                                                        }}
-                                                    >
-                                                        <span>USDC</span>
-                                                    </a>
-                                                )}
-                                            </Menu.Item>
-                                        </Menu.Items>
-                                    </Menu>
+                                            </Menu.Button>
+                                            <Menu.Items
+                                                className={'flex flex-col text-[#22313F] absolute z-50 top-[63px] right-[-15px] bg-white rounded'}
+                                                style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                                            >
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <a
+                                                            className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA]`}
+                                                            onClick={() => {
+                                                                setUnitMoney('USDT')
+                                                                setChangeUnit1(false)
+                                                            }}
+                                                        >
+                                                            <span>USDT</span>
+                                                        </a>
+                                                    )}
+                                                </Menu.Item>
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <a
+                                                            className={`${
+                                                                active && 'bg-blue-500'
+                                                            }  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
+                                                            onClick={() => {
+                                                                setUnitMoney('BUSD')
+                                                                setChangeUnit1(false)
+                                                            }}
+                                                        >
+                                                            <span>BUSD</span>
+                                                        </a>
+                                                    )}
+                                                </Menu.Item>
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <a
+                                                            className={`${
+                                                                active && 'bg-blue-500'
+                                                            }  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
+                                                            onClick={() => {
+                                                                setUnitMoney('USDC')
+                                                                setChangeUnit1(false)
+                                                            }}
+                                                        >
+                                                            <span>USDC</span>
+                                                        </a>
+                                                    )}
+                                                </Menu.Item>
+                                            </Menu.Items>
+                                        </Menu>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1265,13 +1270,10 @@ export const InsuranceFrom = () => {
                         //description
                         index == 1 && (
                             <div
-                                className={'flex justify-center items-center mt-[24px]'}
+                                className={'flex justify-center items-center mt-[24px] max-w-screen-layout 4xl:max-w-screen-3xl m-auto'}
                                 onClick={() => {
                                     setDrop(false)
                                     setChosing(false)
-                                    setChangeUnit(false)
-                                    setChangeUnit1(false)
-                                    setChangeUnit2(false)
                                 }}
                             >
                                 <CheckCircle></CheckCircle>
@@ -1286,13 +1288,10 @@ export const InsuranceFrom = () => {
                     {/* the next level*/}
                     {index == 1 && (
                         <div
-                            className={`flex flex-col justify-center items-center my-[48px]`}
+                            className={`flex flex-col justify-center items-center my-[48px] max-w-screen-layout 4xl:max-w-screen-3xl m-auto`}
                             onClick={() => {
                                 setDrop(false)
                                 setChosing(false)
-                                setChangeUnit(false)
-                                setChangeUnit1(false)
-                                setChangeUnit2(false)
                             }}
                         >
                             <button
@@ -1357,10 +1356,8 @@ export const InsuranceFrom = () => {
                 </LayoutInsurance>
             </>
         ) : (
-            <div>
-                <div className="w-full">
-                    <Guide start={showGuide} setStart={setShowGuide} />
-                </div>
+            <>
+                <Guide start={showGuide} setStart={setShowGuide} />
 
                 {!wallet.account ? (
                     <>
@@ -1469,14 +1466,14 @@ export const InsuranceFrom = () => {
                                 onBackdropCb={() => setShowChangeUnit({ ...showChangeUnit, isShow: false, name: '' })}
                             >
                                 <div className={` bg-white text-sm  mx-auto `}>
-                                    <div className="flex flex-col justify-center items-center my-[24px]">
+                                    <div className="flex flex-col justify-center my-[24px]">
                                         <div className="font-medium text-xl">{showChangeUnit.name}</div>
                                         <div className="mt-[32px] divide-y divide-[#E5E7E8] text-[#22313F] w-full">
                                             {['USDT', 'USDC', 'BUSD'].map((item, key) => {
                                                 return (
                                                     <div
                                                         key={key}
-                                                        className="w-full flex flex-row justify-between items-center"
+                                                        className="w-full flex flex-row justify-between items-center hover:bg-[#F2F3F5] hover:pl-[8px]"
                                                         onClick={() => {
                                                             setUnitMoney(item)
                                                             setShowChangeUnit({ ...showChangeUnit, isShow: false, name: '' })
@@ -1572,7 +1569,8 @@ export const InsuranceFrom = () => {
                             </Modal>
                         )}
                         {index == 1 && (
-                            <div className={`h-[32px] flex flex-row justify-between items-center mx-[16px] mt-[24px] mb-[16px] sticky top-0 bg-white z-50`}>
+                            //sticky
+                            <div className={`h-[32px] flex flex-row justify-between items-center mx-[16px] mt-[24px] mb-[16px]  top-0 bg-white z-50`}>
                                 <div
                                     onClick={() => {
                                         router.push('/home')
@@ -1580,7 +1578,7 @@ export const InsuranceFrom = () => {
                                 >
                                     <XMark></XMark>
                                 </div>
-                                <div data-tut="tour_custom" className={`h-[32px] flex flex-row mx-[16px]`}>
+                                <div data-tut="tour_custom" id="tour_custom" className={`h-[32px] flex flex-row mx-[16px]`}>
                                     <span
                                         className={'text-[#00ABF9] underline hover:cursor-pointer pr-[16px] flex items-center'}
                                         onClick={() => {
@@ -1616,7 +1614,8 @@ export const InsuranceFrom = () => {
                         {index == 1 && (
                             <div
                                 data-tut="tour_statistics"
-                                className=" my-[24px] w-full mx-auto flex flex-wrap flex-col justify-center content-center font-medium text-2xl relative "
+                                id="tour_statistics"
+                                className=" my-[24px] w-full mx-auto flex flex-wrap flex-col justify-center content-center font-bold text-2xl relative "
                             >
                                 <div>
                                     <span>{t('insurance:buy:buy_covered')} </span>{' '}
@@ -1626,13 +1625,13 @@ export const InsuranceFrom = () => {
                                             setOpenChangeToken(true)
                                         }}
                                     >
-                                        {selectCoin.name}
+                                        {'Ethereum'}
                                     </span>
                                 </div>
                                 <div className="flex flex-row overflow-clip">
                                     <span className="pr-[4px]">{t('insurance:buy:quality')} </span>{' '}
                                     <label className={`${state.q_covered == 0 ? 'text-[#B2B7BC]' : 'text-[#EB2B3E]'} max-w-[245] relative ml-[6xp] `}>
-                                        {state.q_covered > 0 ? Number(state.q_covered).toFixed(8) : 'Số tiền?'}
+                                        {state.q_covered > 0 ? Number(state.q_covered) : 'Số tiền?'}
                                         <input
                                             type="number"
                                             className={` text-white pl-[4px] focus-visible:outline-none w-0 border border-1 border-black ${
@@ -1642,22 +1641,18 @@ export const InsuranceFrom = () => {
                                             name="name"
                                             id="name"
                                             onChange={(a: any) => {
-                                                if (a.target.value > userBalance) {
-                                                    setState({ ...state, q_covered: userBalance })
-                                                } else {
-                                                    setState({ ...state, q_covered: a.target.value })
-                                                }
+                                                setState({ ...state, q_covered: a.target.value.replace(/^00+/, '0') })
                                                 setPercentInsurance(0)
                                             }}
                                         ></input>
                                     </label>{' '}
-                                    <span className="text-[#EB2B3E]">BNB</span>
+                                    <span className="text-[#EB2B3E]">{selectCoin.type}</span>
                                 </div>
                                 {tab == 6 && (
                                     <div>
                                         <span>{t('insurance:buy:title_change_margin')}</span>{' '}
                                         <label className={`${state.q_covered == 0 ? 'text-[#B2B7BC]' : 'text-[#EB2B3E]'} max-w-[245] relative ml-[6xp]`}>
-                                            {state.margin > 0 ? Number(state.margin).toFixed(8) : 'Số tiền?'}
+                                            {state.margin > 0 ? Number(state.margin) : 'Số tiền?'}
                                             <input
                                                 type="number"
                                                 className={` text-white pl-[4px] focus-visible:outline-none w-0 border border-1 border-black`}
@@ -1681,63 +1676,66 @@ export const InsuranceFrom = () => {
                                         </span>
                                     </div>
                                 )}
+                                {state.q_covered > userBalance && (
+                                    <div className="text-[#E5544B] text-xs flex items-center">
+                                        <div className="mr-[8px]">
+                                            <ErrorTriggersIcon />
+                                        </div>
+                                        <div>Số dư không đủ</div>
+                                    </div>
+                                )}
                             </div>
                         )}
-                        <div data-tut="tour_chart">
-                            {index == 1 && (
-                                <>
-                                    <div className={'px-[32px] flex flex-row relative'}>
-                                        <Suspense fallback={`Loading...`}>
-                                            <ChartComponent
-                                                data={dataChart}
-                                                state={state ? state : null}
-                                                p_claim={Number(state && state.p_claim)}
-                                                p_expired={state.p_expired > 0 ? state.p_expired : undefined}
-                                                setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
-                                                setP_Market={(data: number) => setState({ ...state, p_market: data })}
-                                                isMobile={isMobile}
-                                            ></ChartComponent>
-                                        </Suspense>
-                                        <svg
-                                            className={`absolute lg:right-[34px] right-[32px]`}
-                                            width="10"
-                                            height="100%"
-                                            viewBox="0 0 2 240"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <line
-                                                x1="1"
-                                                y1="3.5011e-08"
-                                                x2="0.999987"
-                                                y2="240"
-                                                stroke="#B2B7BC"
-                                                strokeWidth="150"
-                                                strokeDasharray="0.74 3.72"
-                                            ></line>
-                                        </svg>
-                                    </div>
-                                    <div className={'flex flex-row justify-between items-center w-full mt-5 pl-[32px] pr-[32px]'}>
-                                        {listTime.map((time, key) => {
-                                            return (
-                                                <div
-                                                    key={key}
-                                                    className={`${
-                                                        selectTime == time ? 'text-[#EB2B3E]' : 'text-[#808890]'
-                                                    } hover:cursor-pointer font-medium  text-base`}
-                                                    onClick={() => {
-                                                        setSelectTime(time)
-                                                    }}
-                                                >
-                                                    {time}
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                </>
-                            )}
-
-                            {index == 1 && (
+                        {index == 1 && (
+                            <div data-tut="tour_chart" id="tour_chart" className="">
+                                <div className={'px-[32px] flex flex-row relative'}>
+                                    <Suspense fallback={`Loading...`}>
+                                        <ChartComponent
+                                            data={dataChart}
+                                            state={state ? state : null}
+                                            p_claim={Number(state && state.p_claim)}
+                                            p_expired={state.p_expired > 0 ? state.p_expired : undefined}
+                                            setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
+                                            setP_Market={(data: number) => setState({ ...state, p_market: data })}
+                                            isMobile={isMobile}
+                                        ></ChartComponent>
+                                    </Suspense>
+                                    <svg
+                                        className={`absolute lg:right-[34px] right-[32px] z-50`}
+                                        width="10"
+                                        height={500}
+                                        viewBox="0 0 2 240"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <line
+                                            x1="1"
+                                            y1="3.5011e-08"
+                                            x2="0.999987"
+                                            y2="240"
+                                            stroke="#B2B7BC"
+                                            strokeWidth="150"
+                                            strokeDasharray="0.74 3.72"
+                                        ></line>
+                                    </svg>
+                                </div>
+                                <div className={'flex flex-row justify-between items-center w-full mt-5 pl-[32px] pr-[32px]'}>
+                                    {listTime.map((time, key) => {
+                                        return (
+                                            <div
+                                                key={key}
+                                                className={`${
+                                                    selectTime == time ? 'text-[#EB2B3E]' : 'text-[#808890]'
+                                                } hover:cursor-pointer font-medium  text-base`}
+                                                onClick={() => {
+                                                    setSelectTime(time)
+                                                }}
+                                            >
+                                                {time}
+                                            </div>
+                                        )
+                                    })}
+                                </div>
                                 <div className={'my-[24px] px-[32px]'}>
                                     <span className={'flex flex-row items-center '}>
                                         <span className={'mr-[6px] text-[#808890] text-sm'}>P-Claim</span>
@@ -1771,12 +1769,12 @@ export const InsuranceFrom = () => {
                                         </div>
                                     </div>
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
 
                         {/* Period */}
                         {index == 1 && (
-                            <div data-tut="tour_period" className={'mt-5 pl-[32px] pr-[32px] pb-[32px] text-sm text-[#808890]'}>
+                            <div data-tut="tour_period" id="tour_period" className={'mt-5 pl-[32px] pr-[32px] pb-[32px] text-sm text-[#808890]'}>
                                 <span className="flex flex-row items-center">
                                     <span className={'mr-[8px]'}>Period ({menu[8].name})</span>
                                     <div data-tip={t('insurance:terminology:period')} data-for={`period`}>
@@ -1856,16 +1854,13 @@ export const InsuranceFrom = () => {
                                 onClick={() => {
                                     setDrop(false)
                                     setChosing(false)
-                                    setChangeUnit(false)
-                                    setChangeUnit1(false)
-                                    setChangeUnit2(false)
                                 }}
                             >
                                 <div className={'flex justify-center items-center mt-[24px]'}>
                                     <CheckCircle></CheckCircle>
-                                    <span className={'text-sm text-[#22313F] px-[4px]'}>
+                                    <span className={'text-sm text-[#22313F] px-[4px] font-semibold'}>
                                         {t('insurance:buy:saved')}
-                                        <span className={'text-[#EB2B3E]'}>1,000 {unitMoney}</span> {t('insurance:buy:sub_saved')}
+                                        <span className={'text-[#EB2B3E]'}> 1,000 {unitMoney}</span> {t('insurance:buy:sub_saved')}
                                     </span>
                                 </div>
                                 <div className={'flex flex-col mt-[24px] hover:cursor-default'}>
@@ -1898,7 +1893,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
-                                            {state.q_claim.toFixed(8) || 0}
+                                            {state.q_claim.toFixed(4) || 0}
                                             <span
                                                 className={'text-[#EB2B3E] pl-[8px]'}
                                                 onClick={() => setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:q_claim')}` })}
@@ -1920,7 +1915,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                            {state.margin > 0 ? Number(state.margin).toFixed(8) : 0}
+                                            {state.margin > 0 ? Number(state.margin) : 0}
 
                                             <span
                                                 className={'text-[#EB2B3E] pl-[8px]'}
@@ -1964,10 +1959,10 @@ export const InsuranceFrom = () => {
                         )}
                     </>
                 )}
-            </div>
+            </>
         )
     ) : (
-        <Loading />
+        <></>
     )
 }
 
