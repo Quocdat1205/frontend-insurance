@@ -27,7 +27,7 @@ export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number) => {
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
     trend.strokeWidth = 1.5
-    trend.stroke = am4core.color('#c00')
+    trend.stroke = am4core.color('#22313F')
     trend.strokeDasharray = '3,3'
     trend.defaultState.transitionDuration = 1
 
@@ -230,9 +230,7 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                 expiredLabel.label.fill = am4core.color('#B2B7BC')
             }
 
-            if (p_claim) {
-                //chart claim
-
+            if (p_claim >= 0) {
                 const timeEnd = new Date()
                 timeEnd.setDate(timeEnd.getDate() + 5)
 
@@ -242,13 +240,16 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                 latitudeClaim.data = [
                     {
                         date: timeEnd,
-                        value: p_claim,
+                        value: p_claim > 0 ? p_claim : state.p_market,
                     },
                 ]
 
                 let bulletClaim = latitudeClaim.bullets.push(new am4charts.CircleBullet())
                 bulletClaim.fill = am4core.color('white')
                 bulletClaim.stroke = am4core.color('#EB2B3E')
+                bulletClaim.properties.alwaysShowTooltip = true
+
+                // bulletClaim.tooltip.disable = false
 
                 let claimLabel = latitudeClaim.bullets.push(new am4charts.LabelBullet())
                 claimLabel.label.horizontalCenter = 'left'
@@ -256,16 +257,20 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                 claimLabel.label.verticalCenter = 'middle'
                 claimLabel.label.fill = am4core.color('#EB2B3E')
 
-                claimLabel.label.html = `<div class="hover:cursor-pointer" style="color: ${
-                    latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : '#52CC74'
-                } ; border-radius: 800px; padding: 4px 16px; background-color: ${
-                    latitudeClaim.data[0].value < state.p_market ? '#FFF1F2' : '#F1FFF5'
-                }  ">P-Claim ${latitudeClaim.data[0].value} ${
-                    latitudeClaim.data[0].value > state.p_market
-                        ? `${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
-                        : `${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
-                }</div>`
-                claimLabel.id = 'g2'
+                if (p_claim > 0) {
+                    claimLabel.label.html = `<div id="claimLabel" class="hover:cursor-pointer" style="color: ${
+                        latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : '#52CC74'
+                    } ; border-radius: 800px; padding: 4px 16px; background-color: ${
+                        latitudeClaim.data[0].value < state.p_market ? '#FFF1F2' : '#F1FFF5'
+                    }  "><span class="mr-[8px]">P-Claim ${latitudeClaim.data[0].value}</span> <span> ${
+                        latitudeClaim.data[0].value > state.p_market
+                            ? `${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                            : `${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                    }</span></div>`
+                }
+                if (p_claim == 0 || p_claim == state.p_market) {
+                    claimLabel.label.html = `<div id="claimLabel" class="hover:cursor-pointer text-[#808890] bg-[#F7F8FA] rounded-[800px] px-[16px] py-[4px]"><span class="mr-[8px]">P-Claim ${latitudeClaim.data[0].value}</span> <span>0%</span></div>`
+                }
 
                 //label claim
                 claimLabel.cursorOverStyle = am4core.MouseCursorStyle.verticalResize
@@ -274,13 +279,25 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                 // let interract = am4core.getInteraction()
                 claimLabel.events.on('drag', (event: any) => {
                     let value = valueAxis.yToValue(event.target.pixelY)
-                    console.log(latitudeClaim.data[0].value)
                     event.target.dataItem.valueY = value
+                    const claimLabel = document.getElementById('claimLabel')
+                    if (claimLabel) {
+                        if (value < state.p_market) {
+                            claimLabel.style.color = '#EB2B3E'
+                            claimLabel.style.backgroundColor = '#FFF1F2'
+                            claimLabel.innerHTML = `P-Claim ${value} ${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                        } else {
+                            claimLabel.style.color = '#52CC74'
+                            claimLabel.style.backgroundColor = '#F1FFF5'
+                            claimLabel.innerHTML = `P-Claim ${value} ${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                        }
+                    }
                 })
 
-                // bullet.events.on('dragstop', (event: any) => {
-                //     handleDrag(event)
-                // })
+                claimLabel.events.on('dragstop', (event: any) => {
+                    let value = valueAxis.yToValue(event.target.pixelY)
+                    setP_Claim(value)
+                })
 
                 handleTrendLineStatus(chart, p_claim)
             }
