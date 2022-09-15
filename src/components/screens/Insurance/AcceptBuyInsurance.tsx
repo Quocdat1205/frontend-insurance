@@ -206,7 +206,7 @@ export const AcceptBuyInsurance = ({
     }
 
     return !isMobile ? (
-        <>
+        <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
             <div
                 className="max-w-screen-md mx-auto flex flex-col"
                 style={{ filter: 'drop-shadow(0px 6px 18px rgba(9, 30, 66, 0.15)) drop-shadow(0px 0px 1px rgba(9, 30, 66, 0.31))' }}
@@ -404,7 +404,7 @@ export const AcceptBuyInsurance = ({
                     </div>
                 </span>
             </div>
-        </>
+        </div>
     ) : (
         <div className="relative">
             <div className="relative flex flex-col">

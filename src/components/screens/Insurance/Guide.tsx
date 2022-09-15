@@ -19,14 +19,19 @@ const Guide = ({ start, setStart }: Guideline) => {
     const { width } = useWindowSize()
 
     const getCurrentStep = (e: number) => {
-        if (e === 0) {
-            const _el = document.querySelector('#tour_statistics')
-            console.log(_el)
+        console.log(e)
+
+        if (e == 1) {
+            const _el = document.querySelector('#tour_chart')
 
             if (_el) _el.scrollIntoView()
         }
-        if (e === 1) {
-            const _el = document.querySelector('#tour_chart')
+        if (e == 2) {
+            const _el = document.querySelector('#tour_period')
+            if (_el) _el.scrollIntoView()
+        }
+        if (e == 3) {
+            const _el = document.querySelector('#tour_custom')
             if (_el) _el.scrollIntoView()
         }
         step.current = e
@@ -58,23 +63,23 @@ const Guide = ({ start, setStart }: Guideline) => {
         return [
             {
                 selector: '[data-tut="tour_statistics"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_1')} {...props} top onClose={onClose} />,
+                content: (props: any) => <Content title={t('insurance:guild:step_title_1')} {...props} onClose={onClose} />,
                 position: 'bottom',
             },
             {
                 selector: '[data-tut="tour_chart"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_2')} content={contentStep2()} {...props} top onClose={onClose} />,
+                content: (props: any) => <Content title={t('insurance:guild:step_title_2')} content={contentStep2()} {...props} onClose={onClose} />,
                 position: 'bottom',
             },
             {
                 selector: '[data-tut="tour_period"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_3')} content={contentStep1()} {...props} top onClose={onClose} />,
-                position: 'bottom',
+                content: (props: any) => <Content title={t('insurance:guild:step_title_3')} content={contentStep1()} {...props} onClose={onClose} />,
+                position: 'center',
             },
             {
                 selector: '[data-tut="tour_custom"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_4')} {...props} top onClose={onClose} />,
-                position: 'bottom',
+                content: (props: any) => <Content title={t('insurance:guild:step_title_4')} {...props} onClose={onClose} />,
+                position: 'top',
             },
         ]
     }, [])
@@ -93,18 +98,17 @@ const Guide = ({ start, setStart }: Guideline) => {
 
     return (
         <Tour
-            className={`!w-full !absolute !mx-[8px] !max-w-[${width}px] !min-w-[374px]  `}
             onRequestClose={() => onClose(false)}
             steps={tourConfig}
             isOpen={start}
             showCloseButton={false}
+            className={`${step.current === 2 ? 'reactour__arrow__right' : ''} !absolute`}
             maskClassName="guideline"
             rounded={6}
             startAt={0}
             maskSpace={2}
             disableInteraction
             disableKeyboardNavigation
-            // accentColor={colors.red.red}
             getCurrentStep={getCurrentStep}
             showNavigation={false}
             showButtons={false}
@@ -141,7 +145,7 @@ const Content = ({ title, content, step, onClose, top, goTo, ...props }: any) =>
                         <div className="mb-3">{content}</div>
                     </div>
                     <Button onClick={() => onClose(step === 4)} variants="primary" className="text-xs py-2 w-full">
-                        {t(step === 4 ? 'insurance:guide:got_it' : 'common:next')}
+                        {t(step === 4 ? 'insurance:guild:got_it' : 'common:next')}
                     </Button>
                 </div>
             </div>
