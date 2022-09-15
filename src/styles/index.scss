@@ -2,10 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "fonts";
-@import "fonts";
-@import "datepicker";
-@import "pagination";
+@import 'fonts';
+@import 'fonts';
+@import 'datepicker';
+@import 'pagination';
 
 html {
     @apply font-Manrope;
@@ -169,7 +169,7 @@ input::-webkit-inner-spin-button {
     margin: 0;
 }
 
-input[type="number"] {
+input[type='number'] {
     -moz-appearance: textfield;
 }
 
