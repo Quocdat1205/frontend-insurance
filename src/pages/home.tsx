@@ -15,10 +15,12 @@ const Home = ({ news }: any) => {
     return (
         <LayoutWeb3>
             <Slogan />
-            <section className="pt-20 sm:pt-[7.5rem] px-4 max-w-screen-insurance m-auto">
-                <div className="text-2xl sm:text-5xl font-semibold">{t('home:home:new_insurance_assets')}</div>
-                <Assets />
-            </section>
+            <div className="px-4 lg:px-20 ">
+                <section className="pt-20 sm:pt-[7.5rem] max-w-screen-insurance 4xl:max-w-screen-3xl m-auto">
+                    <div className="text-2xl sm:text-5xl font-semibold">{t('home:home:new_insurance_assets')}</div>
+                    <Assets />
+                </section>
+            </div>
             <Banner />
             <News news={news} />
             <RegisterLanding />

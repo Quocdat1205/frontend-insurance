@@ -19,7 +19,7 @@
     "choose_asset_type": "Choose Asset type",
     "status_ins": "Status",
     "choose_status": "Choose Status",
-    "insurance": "Insurance",
+    "insurance": "Insurance Contract",
     "confirm": "Confirm",
     "filter": "Filter",
     "buy_back": "Buy Back",
@@ -28,7 +28,7 @@
     "filter_by": "Filter By",
     "undo": "Undo",
     "notification": {
-        "notification": "Notification",
+        "title": "Notification",
         "notice_message": "Insurance contract <span class='text-red'>{{id}}</span> {{status}}",
         "status": {
             "expired": "Expired",

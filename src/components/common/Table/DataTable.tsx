@@ -95,15 +95,15 @@ const DataGrid = ({ columns, data, total = 0, skip = 0, limit = 10, onChangePage
                 <table className="w-full" {...getTableProps()}>
                     <thead className="">
                         {headerGroups.map((headerGroup) => (
-                            <tr className="text-sm font-semibold text-txtSecondary flex flex-nowrap" {...headerGroup.getHeaderGroupProps()}>
+                            <tr className="text-sm font-medium text-txtSecondary flex flex-nowrap" {...headerGroup.getHeaderGroupProps()}>
                                 {headerGroup.headers.map((column: any) => {
                                     return (
                                         <th
-                                            className="px-2 py-4 select-none flex items-center space-x-1"
+                                            className="px-2 py-4 select-none flex items-center space-x-1 flex-1"
                                             {...column.getHeaderProps(column.getSortByToggleProps())}
                                             {...column.getHeaderProps({ style: { minWidth: column.minWidth, width: column.width } })}
                                         >
-                                            <span className="whitespace-nowrap">{column.render('Header')}</span>
+                                            <span className="whitespace-nowrap font-medium">{column.render('Header')}</span>
                                             {/* {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''} */}
                                             <SortIcon
                                                 color={colors.txtSecondary}
@@ -122,11 +122,11 @@ const DataGrid = ({ columns, data, total = 0, skip = 0, limit = 10, onChangePage
                         {rows.map((row, i) => {
                             prepareRow(row)
                             return (
-                                <tr className="flex items-center" {...row.getRowProps()}>
+                                <tr className="flex items-center flex-nowrap" {...row.getRowProps()}>
                                     {row.cells.map((cell) => {
                                         return (
                                             <td
-                                                className="px-2 border-t border-divider min-h-[54px] flex items-center "
+                                                className="px-2 border-t border-divider min-h-[54px] flex items-center flex-1"
                                                 {...cell.getCellProps({ style: { minWidth: cell.column.minWidth, width: cell.column.width } })}
                                             >
                                                 {loading ? <Skeleton className="min-h-[2rem]" /> : cell.render('Cell')}

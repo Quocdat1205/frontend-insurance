@@ -5,19 +5,21 @@ import { NotificationsIcon } from 'components/common/Svg/SvgIcon'
 import useOutsideAlerter from 'hooks/useOutsideAlerter'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import { useTranslation } from 'next-i18next'
-import React, { Fragment, useEffect, useRef, useState } from 'react'
+import React, { Fragment, useEffect, useRef, useState, useMemo } from 'react'
 import { API_CHECK_NOTICE, API_GET_NOTICE, API_UPDATE_NOTICE } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { getTimeAgo } from 'utils/utils'
 import { isMobile } from 'react-device-detect'
 import { renderContentStatus } from 'components/screens/InsuranceHistory/InsuranceContract'
 import { X } from 'react-feather'
+import Spinner from 'components/common/Loader/Spinner'
 
 const Notifications = () => {
     const { account } = useWeb3Wallet()
     const { t } = useTranslation()
     const [visible, setVisible] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(true)
+    const [isLoadMore, setIsLoadMore] = useState<boolean>(false)
     const wrapperRef = useRef<any>(null)
     const [hasNotice, setHasNotice] = useState<boolean>(false)
     const [showNotiDetail, setShowNotiDetail] = useState<boolean>(false)
@@ -41,6 +43,7 @@ const Notifications = () => {
     useEffect(() => {
         if (visible) {
             filter.current.skip = 0
+            setLoading(true)
             getNotice()
         }
     }, [visible])
@@ -83,7 +86,6 @@ const Notifications = () => {
     }
 
     const getNotice = async () => {
-        setLoading(true)
         try {
             const { data } = await fetchApi({
                 url: API_GET_NOTICE,
@@ -95,6 +97,9 @@ const Notifications = () => {
             })
             if (data) {
                 const dataFiter = !filter.current.skip ? data?.list_notice : dataSource.list_notice.concat(data?.list_notice)
+                // const currentPage = Math.ceil(filter.current.skip / filter.current.limit) + 1
+                // const _totalPage = Math.ceil(data?.count / filter.current.limit)
+                // hasNext.current = data?.list_notice.length >= filter.current.limit && currentPage < _totalPage
                 setDataSource({
                     count: data?.count,
                     list_notice: dataFiter,
@@ -104,6 +109,7 @@ const Notifications = () => {
             console.log(e)
         } finally {
             setLoading(false)
+            setIsLoadMore(false)
         }
     }
 
@@ -155,6 +161,20 @@ const Notifications = () => {
               })
     }
 
+    const onLoadMore = () => {
+        filter.current.skip = filter.current.limit + filter.current.skip
+        setIsLoadMore(true)
+        getNotice()
+    }
+
+    const totalPage = useMemo(() => {
+        return Math.ceil(dataSource?.count / filter.current.limit)
+    }, [dataSource, filter])
+
+    const hasNext = useMemo(() => {
+        return Math.ceil(filter.current.skip / filter.current.limit) + 1 < totalPage || isLoadMore
+    }, [filter, loading, isLoadMore, totalPage])
+
     return (
         <div ref={wrapperRef} className="relative">
             <NotiDetailModal isMobile={isMobile} data={rowData.current} visible={showNotiDetail} onClose={() => setShowNotiDetail(false)} t={t} />
@@ -167,7 +187,7 @@ const Notifications = () => {
                     isMobile
                     containerClassName="flex-col justify-end !bg-transparent"
                     className="h-[calc(100%-4rem)]"
-                    wrapClassName="!px-4 !py-8"
+                    wrapClassName="!px-4 !py-8 h-full"
                     isVisible={visible}
                     onBackdropCb={() => setVisible(false)}
                     customHeader={() => (
@@ -177,7 +197,14 @@ const Notifications = () => {
                         </div>
                     )}
                 >
-                    <div className="overflow-hidden relative flex flex-col space-y-2">{renderNoti()}</div>
+                    <div className="overflow-auto h-[calc(100%-3.5rem)] relative flex flex-col space-y-2">
+                        {renderNoti()}
+                        {totalPage > 1 && !loading && hasNext && (
+                            <div onClick={onLoadMore} className="text-red underline text-sm my-3 flex text-center justify-center cursor-pointer">
+                                {isLoadMore ? <Spinner /> : t('common:load_more')}
+                            </div>
+                        )}
+                    </div>
                 </Modal>
             ) : (
                 <Transition
@@ -191,7 +218,14 @@ const Notifications = () => {
                     leaveTo="opacity-0 translate-y-1"
                 >
                     <div className={'absolute z-10 mt-3 left-0 shadow-subMenu rounded-xl min-w-[360px] py-1 bg-white'}>
-                        <div className="overflow-hidden font-normal">{renderNoti()}</div>
+                        <div className="font-normal sm:max-h-[500px] overflow-auto">
+                            {renderNoti()}
+                            {totalPage > 1 && !loading && hasNext && (
+                                <div onClick={onLoadMore} className="text-red underline text-sm my-3 flex text-center justify-center cursor-pointer">
+                                    {isLoadMore ? <Spinner /> : t('common:load_more')}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </Transition>
             )}

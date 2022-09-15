@@ -229,6 +229,8 @@ module.exports = {
                 1: '1 auto',
             },
             screens: {
+                "3xl": '1600px',
+                "4xl": '1920px',
                 insurance: '1280px',
                 layout: '1360px',
                 mb: '820px',
