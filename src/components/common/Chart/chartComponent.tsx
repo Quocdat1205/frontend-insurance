@@ -163,6 +163,16 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
             series.defaultState.transitionDuration = 0
             series.tensionX = 0.8
             series.focusable = true
+            series.fullWidthLineX = 0.05
+            series.fullWidthLineY = 0.05
+
+            chart.events.on('wheeldown', (e: any) => {
+                console.log(series)
+            })
+
+            chart.events.on('wheelup', (e: any) => {
+                console.log(e)
+            })
 
             //chart sub
             let subSeries = chart.series.push(new am4charts.LineSeries())

@@ -1462,24 +1462,21 @@ export const InsuranceFrom = () => {
                 ) : (
                     <>
                         {showChangeUnit.isShow && (
-                            <Modal portalId="modal" isVisible={true} onBackdropCb={() => {}} className=" p-6 bg-white absolute bottom-0">
+                            <Modal
+                                portalId="modal"
+                                isVisible={true}
+                                className=" bg-white absolute bottom-0 rounded-none translate-y-0"
+                                onBackdropCb={() => setShowChangeUnit({ ...showChangeUnit, isShow: false, name: '' })}
+                            >
                                 <div className={` bg-white text-sm  mx-auto `}>
-                                    <div
-                                        className="mt-[32px] mx-[24px] flex flex-row-reverse"
-                                        onClick={() => {
-                                            setShowChangeUnit({ ...showChangeUnit, isShow: false, name: '' })
-                                        }}
-                                    >
-                                        <XMark></XMark>
-                                    </div>
                                     <div className="flex flex-col justify-center items-center my-[24px]">
                                         <div className="font-medium text-xl">{showChangeUnit.name}</div>
-                                        <div className="mt-[32px] divide-y divide-[#E5E7E8] text-[#22313F]">
+                                        <div className="mt-[32px] divide-y divide-[#E5E7E8] text-[#22313F] w-full">
                                             {['USDT', 'USDC', 'BUSD'].map((item, key) => {
                                                 return (
                                                     <div
                                                         key={key}
-                                                        className="w-[380px] flex flex-row justify-between items-center"
+                                                        className="w-full flex flex-row justify-between items-center"
                                                         onClick={() => {
                                                             setUnitMoney(item)
                                                             setShowChangeUnit({ ...showChangeUnit, isShow: false, name: '' })
@@ -1689,7 +1686,7 @@ export const InsuranceFrom = () => {
                         <div data-tut="tour_chart">
                             {index == 1 && (
                                 <>
-                                    <div className={' flex flex-row relative'}>
+                                    <div className={'px-[32px] flex flex-row relative'}>
                                         <Suspense fallback={`Loading...`}>
                                             <ChartComponent
                                                 data={dataChart}
@@ -1702,7 +1699,7 @@ export const InsuranceFrom = () => {
                                             ></ChartComponent>
                                         </Suspense>
                                         <svg
-                                            className={`absolute lg:right-[34px] right-[0px]`}
+                                            className={`absolute lg:right-[34px] right-[32px]`}
                                             width="10"
                                             height="100%"
                                             viewBox="0 0 2 240"
