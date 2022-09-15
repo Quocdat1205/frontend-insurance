@@ -42,10 +42,10 @@ const News = ({ news = [] }: any) => {
                                 <div className="rounded-xl mb-6 ">
                                     <img src={item.feature_image} className="h-[140px] w-full rounded-xl" />
                                 </div>
-                                <div className="flex items-center text-sm mb-1">
-                                    <span>{item.primary_tag.name}</span>
+                                <div className="flex items-center mb-1">
+                                    <span className="text-sm sm:text-base">{item.primary_tag.name}</span>
                                     &nbsp;/&nbsp;
-                                    <span className="text-gray">{formatTime(item.created_at, 'dd.MM.yyyy')}</span>
+                                    <span className="text-gray text-sm">{formatTime(item.created_at, 'dd.MM.yyyy')}</span>
                                 </div>
                                 <div title={item.title} className="text-xl font-medium  line-clamp-2 min-h-[56px]">
                                     {item.title}
@@ -98,6 +98,10 @@ const News = ({ news = [] }: any) => {
                             spaceBetween: 16,
                         },
                         1080: {
+                            slidesPerView: 3,
+                            spaceBetween: 24,
+                        },
+                        1280: {
                             slidesPerView: 4,
                             spaceBetween: 24,
                         },

@@ -54,6 +54,7 @@ const Menu = ({ data, onChange }: Menu) => {
     const renderMenu = (menu: any, index: number, child: boolean = false) => {
         const hasChildren = menu.children.length > 0
         const _active = active?.menuId === menu.menuId || active?.parentId === menu.menuId
+        const level = menu.level + 1
         return (
             <ItemMenu
                 key={index}
@@ -75,12 +76,17 @@ const Menu = ({ data, onChange }: Menu) => {
                             'pb-3': _active,
                         })}
                     >
-                        {menu.icon && <img className="min-w-6 min-h-6 w-6 h-6" src={menu.icon} />}
-                        <span>{t(menu.name)}</span> {!_active ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+                        <div className="space-x-4 flex items-center">
+                            {menu.icon && <img className="min-w-6 min-h-6 w-6 h-6" src={menu.icon} />}
+                            <span>{t(menu.name)}</span>
+                        </div>
+                        {!_active ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
                     </div>
                 )}
                 {hasChildren && (
-                    <ul className="w-full sm:w-max bg-hover mb:bg-white sm:-mx-8 mb:absolute relative flex flex-col mb:py-4 mb:space-y-2 mb:rounded-b-xl mb:shadow-subMenu mb:top-full h-max sm:left-12 mb:min-w-[244px]">
+                    <ul
+                        className={`menu-${level} w-full sm:w-max bg-hover mb:bg-white sm:-mx-8 mb:absolute relative flex flex-col mb:py-4 mb:space-y-2 mb:rounded-b-xl mb:shadow-subMenu mb:top-full h-max sm:left-12 mb:min-w-[244px]`}
+                    >
                         {menu.children.map((menu: any, idx: number) => renderMenu(menu, idx, true))}
                     </ul>
                 )}
@@ -98,7 +104,7 @@ interface Item {
 const ItemMenu = styled.li.attrs<Item>(({ isChild }) => ({
     className: classnames('cursor-pointer text-sm py-3 relative mb:hover:active-menu', {
         'mb:hover:text-red mb:py-6': !isChild,
-        'mb:!py-[10px] px-4 font-normal mb:text-txtPrimary mb:hover:bg-hover mb:hover:rounded-[3px]': isChild,
+        'mb:!py-[10px] pl-4 font-normal mb:text-txtPrimary mb:hover:bg-hover mb:hover:rounded-[3px]': isChild,
     }),
 }))<Item>``
 export default Menu
