@@ -6,6 +6,7 @@ import { X } from 'react-feather'
 import { LeftArrow } from 'components/common/Svg/SvgIcon'
 import Button from 'components/common/Button/Button'
 import Tour from 'reactour'
+import useWindowSize from 'hooks/useWindowSize'
 
 interface Guideline {
     start: boolean
@@ -15,14 +16,17 @@ const Guide = ({ start, setStart }: Guideline) => {
     const { t } = useTranslation()
     const step = useRef<number>(0)
     const refGuide = useRef<any>(null)
+    const { width } = useWindowSize()
 
     const getCurrentStep = (e: number) => {
         if (e === 0) {
             const _el = document.querySelector('#tour_statistics')
+            console.log(_el)
+
             if (_el) _el.scrollIntoView()
         }
         if (e === 1) {
-            const _el = document.querySelector('#filter-contract')
+            const _el = document.querySelector('#tour_chart')
             if (_el) _el.scrollIntoView()
         }
         step.current = e
@@ -30,7 +34,7 @@ const Guide = ({ start, setStart }: Guideline) => {
 
     useEffect(() => {
         if (start) {
-            const _el = document.querySelector('#tour_statistics')
+            const _el = document.querySelector('#tour_custom')
             if (_el) _el.scrollIntoView()
         }
     }, [start])
@@ -53,35 +57,23 @@ const Guide = ({ start, setStart }: Guideline) => {
     const tourConfig: any = useMemo(() => {
         return [
             {
-                content: (props: any) => <Content title={'Chọn loại tài sản và số lượng tài sản.'} {...props} top onClose={onClose} />,
+                selector: '[data-tut="tour_statistics"]',
+                content: (props: any) => <Content title={t('insurance:guild:step_title_1')} {...props} top onClose={onClose} />,
                 position: 'bottom',
             },
             {
-                content: (props: any) => (
-                    <Content
-                        title={`Chọn nhanh P-Claim bằng cách kéo thả thanh giá trên biểu đồ theo phương dọc hoặc nhập khối lượng P-Claim mong muốn.`}
-                        content={contentStep2()}
-                        {...props}
-                        top
-                        onClose={onClose}
-                    />
-                ),
+                selector: '[data-tut="tour_chart"]',
+                content: (props: any) => <Content title={t('insurance:guild:step_title_2')} content={contentStep2()} {...props} top onClose={onClose} />,
                 position: 'bottom',
             },
             {
-                content: (props: any) => (
-                    <Content
-                        title={`Chọn nhanh P-Claim bằng cách kéo thả thanh giá trên biểu đồ theo phương dọc hoặc nhập khối lượng P-Claim mong muốn.`}
-                        content={contentStep2()}
-                        {...props}
-                        top
-                        onClose={onClose}
-                    />
-                ),
+                selector: '[data-tut="tour_period"]',
+                content: (props: any) => <Content title={t('insurance:guild:step_title_3')} content={contentStep1()} {...props} top onClose={onClose} />,
                 position: 'bottom',
             },
             {
-                content: (props: any) => <Content title={`Chọn period.`} content={contentStep1()} {...props} top onClose={onClose} />,
+                selector: '[data-tut="tour_custom"]',
+                content: (props: any) => <Content title={t('insurance:guild:step_title_4')} {...props} top onClose={onClose} />,
                 position: 'bottom',
             },
         ]
@@ -101,6 +93,7 @@ const Guide = ({ start, setStart }: Guideline) => {
 
     return (
         <Tour
+            className={`!w-full !absolute !mx-[8px] !max-w-[${width}px] !min-w-[374px]  `}
             onRequestClose={() => onClose(false)}
             steps={tourConfig}
             isOpen={start}
@@ -127,7 +120,7 @@ const Guide = ({ start, setStart }: Guideline) => {
 const Content = ({ title, content, step, onClose, top, goTo, ...props }: any) => {
     const { t } = useTranslation()
     return (
-        <div className="">
+        <div>
             <div className="relative">
                 <div id={`guideline-step-${step}`} className="flex flex-col space-y-3">
                     <div className="flex items-center justify-between">
@@ -148,7 +141,7 @@ const Content = ({ title, content, step, onClose, top, goTo, ...props }: any) =>
                         <div className="mb-3">{content}</div>
                     </div>
                     <Button onClick={() => onClose(step === 4)} variants="primary" className="text-xs py-2 w-full">
-                        {t(step === 3 ? 'insurance_history:guidelines:got_it' : 'common:next')}
+                        {t(step === 4 ? 'insurance:guide:got_it' : 'common:next')}
                     </Button>
                 </div>
             </div>

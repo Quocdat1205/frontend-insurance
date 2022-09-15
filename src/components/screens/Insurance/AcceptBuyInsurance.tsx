@@ -229,7 +229,7 @@ export const AcceptBuyInsurance = ({
                     <div className="p-[32px] pb-[24px] pt-0">
                         <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
                             <div className={'text-[#808890] flex items-center'}>
-                                <span className={'mr-[6px]'}>R-Claim</span>
+                                <span className={'mr-[8px]'}>R-Claim</span>
                                 <div data-tip={t('insurance:terminology:r_claim')} data-for={`r-claim`}>
                                     <InfoCircle size={14} color={colors.txtSecondary} />
                                     <Tooltip className="max-w-[200px] !left-[120px] !top-[148px]" id={'r-claim'} placement="right" />
@@ -244,7 +244,7 @@ export const AcceptBuyInsurance = ({
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px]">
                             <div className={'text-[#808890] flex flex-row items-center'}>
-                                <span className={'mr-[6px]'}>Q-Claim</span>
+                                <span className={'mr-[8px]'}>Q-Claim</span>
                                 <div data-tip={t('insurance:terminology:q_claim')} data-for={`q_claim`}>
                                     <InfoCircle size={14} color={colors.txtSecondary} />
                                     <Tooltip className="max-w-[200px] !left-[120px] !top-[179px]" id={'q_claim'} placement="right" />
@@ -260,7 +260,7 @@ export const AcceptBuyInsurance = ({
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
                             <div className={'text-[#808890] flex flex-row items-center'}>
-                                <span className={'mr-[6px]'}>Margin</span>
+                                <span className={'mr-[8px]'}>Margin</span>
                                 <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
                                     <InfoCircle size={14} color={colors.txtSecondary} />
                                     <Tooltip className="max-w-[200px] !left-[110px] !top-[235px]" id={'margin'} placement="right" />
@@ -272,7 +272,7 @@ export const AcceptBuyInsurance = ({
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px]">
                             <div className={'text-[#808890] flex flex-row items-center'}>
-                                <span className={'mr-[6px]'}>Period</span>
+                                <span className={'mr-[8px]'}>Period</span>
                                 <div data-tip={t('insurance:terminology:period')} data-for={`period`}>
                                     <InfoCircle size={14} color={colors.txtSecondary} />
                                     <Tooltip className="max-w-[200px] !left-[110px] !top-[268px]" id={'period'} placement="right" />
@@ -435,7 +435,7 @@ export const AcceptBuyInsurance = ({
                     <div className="mx-[24px]">
                         <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
                             <div className={'text-[#808890] flex flex-row items-center'}>
-                                <span className={'mr-[6px]'}>R-Claim</span>
+                                <span className={'mr-[8px]'}>R-Claim</span>
                                 <div data-tip={t('insurance:terminology:r_claim')} data-for={`r-claim1`}>
                                     <InfoCircle size={14} color={colors.txtSecondary} />
                                     <Tooltip className="max-w-[200px]" id={'r-claim1'} placement="right" />
@@ -451,7 +451,7 @@ export const AcceptBuyInsurance = ({
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px]">
                             <div className={'text-[#808890] flex flex-row items-center'}>
-                                <span className={'mr-[6px]'}>Q-Claim</span>
+                                <span className={'mr-[8px]'}>Q-Claim</span>
                                 <div data-tip={t('insurance:terminology:q_claim')} data-for={`q-claim`}>
                                     <InfoCircle size={14} color={colors.txtSecondary} />
                                     <Tooltip className="max-w-[200px]" id={'q-claim'} placement="right" />
@@ -467,7 +467,7 @@ export const AcceptBuyInsurance = ({
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
                             <div className={'text-[#808890] flex flex-row items-center'}>
-                                <span className={'mr-[6px]'}>Margin</span>
+                                <span className={'mr-[8px]'}>Margin</span>
                                 <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
                                     <InfoCircle size={14} color={colors.txtSecondary} />
                                     <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
@@ -479,7 +479,7 @@ export const AcceptBuyInsurance = ({
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px]">
                             <div className={'text-[#808890] flex flex-row items-center'}>
-                                <span className={'mr-[6px]'}>Period</span>
+                                <span className={'mr-[8px]'}>Period</span>
                                 <div data-tip={t('insurance:terminology:period')} data-for={`period`}>
                                     <InfoCircle size={14} color={colors.txtSecondary} />
                                     <Tooltip className="max-w-[200px]" id={'period'} placement="right" />
