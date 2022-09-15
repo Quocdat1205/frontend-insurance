@@ -1,5 +1,5 @@
 import { useTranslation } from 'next-i18next'
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock'
 import Tour from 'reactour'
 import styled from 'styled-components'
@@ -15,6 +15,7 @@ const Guideline = ({ start, setStart }: Guideline) => {
     const { t } = useTranslation()
     const step = useRef<number>(0)
     const refGuide = useRef<any>(null)
+    const [flag, setFlag] = useState<boolean>(false)
 
     const getCurrentStep = (e: number) => {
         if (e === 0) {
@@ -26,6 +27,7 @@ const Guideline = ({ start, setStart }: Guideline) => {
             if (_el) _el.scrollIntoView()
         }
         step.current = e
+        setFlag(!flag)
     }
 
     useEffect(() => {
@@ -95,13 +97,13 @@ const Guideline = ({ start, setStart }: Guideline) => {
             steps={tourConfig}
             isOpen={start}
             showCloseButton={false}
+            className={step.current === 2 ? 'reactour__arrow__right' : ''}
             maskClassName="guideline"
             rounded={6}
             startAt={0}
             maskSpace={2}
             disableInteraction
             disableKeyboardNavigation
-            // accentColor={colors.red.red}
             getCurrentStep={getCurrentStep}
             showNavigation={false}
             showButtons={false}
