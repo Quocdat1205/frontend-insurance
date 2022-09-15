@@ -1,4 +1,4 @@
-import AOS from 'aos';
+import AOS from 'aos'
 import classnames from 'classnames'
 import useWindowSize from 'hooks/useWindowSize'
 import { useTranslation } from 'next-i18next'
@@ -7,8 +7,8 @@ import fetchApi from 'services/fetch-api'
 import styled from 'styled-components'
 import { API_GET_INFO_GENERAL } from 'services/apis'
 import { formatNumber } from 'utils/utils'
-import "aos/dist/aos.css";
-import {DURATION_AOS} from "utils/constants";
+import 'aos/dist/aos.css'
+import { DURATION_AOS } from 'utils/constants'
 
 const BannerLanding = () => {
     const { t } = useTranslation()
@@ -45,17 +45,23 @@ const BannerLanding = () => {
     useEffect(() => {
         AOS.init({
             once: true,
-            offset: 10
-        });
-        AOS.refresh();
-    }, []);
+            offset: 10,
+        })
+        AOS.refresh()
+    }, [])
 
     return (
         <Background isMobile={isMobile}>
-            <div className="max-w-screen-insurance m-auto text-center flex flex-col space-y-12 sm:space-y-6">
+            <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto mb-0 w-full text-center flex flex-col space-y-12 sm:space-y-6">
                 <div className="flex flex-col space-y-2">
                     <div className="leading-5 sm:leading-6">{t('home:landing:total_q_claim')}</div>
-                    <div className="text-red text-[2.25rem] leading-[3.25rem] sm:leading-10 font-bold sm:font-semibold" data-aos="fade-up" data-aos-delay={DURATION_AOS}>{formatNumber(general?.q_claim, 4)}</div>
+                    <div
+                        className="text-red text-[2.25rem] leading-[3.25rem] sm:leading-10 font-bold sm:font-semibold"
+                        data-aos="fade-up"
+                        data-aos-delay={DURATION_AOS}
+                    >
+                        {formatNumber(general?.q_claim, 4)}
+                    </div>
                 </div>
                 <div className="grid grid-rows-4 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-4 grid-flow-col sm:gap-x-6 lg:gap-6">
                     {list.map((item: any, index: number) => (
@@ -84,7 +90,7 @@ const Item = styled.div.attrs<any>({
     border-bottom: 0;
 `
 const Background = styled.section.attrs({
-    className: 'pt-12 banner-landing px-4 lg:px-20',
+    className: 'pt-12 banner-landing px-4 lg:px-20 min-h-[350px] flex flex-col justify-end',
 })<any>`
     background-image: ${({ isMobile }) => `url(${`/images/screens/landing-page/bg_banner${isMobile ? '_mobile' : ''}.png`})`};
     background-position: top;

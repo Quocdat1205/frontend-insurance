@@ -57,6 +57,10 @@ const InsuranceContractMobile = ({
         return Math.ceil(total / filter?.limit)
     }, [total, filter])
 
+    const hasNext = useMemo(() => {
+        return Math.ceil(filter.skip / filter?.limit) + 1 < totalPage || loading
+    }, [filter, totalPage, loading])
+
     const onShowStatusModal = (item: any) => {
         rowData.current = item
         setShowStatusModal(true)
@@ -142,11 +146,7 @@ const InsuranceContractMobile = ({
                                         <img className="rounded-[50%]" src={asset?.attachment} width={32} height={32} />
                                         <div className="flex flex-col space-y-1">
                                             <div className="font-medium">{asset?.name}</div>
-                                            <div className="text-xs text-txtSecondary">
-                                                <Link href={Config.env.BSC + '/' + item?.transaction_hash}>
-                                                    <a target="_blank">{item?.transaction_hash}</a>
-                                                </Link>
-                                            </div>
+                                            <div className="text-xs text-txtSecondary">{item?._id}</div>
                                         </div>
                                     </div>
 
@@ -162,7 +162,13 @@ const InsuranceContractMobile = ({
                                     <Item>
                                         <div className="text-txtSecondary text-xs whitespace-nowrap">{t('common:insurance')}</div>
                                         <span className="text-xs font-semibold text-red underline">
-                                            {String(item?._id).substr(0, 5) + '...' + String(item?._id).substr(-3)}
+                                            <Link href={Config.env.BSC + '/' + item?.transaction_hash}>
+                                                <a target="_blank">
+                                                    {item?.transaction_hash?.length > 10
+                                                        ? String(item?.transaction_hash).substr(0, 5) + '...' + String(item?.transaction_hash).substr(-3)
+                                                        : item?.transaction_hash}
+                                                </a>
+                                            </Link>
                                         </span>
                                     </Item>
                                     <Item>
@@ -185,7 +191,7 @@ const InsuranceContractMobile = ({
                     })
                 )}
 
-                {totalPage > 1 && (
+                {totalPage > 1 && hasNext && (
                     <div onClick={onLoadMore} className="text-red underline text-sm mt-6 flex text-center justify-center cursor-pointer">
                         {loading ? <Spinner /> : t('common:load_more')}
                     </div>

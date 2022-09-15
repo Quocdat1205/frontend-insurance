@@ -222,4 +222,25 @@ input[type="number"] {
     width: calc(100vw - 16px);
     max-width: calc(100vw - 26px) !important;
     margin: 16px 0;
+    position: relative;
+    border: 1px solid white;
+    &::before {
+        content: "";
+        position: absolute;
+        display: block;
+        width: 0px;
+        left: 20px;
+        top: 0;
+        border: 6px solid transparent;
+        border-top: 0;
+        border-bottom: 10px solid white;
+        transform: translate(-50%, -100%);
+    }
+}
+
+.reactour__arrow__right {
+    &::before {
+        right: 12px;
+        left: unset;
+    }
 }
