@@ -8,16 +8,19 @@ import { useTranslation } from 'next-i18next'
 import React, { Fragment, useEffect, useRef, useState, useMemo } from 'react'
 import { API_CHECK_NOTICE, API_GET_NOTICE, API_UPDATE_NOTICE } from 'services/apis'
 import fetchApi from 'services/fetch-api'
-import { getTimeAgo } from 'utils/utils'
+import { getTimeAgo, getUnit } from 'utils/utils'
 import { isMobile } from 'react-device-detect'
 import { renderContentStatus } from 'components/screens/InsuranceHistory/InsuranceContract'
 import { X } from 'react-feather'
 import Spinner from 'components/common/Loader/Spinner'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
+import { RootStore, useAppSelector } from 'redux/store'
+import { UnitConfig } from 'types/types'
 
 const Notifications = () => {
     const { account } = useWeb3Wallet()
+    const unitConfig: UnitConfig = useAppSelector((state: RootStore) => getUnit(state, 'USDT'))
     const { t } = useTranslation()
     const { width } = useWindowSize()
     const [visible, setVisible] = useState<boolean>(false)
@@ -26,7 +29,7 @@ const Notifications = () => {
     const wrapperRef = useRef<any>(null)
     const [hasNotice, setHasNotice] = useState<boolean>(false)
     const [showNotiDetail, setShowNotiDetail] = useState<boolean>(false)
-    const rowData = useRef(null)
+    const rowData = useRef<any>(null)
     const filter = useRef({
         skip: 0,
         limit: 10,
@@ -133,35 +136,44 @@ const Notifications = () => {
     const onShowDetail = (item: any) => {
         if (!item?.isConfirm) updateNotice(item?._id)
         rowData.current = item
+        rowData.current['decimalSymbol'] = unitConfig?.assetDigit
+        rowData.current['assetCode'] = unitConfig?.assetCode
         setShowNotiDetail(true)
         setVisible(false)
     }
 
     const renderNoti = () => {
-        return loading
-            ? loader()
-            : dataSource.list_notice?.map((item: any, index: number) => {
-                  return (
-                      <div onClick={() => onShowDetail(item)} key={index} className="flex items-center sm:px-6 py-4 space-x-4 mb:hover:bg-hover">
-                          <div className="min-w-[40px] min-h-[40px]">
-                              <img src={`/images/icons/${item?.isConfirm ? 'ic_noti_active' : 'ic_noti_inactive'}.png`} width="40" height="40" />
-                          </div>
-                          <div className="flex flex-col space-y-[2px]">
-                              <div
-                                  className="text-sm"
-                                  dangerouslySetInnerHTML={{
-                                      __html: t('common:notification:notice_message', {
-                                          id: item?._id,
-                                          status: t(`common:notification:status:${String(item?.state).toLowerCase()}`),
-                                      }),
-                                  }}
-                              ></div>
-                              <span className="text-xs leading-[1rem] text-gray">{getTimeAgo(item?.createdAt)}</span>
-                          </div>
-                          {!item?.isConfirm && <div className="min-w-[6px] min-h-[6px] bg-red rounded-[50%]" />}
-                      </div>
-                  )
-              })
+        return loading ? (
+            loader()
+        ) : dataSource?.list_notice.length <= 0 ? (
+            <div className="flex flex-col items-center justify-center h-full">
+                <img src="/images/icons/notice_noData.png" className="max-w-[240px] sm:max-w-[160px]" />
+                <span className="text-sm">{t('common:notification:no_notice')}</span>
+            </div>
+        ) : (
+            dataSource?.list_notice?.map((item: any, index: number) => {
+                return (
+                    <div onClick={() => onShowDetail(item)} key={index} className="flex items-center sm:px-6 py-4 space-x-4 mb:hover:bg-hover">
+                        <div className="min-w-[40px] min-h-[40px]">
+                            <img src={`/images/icons/${item?.isConfirm ? 'ic_noti_active' : 'ic_noti_inactive'}.png`} width="40" height="40" />
+                        </div>
+                        <div className="flex flex-col space-y-[2px]">
+                            <div
+                                className="text-sm"
+                                dangerouslySetInnerHTML={{
+                                    __html: t('common:notification:notice_message', {
+                                        id: item?._id,
+                                        status: t(`common:notification:status:${String(item?.state).toLowerCase()}`),
+                                    }),
+                                }}
+                            ></div>
+                            <span className="text-xs leading-[1rem] text-gray">{getTimeAgo(item?.createdAt)}</span>
+                        </div>
+                        {!item?.isConfirm && <div className="min-w-[6px] min-h-[6px] bg-red rounded-[50%]" />}
+                    </div>
+                )
+            })
+        )
     }
 
     const onLoadMore = () => {
@@ -225,7 +237,7 @@ const Notifications = () => {
                             width && width > screens.drawer ? 'left-0' : 'right-0'
                         }  shadow-subMenu rounded-xl min-w-[360px] py-1 bg-white`}
                     >
-                        <div className="font-normal sm:max-h-[500px] overflow-auto px-4 sm:px-0">
+                        <div className="font-normal sm:h-[28rem] overflow-auto px-4 sm:px-0">
                             {renderNoti()}
                             {totalPage > 1 && !loading && hasNext && (
                                 <div onClick={onLoadMore} className="text-red underline text-sm my-3 flex text-center justify-center cursor-pointer">

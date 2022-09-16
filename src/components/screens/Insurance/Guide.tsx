@@ -18,22 +18,21 @@ const Guide = ({ start, setStart }: Guideline) => {
     const refGuide = useRef<any>(null)
 
     const getCurrentStep = (e: number) => {
-        console.log(e)
-
-        if (e == 1) {
+        if (e === 1) {
             const _el = document.querySelector('#tour_chart')
-
+            step.current = e
             if (_el) _el.scrollIntoView()
         }
-        if (e == 2) {
+        if (e === 2) {
             const _el = document.querySelector('#tour_period')
             if (_el) _el.scrollIntoView()
+            step.current = e
         }
-        if (e == 3) {
+        if (e === 3) {
             const _el = document.querySelector('#tour_custom')
             if (_el) _el.scrollIntoView()
+            step.current = e
         }
-        step.current = e
     }
 
     useEffect(() => {
@@ -62,23 +61,23 @@ const Guide = ({ start, setStart }: Guideline) => {
         return [
             {
                 selector: '[data-tut="tour_statistics"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_1')} {...props} top onClose={onClose} />,
+                content: (props: any) => <Content title={t('insurance:guild:step_title_1')} {...props} onClose={onClose} />,
                 position: 'bottom',
             },
             {
                 selector: '[data-tut="tour_chart"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_2')} content={contentStep2()} {...props} top onClose={onClose} />,
+                content: (props: any) => <Content title={t('insurance:guild:step_title_2')} content={contentStep2()} {...props} onClose={onClose} />,
                 position: 'bottom',
             },
             {
                 selector: '[data-tut="tour_period"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_3')} content={contentStep1()} {...props} top onClose={onClose} />,
+                content: (props: any) => <Content title={t('insurance:guild:step_title_3')} content={contentStep1()} {...props} onClose={onClose} />,
                 position: 'bottom',
             },
             {
                 selector: '[data-tut="tour_custom"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_4')} {...props} top onClose={onClose} />,
-                position: 'bottom',
+                content: (props: any) => <Content title={t('insurance:guild:step_title_4')} top {...props} onClose={onClose} />,
+                position: 'right',
             },
         ]
     }, [])
@@ -101,8 +100,8 @@ const Guide = ({ start, setStart }: Guideline) => {
             steps={tourConfig}
             isOpen={start}
             showCloseButton={false}
-            className={`${step.current === 3 ? 'reactour__arrow__right' : ''} !absolute`}
-            maskClassName="guideline"
+            className={`${step.current == 3 ? 'reactour__arrow__right' : ''} !max-w-md  `}
+            maskClassName="guideline "
             rounded={6}
             startAt={0}
             maskSpace={2}
@@ -124,7 +123,7 @@ const Content = ({ title, content, step, onClose, top, goTo, ...props }: any) =>
     const { t } = useTranslation()
     return (
         <div>
-            <div className="relative">
+            <div className="relative !max-w-md">
                 <div id={`guideline-step-${step}`} className="flex flex-col space-y-3">
                     <div className="flex items-center justify-between">
                         {step > 1 ? (

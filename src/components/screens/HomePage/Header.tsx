@@ -14,6 +14,8 @@ import { X } from 'react-feather'
 import Notifications from 'components/layout/Notifications'
 import { useRouter } from 'next/router'
 import { RootStore, useAppSelector } from 'redux/store'
+import detectEthereumProvider from '@metamask/detect-provider'
+import { isMobile } from 'react-device-detect'
 
 const Header = () => {
     const { t } = useTranslation()
@@ -24,8 +26,13 @@ const Header = () => {
     const [visible, setVisible] = useState<boolean>(false)
     const loading_account = useAppSelector((state: RootStore) => state.setting.loading_account)
 
-    const onConnect = () => {
-        Config.connectWallet()
+    const onConnect = async () => {
+        const provider = await detectEthereumProvider({ timeout: 0 })
+        if (isMobile) {
+            window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}`)
+        } else {
+            provider ? Config.connectWallet() : Config.toast.show('error', 'Cài đặt metamask')
+        }
     }
 
     const network = useMemo(() => {
@@ -38,7 +45,7 @@ const Header = () => {
     }
 
     return (
-        <header className="header-landing h-[4rem] mb:h-[4.25rem] flex items-center px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[10]">
+        <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[50]">
             <div className="max-w-screen-layout 4xl:max-w-screen-4xl m-auto w-full flex items-center justify-between space-x-4 sm:space-x-12">
                 <div className="min-w-[67px] w-[75px]">
                     <img src="/images/ic_logo.png" />

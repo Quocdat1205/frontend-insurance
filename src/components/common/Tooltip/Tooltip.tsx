@@ -21,9 +21,9 @@ const Tooltip = ({ children, placement = 'right', className, id, backgroundColor
             ref={ref}
             {...props}
             place={placement}
-            arrowColor={arrowColor ?? colors.txtPrimary}
-            backgroundColor={backgroundColor ?? colors.txtPrimary}
-            className={classnames('!rounded-[3px] !text-xs font-medium !p-2 !text-white relative !opacity-100', className)}
+            arrowColor={arrowColor ?? 'transparent'}
+            backgroundColor={backgroundColor ?? colors.white.white}
+            className={classnames('!rounded-md !text-xs !p-2 relative !border !border-red !opacity-100', className)}
             type="light"
             effect="solid"
             afterShow={() => ref?.current?.updatePosition()}

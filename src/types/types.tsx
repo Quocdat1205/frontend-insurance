@@ -28,3 +28,19 @@ export interface StateInsurance {
     EXPIRED?: string
     LIQUIDATED?: string
 }
+
+export interface UnitConfig {
+    assetCode: string
+    assetDigit: number
+    assetName: string
+    id: number | string
+    [key: string]: number | string
+}
+
+export interface PairConfig {
+    baseAsset: string
+    filters: any
+    quoteAsset: string
+    symbol: string
+    [key: string]: number | string
+}

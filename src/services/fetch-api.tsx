@@ -5,11 +5,11 @@ import Config from 'config/config'
 
 const mandatory = () => Promise.reject(new Error('Fetch API Missing parameter!'))
 const { API_URL } = Config.env
-const fetchApi = async ({ url, options, params, cancelToken, timeout }: any = mandatory(), cb: any = (f: any) => f) => {
+const fetchApi = async ({ url, options, params, cancelToken, timeout, baseURL }: any = mandatory(), cb: any = (f: any) => f) => {
     try {
         const defaultOptions = {
             method: 'GET',
-            baseURL: API_URL,
+            baseURL: baseURL ?? API_URL,
             url,
             withCredentials: true,
             headers: {

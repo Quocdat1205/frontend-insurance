@@ -9,7 +9,7 @@ import React, { useEffect, useMemo, useState, useRef } from 'react'
 import { API_GET_INSURANCE_BY_ADDRESS } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { stateInsurance } from 'utils/constants'
-import { formatCurrency, formatNumber, formatTime } from 'utils/utils'
+import { formatCurrency, formatNumber, formatTime, getDecimalPrice } from 'utils/utils'
 import InsuranceContractMobile from './InsuranceContractMobile'
 import { useAppSelector, RootStore } from 'redux/store'
 import colors from 'styles/colors'
@@ -19,11 +19,12 @@ import { isMobile as mobile } from 'react-device-detect'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import Tooltip from 'components/common/Tooltip/Tooltip'
-import { StateInsurance } from 'types/types'
+import { PairConfig, StateInsurance, UnitConfig } from 'types/types'
 
 interface InsuranceContract {
     account: any
     showGuide: boolean
+    unitConfig: UnitConfig
 }
 
 const renderStatus = (data: any, t: any) => {
@@ -110,7 +111,9 @@ export const renderContentStatus = (data: any, t: any) => {
                                 <Tooltip className="max-w-[200px]" id={'q-claim'} placement="right" />
                             </div>
                         </div>
-                        <div className="font-semibold">{formatCurrency(data?.q_claim, 4, 1e4)}</div>
+                        <div className="font-semibold">
+                            {formatCurrency(data?.q_claim, data?.decimalSymbol, 1e4)} {data?.assetCode}
+                        </div>
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="text-txtSecondary flex items-center space-x-2">
@@ -131,12 +134,13 @@ export const renderContentStatus = (data: any, t: any) => {
     )
 }
 
-const InsuranceContract = ({ account, showGuide }: InsuranceContract) => {
+const InsuranceContract = ({ account, showGuide, unitConfig }: InsuranceContract) => {
     const { t } = useTranslation()
     const { width } = useWindowSize()
     const router = useRouter()
-    const isMobile = width && width <= 640 || mobile
+    const isMobile = (width && width <= 640) || mobile
     const assetsToken = useAppSelector((state: RootStore) => state.setting.assetsToken)
+    const allPairConfigs = useAppSelector((state: RootStore) => state.setting.pairConfigs)
     const [loading, setLoading] = useState<boolean>(true)
     const [dataSource, setDataSource] = useState<any>({
         count: 0,
@@ -165,6 +169,7 @@ const InsuranceContract = ({ account, showGuide }: InsuranceContract) => {
 
     useEffect(() => {
         clearTimeout(timer.current)
+        if (!allPairConfigs || allPairConfigs.length <= 0) return
         if (account) {
             getInsurance()
         } else {
@@ -172,7 +177,7 @@ const InsuranceContract = ({ account, showGuide }: InsuranceContract) => {
                 setLoading(false)
             }, 500)
         }
-    }, [filter, account])
+    }, [filter, account, allPairConfigs])
 
     const onChangePage = (page: number) => {
         if (loading) return
@@ -205,6 +210,14 @@ const InsuranceContract = ({ account, showGuide }: InsuranceContract) => {
                 },
             })
             if (data) {
+                data?.insurance?.map((item: any) => {
+                    const symbol = allPairConfigs.find((rs: PairConfig) => rs.baseAsset === item?.asset_covered)
+                    const decimalPrice = getDecimalPrice(symbol)
+                    item['decimalSymbol'] = unitConfig?.assetDigit
+                    item['assetCode'] = unitConfig?.assetCode
+                    item['decimalPrice'] = decimalPrice
+                    return item
+                })
                 const dataFiter = !isMobile || !filter.skip ? data?.insurance : dataSource.insurance.concat(data?.insurance)
                 setDataSource({
                     count: data?.count,
@@ -273,19 +286,31 @@ const InsuranceContract = ({ account, showGuide }: InsuranceContract) => {
                 Header: () => renderHeaderTooltip('Q-Claim', t('insurance:terminology:q_claim'), 'q_claim'),
                 accessor: 'q_claim',
                 minWidth: 150,
-                Cell: (e: any) => <div>{formatCurrency(e.value, 4, 1e4)} USDT</div>,
+                Cell: (e: any) => (
+                    <div>
+                        {formatCurrency(e.value, unitConfig?.assetDigit, 1e4)} {unitConfig?.assetCode}
+                    </div>
+                ),
             },
             {
                 Header: renderHeaderTooltip('P-Claim', t('insurance:terminology:p_claim'), 'p_claim'),
                 accessor: 'p_claim',
                 minWidth: 150,
-                Cell: (e: any) => <div>{formatCurrency(e.value, 4, 1e4)} USDT</div>,
+                Cell: (e: any) => (
+                    <div>
+                        {formatCurrency(e.value, e?.row?.original?.decimalPrice, 1e4)} {unitConfig?.assetCode}
+                    </div>
+                ),
             },
             {
                 Header: renderHeaderTooltip('Margin', t('insurance:terminology:margin'), 'margin'),
                 accessor: 'margin',
                 minWidth: 150,
-                Cell: (e: any) => <div>{formatCurrency(e.value, 4, 1e4)} USDT</div>,
+                Cell: (e: any) => (
+                    <div>
+                        {formatCurrency(e.value, e?.row?.original?.decimalPrice, 1e4)} {unitConfig?.assetCode}
+                    </div>
+                ),
             },
             {
                 Header: t('common:insurance_history:status_2'),
@@ -320,7 +345,7 @@ const InsuranceContract = ({ account, showGuide }: InsuranceContract) => {
                 minWidth: 150,
             },
         ],
-        [assetsToken],
+        [assetsToken, unitConfig],
     )
 
     const renderContentPicker = () => {
@@ -397,6 +422,7 @@ const InsuranceContract = ({ account, showGuide }: InsuranceContract) => {
                 loading={loading}
                 onBuyInsurance={onBuyInsurance}
                 showGuide={showGuide}
+                unitConfig={unitConfig}
             />
         )
 

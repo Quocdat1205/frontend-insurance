@@ -7,7 +7,15 @@
         "expired": "Expired",
         "claimed": "Claimed",
         "refunded": "Refunded",
-        "liquidated": "Liquidated"
+        "liquidated": "Liquidated",
+        "explain": {
+            "available": "IC is activated but has not yet reached other milestones",
+            "claim_waiting": "IC reaches P-Claim but waiting to receive Q-Claim at T-End",
+            "claimed": "IC has received Q-Claim at T-End",
+            "refunded": "P-Market is between P-Refunded and P-Claim at T-End, Margin is refunded ",
+            "liquidated": "P-Market reaches P-Expired, IC is terminated immediately",
+            "expired": "At T-End, P-Market is not in the claim waiting, claimed, refunded, liquidated"
+        }
     },
     "header": {
         "home": "Home",
@@ -30,6 +38,7 @@
     "notification": {
         "title": "Notification",
         "notice_message": "Insurance contract <span class='text-red'>{{id}}</span> {{status}}",
+        "no_notice": "You have no notifications.",
         "status": {
             "expired": "Expired",
             "claimed": "Received Q-Claim succesfully",

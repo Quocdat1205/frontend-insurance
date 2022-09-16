@@ -210,7 +210,7 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                         if (index == 0) {
                                                             router.push('/buy-covered/insurance-history')
                                                             localStorage.setItem(
-                                                                'state',
+                                                                'buy_covered_state',
                                                                 JSON.stringify({
                                                                     icon: undefined,
                                                                     id: undefined,

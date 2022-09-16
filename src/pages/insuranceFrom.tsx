@@ -17,12 +17,13 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
 import { Suspense } from 'react'
-import store from 'redux/store'
+import store, { RootStore, useAppSelector } from 'redux/store'
 import Config from 'config/config'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
 import Modal from 'components/common/Modal/Modal'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
+import { formatNumber, getUnit } from 'utils/utils'
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
@@ -39,6 +40,7 @@ export const InsuranceFrom = () => {
     const { width } = useWindowSize()
     const isMobile = width && width <= screens.drawer
 
+    const unitConfig = useAppSelector((state: RootStore) => getUnit(state, 'USDT'))
     const [percentInsurance, setPercentInsurance] = useState<number>(0)
     const [selectTime, setSelectTime] = useState<string>('ALL')
     const [isDrop, setDrop] = useState(false)
@@ -122,22 +124,8 @@ export const InsuranceFrom = () => {
         { menuId: 'help', name: t('insurance:buy:help') },
     ]
 
-    const listTerminology = [
-        { name: 'Q-Covered', description: t('insurance:terminology:q_covered') },
-        { name: 'P-Market', description: t('insurance:terminology:p_market') },
-        { name: 'P-Claim', description: t('insurance:terminology:p_claim') },
-        { name: 'P-Expired', description: t('insurance:terminology:p_expired') },
-        { name: 'P-Refund', description: t('insurance:terminology:p_refund') },
-        { name: 'Period', description: t('insurance:terminology:period') },
-        { name: 'R-Claim', description: t('insurance:terminology:r_claim') },
-        { name: 'Q-Claim', description: t('insurance:terminology:q_claim') },
-        { name: 'Margin', description: t('insurance:terminology:margin') },
-        { name: 'T-Start', description: t('insurance:terminology:t_start') },
-        { name: 'T-Expired', description: t('insurance:terminology:t_expired') },
-    ]
-
     const Leverage = (p_market: number, p_stop: number) => {
-        const leverage = Number((p_market / Math.abs(p_market - p_stop)).toFixed(2))
+        const leverage = Number(formatNumber(p_market / Math.abs(p_market - p_stop), 2))
         return leverage < 1 ? 1 : leverage
     }
 
@@ -145,10 +133,10 @@ export const InsuranceFrom = () => {
         const diffStopfutures = 0 / 100
         const ratio_min_profit = Math.abs(p_claim - p_market) / p_market / 2
         if (p_claim > p_market) {
-            const p_stop = Number(((p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2))
+            const p_stop = Number(formatNumber((p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100, 2))
             return Math.abs(p_stop) / 100
         } else {
-            const p_stop = Number(((p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2))
+            const p_stop = Number(formatNumber((p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100, 2))
             return Math.abs(p_stop) / 100
         }
     }
@@ -187,12 +175,10 @@ export const InsuranceFrom = () => {
             }
         }
     }
-
     useEffect(() => {
         try {
             const result = wallet.getBalance()
             result.then((balance: number) => {
-                console.log(balance, wallet)
                 const tmp = balance / state.p_market
                 console.log('connect success')
                 setUserBalance(tmp)
@@ -258,6 +244,16 @@ export const InsuranceFrom = () => {
                 if (res.index) {
                     setIndex(res.index)
                 }
+                validatePclaim(res.p_claim)
+            } else {
+                const defaultToken = {
+                    icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
+                    id: '63187ae8c2ad72eac4d0f363',
+                    name: 'Binance',
+                    symbol: 'BNBUSDT',
+                    type: 'BNB',
+                }
+                return localStorage.setItem('buy_covered_state', JSON.stringify({ symbol: { ...defaultToken } }))
             }
         } catch (error) {
             return console.log(error)
@@ -301,6 +297,25 @@ export const InsuranceFrom = () => {
     }, [state.q_covered])
 
     useEffect(() => {
+        if (state) {
+            const data = localStorage.getItem('buy_covered_state')
+            if (data) {
+                const res = JSON.parse(data)
+                const newData = {
+                    ...res,
+                    percent_margin: state.percent_margin,
+                    period: state.period,
+                    p_claim: state.p_claim,
+                    q_claim: state.q_claim,
+                    r_claim: state.r_claim,
+                    q_covered: state.q_covered,
+                }
+                localStorage.setItem('buy_covered_state', JSON.stringify(newData))
+            }
+        }
+    }, [state])
+
+    useEffect(() => {
         const data = localStorage.getItem('buy_covered_state')
         if (data) {
             const res = JSON.parse(data)
@@ -325,7 +340,7 @@ export const InsuranceFrom = () => {
     }, [selectTime, selectCoin])
 
     useEffect(() => {
-        if (selectCoin) {
+        if (selectCoin.symbol != '') {
             getPrice(selectCoin.symbol, state, setState)
             const data = localStorage.getItem('buy_covered_state')
             if (data) {
@@ -338,7 +353,7 @@ export const InsuranceFrom = () => {
 
     const refreshApi = (
         selectTime: string | undefined,
-        selectCoin: { id?: string; name?: string; icon?: string; disable?: boolean | undefined; symbol: any },
+        selectCoin: { id?: string; name?: string; icon?: string; disable?: boolean | undefined; symbol?: string; type: any },
     ) => {
         const timeEnd = new Date()
         const timeBegin = new Date()
@@ -347,30 +362,36 @@ export const InsuranceFrom = () => {
             if (selectTime == '1H' || selectTime == '1D') {
                 timeBegin.setDate(timeEnd.getDate() - 10)
                 fetchApiNami(
-                    `${selectCoin.symbol}`,
+                    `${selectCoin.type ? selectCoin.type : defaultToken.type}${unitMoney}`,
                     `${Math.floor(timeBegin.getTime() / 1000)}`,
                     `${Math.ceil(timeEnd.getTime() / 1000)}`,
                     '1m',
                     setDataChart,
-                ).then(() => setLoadings(false))
+                ).then(() => {
+                    return setLoadings(false)
+                })
             } else if (selectTime == '1W') {
                 timeBegin.setDate(timeEnd.getDate() - 10)
                 fetchApiNami(
-                    `${selectCoin.symbol}`,
+                    `${selectCoin.type ? selectCoin.type : defaultToken.type}${unitMoney}`,
                     `${Math.floor(timeBegin.getTime() / 1000)}`,
                     `${Math.ceil(timeEnd.getTime() / 1000)}`,
                     '1h',
                     setDataChart,
-                ).then(() => setLoadings(false))
+                ).then(() => {
+                    return setLoadings(false)
+                })
             } else {
                 timeBegin.setDate(timeEnd.getDate() - 10)
                 fetchApiNami(
-                    `${selectCoin.symbol}`,
+                    `${selectCoin.type ? selectCoin.type : defaultToken.type}${unitMoney}`,
                     `${Math.floor(timeBegin.getTime() / 1000)}`,
                     `${Math.ceil(timeEnd.getTime() / 1000)}`,
                     '1h',
                     setDataChart,
-                ).then(() => setLoadings(false))
+                ).then(() => {
+                    return setLoadings(false)
+                })
             }
         }
     }
@@ -421,6 +442,8 @@ export const InsuranceFrom = () => {
         }
     }, [state.p_claim])
 
+    console.log(state)
+
     return !loadings ? (
         !isMobile ? (
             <>
@@ -433,6 +456,8 @@ export const InsuranceFrom = () => {
                         setChangeUnit1(false)
                     }}
                 >
+                    {index == 1 && <Guide start={showGuide} setStart={setShowGuide} />}
+
                     {showDetails && <TerminologyModal isMobile={isMobile} visible={showDetails} onClose={() => setShowDetails(false)} t={t} />}
 
                     {active && (
@@ -579,209 +604,219 @@ export const InsuranceFrom = () => {
                                 }}
                             >
                                 {/*head*/}
-
-                                <div className={' pb-[8px] pl-[32px] pt-[32px] text-[14px] leading-5 text-[#808890] flex flex-row justify-start items-center'}>
-                                    <div className={'w-1/2 flex flex-row items-center'}>
-                                        <span className={'mr-[8px]'}>{menu[7].name}</span>
-                                        <div data-tip={t('insurance:terminology:q_covered')} data-for={`q-covered`}>
-                                            <InfoCircle size={14} color={colors.txtSecondary} />
-                                            <Tooltip className="max-w-[200px]" id={'q-covered'} placement="right" />
-                                        </div>
-                                    </div>
-                                    {tab == 6 && (
+                                <div id="tour_statistics" data-tut="tour_statistics">
+                                    <div
+                                        className={
+                                            ' pb-[8px] pl-[32px] pt-[32px] text-[14px] leading-5 text-[#808890] flex flex-row justify-start items-center'
+                                        }
+                                    >
                                         <div className={'w-1/2 flex flex-row items-center'}>
-                                            <span className={'mr-[8px]'}>Margin</span>
-                                            <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
+                                            <span className={'mr-[8px]'}>{menu[7].name}</span>
+                                            <div data-tip={t('insurance:terminology:q_covered')} data-for={`q-covered`}>
                                                 <InfoCircle size={14} color={colors.txtSecondary} />
-                                                <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
+                                                <Tooltip className="max-w-[200px]" id={'q-covered'} placement="right" />
                                             </div>
                                         </div>
-                                    )}
-                                </div>
-                                <div className={'pb-[8px] pl-[32px] pr-[32px] h-[70px] flex justify-between'}>
-                                    <div
-                                        className={`${tab > 3 ? 'w-[50%] mr-[12px]' : 'w-full'} flex justify-between border-collapse rounded-[3px] shadow-none`}
-                                    >
-                                        <Input
-                                            className={'w-[70%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none'}
-                                            type={'number'}
-                                            inputName={'Loại tài sản và số lượng tài sản'}
-                                            idInput={'iCoin'}
-                                            value={state.q_covered ? Number(Number(state.q_covered).toFixed(8)) : 0}
-                                            onChange={(a: any) => {
-                                                setState({
-                                                    ...state,
-                                                    q_covered: Number(a.target.value.replace(/^00+/, '0')),
-                                                })
-
-                                                setPercentInsurance(0)
-                                            }}
-                                            placeholder={'0'}
-                                        ></Input>
-                                        <Popover className="relative w-[40%] outline-none bg-[#F7F8FA] focus:ring-0 rounded-none shadow-none flex items-center justify-center pr-[21px]">
-                                            {state.q_covered > userBalance && (
-                                                <div className="absolute right-0 top-[-50px] text-xs z-[100] w-max border border-1 border-[#EB2B3E] p-[8px] rounded-md tooltip">
-                                                    <div className="flex flex-row items-center justify-center">
-                                                        <div className="mr-[8px] items-center justify-center">
-                                                            <ErrorTriggersIcon />
-                                                        </div>
-                                                        <div>{`Số dư khả dụng: ${userBalance}`}</div>
-                                                    </div>
+                                        {tab == 6 && (
+                                            <div className={'w-1/2 flex flex-row items-center'}>
+                                                <span className={'mr-[8px]'}>Margin</span>
+                                                <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
+                                                    <InfoCircle size={14} color={colors.txtSecondary} />
+                                                    <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
                                                 </div>
-                                            )}
-                                            <Popover.Button
-                                                id={'popoverInsurance'}
-                                                className={'flex flex-row justify-end w-full items-center focus:border-0 focus:ring-0 active:border-0'}
-                                                onClick={() => {
-                                                    setChosing(!chosing)
-                                                }}
-                                            >
-                                                <img
-                                                    alt={''}
-                                                    src={`${selectCoin ? selectCoin.icon : defaultToken.icon}`}
-                                                    width="20"
-                                                    height="20"
-                                                    className={'mr-[4px] rounded-[50%]'}
-                                                ></img>
-                                                <span className={'w-max flex flex-start font-semibold text-[#EB2B3E] text-base'}>
-                                                    {selectCoin ? selectCoin.name : defaultToken.name}
-                                                </span>
-                                                {!chosing ? (
-                                                    <ChevronDown size={18} className={'mt-1 text-[#22313F]'}></ChevronDown>
-                                                ) : (
-                                                    <ChevronUp size={18} className={'mt-1 text-[#22313F]'}></ChevronUp>
-                                                )}
-                                            </Popover.Button>
-                                            <Popover.Panel className="absolute z-50 bg-white top-[88px] right-0  w-[360px] rounded shadow">
-                                                {({ close }) => (
-                                                    <div className="flex flex-col focus:border-0 focus:ring-0 active:border-0">
-                                                        {listCoin &&
-                                                            listCoin.map((coin, key) => {
-                                                                let isPress = false
-                                                                // @ts-ignore
-                                                                return !coin.disable ? (
-                                                                    <div
-                                                                        id={`${coin.id}`}
-                                                                        key={key}
-                                                                        onMouseDown={() => (isPress = true)}
-                                                                        onMouseUp={() => {
-                                                                            isPress = false
-                                                                            setSelectedCoin(coin)
-                                                                            setState({ ...state, symbol: { ...coin } })
-                                                                            setChosing(false)
-                                                                        }}
-                                                                        onClick={() => close()}
-                                                                        className={`${
-                                                                            isPress ? 'bg-[#F2F3F5]' : 'hover:bg-[#F7F8FA]'
-                                                                        } flex flex-row justify-start w-full items-center p-3 font-medium`}
-                                                                    >
-                                                                        <div className="max-w-[20px] mr-[8px] max-h-[20px] ">
-                                                                            <img
-                                                                                alt={''}
-                                                                                src={`${coin.icon}`}
-                                                                                width="20"
-                                                                                height="20"
-                                                                                className={'mr-[5px] rounded-[50%]'}
-                                                                            ></img>
-                                                                        </div>
-                                                                        <div className={'flex flex-row justify-between w-full text-sm'}>
-                                                                            <span className={'hover:cursor-default'}>{coin.name}</span>
-                                                                            {coin.id === selectCoin.id ? (
-                                                                                <Check size={18} className={'text-[#EB2B3E]'}></Check>
-                                                                            ) : (
-                                                                                ''
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                ) : (
-                                                                    <a
-                                                                        id={`${coin.id}`}
-                                                                        key={key}
-                                                                        className={`hover:bg-[#F7F8FA] flex flex-row justify-start w-full items-center p-3 text-[#E5E7E8] font-medium`}
-                                                                    >
-                                                                        <img
-                                                                            alt={''}
-                                                                            src={`${coin.icon}`}
-                                                                            width="36"
-                                                                            height="36"
-                                                                            className={'mr-[5px] grayscale hover:cursor-default'}
-                                                                        ></img>
-                                                                        <div className={'flex flex-row justify-between w-full'}>
-                                                                            <span>{coin.name}</span>
-                                                                            {coin.id === selectCoin.id ? (
-                                                                                <Check size={18} className={'text-[#EB2B3E]'}></Check>
-                                                                            ) : (
-                                                                                ''
-                                                                            )}
-                                                                        </div>
-                                                                    </a>
-                                                                )
-                                                            })}
-                                                    </div>
-                                                )}
-                                            </Popover.Panel>
-                                        </Popover>
+                                            </div>
+                                        )}
                                     </div>
-
-                                    {tab > 3 && (
+                                    <div className={'pb-[8px] pl-[32px] pr-[32px] h-[70px] flex justify-between'}>
                                         <div
                                             className={`${
-                                                tab > 3 ? 'w-[50%]' : 'hidden'
-                                            } ml-[12px] flex justify-between border-collapse rounded-[3px] shadow-none`}
+                                                tab > 3 ? 'w-[50%] mr-[12px]' : 'w-full'
+                                            } flex justify-between border-collapse rounded-[3px] shadow-none`}
                                         >
                                             <Input
                                                 className={
-                                                    'w-[90%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none'
+                                                    'w-[70%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none'
                                                 }
                                                 type={'number'}
-                                                inputName={'P-Claim'}
-                                                idInput={''}
-                                                value={state.margin > 0 ? Number(state.margin).toFixed(8) : 0}
+                                                inputName={'Loại tài sản và số lượng tài sản'}
+                                                idInput={'iCoin'}
+                                                value={state.q_covered ? state?.q_covered : 0}
                                                 onChange={(a: any) => {
-                                                    setState({ ...state, margin: a.target.value.replace(/^00+/, '0'), percent_margin: 0 })
+                                                    setState({
+                                                        ...state,
+                                                        q_covered: Number(a.target.value.replace(/^00+/, '0')),
+                                                    })
+
+                                                    setPercentInsurance(0)
                                                 }}
-                                                placeholder={''}
+                                                placeholder={'0'}
                                             ></Input>
-                                            <div
-                                                className={
-                                                    'bg-[#F7F8FA] w-[10%] shadow-none flex flex-row items-center justify-end px-[16px] select-none hover:cursor-pointer text-red'
-                                                }
-                                            >
-                                                <span>{unitMoney}</span>
-                                                <Popover className="relative">
-                                                    <Popover.Button
-                                                        className={'my-[16px] text-[#22313F] underline hover:cursor-pointer '}
-                                                        onClick={() => setChangeUnit2(!changeUnit2)}
-                                                    >
-                                                        {!changeUnit2 ? <ChevronDown></ChevronDown> : <ChevronUp></ChevronUp>}
-                                                    </Popover.Button>
-                                                    <Popover.Panel
-                                                        className="flex flex-col text-[#22313F] absolute  top-[63px] right-[-15px] bg-white z-[100] rounded"
-                                                        style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
-                                                    >
-                                                        {({ close }) => (
-                                                            <div className="flex flex-col justify-center h-full ">
-                                                                {['USDT', 'BUSD', 'USDC'].map((e, key) => {
-                                                                    return (
+                                            <Popover className="relative w-[40%] outline-none bg-[#F7F8FA] focus:ring-0 rounded-none shadow-none flex items-center justify-center pr-[21px]">
+                                                {state.q_covered > userBalance && (
+                                                    <div className="absolute right-0 top-[-50px] text-xs z-[100] w-max border border-1 border-[#EB2B3E] p-[8px] rounded-md tooltip">
+                                                        <div className="flex flex-row items-center justify-center">
+                                                            <div className="mr-[8px] items-center justify-center">
+                                                                <ErrorTriggersIcon />
+                                                            </div>
+                                                            <div>{`Số dư khả dụng: ${userBalance}`}</div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <Popover.Button
+                                                    id={'popoverInsurance'}
+                                                    className={'flex flex-row justify-end w-full items-center focus:border-0 focus:ring-0 active:border-0'}
+                                                    onClick={() => {
+                                                        setChosing(!chosing)
+                                                    }}
+                                                >
+                                                    <img
+                                                        alt={''}
+                                                        src={`${selectCoin ? selectCoin.icon : defaultToken.icon}`}
+                                                        width="20"
+                                                        height="20"
+                                                        className={'mr-[4px] rounded-[50%]'}
+                                                    ></img>
+                                                    <span className={'w-max flex flex-start font-semibold text-[#EB2B3E] text-base'}>
+                                                        {selectCoin ? selectCoin.name : defaultToken.name}
+                                                    </span>
+                                                    {!chosing ? (
+                                                        <ChevronDown size={18} className={'mt-1 text-[#22313F]'}></ChevronDown>
+                                                    ) : (
+                                                        <ChevronUp size={18} className={'mt-1 text-[#22313F]'}></ChevronUp>
+                                                    )}
+                                                </Popover.Button>
+                                                <Popover.Panel className="absolute z-50 bg-white top-[88px] right-0  w-[360px] rounded shadow">
+                                                    {({ close }) => (
+                                                        <div className="flex flex-col focus:border-0 focus:ring-0 active:border-0">
+                                                            {listCoin &&
+                                                                listCoin.map((coin, key) => {
+                                                                    let isPress = false
+                                                                    // @ts-ignore
+                                                                    return !coin.disable ? (
                                                                         <div
-                                                                            className={` py-[8px] px-[16px] hover:bg-[#F7F8FA]`}
-                                                                            onClick={() => {
-                                                                                setUnitMoney('USDT')
-                                                                                setChangeUnit2(false)
-                                                                                close()
+                                                                            id={`${coin.id}`}
+                                                                            key={key}
+                                                                            onMouseDown={() => (isPress = true)}
+                                                                            onMouseUp={() => {
+                                                                                isPress = false
+                                                                                setSelectedCoin(coin)
+                                                                                setState({ ...state, symbol: { ...coin } })
+                                                                                setChosing(false)
                                                                             }}
+                                                                            onClick={() => close()}
+                                                                            className={`${
+                                                                                isPress ? 'bg-[#F2F3F5]' : 'hover:bg-[#F7F8FA]'
+                                                                            } flex flex-row justify-start w-full items-center p-3 font-medium`}
                                                                         >
-                                                                            <span>{e}</span>
+                                                                            <div className="max-w-[20px] mr-[8px] max-h-[20px] ">
+                                                                                <img
+                                                                                    alt={''}
+                                                                                    src={`${coin.icon}`}
+                                                                                    width="20"
+                                                                                    height="20"
+                                                                                    className={'mr-[5px] rounded-[50%]'}
+                                                                                ></img>
+                                                                            </div>
+                                                                            <div className={'flex flex-row justify-between w-full text-sm'}>
+                                                                                <span className={'hover:cursor-default'}>{coin.name}</span>
+                                                                                {coin.id === selectCoin.id ? (
+                                                                                    <Check size={18} className={'text-[#EB2B3E]'}></Check>
+                                                                                ) : (
+                                                                                    ''
+                                                                                )}
+                                                                            </div>
                                                                         </div>
+                                                                    ) : (
+                                                                        <a
+                                                                            id={`${coin.id}`}
+                                                                            key={key}
+                                                                            className={`hover:bg-[#F7F8FA] flex flex-row justify-start w-full items-center p-3 text-[#E5E7E8] font-medium`}
+                                                                        >
+                                                                            <img
+                                                                                alt={''}
+                                                                                src={`${coin.icon}`}
+                                                                                width="36"
+                                                                                height="36"
+                                                                                className={'mr-[5px] grayscale hover:cursor-default'}
+                                                                            ></img>
+                                                                            <div className={'flex flex-row justify-between w-full'}>
+                                                                                <span>{coin.name}</span>
+                                                                                {coin.id === selectCoin.id ? (
+                                                                                    <Check size={18} className={'text-[#EB2B3E]'}></Check>
+                                                                                ) : (
+                                                                                    ''
+                                                                                )}
+                                                                            </div>
+                                                                        </a>
                                                                     )
                                                                 })}
-                                                            </div>
-                                                        )}
-                                                    </Popover.Panel>
-                                                </Popover>
-                                            </div>
+                                                        </div>
+                                                    )}
+                                                </Popover.Panel>
+                                            </Popover>
                                         </div>
-                                    )}
+
+                                        {tab > 3 && (
+                                            <div
+                                                className={`${
+                                                    tab > 3 ? 'w-[50%]' : 'hidden'
+                                                } ml-[12px] flex justify-between border-collapse rounded-[3px] shadow-none`}
+                                            >
+                                                <Input
+                                                    className={
+                                                        'w-[90%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none'
+                                                    }
+                                                    type={'number'}
+                                                    inputName={'P-Claim'}
+                                                    idInput={''}
+                                                    value={state.margin > 0 ? state?.margin : 0}
+                                                    onChange={(a: any) => {
+                                                        setState({ ...state, margin: Number(a.target.value.replace(/^00+/, '0')), percent_margin: 0 })
+                                                    }}
+                                                    placeholder={''}
+                                                ></Input>
+                                                <div
+                                                    className={
+                                                        'bg-[#F7F8FA] w-[10%] shadow-none flex flex-row items-center justify-end px-[16px] select-none hover:cursor-pointer text-red'
+                                                    }
+                                                >
+                                                    <span>{unitMoney}</span>
+                                                    <Popover className="relative">
+                                                        <Popover.Button
+                                                            className={'my-[16px] text-[#22313F] underline hover:cursor-pointer '}
+                                                            onClick={() => setChangeUnit2(!changeUnit2)}
+                                                        >
+                                                            {!changeUnit2 ? <ChevronDown></ChevronDown> : <ChevronUp></ChevronUp>}
+                                                        </Popover.Button>
+                                                        <Popover.Panel
+                                                            className="flex flex-col text-[#22313F] absolute  top-[63px] right-[-15px] bg-white z-[100] rounded"
+                                                            style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                                                        >
+                                                            {({ close }) => (
+                                                                <div className="flex flex-col justify-center h-full ">
+                                                                    {['USDT', 'BUSD', 'USDC'].map((e, key) => {
+                                                                        return (
+                                                                            <div
+                                                                                key={key}
+                                                                                className={` py-[8px] px-[16px] hover:bg-[#F7F8FA]`}
+                                                                                onClick={() => {
+                                                                                    setUnitMoney(e)
+                                                                                    setChangeUnit2(false)
+                                                                                    close()
+                                                                                }}
+                                                                            >
+                                                                                <span>{e}</span>
+                                                                            </div>
+                                                                        )
+                                                                    })}
+                                                                </div>
+                                                            )}
+                                                        </Popover.Panel>
+                                                    </Popover>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="flex flex-row w-full px-[0px]">
                                     <div className={`flex flex-row justify-between mt-[8px] text-[12px] md:text-[14px] ${tab == 6 ? 'w-1/2' : 'w-full'}`}>
@@ -822,7 +857,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 2,
-                                                    margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -835,7 +870,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 5,
-                                                    margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -848,7 +883,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 7,
-                                                    margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -861,7 +896,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 10,
-                                                    margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -872,99 +907,100 @@ export const InsuranceFrom = () => {
                                 </div>
 
                                 {/*end head*/}
-
-                                {/*body*/}
-                                <div className={'px-[32px] flex flex-row relative'}>
-                                    <Suspense fallback={`Loading...`}>
-                                        <ChartComponent
-                                            data={dataChart}
-                                            state={state ? state : null}
-                                            p_claim={Number(state && state.p_claim)}
-                                            p_expired={state.p_expired > 0 ? state.p_expired : undefined}
-                                            setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
-                                            setP_Market={(data: number) => setState({ ...state, p_market: data })}
-                                        ></ChartComponent>
-                                        <svg
-                                            className={`absolute lg:right-[34px] right-[32px] z-50`}
-                                            width="10"
-                                            height={500}
-                                            viewBox="0 0 2 240"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <line
-                                                x1="1"
-                                                y1="3.5011e-08"
-                                                x2="0.999987"
-                                                y2="240"
-                                                stroke="#B2B7BC"
-                                                strokeWidth="150"
-                                                strokeDasharray="0.74 3.72"
-                                            ></line>
-                                        </svg>
-                                    </Suspense>
-                                </div>
-                                {/*end body*/}
-
-                                {/*footer*/}
-                                {/* fill of time */}
-                                <div className={'flex flex-row justify-between items-center w-full mt-5 pl-[32px] pr-[32px]'}>
-                                    {listTime.map((time, key) => {
-                                        return (
-                                            <div
-                                                key={key}
-                                                className={`${
-                                                    selectTime == time ? 'text-[#EB2B3E]' : 'text-[#808890]'
-                                                } hover:cursor-pointer font-medium  text-base`}
-                                                onClick={() => {
-                                                    setSelectTime(time)
-                                                }}
+                                <div data-tut="tour_chart" id="tour_chart">
+                                    {/*body*/}
+                                    <div className={'px-[32px] flex flex-row relative'}>
+                                        <Suspense fallback={`Loading...`}>
+                                            <ChartComponent
+                                                data={dataChart}
+                                                state={state ? state : null}
+                                                p_claim={Number(state && state.p_claim)}
+                                                p_expired={state.p_expired > 0 ? state.p_expired : undefined}
+                                                setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
+                                                setP_Market={(data: number) => setState({ ...state, p_market: data })}
+                                            ></ChartComponent>
+                                            <svg
+                                                className={`absolute lg:right-[34px] right-[32px] z-10`}
+                                                width="10"
+                                                height={500}
+                                                viewBox="0 0 2 240"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
                                             >
-                                                {time}
-                                            </div>
-                                        )
-                                    })}
-                                </div>
-                                {/*P-Claim*/}
-                                {
-                                    <div className={'my-[24px] px-[32px] text-sm text-[#808890]'}>
-                                        <span className={'flex flex-row items-center mr-[4px]'}>
-                                            <span className={'mr-[8px]'}>P-Claim</span>
-                                            <div data-tip={t('insurance:terminology:p_claim')} data-for={`p_claim`}>
-                                                <InfoCircle size={14} color={colors.txtSecondary} />
-                                                <Tooltip className="max-w-[200px]" id={'p_claim'} placement="right" />
-                                            </div>
-                                        </span>
-                                        <div
-                                            className={`mt-[8px] flex justify-between border-collapse rounded-[3px] shadow-none text-base ${
-                                                !errorPCalim && state.p_claim != 0 && 'border border-1 border-red'
-                                            }`}
-                                        >
-                                            <Input
-                                                className={
-                                                    'w-[90%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none '
-                                                }
-                                                type={'number'}
-                                                inputName={'P-Claim'}
-                                                idInput={'iPClaim'}
-                                                value={state.p_claim}
-                                                onChange={(a: any) => {
-                                                    setState({ ...state, p_claim: a.target.value.replace(/^00+/, '0') })
-                                                }}
-                                                placeholder={`${menu[9].name}`}
-                                            ></Input>
-                                            <div className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px]'}>{unitMoney}</div>
-                                        </div>
-                                        {!errorPCalim && state.p_claim != 0 && (
-                                            <span className="flex flex-row text-[#E5544B] mt-[8px]">
-                                                <ErrorTriggersIcon /> <span className="pl-[6px]">{t('insurance:error:p_claim')}</span>
-                                            </span>
-                                        )}
+                                                <line
+                                                    x1="1"
+                                                    y1="3.5011e-08"
+                                                    x2="0.999987"
+                                                    y2="240"
+                                                    stroke="#B2B7BC"
+                                                    strokeWidth="150"
+                                                    strokeDasharray="0.74 3.72"
+                                                ></line>
+                                            </svg>
+                                        </Suspense>
                                     </div>
-                                }
+                                    {/*end body*/}
+
+                                    {/*footer*/}
+                                    {/* fill of time */}
+                                    <div className={'flex flex-row justify-between items-center w-full mt-5 pl-[32px] pr-[32px]'}>
+                                        {listTime.map((time, key) => {
+                                            return (
+                                                <div
+                                                    key={key}
+                                                    className={`${
+                                                        selectTime == time ? 'text-[#EB2B3E]' : 'text-[#808890]'
+                                                    } hover:cursor-pointer font-medium  text-base`}
+                                                    onClick={() => {
+                                                        setSelectTime(time)
+                                                    }}
+                                                >
+                                                    {time}
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                    {/*P-Claim*/}
+                                    {
+                                        <div className={'my-[24px] px-[32px] text-sm text-[#808890]'}>
+                                            <span className={'flex flex-row items-center mr-[4px]'}>
+                                                <span className={'mr-[8px]'}>P-Claim</span>
+                                                <div data-tip={t('insurance:terminology:p_claim')} data-for={`p_claim`}>
+                                                    <InfoCircle size={14} color={colors.txtSecondary} />
+                                                    <Tooltip className="max-w-[200px]" id={'p_claim'} placement="right" />
+                                                </div>
+                                            </span>
+                                            <div
+                                                className={`mt-[8px] flex justify-between border-collapse rounded-[3px] shadow-none text-base ${
+                                                    !errorPCalim && state.p_claim != 0 && 'border border-1 border-red'
+                                                }`}
+                                            >
+                                                <Input
+                                                    className={
+                                                        'w-[90%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none '
+                                                    }
+                                                    type={'number'}
+                                                    inputName={'P-Claim'}
+                                                    idInput={'iPClaim'}
+                                                    value={state.p_claim}
+                                                    onChange={(a: any) => {
+                                                        setState({ ...state, p_claim: Number(a.target.value.replace(/^00+/, '0')) })
+                                                    }}
+                                                    placeholder={`${menu[9].name}`}
+                                                ></Input>
+                                                <div className={'bg-[#F7F8FA] w-[10%] shadow-none flex items-center justify-end px-[16px]'}>{unitMoney}</div>
+                                            </div>
+                                            {!errorPCalim && state.p_claim != 0 && (
+                                                <span className="flex flex-row text-[#E5544B] mt-[8px]">
+                                                    <ErrorTriggersIcon /> <span className="pl-[6px]">{t('insurance:error:p_claim')}</span>
+                                                </span>
+                                            )}
+                                        </div>
+                                    }
+                                </div>
 
                                 {/* Period */}
-                                <div className={'mt-5 pl-[32px] pr-[32px] pb-[32px] text-sm text-[#808890]'}>
+                                <div className={'mt-5 pl-[32px] pr-[32px] pb-[32px] text-sm text-[#808890]'} data-tut="tour_period" id="tour_period">
                                     <span className="flex flex-row items-center">
                                         <span className={'mr-[8px]'}>Period ({menu[8].name})</span>
                                         <div data-tip={t('insurance:terminology:period')} data-for={`period`}>
@@ -1029,9 +1065,7 @@ export const InsuranceFrom = () => {
                                         <Tooltip className="max-w-[200px]" id={'r_claim'} placement="right" />
                                     </div>
                                 </div>
-                                <div className={'font-semibold'}>
-                                    <span>{state.r_claim > 0 ? Number(state.r_claim).toFixed(2) : 0}%</span>
-                                </div>
+                                <div className={'font-semibold'}>{/* <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span> */}</div>
                             </div>
                             <div
                                 className={`${
@@ -1046,7 +1080,7 @@ export const InsuranceFrom = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold flex flex-row justify-center items-center hover:cursor-pointer relative max-h-[24px]'}>
-                                    {state.q_claim > 0 ? Number(state.q_claim).toFixed(2) : 0}
+                                    {state.q_claim > 0 ? Number(formatNumber(state?.q_claim, 2)) : 0}
                                     <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
                                     <div className="relative">
                                         <Popover className="relative">
@@ -1065,9 +1099,10 @@ export const InsuranceFrom = () => {
                                                         {['USDT', 'BUSD', 'USDC'].map((e, key) => {
                                                             return (
                                                                 <div
+                                                                    key={key}
                                                                     className={` py-[8px] px-[16px] hover:bg-[#F7F8FA]`}
                                                                     onClick={() => {
-                                                                        setUnitMoney('USDT')
+                                                                        setUnitMoney(e)
                                                                         setChangeUnit(false)
                                                                         close()
                                                                     }}
@@ -1096,7 +1131,7 @@ export const InsuranceFrom = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold flex flex-row items-center justify-center hover:cursor-pointer relative max-h-[24px]'}>
-                                    {state.margin > 0 ? Number(state.margin).toFixed(2) : 0}
+                                    {state.margin > 0 ? Number(formatNumber(state?.margin, 2)) : 0}
                                     <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
                                     <div className="relative">
                                         <Popover className="relative">
@@ -1115,9 +1150,10 @@ export const InsuranceFrom = () => {
                                                         {['USDT', 'BUSD', 'USDC'].map((e, key) => {
                                                             return (
                                                                 <div
+                                                                    key={key}
                                                                     className={` py-[8px] px-[16px] hover:bg-[#F7F8FA]`}
                                                                     onClick={() => {
-                                                                        setUnitMoney('USDT')
+                                                                        setUnitMoney(e)
                                                                         setChangeUnit1(false)
                                                                         close()
                                                                     }}
@@ -1178,7 +1214,9 @@ export const InsuranceFrom = () => {
                                 {menu[11].name}
                             </button>
                             <Menu>
-                                <Menu.Button className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}>{menu[12].name}</Menu.Button>
+                                <Menu.Button data-tut="tour_custom" id="tour_custom" className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}>
+                                    {menu[12].name}
+                                </Menu.Button>
                                 <Menu.Items
                                     className={'flex flex-col text-[#22313F]'}
                                     style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
@@ -1187,7 +1225,9 @@ export const InsuranceFrom = () => {
                                         {({ active }) => (
                                             <a
                                                 className={`${active && 'bg-blue-500'}  py-[8px] pl-[16px] w-[300px] hover:bg-[#F7F8FA]`}
-                                                href="https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/"
+                                                onClick={() => {
+                                                    setShowGuide(true)
+                                                }}
                                             >
                                                 <span>{t('insurance:buy:help1')}</span>
                                             </a>
@@ -1221,6 +1261,7 @@ export const InsuranceFrom = () => {
                             setNoti={setNameNoti}
                             setRes={setRes}
                             setIndex={setIndex}
+                            unit={unitMoney}
                         ></AcceptBuyInsurance>
                     )}
                 </LayoutInsurance>
@@ -1478,18 +1519,23 @@ export const InsuranceFrom = () => {
                                 </div>
                                 <div className="flex flex-row overflow-clip">
                                     <span className="pr-[4px]">{t('insurance:buy:quality')} </span>{' '}
-                                    <label className={`${state.q_covered == 0 ? 'text-[#B2B7BC]' : 'text-[#EB2B3E]'} max-w-[245] relative ml-[6xp] `}>
+                                    <label
+                                        className={`${
+                                            state.q_covered && state.q_covered > 0 ? 'text-[#EB2B3E]' : 'text-[#B2B7BC]'
+                                        } max-w-[245] relative ml-[6xp] `}
+                                    >
                                         {state.q_covered > 0 ? Number(state.q_covered) : 'Số tiền?'}
                                         <input
                                             type="number"
                                             className={` text-white pl-[4px] focus-visible:outline-none w-0 border border-1 border-black ${
                                                 openChangeToken && 'opacity-0'
                                             } `}
-                                            placeholder=""
+                                            placeholder="Số tiền?"
+                                            value={state.q_covered > 0 ? Number(state.q_covered) : 'Số tiền?'}
                                             name="name"
                                             id="name"
                                             onChange={(a: any) => {
-                                                setState({ ...state, q_covered: a.target.value.replace(/^00+/, '0') })
+                                                setState({ ...state, q_covered: Number(a.target.value.replace(/^00+/, '0')) })
                                                 setPercentInsurance(0)
                                             }}
                                         ></input>
@@ -1499,19 +1545,20 @@ export const InsuranceFrom = () => {
                                 {tab == 6 && (
                                     <div>
                                         <span>{t('insurance:buy:title_change_margin')}</span>{' '}
-                                        <label className={`${state.q_covered == 0 ? 'text-[#B2B7BC]' : 'text-[#EB2B3E]'} max-w-[245] relative ml-[6xp]`}>
+                                        <label className={`${state.margin == 0 ? 'text-[#B2B7BC]' : 'text-[#EB2B3E]'} max-w-[245] relative ml-[6xp]`}>
                                             {state.margin > 0 ? Number(state.margin) : 'Số tiền?'}
                                             <input
                                                 type="number"
                                                 className={` text-white pl-[4px] focus-visible:outline-none w-0 border border-1 border-black`}
-                                                placeholder=""
+                                                placeholder="Số tiền?"
+                                                value={state.margin > 0 ? Number(state.margin) : 'Số tiền?'}
                                                 name="name"
                                                 id="name"
                                                 onChange={(a: any) => {
                                                     setState({
                                                         ...state,
-                                                        margin: a.target.value,
-                                                        percent_margin: a.target.value / (state.q_covered * state.p_market),
+                                                        margin: Number(a.target.value),
+                                                        percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
                                                     })
                                                 }}
                                             ></input>
@@ -1549,7 +1596,7 @@ export const InsuranceFrom = () => {
                                         ></ChartComponent>
                                     </Suspense>
                                     <svg
-                                        className={`absolute lg:right-[34px] right-[32px] z-50`}
+                                        className={`absolute lg:right-[34px] right-[32px] z-10`}
                                         width="10"
                                         height={500}
                                         viewBox="0 0 2 240"
@@ -1607,7 +1654,7 @@ export const InsuranceFrom = () => {
                                                 if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
                                                     setState({ ...state, p_claim: 0 })
                                                 } else {
-                                                    setState({ ...state, p_claim: a.target.value.replace(/^0+/, '') })
+                                                    setState({ ...state, p_claim: Number(a.target.value.replace(/^0+/, '')) })
                                                 }
                                             }}
                                             placeholder={`${menu[9].name}`}
@@ -1685,7 +1732,7 @@ export const InsuranceFrom = () => {
                                                         setState({
                                                             ...state,
                                                             percent_margin: item,
-                                                            margin: Number(((item * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                                            margin: Number((item * state.q_covered * state.p_market) / 100),
                                                         })
                                                     }
                                                 >
@@ -1726,7 +1773,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold'}>
-                                            <span>{state.r_claim.toFixed(2) || 0}%</span>
+                                            {/* <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span> */}
                                         </div>
                                     </div>
                                     <div
@@ -1742,7 +1789,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
-                                            {state.q_claim.toFixed(4) || 0}
+                                            {state.q_claim > 0 ? Number(formatNumber(state.q_claim, 2)) : 0}
                                             <span
                                                 className={'text-[#EB2B3E] pl-[8px]'}
                                                 onClick={() => setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:q_claim')}` })}
@@ -1764,7 +1811,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                            {state.margin > 0 ? Number(state.margin) : 0}
+                                            {state.margin > 0 ? Number(formatNumber(state.margin, 2)) : 0}
 
                                             <span
                                                 className={'text-[#EB2B3E] pl-[8px]'}
@@ -1804,6 +1851,7 @@ export const InsuranceFrom = () => {
                                 setNoti={setNameNoti}
                                 setRes={setRes}
                                 setIndex={setIndex}
+                                unit={unitMoney}
                             ></AcceptBuyInsurance>
                         )}
                     </>
@@ -1893,7 +1941,7 @@ export const getPriceBNBUSDT = async (setPriceBNB: any) => {
 const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGuildline }: any) => {
     return (
         <Modal isMobile containerClassName="flex-col justify-end" isVisible={visible} onBackdropCb={onClose}>
-            <div className="text-xl leading-8 font-semibold mb-6">{t('insurance_history:guidelines:title')}</div>
+            <div className="text-xl leading-8 font-semibold mb-6">{t('insurance:guild:title')}</div>
             <div className="flex flex-col text-sm divide-solid divide-y divide-divider">
                 <div
                     onClick={() => {
@@ -1902,7 +1950,7 @@ const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGui
                     }}
                     className="py-4"
                 >
-                    {t('insurance_history:tracking_and_utilizing')}
+                    {t('insurance:buy:help1')}
                 </div>
                 <div
                     onClick={() => {
@@ -1911,7 +1959,7 @@ const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGui
                     }}
                     className="py-4"
                 >
-                    {t('insurance_history:detailed_terminology')}
+                    {t('insurance:buy:detailed_terminology')}
                 </div>
             </div>
         </Modal>
@@ -1971,7 +2019,7 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
             isVisible={visible}
             onBackdropCb={onClose}
             wrapClassName="!p-6"
-            className={'xl:max-w-[424px]'}
+            className={'md:max-w-[424px]'}
             containerClassName="z-[10000]"
         >
             <div className="text-xl font-medium mb-8 text-left">{t('insurance:buy:detailed_terminology')}</div>

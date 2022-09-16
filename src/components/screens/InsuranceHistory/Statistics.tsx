@@ -10,8 +10,12 @@ import { useTranslation } from 'next-i18next'
 import Skeleton from 'components/common/Skeleton/Skeleton'
 import colors from 'styles/colors'
 import Tooltip from 'components/common/Tooltip/Tooltip'
+import { UnitConfig } from 'types/types'
 
-const Statistics = () => {
+interface Statistics {
+    unitConfig: UnitConfig
+}
+const Statistics = ({ unitConfig }: Statistics) => {
     const [day, setDay] = useState(30)
     const [loading, setLoading] = useState<boolean>(true)
     const { account } = useWeb3Wallet()
@@ -103,7 +107,11 @@ const Statistics = () => {
                         </div>
                         <div className="flex items-center justify-between w-full">
                             <div className="text-xl leading-8 sm:text-4xl font-semibold">
-                                {loading ? <Skeleton className="w-[100px] sm:w-[250px] h-8" /> : formatNumber(dataSource?.lookup_information?.q_claim, 4)}
+                                {loading ? (
+                                    <Skeleton className="w-[100px] sm:w-[250px] h-8" />
+                                ) : (
+                                    formatNumber(dataSource?.lookup_information?.q_claim, unitConfig?.assetDigit ?? 0)
+                                )}
                             </div>
                             <div className="flex items-center space-x-1  font-semibold">
                                 {loading ? (
