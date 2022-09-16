@@ -39,6 +39,14 @@ export const INSURANCE_ABI = [
         name: 'OwnershipTransferred',
         type: 'event',
     },
+    { inputs: [], name: 'address_nain', outputs: [{ internalType: 'address', name: '', type: 'address' }], stateMutability: 'view', type: 'function' },
+    {
+        inputs: [{ internalType: 'address', name: '_address_nain', type: 'address' }],
+        name: 'configAddressNain',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+    },
     {
         inputs: [
             { internalType: 'address', name: '_buyer', type: 'address' },
@@ -75,13 +83,6 @@ export const INSURANCE_ABI = [
         type: 'function',
     },
     {
-        inputs: [{ internalType: 'uint256', name: '_amount', type: 'uint256' }],
-        name: 'depositTokens',
-        outputs: [],
-        stateMutability: 'nonpayable',
-        type: 'function',
-    },
-    {
         inputs: [{ internalType: 'uint256', name: '_insuranceId', type: 'uint256' }],
         name: 'insuranceState',
         outputs: [
@@ -115,11 +116,19 @@ export const INSURANCE_ABI = [
         stateMutability: 'view',
         type: 'function',
     },
+    { inputs: [], name: 'renounceNain', outputs: [], stateMutability: 'nonpayable', type: 'function' },
     { inputs: [], name: 'renounceOwnership', outputs: [], stateMutability: 'nonpayable', type: 'function' },
     { inputs: [], name: 'totalInsurance', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], stateMutability: 'view', type: 'function' },
     {
         inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }],
         name: 'transferOwnership',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+    },
+    {
+        inputs: [{ internalType: 'uint256', name: '_quantity', type: 'uint256' }],
+        name: 'updateQuantityNainEligibleForIncentives',
         outputs: [],
         stateMutability: 'nonpayable',
         type: 'function',
@@ -131,16 +140,6 @@ export const INSURANCE_ABI = [
         ],
         name: 'updateStateInsurance',
         outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-        stateMutability: 'nonpayable',
-        type: 'function',
-    },
-    {
-        inputs: [
-            { internalType: 'address', name: '_receipient', type: 'address' },
-            { internalType: 'uint256', name: '_amount', type: 'uint256' },
-        ],
-        name: 'withdrawTokens',
-        outputs: [],
         stateMutability: 'nonpayable',
         type: 'function',
     },
