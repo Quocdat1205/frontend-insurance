@@ -637,7 +637,7 @@ export const InsuranceFrom = () => {
                                                 type={'number'}
                                                 inputName={'Loại tài sản và số lượng tài sản'}
                                                 idInput={'iCoin'}
-                                                value={state.q_covered ? Number(Number(state?.q_covered).toFixed(8)) : 0}
+                                                value={state.q_covered ? state?.q_covered : 0}
                                                 onChange={(a: any) => {
                                                     setState({
                                                         ...state,
@@ -766,7 +766,7 @@ export const InsuranceFrom = () => {
                                                     type={'number'}
                                                     inputName={'P-Claim'}
                                                     idInput={''}
-                                                    value={state.margin > 0 ? Number(state?.margin).toFixed(8) : 0}
+                                                    value={state.margin > 0 ? state?.margin : 0}
                                                     onChange={(a: any) => {
                                                         setState({ ...state, margin: Number(a.target.value.replace(/^00+/, '0')), percent_margin: 0 })
                                                     }}
@@ -854,7 +854,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 2,
-                                                    margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -867,7 +867,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 5,
-                                                    margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -880,7 +880,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 7,
-                                                    margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -893,7 +893,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 10,
-                                                    margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >

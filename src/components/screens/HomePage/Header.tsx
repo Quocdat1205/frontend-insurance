@@ -14,6 +14,8 @@ import { X } from 'react-feather'
 import Notifications from 'components/layout/Notifications'
 import { useRouter } from 'next/router'
 import { RootStore, useAppSelector } from 'redux/store'
+import detectEthereumProvider from '@metamask/detect-provider'
+import { isMobile } from 'react-device-detect'
 
 const Header = () => {
     const { t } = useTranslation()
@@ -24,8 +26,13 @@ const Header = () => {
     const [visible, setVisible] = useState<boolean>(false)
     const loading_account = useAppSelector((state: RootStore) => state.setting.loading_account)
 
-    const onConnect = () => {
-        Config.connectWallet()
+    const onConnect = async () => {
+        const provider = await detectEthereumProvider({ timeout: 0 })
+        if (isMobile) {
+            window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}`)
+        } else {
+            provider ? Config.connectWallet() : Config.toast.show('error', 'Cài đặt metamask')
+        }
     }
 
     const network = useMemo(() => {

@@ -12,9 +12,13 @@
     "insurance_contract": "Hợp đồng bảo hiểm",
     "guidelines": {
         "title": "Hướng dẫn",
-        "step_title_1": "Xem Thống kê hợp đồng bảo hiểm của tôi",
-        "step_title_2": "Xem chi tiết hợp đồng bảo hiểm",
+        "step_title_1": "Thống kê bảo hiểm cá nhân",
+        "step_content_1": "Chọn mốc thời gian để xem tổng hợp dữ liệu về hợp đồng bảo hiểm (HĐBH) đã ký quỹ theo thời gian tương ứng.",
+        "step_title_2": "Chi tiết hợp đồng bảo hiểm",
+        "step_content_2": "Xem và theo dõi các chỉ số của HĐBH tại đây.",
         "step_title_3": "Ấn 'Hướng dẫn' nếu bạn gặp khó khăn khi sử dụng Nami Insurance",
+        "step_content_3": "HashID là mã nhận dạng duy nhất cho mỗi HĐBH. Sao chép mã và gửi bộ phận CSKH của Nami khi cần hỗ trợ.",
+        "step_content_5": "Bấm để xem lại các bước hướng dẫn, hoặc tìm hiểu thêm về bảng chú giải thuật ngữ nếu gặp khó khăn trong quá trình sử dụng.",
         "got_it": "Đã hiểu"
     }
 }

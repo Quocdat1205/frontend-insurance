@@ -77,9 +77,9 @@ const Modal = ({
                 ref={container}
             >
                 <div
-                    className={classnames('h-full relative ease-in transition-all flex duration-300', {
-                        'translate-y-full': !isVisible || !mount,
-                        'translate-y-0': mount,
+                    className={classnames('h-full relative ease-in transition-all flex', {
+                        'translate-y-full duration-200': !isVisible || !mount,
+                        'translate-y-0 duration-200': mount,
                         'flex flex-col justify-end': isMobile,
                     })}
                 >

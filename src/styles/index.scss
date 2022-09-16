@@ -247,6 +247,13 @@ input[type='number'] {
     }
 }
 
+.reactour__arrow__center {
+    &::before {
+        right: 50%;
+        left: unset;
+    }
+}
+
 .scroll-table {
     &::-webkit-scrollbar {
         width: 6px !important;

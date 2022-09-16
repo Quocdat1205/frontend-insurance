@@ -8,16 +8,19 @@ import { useTranslation } from 'next-i18next'
 import React, { Fragment, useEffect, useRef, useState, useMemo } from 'react'
 import { API_CHECK_NOTICE, API_GET_NOTICE, API_UPDATE_NOTICE } from 'services/apis'
 import fetchApi from 'services/fetch-api'
-import { getTimeAgo } from 'utils/utils'
+import { getTimeAgo, getUnit } from 'utils/utils'
 import { isMobile } from 'react-device-detect'
 import { renderContentStatus } from 'components/screens/InsuranceHistory/InsuranceContract'
 import { X } from 'react-feather'
 import Spinner from 'components/common/Loader/Spinner'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
+import { RootStore, useAppSelector } from 'redux/store'
+import { UnitConfig } from 'types/types'
 
 const Notifications = () => {
     const { account } = useWeb3Wallet()
+    const unitConfig: UnitConfig = useAppSelector((state: RootStore) => getUnit(state, 'USDT'))
     const { t } = useTranslation()
     const { width } = useWindowSize()
     const [visible, setVisible] = useState<boolean>(false)
@@ -26,7 +29,7 @@ const Notifications = () => {
     const wrapperRef = useRef<any>(null)
     const [hasNotice, setHasNotice] = useState<boolean>(false)
     const [showNotiDetail, setShowNotiDetail] = useState<boolean>(false)
-    const rowData = useRef(null)
+    const rowData = useRef<any>(null)
     const filter = useRef({
         skip: 0,
         limit: 10,
@@ -133,6 +136,8 @@ const Notifications = () => {
     const onShowDetail = (item: any) => {
         if (!item?.isConfirm) updateNotice(item?._id)
         rowData.current = item
+        rowData.current['decimalSymbol'] = unitConfig?.assetDigit
+        rowData.current['assetCode'] = unitConfig?.assetCode
         setShowNotiDetail(true)
         setVisible(false)
     }
