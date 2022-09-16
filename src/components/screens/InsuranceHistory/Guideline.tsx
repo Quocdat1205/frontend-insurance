@@ -2,7 +2,6 @@ import { useTranslation } from 'next-i18next'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock'
 import Tour from 'reactour'
-import styled from 'styled-components'
 import { X } from 'react-feather'
 import { LeftArrow } from 'components/common/Svg/SvgIcon'
 import Button from 'components/common/Button/Button'
@@ -10,8 +9,9 @@ import Button from 'components/common/Button/Button'
 interface Guideline {
     start: boolean
     setStart: (e: boolean) => void
+    seen: boolean
 }
-const Guideline = ({ start, setStart }: Guideline) => {
+const Guideline = ({ start, setStart, seen }: Guideline) => {
     const { t } = useTranslation()
     const step = useRef<number>(0)
     const refGuide = useRef<any>(null)
@@ -37,47 +37,80 @@ const Guideline = ({ start, setStart }: Guideline) => {
         }
     }, [start])
 
-    const contentStep1 = () => {
-        return (
-            <>
-                <div>*Q-Claim: {t('insurance:terminology:q_claim')}</div>
-                <div>*R-Claim: {t('insurance:terminology:r_claim')}</div>
-            </>
-        )
-    }
-    const contentStep2 = () => {
-        return (
-            <>
-                <div>*P-Claim: {t('insurance:terminology:p_claim')}</div>
-                <div>*Q-Claim: {t('insurance:terminology:q_claim')}</div>
-                <div>*Margin: {t('insurance:terminology:margin')}</div>
-            </>
-        )
-    }
-
     const tourConfig: any = useMemo(() => {
         return [
             {
                 selector: '[data-tut="tour_statistics"]',
                 content: (props: any) => (
-                    <Content title={t('insurance_history:guidelines:step_title_1')} content={contentStep1()} {...props} top onClose={onClose} />
+                    <Content
+                        title={t('insurance_history:guidelines:step_title_1')}
+                        content={t('insurance_history:guidelines:step_content_1')}
+                        {...props}
+                        top
+                        onClose={onClose}
+                        seen={seen}
+                    />
                 ),
                 position: 'bottom',
             },
             {
                 selector: '[data-tut="tour_insurance_contract"]',
                 content: (props: any) => (
-                    <Content title={t('insurance_history:guidelines:step_title_2')} content={contentStep2()} {...props} top onClose={onClose} />
+                    <Content
+                        title={t('insurance_history:guidelines:step_title_2')}
+                        content={t('insurance_history:guidelines:step_content_2')}
+                        {...props}
+                        top
+                        onClose={onClose}
+                        seen={seen}
+                    />
+                ),
+                position: 'bottom',
+            },
+            {
+                selector: '[data-tut="tour_hashID"]',
+                content: (props: any) => (
+                    <Content
+                        title={t('insurance_history:guidelines:step_title_2')}
+                        content={t('insurance_history:guidelines:step_content_3')}
+                        {...props}
+                        top
+                        onClose={onClose}
+                        seen={seen}
+                    />
+                ),
+                position: 'bottom',
+            },
+            {
+                selector: '[data-tut="tour_status"]',
+                content: (props: any) => (
+                    <Content
+                        title={t('insurance_history:guidelines:title')}
+                        content={'Bấm để xem lại các bước hướng dẫn, hoặc tìm hiểu thêm về bảng chú giải thuật ngữ nếu gặp khó khăn trong quá trình sử dụng.'}
+                        {...props}
+                        top
+                        onClose={onClose}
+                        seen={seen}
+                    />
                 ),
                 position: 'bottom',
             },
             {
                 selector: '[data-tut="tour_guideline"]',
-                content: (props: any) => <Content title={t('insurance_history:guidelines:step_title_3')} {...props} top onClose={onClose} />,
+                content: (props: any) => (
+                    <Content
+                        title={t('insurance_history:guidelines:title')}
+                        content={t('insurance_history:guidelines:step_content_5')}
+                        {...props}
+                        top
+                        onClose={onClose}
+                        seen={seen}
+                    />
+                ),
                 position: 'bottom',
             },
         ]
-    }, [])
+    }, [seen])
 
     const onClose = (e: boolean) => {
         if (!e) {
@@ -91,13 +124,15 @@ const Guideline = ({ start, setStart }: Guideline) => {
         }
     }
 
+    const className = step.current === 2 ? 'reactour__arrow__center' : step.current === 3 || step.current === 4 ? 'reactour__arrow__right' : ''
+
     return (
         <Tour
             onRequestClose={() => onClose(false)}
             steps={tourConfig}
             isOpen={start}
             showCloseButton={false}
-            className={step.current === 2 ? 'reactour__arrow__right' : ''}
+            className={className}
             maskClassName="guideline"
             rounded={6}
             startAt={0}
@@ -116,8 +151,9 @@ const Guideline = ({ start, setStart }: Guideline) => {
     )
 }
 
-const Content = ({ title, content, step, onClose, top, goTo, ...props }: any) => {
+const Content = ({ title, content, step, onClose, top, goTo, seen, ...props }: any) => {
     const { t } = useTranslation()
+    const steps = seen ? 4 : 5
     return (
         <div className="">
             <div className="relative">
@@ -130,26 +166,22 @@ const Content = ({ title, content, step, onClose, top, goTo, ...props }: any) =>
                         ) : (
                             <div />
                         )}
-                        <div className="text-sm text-red font-medium">{step + '/3'}</div>
+                        <div className="text-sm text-red font-medium">{step + '/' + steps}</div>
                         <div className="cursor-pointer" onClick={() => onClose(true)}>
                             <X width={16} />
                         </div>
                     </div>
-                    <div className="text-sm">
-                        <div className="mb-4">{title}</div>
-                        <div className="mb-3">{content}</div>
+                    <div className="mb-4">
+                        <div className="mb-2 font-medium">{title}</div>
+                        <div className="text-sm text-txtSecondary">{content}</div>
                     </div>
-                    <Button onClick={() => onClose(step === 3)} variants="primary" className="text-xs py-2 w-full">
-                        {t(step === 3 ? 'insurance_history:guidelines:got_it' : 'common:next')}
+                    <Button onClick={() => onClose(step === steps)} variants="primary" className="text-xs py-2 w-full">
+                        {t(step === steps ? 'insurance_history:guidelines:got_it' : 'common:next')}
                     </Button>
                 </div>
             </div>
         </div>
     )
 }
-
-const View = styled.div.attrs({
-    className: '',
-})``
 
 export default Guideline

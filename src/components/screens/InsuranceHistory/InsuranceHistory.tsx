@@ -11,17 +11,24 @@ import { isMobile } from 'react-device-detect'
 import { API_CHECK_GUIDE_LINE, API_UPDATE_GUIDE_LINE } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import dynamic from 'next/dynamic'
+import { createSelector } from 'reselect'
+import { RootStore, useAppSelector } from 'redux/store'
+import { UnitConfig } from 'types/types'
+import { getUnit } from 'utils/utils'
+
 const Guideline = dynamic(() => import('components/screens/InsuranceHistory/Guideline'), {
     ssr: false,
 })
 
 const InsuranceHistory = () => {
+    const unitConfig = useAppSelector((state: RootStore) => getUnit(state, 'USDT'))
     const { account } = useWeb3Wallet()
     const { t } = useTranslation()
     const [showGuideModal, setShowGuideModal] = useState<boolean>(false)
     const [showTerminologyModal, setShowTerminologyModal] = useState<boolean>(false)
     const [showGuide, setShowGuide] = useState<boolean>(false)
     const refPopover = useRef<any>(null)
+    const seen = useRef<boolean>(true)
 
     useEffect(() => {
         if (showGuide) {
@@ -44,6 +51,7 @@ const InsuranceHistory = () => {
                     owner: account,
                 },
             })
+            seen.current = data
             if (!data) {
                 timer.current = setTimeout(() => {
                     setShowGuide(true)
@@ -73,7 +81,7 @@ const InsuranceHistory = () => {
 
     return (
         <>
-            <Guideline start={showGuide} setStart={setShowGuide} />
+            <Guideline seen={seen.current} start={showGuide} setStart={setShowGuide} />
             <TerminologyModal isMobile={isMobile} visible={showTerminologyModal} onClose={() => setShowTerminologyModal(false)} t={t} />
             <GuidelineModal
                 visible={showGuideModal}
@@ -117,9 +125,9 @@ const InsuranceHistory = () => {
                             </div>
                         </Popover>
                     </div>
-                    {account && <Statistics />}
+                    {account && <Statistics unitConfig={unitConfig} />}
                     <CardShadow mobileNoShadow className="sm:mt-12 sm:p-8">
-                        <InsuranceContract showGuide={showGuide} account={account} />
+                        <InsuranceContract unitConfig={unitConfig} showGuide={showGuide} account={account} />
                     </CardShadow>
                     <div className="pt-[30px] sm:pt-12">
                         <div className="sm:text-2xl font-medium">{t('insurance_history:new_cover_assets')}</div>

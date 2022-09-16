@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect } from 'react'
-import { getConfigAsset, getListAssetToken } from 'redux/actions/setting'
+import { getConfigAsset, getConfigUnit, getListAssetToken } from 'redux/actions/setting'
 import { useAppDispatch } from 'redux/store'
 import Toast from 'components/layout/Toast'
 import Config from 'config/config'
@@ -21,6 +21,7 @@ const Container = ({ children }: Container) => {
         }
         dispath(getListAssetToken())
         dispath(getConfigAsset())
+        dispath(getConfigUnit())
     }, [])
 
     return (
