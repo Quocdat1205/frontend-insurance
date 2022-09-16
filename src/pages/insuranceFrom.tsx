@@ -1065,9 +1065,7 @@ export const InsuranceFrom = () => {
                                         <Tooltip className="max-w-[200px]" id={'r_claim'} placement="right" />
                                     </div>
                                 </div>
-                                <div className={'font-semibold'}>
-                                    <span>{state.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span>
-                                </div>
+                                <div className={'font-semibold'}>{/* <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span> */}</div>
                             </div>
                             <div
                                 className={`${
@@ -1775,7 +1773,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold'}>
-                                            <span>{state.r_claim > 0 ? Number(formatNumber(state.r_claim, 2)) : 0}%</span>
+                                            {/* <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span> */}
                                         </div>
                                     </div>
                                     <div
