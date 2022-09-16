@@ -195,7 +195,7 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
         },
     ]
     return (
-        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'max-w-[424px]'} containerClassName="z-[100]">
+        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'xl:max-w-[424px]'} containerClassName="z-[100]">
             <div className="text-xl font-medium mb-8 text-center">{t('insurance_history:detailed_terminology')}</div>
             <div className="flex flex-col text-sm divide-solid divide-y divide-divider max-h-[70vh] overflow-auto -mx-6 px-6">
                 {terms.map((item: any, index: number) => (

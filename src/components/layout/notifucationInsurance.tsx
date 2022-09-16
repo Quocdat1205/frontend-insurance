@@ -115,7 +115,7 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                     className={`bg-[#EB2B3E] w-[80%] m-[24px] mt-[32px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                                                     onClick={() => {
                                                         localStorage.setItem(
-                                                            'state',
+                                                            'buy_covered_state',
                                                             JSON.stringify({
                                                                 icon: undefined,
                                                                 id: undefined,

@@ -10,17 +10,7 @@ import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import {
-    CheckCircle,
-    LeftArrow,
-    InfoCircle,
-    XMark,
-    ErrorTriggersIcon,
-    BxDollarCircle,
-    BxLineChartDown,
-    BxCaledarCheck,
-    Loading,
-} from 'components/common/Svg/SvgIcon'
+import { CheckCircle, LeftArrow, InfoCircle, XMark, ErrorTriggersIcon, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -72,6 +62,7 @@ export const InsuranceFrom = () => {
     const [errorPCalim, setErrorPCalim] = useState(false)
     const [showGuide, setShowGuide] = useState<boolean>(true)
     const [chosing, setChosing] = useState(false)
+    const [showGuideModal, setShowGuideModal] = useState<boolean>(false)
     const [showChangeUnit, setShowChangeUnit] = useState({
         isShow: false,
         name: '',
@@ -227,7 +218,7 @@ export const InsuranceFrom = () => {
 
             getPriceBNBUSDT(setPriceBNB)
 
-            const data = localStorage.getItem('state')
+            const data = localStorage.getItem('buy_covered_state')
 
             if (data) {
                 const res = JSON.parse(data)
@@ -275,22 +266,22 @@ export const InsuranceFrom = () => {
 
     useEffect(() => {
         if (unitMoney) {
-            const data = localStorage.getItem('state')
+            const data = localStorage.getItem('buy_covered_state')
             if (data) {
                 const res = JSON.parse(data)
                 const newData = { ...res, unitMoney: unitMoney }
-                localStorage.setItem('state', JSON.stringify(newData))
+                localStorage.setItem('buy_covered_state', JSON.stringify(newData))
             }
         }
     }, [unitMoney])
 
     useEffect(() => {
         if (index) {
-            const data = localStorage.getItem('state')
+            const data = localStorage.getItem('buy_covered_state')
             if (data) {
                 const res = JSON.parse(data)
                 const newData = { ...res, index: index }
-                localStorage.setItem('state', JSON.stringify(newData))
+                localStorage.setItem('buy_covered_state', JSON.stringify(newData))
             }
         }
     }, [index])
@@ -299,7 +290,7 @@ export const InsuranceFrom = () => {
         if (state.p_claim != 0) {
             validatePclaim(state.p_claim)
             const dataSave = { ...state, index: index, tab: tab }
-            return localStorage.setItem('state', JSON.stringify(dataSave))
+            return localStorage.setItem('buy_covered_state', JSON.stringify(dataSave))
         }
     }, [state.p_claim])
 
@@ -310,11 +301,11 @@ export const InsuranceFrom = () => {
     }, [state.q_covered])
 
     useEffect(() => {
-        const data = localStorage.getItem('state')
+        const data = localStorage.getItem('buy_covered_state')
         if (data) {
             const res = JSON.parse(data)
             const newData = { ...res, tab: tab }
-            return localStorage.setItem('state', JSON.stringify(newData))
+            return localStorage.setItem('buy_covered_state', JSON.stringify(newData))
         }
     }, [tab])
 
@@ -336,11 +327,11 @@ export const InsuranceFrom = () => {
     useEffect(() => {
         if (selectCoin) {
             getPrice(selectCoin.symbol, state, setState)
-            const data = localStorage.getItem('state')
+            const data = localStorage.getItem('buy_covered_state')
             if (data) {
                 const res = JSON.parse(data)
                 const newData = { ...res, symbol: { ...selectCoin } }
-                return localStorage.setItem('state', JSON.stringify(newData))
+                return localStorage.setItem('buy_covered_state', JSON.stringify(newData))
             }
         }
     }, [selectCoin])
@@ -437,11 +428,13 @@ export const InsuranceFrom = () => {
                     handleClick={() => {
                         setDrop(false)
                         setChosing(false)
+                        setChangeUnit2(false)
                         setChangeUnit(false)
                         setChangeUnit1(false)
-                        setChangeUnit2(false)
                     }}
                 >
+                    {showDetails && <TerminologyModal isMobile={isMobile} visible={showDetails} onClose={() => setShowDetails(false)} t={t} />}
+
                     {active && (
                         <Modal
                             portalId="modal"
@@ -459,38 +452,6 @@ export const InsuranceFrom = () => {
                                 }}
                                 isMobile={false}
                             />
-                        </Modal>
-                    )}
-                    {showDetails && (
-                        <Modal
-                            portalId="modal"
-                            isVisible={true}
-                            onBackdropCb={() => {}}
-                            className="rounded-xl p-6 bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                        >
-                            <div className={` bg-white text-sm  w-[424px] mx-auto `}>
-                                <div
-                                    className="m-[24px] flex flex-row-reverse"
-                                    onClick={() => {
-                                        setShowDetails(false)
-                                    }}
-                                >
-                                    <XMark></XMark>
-                                </div>
-                                <div className="flex flex-col justify-center items-center my-[24px]">
-                                    <div className="font-medium text-xl">{t('insurance:buy:detailed_terminology')}</div>
-                                    <div className="mt-[32px] divide-y divide-[#E5E7E8] text-[#22313F]">
-                                        {listTerminology.map((item, key) => {
-                                            return (
-                                                <div key={key} className="w-[380px] flex flex-row justify-between items-center">
-                                                    <span className="py-[24px]">{item.name}</span>
-                                                    <span className="text-left w-[160px] py-[12px]">{item.description}</span>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                </div>
-                            </div>
                         </Modal>
                     )}
 
@@ -642,7 +603,7 @@ export const InsuranceFrom = () => {
                                         className={`${tab > 3 ? 'w-[50%] mr-[12px]' : 'w-full'} flex justify-between border-collapse rounded-[3px] shadow-none`}
                                     >
                                         <Input
-                                            className={'w-[75%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none'}
+                                            className={'w-[70%] font-semibold appearance-none bg-[#F7F8FA] outline-none focus:ring-0 rounded-none shadow-none'}
                                             type={'number'}
                                             inputName={'Loại tài sản và số lượng tài sản'}
                                             idInput={'iCoin'}
@@ -657,7 +618,7 @@ export const InsuranceFrom = () => {
                                             }}
                                             placeholder={'0'}
                                         ></Input>
-                                        <Popover className="relative w-[25%] outline-none bg-[#F7F8FA] focus:ring-0 rounded-none shadow-none flex items-center justify-center pr-[21px]">
+                                        <Popover className="relative w-[40%] outline-none bg-[#F7F8FA] focus:ring-0 rounded-none shadow-none flex items-center justify-center pr-[21px]">
                                             {state.q_covered > userBalance && (
                                                 <div className="absolute right-0 top-[-50px] text-xs z-[100] w-max border border-1 border-[#EB2B3E] p-[8px] rounded-md tooltip">
                                                     <div className="flex flex-row items-center justify-center">
@@ -680,9 +641,9 @@ export const InsuranceFrom = () => {
                                                     src={`${selectCoin ? selectCoin.icon : defaultToken.icon}`}
                                                     width="20"
                                                     height="20"
-                                                    className={'mr-[4px]'}
+                                                    className={'mr-[4px] rounded-[50%]'}
                                                 ></img>
-                                                <span className={'w-[104px] flex flex-start font-semibold text-[#EB2B3E] text-base'}>
+                                                <span className={'w-max flex flex-start font-semibold text-[#EB2B3E] text-base'}>
                                                     {selectCoin ? selectCoin.name : defaultToken.name}
                                                 </span>
                                                 {!chosing ? (
@@ -714,13 +675,13 @@ export const InsuranceFrom = () => {
                                                                             isPress ? 'bg-[#F2F3F5]' : 'hover:bg-[#F7F8FA]'
                                                                         } flex flex-row justify-start w-full items-center p-3 font-medium`}
                                                                     >
-                                                                        <div className="max-w-[20px] mr-[8px] max-h-[20px]">
+                                                                        <div className="max-w-[20px] mr-[8px] max-h-[20px] ">
                                                                             <img
                                                                                 alt={''}
                                                                                 src={`${coin.icon}`}
                                                                                 width="20"
                                                                                 height="20"
-                                                                                className={'mr-[5px] '}
+                                                                                className={'mr-[5px] rounded-[50%]'}
                                                                             ></img>
                                                                         </div>
                                                                         <div className={'flex flex-row justify-between w-full text-sm'}>
@@ -787,66 +748,37 @@ export const InsuranceFrom = () => {
                                                 }
                                             >
                                                 <span>{unitMoney}</span>
-                                                <div className="relative">
-                                                    <Menu>
-                                                        <Menu.Button
-                                                            className={'my-[16px] text-[#22313F] underline hover:cursor-pointer '}
-                                                            onClick={() => {
-                                                                setChangeUnit2(!changeUnit2)
-                                                            }}
-                                                        >
-                                                            {!changeUnit2 ? <ChevronDown></ChevronDown> : <ChevronUp></ChevronUp>}
-                                                        </Menu.Button>
-                                                        <Menu.Items
-                                                            className={'flex flex-col text-[#22313F] absolute z-50 top-[63px] right-[-15px] bg-white rounded'}
-                                                            style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
-                                                        >
-                                                            <Menu.Item>
-                                                                {({ active }) => (
-                                                                    <a
-                                                                        className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA]`}
-                                                                        onClick={() => {
-                                                                            setUnitMoney('USDT')
-                                                                            setChangeUnit2(false)
-                                                                        }}
-                                                                    >
-                                                                        <span>USDT</span>
-                                                                    </a>
-                                                                )}
-                                                            </Menu.Item>
-                                                            <Menu.Item>
-                                                                {({ active }) => (
-                                                                    <a
-                                                                        className={`${
-                                                                            active && 'bg-blue-500'
-                                                                        }  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
-                                                                        onClick={() => {
-                                                                            setUnitMoney('BUSD')
-                                                                            setChangeUnit2(false)
-                                                                        }}
-                                                                    >
-                                                                        <span>BUSD</span>
-                                                                    </a>
-                                                                )}
-                                                            </Menu.Item>
-                                                            <Menu.Item>
-                                                                {({ active }) => (
-                                                                    <a
-                                                                        className={`${
-                                                                            active && 'bg-blue-500'
-                                                                        }  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
-                                                                        onClick={() => {
-                                                                            setUnitMoney('USDC')
-                                                                            setChangeUnit2(false)
-                                                                        }}
-                                                                    >
-                                                                        <span>USDC</span>
-                                                                    </a>
-                                                                )}
-                                                            </Menu.Item>
-                                                        </Menu.Items>
-                                                    </Menu>
-                                                </div>
+                                                <Popover className="relative">
+                                                    <Popover.Button
+                                                        className={'my-[16px] text-[#22313F] underline hover:cursor-pointer '}
+                                                        onClick={() => setChangeUnit2(!changeUnit2)}
+                                                    >
+                                                        {!changeUnit2 ? <ChevronDown></ChevronDown> : <ChevronUp></ChevronUp>}
+                                                    </Popover.Button>
+                                                    <Popover.Panel
+                                                        className="flex flex-col text-[#22313F] absolute  top-[63px] right-[-15px] bg-white z-[100] rounded"
+                                                        style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                                                    >
+                                                        {({ close }) => (
+                                                            <div className="flex flex-col justify-center h-full ">
+                                                                {['USDT', 'BUSD', 'USDC'].map((e, key) => {
+                                                                    return (
+                                                                        <div
+                                                                            className={` py-[8px] px-[16px] hover:bg-[#F7F8FA]`}
+                                                                            onClick={() => {
+                                                                                setUnitMoney('USDT')
+                                                                                setChangeUnit2(false)
+                                                                                close()
+                                                                            }}
+                                                                        >
+                                                                            <span>{e}</span>
+                                                                        </div>
+                                                                    )
+                                                                })}
+                                                            </div>
+                                                        )}
+                                                    </Popover.Panel>
+                                                </Popover>
                                             </div>
                                         </div>
                                     )}
@@ -1117,68 +1049,37 @@ export const InsuranceFrom = () => {
                                     {state.q_claim > 0 ? Number(state.q_claim).toFixed(2) : 0}
                                     <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
                                     <div className="relative">
-                                        <Menu>
-                                            <Menu.Button
+                                        <Popover className="relative">
+                                            <Popover.Button
                                                 className={'my-[16px] text-[#22313F] underline hover:cursor-pointer '}
-                                                onClick={() => {
-                                                    setChangeUnit(!changeUnit)
-                                                }}
+                                                onClick={() => setChangeUnit(!changeUnit)}
                                             >
-                                                {!changeUnit ? (
-                                                    <ChevronDown width={16} height={16}></ChevronDown>
-                                                ) : (
-                                                    <ChevronUp width={16} height={16}></ChevronUp>
-                                                )}
-                                            </Menu.Button>
-                                            <Menu.Items
-                                                className={'flex flex-col text-[#22313F] absolute z-50 top-[63px] right-[-15px] bg-white rounded'}
+                                                {!changeUnit ? <ChevronDown></ChevronDown> : <ChevronUp></ChevronUp>}
+                                            </Popover.Button>
+                                            <Popover.Panel
+                                                className="flex flex-col text-[#22313F] absolute  top-[63px] right-[-15px] bg-white z-[100] rounded"
                                                 style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
                                             >
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <a
-                                                            className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA]`}
-                                                            onClick={() => {
-                                                                setUnitMoney('USDT')
-                                                                setChangeUnit(false)
-                                                            }}
-                                                        >
-                                                            <span>USDT</span>
-                                                        </a>
-                                                    )}
-                                                </Menu.Item>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <a
-                                                            className={`${
-                                                                active && 'bg-blue-500'
-                                                            }  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
-                                                            onClick={() => {
-                                                                setUnitMoney('BUSD')
-                                                                setChangeUnit(false)
-                                                            }}
-                                                        >
-                                                            <span>BUSD</span>
-                                                        </a>
-                                                    )}
-                                                </Menu.Item>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <a
-                                                            className={`${
-                                                                active && 'bg-blue-500'
-                                                            }  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
-                                                            onClick={() => {
-                                                                setUnitMoney('USDC')
-                                                                setChangeUnit(false)
-                                                            }}
-                                                        >
-                                                            <span>USDC</span>
-                                                        </a>
-                                                    )}
-                                                </Menu.Item>
-                                            </Menu.Items>
-                                        </Menu>
+                                                {({ close }) => (
+                                                    <div className="flex flex-col justify-center h-full ">
+                                                        {['USDT', 'BUSD', 'USDC'].map((e, key) => {
+                                                            return (
+                                                                <div
+                                                                    className={` py-[8px] px-[16px] hover:bg-[#F7F8FA]`}
+                                                                    onClick={() => {
+                                                                        setUnitMoney('USDT')
+                                                                        setChangeUnit(false)
+                                                                        close()
+                                                                    }}
+                                                                >
+                                                                    <span>{e}</span>
+                                                                </div>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </Popover.Panel>
+                                        </Popover>
                                     </div>
                                 </div>
                             </div>
@@ -1198,68 +1099,37 @@ export const InsuranceFrom = () => {
                                     {state.margin > 0 ? Number(state.margin).toFixed(2) : 0}
                                     <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
                                     <div className="relative">
-                                        <Menu>
-                                            <Menu.Button
-                                                className={' my-[16px] text-[#22313F] text-[18px] underline hover:cursor-pointer '}
-                                                onClick={() => {
-                                                    setChangeUnit1(!changeUnit1)
-                                                }}
+                                        <Popover className="relative">
+                                            <Popover.Button
+                                                className={'my-[16px] text-[#22313F] underline hover:cursor-pointer '}
+                                                onClick={() => setChangeUnit1(!changeUnit1)}
                                             >
-                                                {!changeUnit1 ? (
-                                                    <ChevronDown width={16} height={16}></ChevronDown>
-                                                ) : (
-                                                    <ChevronUp width={16} height={16}></ChevronUp>
-                                                )}
-                                            </Menu.Button>
-                                            <Menu.Items
-                                                className={'flex flex-col text-[#22313F] absolute z-50 top-[63px] right-[-15px] bg-white rounded'}
+                                                {!changeUnit1 ? <ChevronDown></ChevronDown> : <ChevronUp></ChevronUp>}
+                                            </Popover.Button>
+                                            <Popover.Panel
+                                                className="flex flex-col text-[#22313F] absolute  top-[63px] right-[-15px] bg-white z-[100] rounded"
                                                 style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
                                             >
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <a
-                                                            className={`${active && 'bg-blue-500'}  py-[8px] px-[16px]  hover:bg-[#F7F8FA]`}
-                                                            onClick={() => {
-                                                                setUnitMoney('USDT')
-                                                                setChangeUnit1(false)
-                                                            }}
-                                                        >
-                                                            <span>USDT</span>
-                                                        </a>
-                                                    )}
-                                                </Menu.Item>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <a
-                                                            className={`${
-                                                                active && 'bg-blue-500'
-                                                            }  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
-                                                            onClick={() => {
-                                                                setUnitMoney('BUSD')
-                                                                setChangeUnit1(false)
-                                                            }}
-                                                        >
-                                                            <span>BUSD</span>
-                                                        </a>
-                                                    )}
-                                                </Menu.Item>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <a
-                                                            className={`${
-                                                                active && 'bg-blue-500'
-                                                            }  py-[8px] px-[16px]  hover:bg-[#F7F8FA] hover:cursor-pointer`}
-                                                            onClick={() => {
-                                                                setUnitMoney('USDC')
-                                                                setChangeUnit1(false)
-                                                            }}
-                                                        >
-                                                            <span>USDC</span>
-                                                        </a>
-                                                    )}
-                                                </Menu.Item>
-                                            </Menu.Items>
-                                        </Menu>
+                                                {({ close }) => (
+                                                    <div className="flex flex-col justify-center h-full ">
+                                                        {['USDT', 'BUSD', 'USDC'].map((e, key) => {
+                                                            return (
+                                                                <div
+                                                                    className={` py-[8px] px-[16px] hover:bg-[#F7F8FA]`}
+                                                                    onClick={() => {
+                                                                        setUnitMoney('USDT')
+                                                                        setChangeUnit1(false)
+                                                                        close()
+                                                                    }}
+                                                                >
+                                                                    <span>{e}</span>
+                                                                </div>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </Popover.Panel>
+                                        </Popover>
                                     </div>
                                 </div>
                             </div>
@@ -1359,38 +1229,7 @@ export const InsuranceFrom = () => {
             <>
                 {!wallet.account ? (
                     <>
-                        {showDetails && (
-                            <Modal
-                                portalId="modal"
-                                isVisible={true}
-                                onBackdropCb={() => {}}
-                                className="rounded-xl p-6 bg-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                            >
-                                <div className={` bg-white text-sm  mx-auto `}>
-                                    <div
-                                        className="mt-[32px] flex flex-row-reverse"
-                                        onClick={() => {
-                                            setShowDetails(false)
-                                        }}
-                                    >
-                                        <XMark></XMark>
-                                    </div>
-                                    <div className="flex flex-col justify-center  my-[24px] ">
-                                        <div className="font-semibold text-xl">{t('insurance:buy:detailed_terminology')}</div>
-                                        <div className="mt-[32px] divide-y divide-[#E5E7E8] text-[#22313F] snap-y">
-                                            {listTerminology.map((item, key) => {
-                                                return (
-                                                    <div key={key} className="w-[380px] flex flex-row items-center snap-center">
-                                                        <span className="py-[24px] min-w-[80px]">{item.name}</span>
-                                                        <span className="text-left ml-[29px] w-max  py-[12px]">{item.description}</span>
-                                                    </div>
-                                                )
-                                            })}
-                                        </div>
-                                    </div>
-                                </div>
-                            </Modal>
-                        )}
+                        {showDetails && <TerminologyModal isMobile={isMobile} visible={showDetails} onClose={() => setShowDetails(false)} t={t} />}
                         <div style={{ background: 'linear-gradient(180deg, rgba(244, 63, 94, 0.15) 0%, rgba(254, 205, 211, 0) 100%)' }}>
                             <div className="px-[16px] pt-[8px]" onClick={() => router.push('/home')}>
                                 <XMark />
@@ -1456,6 +1295,7 @@ export const InsuranceFrom = () => {
                     </>
                 ) : (
                     <>
+                        {showDetails && <TerminologyModal isMobile={isMobile} visible={showDetails} onClose={() => setShowDetails(false)} t={t} />}
                         {index == 1 && <Guide start={showGuide} setStart={setShowGuide} />}
 
                         {showChangeUnit.isShow && (
@@ -1582,11 +1422,19 @@ export const InsuranceFrom = () => {
                                     <span
                                         className={'text-[#00ABF9] underline hover:cursor-pointer pr-[16px] flex items-center'}
                                         onClick={() => {
-                                            router.push('https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/')
+                                            setShowGuideModal(true)
                                         }}
                                     >
                                         {t('insurance:buy:help_short')}
                                     </span>
+
+                                    <GuidelineModal
+                                        visible={showGuideModal}
+                                        onClose={() => setShowGuideModal(false)}
+                                        t={t}
+                                        onShowTerminologyModal={() => setShowDetails(true)}
+                                        onShowGuildline={() => setShowGuide(true)}
+                                    />
                                     <div className="flex items-center">
                                         <Switch
                                             checked={tab == 6 ? true : false}
@@ -1625,7 +1473,7 @@ export const InsuranceFrom = () => {
                                             setOpenChangeToken(true)
                                         }}
                                     >
-                                        {'Ethereum'}
+                                        {selectCoin.name}
                                     </span>
                                 </div>
                                 <div className="flex flex-row overflow-clip">
@@ -1849,12 +1697,13 @@ export const InsuranceFrom = () => {
                                 </Tab.Group>
                             </div>
                         )}
-                        {index == 1 && clear && (
+                        {index == 1 && (
                             <div
                                 onClick={() => {
                                     setDrop(false)
                                     setChosing(false)
                                 }}
+                                className={`${clear ? 'visible' : 'invisible'}`}
                             >
                                 <div className={'flex justify-center items-center mt-[24px]'}>
                                     <CheckCircle></CheckCircle>
@@ -2030,6 +1879,7 @@ export const getPriceOnly = async (symbol: string) => {
 export const getPriceBNBUSDT = async (setPriceBNB: any) => {
     try {
         const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=BNBUSDT`)
+
         if (data) {
             if (data.data[0]) {
                 return setPriceBNB(data.data[0].p)
@@ -2038,6 +1888,103 @@ export const getPriceBNBUSDT = async (setPriceBNB: any) => {
     } catch (err) {
         console.log('fecth current price error')
     }
+}
+
+const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGuildline }: any) => {
+    return (
+        <Modal isMobile containerClassName="flex-col justify-end" isVisible={visible} onBackdropCb={onClose}>
+            <div className="text-xl leading-8 font-semibold mb-6">{t('insurance_history:guidelines:title')}</div>
+            <div className="flex flex-col text-sm divide-solid divide-y divide-divider">
+                <div
+                    onClick={() => {
+                        onShowGuildline()
+                        onClose()
+                    }}
+                    className="py-4"
+                >
+                    {t('insurance_history:tracking_and_utilizing')}
+                </div>
+                <div
+                    onClick={() => {
+                        onShowTerminologyModal()
+                        onClose()
+                    }}
+                    className="py-4"
+                >
+                    {t('insurance_history:detailed_terminology')}
+                </div>
+            </div>
+        </Modal>
+    )
+}
+
+const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
+    const terms = [
+        {
+            title: 'Q-Covered',
+            description: t('insurance:terminology:q_covered'),
+        },
+        {
+            title: 'P-Market',
+            description: t('insurance:terminology:p_market'),
+        },
+        {
+            title: 'P-Claim',
+            description: t('insurance:terminology:p_claim'),
+        },
+        {
+            title: 'P-Expired',
+            description: t('insurance:terminology:p_expired'),
+        },
+        {
+            title: 'P-Refund',
+            description: t('insurance:terminology:p_refund'),
+        },
+        {
+            title: 'Period',
+            description: t('insurance:terminology:period'),
+        },
+        {
+            title: 'R-Claim',
+            description: t('insurance:terminology:r_claim'),
+        },
+        {
+            title: 'Q-Claim',
+            description: t('insurance:terminology:q_claim'),
+        },
+        {
+            title: 'Margin',
+            description: t('insurance:terminology:margin'),
+        },
+        {
+            title: 'T-Start',
+            description: t('insurance:terminology:t_start'),
+        },
+        {
+            title: 'T-Expired',
+            description: t('insurance:terminology:t_expired'),
+        },
+    ]
+    return (
+        <Modal
+            isMobile={isMobile}
+            isVisible={visible}
+            onBackdropCb={onClose}
+            wrapClassName="!p-6"
+            className={'xl:max-w-[424px]'}
+            containerClassName="z-[10000]"
+        >
+            <div className="text-xl font-medium mb-8 text-left">{t('insurance:buy:detailed_terminology')}</div>
+            <div className="flex flex-col text-sm divide-solid divide-y divide-divider max-h-[70vh] overflow-auto -mx-6 px-6">
+                {terms.map((item: any, index: number) => (
+                    <div key={index} className="py-3 flex items-center">
+                        <div className="whitespace-nowrap min-w-[30%]">{item.title}</div>
+                        <div>{item.description}</div>
+                    </div>
+                ))}
+            </div>
+        </Modal>
+    )
 }
 
 export default InsuranceFrom
