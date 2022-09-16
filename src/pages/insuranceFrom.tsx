@@ -1751,7 +1751,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold'}>
-                                            <span>{state?.r_claim?.toFixed(2) || 0}%</span>
+                                            <span>{state.r_claim > 0 ? state.r_claim.toFixed(4) : 0}%</span>
                                         </div>
                                     </div>
                                     <div
@@ -1767,7 +1767,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
-                                            {state?.q_claim?.toFixed(4) || 0}
+                                            {state.q_claim > 0 ? state.q_claim.toFixed(4) : 0}
                                             <span
                                                 className={'text-[#EB2B3E] pl-[8px]'}
                                                 onClick={() => setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:q_claim')}` })}
