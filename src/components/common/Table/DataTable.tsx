@@ -91,7 +91,7 @@ const DataGrid = ({ columns, data, total = 0, skip = 0, limit = 10, onChangePage
 
     return (
         <>
-            <div ref={table} className="overflow-auto">
+            <div ref={table} className="overflow-auto scroll-table">
                 <table className="w-full" {...getTableProps()}>
                     <thead className="">
                         {headerGroups.map((headerGroup) => (

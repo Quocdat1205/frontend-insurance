@@ -60,10 +60,10 @@ const Assets = () => {
             <SwiperSlide>
                 <CardShadow className="p-6 flex flex-col space-y-6 w-full">
                     <div className="flex items-center space-x-3">
-                        <img width="36" height="36" src="/images/icons/ic_bitcoin.png" />
-                        <span className="font-semibold text-xl">Bitcoin</span>
+                        <img width="48" height="48" src="/images/icons/ic_bitcoin.png" />
+                        <span className="font-medium text-xl">Bitcoin</span>
                     </div>
-                    <Button onClick={() => onBuy('bitcoin')} variants="outlined" className="py-3">
+                    <Button onClick={() => onBuy('bitcoin')} variants="outlined" className="py-3 font-medium text-sm sm:text-base">
                         {t('home:landing:buy_covered')}
                     </Button>
                 </CardShadow>
@@ -71,10 +71,10 @@ const Assets = () => {
             <SwiperSlide>
                 <CardShadow className="p-6 flex flex-col space-y-6 w-full ">
                     <div className="flex items-center space-x-3">
-                        <img width="36" height="36" src="/images/icons/ic_ethereum.png" />
-                        <span className="font-semibold text-xl">Ethereum</span>
+                        <img width="48" height="48" src="/images/icons/ic_ethereum.png" />
+                        <span className="font-medium text-xl">Ethereum</span>
                     </div>
-                    <Button onClick={() => onBuy('ethereum')} variants="outlined" className="py-3">
+                    <Button onClick={() => onBuy('ethereum')} variants="outlined" className="py-3 font-medium text-sm sm:text-base">
                         {t('home:landing:buy_covered')}
                     </Button>
                 </CardShadow>
@@ -82,10 +82,10 @@ const Assets = () => {
             <SwiperSlide>
                 <CardShadow className="p-6 flex flex-col space-y-6 w-full">
                     <div className="flex items-center space-x-3">
-                        <img width="36" height="36" src="/images/icons/ic_binance.png" />
-                        <span className="font-semibold text-xl">Binance Coin</span>
+                        <img width="48" height="48" src="/images/icons/ic_binance.png" />
+                        <span className="font-medium text-xl">Binance Coin</span>
                     </div>
-                    <Button onClick={() => onBuy('binance')} variants="outlined" className="py-3">
+                    <Button onClick={() => onBuy('binance')} variants="outlined" className="py-3 font-medium text-sm sm:text-base">
                         {t('home:landing:buy_covered')}
                     </Button>
                 </CardShadow>

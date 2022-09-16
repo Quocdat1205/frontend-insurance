@@ -30,8 +30,8 @@ const Modal = ({
 }: Modal) => {
     const wrapperRef = useRef<any>(null)
     const container = useRef<any>(null)
-    const [loading, setLoading] = useState<boolean>(false)
     const timer = useRef<any>(null)
+    const [mount, setMount] = useState<boolean>(false)
 
     const handleOutside = () => {
         if (isVisible && onBackdropCb) onBackdropCb()
@@ -44,9 +44,9 @@ const Modal = ({
         clearTimeout(timer.current)
         timer.current = setTimeout(
             () => {
-                setLoading(isVisible)
+                setMount(isVisible)
             },
-            isVisible ? 0 : 500,
+            isVisible ? 10 : 100,
         )
         const hidding = document.body.classList.contains('overflow-hidden')
         if (hidding) return
@@ -59,6 +59,8 @@ const Modal = ({
             if (!hidding) document.body.classList.remove('overflow-hidden')
         }
     }, [isVisible, isMobile])
+
+    if (!isVisible && !mount) return null
 
     return (
         <Portal portalId={portalId} isVisible={isVisible}>
@@ -76,34 +78,32 @@ const Modal = ({
             >
                 <div
                     className={classnames('h-full relative ease-in transition-all flex duration-300', {
-                        'translate-y-full': !isVisible,
-                        'translate-y-0': isVisible,
+                        'translate-y-full': !isVisible || !mount,
+                        'translate-y-0': mount,
                         'flex flex-col justify-end': isMobile,
                     })}
                 >
-                    {loading && (
-                        <div
-                            ref={wrapperRef}
-                            className={classnames(
-                                'w-full absolute bg-white',
-                                { 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl': !isMobile },
-                                className,
-                            )}
-                        >
-                            <div className={`py-8 px-6 ${wrapClassName}`}>
-                                <>
-                                    {customHeader ? (
-                                        customHeader()
-                                    ) : (
-                                        <div className="flex items-center justify-end pb-6 sm:pb-2">
-                                            <X onClick={handleOutside} size={20} className="cursor-pointer" />
-                                        </div>
-                                    )}
-                                    {children}
-                                </>
-                            </div>
+                    <div
+                        ref={wrapperRef}
+                        className={classnames(
+                            'w-full absolute bg-white',
+                            { 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl': !isMobile },
+                            className,
+                        )}
+                    >
+                        <div className={`py-8 px-6 ${wrapClassName}`}>
+                            <>
+                                {customHeader ? (
+                                    customHeader()
+                                ) : (
+                                    <div className="flex items-center justify-end pb-6 sm:pb-2">
+                                        <X onClick={handleOutside} size={20} className="cursor-pointer" />
+                                    </div>
+                                )}
+                                {children}
+                            </>
                         </div>
-                    )}
+                    </div>
                 </div>
             </div>
         </Portal>
