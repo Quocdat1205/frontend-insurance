@@ -2000,7 +2000,7 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
             className={'md:max-w-[424px]'}
             containerClassName="z-[10000]"
         >
-            <div className="text-xl font-medium mb-8 text-center">{t('insurance:buy:detailed_terminology')}</div>
+            <div className="text-xl font-medium mb-8 text-left">{t('insurance:buy:detailed_terminology')}</div>
             <div className="flex flex-col text-sm divide-solid divide-y divide-divider max-h-[70vh] overflow-auto -mx-6 px-6">
                 {terms.map((item: any, index: number) => (
                     <div key={index} className="py-3 flex items-center">
