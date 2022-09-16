@@ -85,6 +85,7 @@
         "connect_wallet": "Connect wallet to start"
     },
     "guild": {
+        "title": "Guide",
         "step_title_1": "Type and quantity of assets",
         "step_title_2": "Select P-claim quickly by dragging the price point vertically on the chart. or enter the P-claim desired",
         "step_title_3": "Select Period",
