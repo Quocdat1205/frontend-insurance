@@ -6,8 +6,16 @@
         "claim_waiting": "Chờ chi trả",
         "expired": "Đã hết hạn",
         "claimed": "Đã chi trả",
-        "refunded": "Đã chuyển nhượng",
-        "liquidated": "Bị Thanh lý"
+        "refunded": "Đã hoàn trả",
+        "liquidated": "Bị Thanh lý",
+        "explain": {
+            "available": "Đã kích hoạt hợp đồng bảo hiểm (HĐBH), nhưng chưa chạm các mốc sự kiện khác",
+            "claim_waiting": "P-Market chạm P-Claim, HĐBH chờ chi trả (Q-Claim) tại T-End",
+            "claimed": "HĐBH đã nhận chi trả (Q-Claim) tại T-End",
+            "refunded": "P-Market nằm giữa P-Refund và P-Claim, HĐBH được hoàn trả Margin",
+            "liquidated": "P-Market chạm P-Expired, HĐBH bị chấm dứt ngay tại thời điểm chạm",
+            "expired": "Tại T-End, HĐBH không ghi nhận các trạng thái chờ chi trả, đã chi trả, đã hoàn trả, và thanh lý"
+        }
     },
     "header": {
         "home": "Trang chủ",
@@ -27,6 +35,7 @@
     "undo": "Hoàn tác",
     "notification": {
         "title": "Thông báo",
+        "no_notice": "Bạn hiện không có thông báo nào.",
         "notice_message": "Hợp đồng bảo hiểm <span class='text-red'>{{id}}</span> {{status}}",
         "status": {
             "expired": "Đã hết hạn",

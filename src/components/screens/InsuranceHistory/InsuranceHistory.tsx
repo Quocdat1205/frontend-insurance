@@ -1,5 +1,5 @@
 import CardShadow from 'components/common/Card/CardShadow'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Assets from 'components/screens/HomePage/Assets'
 import InsuranceContract from 'components/screens/InsuranceHistory/InsuranceContract'
 import Statistics from 'components/screens/InsuranceHistory/Statistics'
@@ -11,10 +11,13 @@ import { isMobile } from 'react-device-detect'
 import { API_CHECK_GUIDE_LINE, API_UPDATE_GUIDE_LINE } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import dynamic from 'next/dynamic'
-import { createSelector } from 'reselect'
 import { RootStore, useAppSelector } from 'redux/store'
-import { UnitConfig } from 'types/types'
 import { getUnit } from 'utils/utils'
+import { stateInsurance } from 'utils/constants'
+import { StateInsurance } from 'types/types'
+import styled from 'styled-components'
+import colors from 'styles/colors'
+import classnames from 'classnames'
 
 const Guideline = dynamic(() => import('components/screens/InsuranceHistory/Guideline'), {
     ssr: false,
@@ -156,6 +159,7 @@ const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGui
 }
 
 const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
+    const [tab, setTab] = useState<number>(0)
     const terms = [
         {
             title: 'Q-Covered',
@@ -202,9 +206,27 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
             description: t('insurance:terminology:t_expired'),
         },
     ]
+
+    const optionsState = useMemo(() => {
+        return Object.keys(stateInsurance).reduce((acc: any[], key: string) => {
+            const _key = String(key).toLowerCase()
+            acc.push({ title: t(`common:status:${_key}`), description: t(`common:status:explain:${_key}`) })
+            return acc
+        }, [])
+    }, [])
+
     return (
         <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'xl:max-w-[424px]'} containerClassName="z-[100]">
-            <div className="text-xl font-medium mb-8 text-center">{t('insurance_history:detailed_terminology')}</div>
+            <div className="text-xl font-medium mb-6 text-center">{t('insurance_history:detailed_terminology')}</div>
+
+            <Tabs tab={tab} className="mb-6 text-sm">
+                <TabItem active={tab === 0} onClick={() => setTab(0)}>
+                    Thuật ngữ bảo hiểm
+                </TabItem>
+                <TabItem active={tab === 1} onClick={() => setTab(1)}>
+                    Trạng thái hợp đồng
+                </TabItem>
+            </Tabs>
             <div className="flex flex-col text-sm divide-solid divide-y divide-divider max-h-[70vh] overflow-auto -mx-6 px-6">
                 {terms.map((item: any, index: number) => (
                     <div key={index} className="py-3 flex items-center">
@@ -216,5 +238,24 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
         </Modal>
     )
 }
+
+const Tabs = styled.div.attrs({
+    className: 'mt-6 text-sm flex items-center justify-between h-11 relative',
+})<any>`
+    &:after {
+        content: '';
+        position: absolute;
+        height: 2px;
+        background-color: ${() => colors.red.red};
+        transform: ${({ tab }) => `translate(${tab * 100}%,0)`};
+        width: calc(100% / 2);
+        transition: all 0.2s;
+        bottom: -1px;
+    }
+`
+
+const TabItem = styled.div.attrs<any>(({ active }) => ({
+    className: classnames('px-4 py-3 font-medium whitespace-nowrap border-b-[2px] border-divider', { 'text-red': active }),
+}))<any>``
 
 export default InsuranceHistory

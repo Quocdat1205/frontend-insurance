@@ -85,7 +85,7 @@ const Guideline = ({ start, setStart, seen }: Guideline) => {
                 selector: '[data-tut="tour_status"]',
                 content: (props: any) => (
                     <Content
-                        title={t('insurance_history:guidelines:title')}
+                        title={t('insurance_history:status')}
                         content={'Bấm để xem lại các bước hướng dẫn, hoặc tìm hiểu thêm về bảng chú giải thuật ngữ nếu gặp khó khăn trong quá trình sử dụng.'}
                         {...props}
                         top
