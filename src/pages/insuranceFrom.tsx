@@ -85,18 +85,13 @@ export const InsuranceFrom = () => {
         name: '',
         symbol: '',
         type: '',
+        disable: false,
     })
     const [state, setState] = useState({
         timeframe: '',
         margin: 0,
         percent_margin: 0,
-        symbol: {
-            icon: '',
-            id: '',
-            name: '',
-            symbol: '',
-            type: '',
-        },
+        symbol: selectCoin || {},
         period: 2,
         p_claim: 0,
         q_claim: 0,
@@ -206,6 +201,7 @@ export const InsuranceFrom = () => {
         try {
             const result = wallet.getBalance()
             result.then((balance: number) => {
+                console.log(balance, wallet)
                 const tmp = balance / state.p_market
                 console.log('connect success')
                 setUserBalance(tmp)
@@ -214,6 +210,7 @@ export const InsuranceFrom = () => {
             setLoadings(true)
             if (stone.setting.assetsToken.length > 0) {
                 let list: ICoin[] = []
+
                 stone.setting.assetsToken.map(async (token: any) => {
                     list.push({
                         id: token._id,
@@ -221,6 +218,7 @@ export const InsuranceFrom = () => {
                         icon: token.attachment,
                         symbol: `${token.symbol}USDT`,
                         type: token.symbol,
+                        disable: !token.isActive,
                     })
                 })
                 setListCoin(list)
@@ -240,6 +238,7 @@ export const InsuranceFrom = () => {
                     name: res.symbol.name,
                     symbol: res.symbol.symbol,
                     type: res.symbol.type,
+                    disable: res.symbol.disable,
                 })
                 setState({
                     ...state,
@@ -255,6 +254,7 @@ export const InsuranceFrom = () => {
                         name: res.symbol.name,
                         symbol: res.symbol.symbol,
                         type: res.symbol.type,
+                        disable: res.symbol.disable,
                     },
                 })
 
@@ -1357,8 +1357,6 @@ export const InsuranceFrom = () => {
             </>
         ) : (
             <>
-                <Guide start={showGuide} setStart={setShowGuide} />
-
                 {!wallet.account ? (
                     <>
                         {showDetails && (
@@ -1370,21 +1368,21 @@ export const InsuranceFrom = () => {
                             >
                                 <div className={` bg-white text-sm  mx-auto `}>
                                     <div
-                                        className="mt-[32px] mx-[24px] flex flex-row-reverse"
+                                        className="mt-[32px] flex flex-row-reverse"
                                         onClick={() => {
                                             setShowDetails(false)
                                         }}
                                     >
                                         <XMark></XMark>
                                     </div>
-                                    <div className="flex flex-col justify-center items-center my-[24px]">
-                                        <div className="font-medium text-xl">{t('insurance:buy:detailed_terminology')}</div>
-                                        <div className="mt-[32px] divide-y divide-[#E5E7E8] text-[#22313F]">
+                                    <div className="flex flex-col justify-center  my-[24px] ">
+                                        <div className="font-semibold text-xl">{t('insurance:buy:detailed_terminology')}</div>
+                                        <div className="mt-[32px] divide-y divide-[#E5E7E8] text-[#22313F] snap-y">
                                             {listTerminology.map((item, key) => {
                                                 return (
-                                                    <div key={key} className="w-[380px] flex flex-row justify-between items-center">
-                                                        <span className="py-[24px]">{item.name}</span>
-                                                        <span className="text-left w-[160px] py-[12px]">{item.description}</span>
+                                                    <div key={key} className="w-[380px] flex flex-row items-center snap-center">
+                                                        <span className="py-[24px] min-w-[80px]">{item.name}</span>
+                                                        <span className="text-left ml-[29px] w-max  py-[12px]">{item.description}</span>
                                                     </div>
                                                 )
                                             })}
@@ -1403,7 +1401,7 @@ export const InsuranceFrom = () => {
                         </div>
                         <div className="flex flex-col items-center pt-[16px] text-[#22313F]">
                             <span className="text-xl font-semibold ">Nami Insurance</span>
-                            <span>
+                            <span className="text-center">
                                 {t('insurance:mobile_login:sub_title1')} - {t('insurance:mobile_login:sub_title2')}
                             </span>
                         </div>
@@ -1458,6 +1456,8 @@ export const InsuranceFrom = () => {
                     </>
                 ) : (
                     <>
+                        {index == 1 && <Guide start={showGuide} setStart={setShowGuide} />}
+
                         {showChangeUnit.isShow && (
                             <Modal
                                 portalId="modal"
@@ -2003,6 +2003,7 @@ export const fetchApiNami = async (symbol: string, from: string, to: string, res
 export const getPrice = async (symbol: string, state: any, setState: any) => {
     try {
         const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${symbol}`)
+
         if (data) {
             if (data.data[0]) {
                 return setState({ ...state, p_market: data.data[0]?.p })
