@@ -13,9 +13,19 @@ class USDT_Contract {
 
     async balanceOf(address: string): Promise<number> {
         const value = await this.contract.balanceOf(address)
-        console.log(value)
+        console.log(this.contract)
 
         return weiToEther(value)
+    }
+
+    async allowance(ownerAddress: string, targetAddress: string): Promise<BigNumber> {
+        return await this.contract.allowance(ownerAddress, targetAddress)
+    }
+
+    async approve(targetAddress: string, value: BigNumber): Promise<void> {
+        const signer = this.provider.getSigner()
+        const tx = await this.contract.connect(signer).approve(targetAddress, value)
+        await tx.wait()
     }
 }
 
