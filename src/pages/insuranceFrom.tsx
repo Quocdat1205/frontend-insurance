@@ -17,12 +17,13 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
 import { Suspense } from 'react'
-import store from 'redux/store'
+import store, { RootStore, useAppSelector } from 'redux/store'
 import Config from 'config/config'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
 import Modal from 'components/common/Modal/Modal'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
+import { formatNumber, getUnit } from 'utils/utils'
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
@@ -39,6 +40,7 @@ export const InsuranceFrom = () => {
     const { width } = useWindowSize()
     const isMobile = width && width <= screens.drawer
 
+    const unitConfig = useAppSelector((state: RootStore) => getUnit(state, 'USDT'))
     const [percentInsurance, setPercentInsurance] = useState<number>(0)
     const [selectTime, setSelectTime] = useState<string>('ALL')
     const [isDrop, setDrop] = useState(false)
@@ -123,7 +125,7 @@ export const InsuranceFrom = () => {
     ]
 
     const Leverage = (p_market: number, p_stop: number) => {
-        const leverage = Number((p_market / Math.abs(p_market - p_stop)).toFixed(2))
+        const leverage = Number(formatNumber(p_market / Math.abs(p_market - p_stop), 2))
         return leverage < 1 ? 1 : leverage
     }
 
@@ -131,10 +133,10 @@ export const InsuranceFrom = () => {
         const diffStopfutures = 0 / 100
         const ratio_min_profit = Math.abs(p_claim - p_market) / p_market / 2
         if (p_claim > p_market) {
-            const p_stop = Number(((p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2))
+            const p_stop = Number(formatNumber((p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100, 2))
             return Math.abs(p_stop) / 100
         } else {
-            const p_stop = Number(((p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2))
+            const p_stop = Number(formatNumber((p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100, 2))
             return Math.abs(p_stop) / 100
         }
     }
@@ -242,6 +244,7 @@ export const InsuranceFrom = () => {
                 if (res.index) {
                     setIndex(res.index)
                 }
+                validatePclaim(res.p_claim)
             } else {
                 const defaultToken = {
                     icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
@@ -439,7 +442,7 @@ export const InsuranceFrom = () => {
         }
     }, [state.p_claim])
 
-    console.log(wallet)
+    console.log(state)
 
     return !loadings ? (
         !isMobile ? (
@@ -637,7 +640,7 @@ export const InsuranceFrom = () => {
                                                 type={'number'}
                                                 inputName={'Loại tài sản và số lượng tài sản'}
                                                 idInput={'iCoin'}
-                                                value={state.q_covered ? Number(Number(state?.q_covered).toFixed(8)) : 0}
+                                                value={state.q_covered ? state?.q_covered : 0}
                                                 onChange={(a: any) => {
                                                     setState({
                                                         ...state,
@@ -766,7 +769,7 @@ export const InsuranceFrom = () => {
                                                     type={'number'}
                                                     inputName={'P-Claim'}
                                                     idInput={''}
-                                                    value={state.margin > 0 ? Number(state?.margin).toFixed(8) : 0}
+                                                    value={state.margin > 0 ? state?.margin : 0}
                                                     onChange={(a: any) => {
                                                         setState({ ...state, margin: Number(a.target.value.replace(/^00+/, '0')), percent_margin: 0 })
                                                     }}
@@ -854,7 +857,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 2,
-                                                    margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -867,7 +870,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 5,
-                                                    margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -880,7 +883,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 7,
-                                                    margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -893,7 +896,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 10,
-                                                    margin: Number(((state.percent_margin * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -1063,7 +1066,7 @@ export const InsuranceFrom = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold'}>
-                                    <span>{state.r_claim > 0 ? Number(state?.r_claim).toFixed(2) : 0}%</span>
+                                    <span>{state.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span>
                                 </div>
                             </div>
                             <div
@@ -1079,7 +1082,7 @@ export const InsuranceFrom = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold flex flex-row justify-center items-center hover:cursor-pointer relative max-h-[24px]'}>
-                                    {state.q_claim > 0 ? Number(state?.q_claim).toFixed(2) : 0}
+                                    {state.q_claim > 0 ? Number(formatNumber(state?.q_claim, 2)) : 0}
                                     <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
                                     <div className="relative">
                                         <Popover className="relative">
@@ -1130,7 +1133,7 @@ export const InsuranceFrom = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold flex flex-row items-center justify-center hover:cursor-pointer relative max-h-[24px]'}>
-                                    {state.margin > 0 ? Number(state?.margin).toFixed(2) : 0}
+                                    {state.margin > 0 ? Number(formatNumber(state?.margin, 2)) : 0}
                                     <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
                                     <div className="relative">
                                         <Popover className="relative">
@@ -1772,7 +1775,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold'}>
-                                            <span>{state.r_claim > 0 ? Number(state.r_claim) : 0}%</span>
+                                            <span>{state.r_claim > 0 ? Number(formatNumber(state.r_claim, 2)) : 0}%</span>
                                         </div>
                                     </div>
                                     <div
@@ -1788,7 +1791,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
-                                            {state.q_claim > 0 ? Number(state.q_claim) : 0}
+                                            {state.q_claim > 0 ? Number(formatNumber(state.q_claim, 2)) : 0}
                                             <span
                                                 className={'text-[#EB2B3E] pl-[8px]'}
                                                 onClick={() => setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:q_claim')}` })}
@@ -1810,7 +1813,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                            {state.margin > 0 ? Number(state.margin) : 0}
+                                            {state.margin > 0 ? Number(formatNumber(state.margin, 2)) : 0}
 
                                             <span
                                                 className={'text-[#EB2B3E] pl-[8px]'}

@@ -3,6 +3,9 @@ import isNil from 'lodash/isNil'
 import numeral from 'numeral'
 import Config from 'config/config'
 import GhostContentAPI from '@tryghost/content-api'
+import { PairConfig, UnitConfig } from 'types/types'
+import { createSelector } from 'reselect'
+import { RootStore } from 'redux/store'
 
 export const getS3Url = (url: string) => Config.env.CDN + url
 
@@ -104,3 +107,13 @@ export const timeMessage = (previous: any) => {
 
     return date.getHours() + ':' + tempMinutes + ' ' + date.getDate() + '/' + (date.getMonth() + 1)
 }
+
+export const getDecimalPrice = (config: PairConfig) => {
+    const decimalScalePrice = config?.filters.find((rs: any) => rs.filterType === 'PRICE_FILTER') ?? 1
+    return +countDecimals(decimalScalePrice?.tickSize)
+}
+
+
+export const getUnit = createSelector([(state: RootStore) => state.setting.unitConfig, (unitConfig, params) => params], (unitConfig, params) => {
+    return unitConfig.find((rs: UnitConfig) => rs?.assetCode === params)
+})

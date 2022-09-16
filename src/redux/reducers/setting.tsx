@@ -4,6 +4,8 @@ import { Action } from 'types/types'
 const initialState = {
     loading_account: true,
     assetsToken: [],
+    pairConfigs: [],
+    unitConfig: [],
 }
 const setting = (state = initialState, action: Action) => {
     switch (action.type) {
@@ -16,6 +18,16 @@ const setting = (state = initialState, action: Action) => {
             return {
                 ...state,
                 assetsToken: action.payload,
+            }
+        case types.SET_CONFIG_ASSET:
+            return {
+                ...state,
+                pairConfigs: action.payload,
+            }
+        case types.SET_CONFIG_UNIT:
+            return {
+                ...state,
+                unitConfig: action.payload,
             }
         default:
             return state

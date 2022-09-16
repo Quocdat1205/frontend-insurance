@@ -12,9 +12,13 @@
     "insurance_contract": "Insurance Contract",
     "guidelines": {
         "title": "Guidelines",
-        "step_title_1": "View my Insurance Contract Stats",
-        "step_title_2": "View Insurance Contract details",
+        "step_title_1": "Individual insurance contract stats",
+        "step_content_1": "Select a timeframe to display aggregated insurance contract (IC) data for that period.",
+        "step_title_2": "Insurance contract details",
+        "step_content_2": "Please click here to view and monitor your IC.",
         "step_title_3": "Press 'tutorial' if you are having trouble using Nami Insurance.",
+        "step_content_3": "HashID là mã nhận dạng duy nhất cho mỗi HĐBH. Sao chép mã và gửi bộ phận CSKH của Nami khi cần hỗ trợ.",
+        "step_content_5": "Bấm để xem lại các bước hướng dẫn, hoặc tìm hiểu thêm về bảng chú giải thuật ngữ nếu gặp khó khăn trong quá trình sử dụng.",
         "got_it": "Got it"
     }
 }

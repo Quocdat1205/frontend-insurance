@@ -1,15 +1,15 @@
 import Spinner from 'components/common/Loader/Spinner'
 import Modal from 'components/common/Modal/Modal'
-import { AddCircleIcon, AlarmIcon, FilterIcon } from 'components/common/Svg/SvgIcon'
+import { AddCircleIcon, AlarmIcon, CopyIcon, FilterIcon } from 'components/common/Svg/SvgIcon'
 import Config from 'config/config'
 import { useTranslation } from 'next-i18next'
 import Link from 'next/link'
 import React, { useMemo, useRef, useState } from 'react'
-import { X } from 'react-feather'
 import styled from 'styled-components'
 import { formatCurrency, formatTime } from 'utils/utils'
 import InsuranceFilterMobile from './InsuranceFilterMobile'
 import { stateInsurance } from 'utils/constants'
+import { UnitConfig } from 'types/types'
 
 interface InsuranceContractMobile {
     filter: any
@@ -33,6 +33,7 @@ interface InsuranceContractMobile {
     loading?: boolean
     onBuyInsurance: () => void
     showGuide: boolean
+    unitConfig: UnitConfig
 }
 
 const InsuranceContractMobile = ({
@@ -46,6 +47,7 @@ const InsuranceContractMobile = ({
     loading,
     onBuyInsurance,
     showGuide,
+    unitConfig,
     ...props
 }: InsuranceContractMobile) => {
     const [showFilter, setShowFilter] = useState(false)
@@ -95,11 +97,14 @@ const InsuranceContractMobile = ({
                                     <img className="rounded-[50%]" src="/images/icons/ic_binance.png" width={32} height={32} />
                                     <div className="flex flex-col space-y-1">
                                         <div className="font-medium">Binance Coin</div>
-                                        <div className="text-xs text-txtSecondary">22160725070001</div>
+                                        <div data-tut="tour_hashID" className="text-xs text-txtSecondary flex items-center space-x-1">
+                                            <span>22160725070001</span>
+                                            <CopyIcon />
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div>{renderStatus({ state: stateInsurance.AVAILABLE }, t)}</div>
+                                <div data-tut="tour_status">{renderStatus({ state: stateInsurance.AVAILABLE }, t)}</div>
                             </div>
                             <div className="flex items-center justify-center space-x-2 bg-pink-1 rounded-md">
                                 <AlarmIcon />
@@ -146,11 +151,20 @@ const InsuranceContractMobile = ({
                                         <img className="rounded-[50%]" src={asset?.attachment} width={32} height={32} />
                                         <div className="flex flex-col space-y-1">
                                             <div className="font-medium">{asset?.name}</div>
-                                            <div className="text-xs text-txtSecondary">{item?._id}</div>
+                                            <div
+                                                data-tut={'tour_hashID'}
+                                                className="text-xs text-txtSecondary flex items-center space-x-1"
+                                                onClick={() => navigator.clipboard.writeText(item?._id)}
+                                            >
+                                                <span>{item?._id}</span>
+                                                <CopyIcon />
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div onClick={() => onShowStatusModal(item)}> {renderStatus(item, t)}</div>
+                                    <div data-tut="tour_status" onClick={() => onShowStatusModal(item)}>
+                                        {renderStatus(item, t)}
+                                    </div>
                                 </div>
                                 <div className="flex items-center justify-center space-x-2 bg-pink-1 rounded-md">
                                     <AlarmIcon />
@@ -173,17 +187,23 @@ const InsuranceContractMobile = ({
                                     </Item>
                                     <Item>
                                         <div className="text-txtSecondary text-xs">P-Claim</div>
-                                        <span className="text-xs font-semibold">{formatCurrency(item?.p_claim, 4, 1e4)} USDT</span>
+                                        <span className="text-xs font-semibold">
+                                            {formatCurrency(item?.p_claim, item?.decimalPrice, 1e4)} {unitConfig?.assetCode}
+                                        </span>
                                     </Item>
                                     <Item className="h-[1px] border-b border-divider my-2"></Item>
                                     <Item className="h-[1px] border-b border-divider my-2"></Item>
                                     <Item>
                                         <div className="text-txtSecondary text-xs">Margin</div>
-                                        <span className="text-xs font-semibold">{formatCurrency(item?.margin, 4, 1e4)} USDT</span>
+                                        <span className="text-xs font-semibold">
+                                            {formatCurrency(item?.margin, item?.decimalPrice, 1e4)} {unitConfig?.assetCode}
+                                        </span>
                                     </Item>
                                     <Item>
                                         <div className="text-txtSecondary text-xs">Q-Claim</div>
-                                        <span className="text-xs font-semibold">{formatCurrency(item?.q_claim, 4, 1e4)} USDT</span>
+                                        <span className="text-xs font-semibold">
+                                            {formatCurrency(item?.q_claim, unitConfig?.assetDigit, 1e4)} {unitConfig?.assetCode}
+                                        </span>
                                     </Item>
                                 </div>
                             </div>
