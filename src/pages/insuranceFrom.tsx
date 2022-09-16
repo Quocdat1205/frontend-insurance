@@ -637,7 +637,7 @@ export const InsuranceFrom = () => {
                                                 type={'number'}
                                                 inputName={'Loại tài sản và số lượng tài sản'}
                                                 idInput={'iCoin'}
-                                                value={state.q_covered ? Number(Number(state.q_covered).toFixed(8)) : 0}
+                                                value={state.q_covered ? Number(Number(state?.q_covered).toFixed(8)) : 0}
                                                 onChange={(a: any) => {
                                                     setState({
                                                         ...state,
@@ -766,7 +766,7 @@ export const InsuranceFrom = () => {
                                                     type={'number'}
                                                     inputName={'P-Claim'}
                                                     idInput={''}
-                                                    value={state.margin > 0 ? Number(state.margin).toFixed(8) : 0}
+                                                    value={state.margin > 0 ? Number(state?.margin).toFixed(8) : 0}
                                                     onChange={(a: any) => {
                                                         setState({ ...state, margin: Number(a.target.value.replace(/^00+/, '0')), percent_margin: 0 })
                                                     }}
@@ -1063,7 +1063,7 @@ export const InsuranceFrom = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold'}>
-                                    <span>{state.r_claim > 0 ? Number(state.r_claim).toFixed(2) : 0}%</span>
+                                    <span>{state.r_claim > 0 ? Number(state?.r_claim).toFixed(2) : 0}%</span>
                                 </div>
                             </div>
                             <div
@@ -1079,7 +1079,7 @@ export const InsuranceFrom = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold flex flex-row justify-center items-center hover:cursor-pointer relative max-h-[24px]'}>
-                                    {state.q_claim > 0 ? Number(state.q_claim).toFixed(2) : 0}
+                                    {state.q_claim > 0 ? Number(state?.q_claim).toFixed(2) : 0}
                                     <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
                                     <div className="relative">
                                         <Popover className="relative">
@@ -1130,7 +1130,7 @@ export const InsuranceFrom = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold flex flex-row items-center justify-center hover:cursor-pointer relative max-h-[24px]'}>
-                                    {state.margin > 0 ? Number(state.margin).toFixed(2) : 0}
+                                    {state.margin > 0 ? Number(state?.margin).toFixed(2) : 0}
                                     <span className={'text-[#EB2B3E] pl-[8px]'}>{unitMoney}</span>
                                     <div className="relative">
                                         <Popover className="relative">
