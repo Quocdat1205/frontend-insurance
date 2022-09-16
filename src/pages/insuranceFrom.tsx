@@ -294,6 +294,25 @@ export const InsuranceFrom = () => {
     }, [state.q_covered])
 
     useEffect(() => {
+        if (state) {
+            const data = localStorage.getItem('buy_covered_state')
+            if (data) {
+                const res = JSON.parse(data)
+                const newData = {
+                    ...res,
+                    percent_margin: state.percent_margin,
+                    period: state.period,
+                    p_claim: state.p_claim,
+                    q_claim: state.q_claim,
+                    r_claim: state.r_claim,
+                    q_covered: state.q_covered,
+                }
+                localStorage.setItem('buy_covered_state', JSON.stringify(newData))
+            }
+        }
+    }, [state])
+
+    useEffect(() => {
         const data = localStorage.getItem('buy_covered_state')
         if (data) {
             const res = JSON.parse(data)
@@ -749,7 +768,7 @@ export const InsuranceFrom = () => {
                                                     idInput={''}
                                                     value={state.margin > 0 ? Number(state.margin).toFixed(8) : 0}
                                                     onChange={(a: any) => {
-                                                        setState({ ...state, margin: a.target.value.replace(/^00+/, '0'), percent_margin: 0 })
+                                                        setState({ ...state, margin: Number(a.target.value.replace(/^00+/, '0')), percent_margin: 0 })
                                                     }}
                                                     placeholder={''}
                                                 ></Input>
@@ -962,7 +981,7 @@ export const InsuranceFrom = () => {
                                                     idInput={'iPClaim'}
                                                     value={state.p_claim}
                                                     onChange={(a: any) => {
-                                                        setState({ ...state, p_claim: a.target.value.replace(/^00+/, '0') })
+                                                        setState({ ...state, p_claim: Number(a.target.value.replace(/^00+/, '0')) })
                                                     }}
                                                     placeholder={`${menu[9].name}`}
                                                 ></Input>
@@ -1510,11 +1529,12 @@ export const InsuranceFrom = () => {
                                             className={` text-white pl-[4px] focus-visible:outline-none w-0 border border-1 border-black ${
                                                 openChangeToken && 'opacity-0'
                                             } `}
-                                            placeholder=""
+                                            placeholder="Số tiền?"
+                                            value={state.q_covered > 0 ? Number(state.q_covered) : 'Số tiền?'}
                                             name="name"
                                             id="name"
                                             onChange={(a: any) => {
-                                                setState({ ...state, q_covered: a.target.value.replace(/^00+/, '0') })
+                                                setState({ ...state, q_covered: Number(a.target.value.replace(/^00+/, '0')) })
                                                 setPercentInsurance(0)
                                             }}
                                         ></input>
@@ -1524,19 +1544,20 @@ export const InsuranceFrom = () => {
                                 {tab == 6 && (
                                     <div>
                                         <span>{t('insurance:buy:title_change_margin')}</span>{' '}
-                                        <label className={`${state.q_covered == 0 ? 'text-[#B2B7BC]' : 'text-[#EB2B3E]'} max-w-[245] relative ml-[6xp]`}>
+                                        <label className={`${state.margin == 0 ? 'text-[#B2B7BC]' : 'text-[#EB2B3E]'} max-w-[245] relative ml-[6xp]`}>
                                             {state.margin > 0 ? Number(state.margin) : 'Số tiền?'}
                                             <input
                                                 type="number"
                                                 className={` text-white pl-[4px] focus-visible:outline-none w-0 border border-1 border-black`}
-                                                placeholder=""
+                                                placeholder="Số tiền?"
+                                                value={state.margin > 0 ? Number(state.margin) : 'Số tiền?'}
                                                 name="name"
                                                 id="name"
                                                 onChange={(a: any) => {
                                                     setState({
                                                         ...state,
-                                                        margin: a.target.value,
-                                                        percent_margin: a.target.value / (state.q_covered * state.p_market),
+                                                        margin: Number(a.target.value),
+                                                        percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
                                                     })
                                                 }}
                                             ></input>
@@ -1632,7 +1653,7 @@ export const InsuranceFrom = () => {
                                                 if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
                                                     setState({ ...state, p_claim: 0 })
                                                 } else {
-                                                    setState({ ...state, p_claim: a.target.value.replace(/^0+/, '') })
+                                                    setState({ ...state, p_claim: Number(a.target.value.replace(/^0+/, '')) })
                                                 }
                                             }}
                                             placeholder={`${menu[9].name}`}
@@ -1710,7 +1731,7 @@ export const InsuranceFrom = () => {
                                                         setState({
                                                             ...state,
                                                             percent_margin: item,
-                                                            margin: Number(((item * state.q_covered * state.p_market) / 100).toFixed(2)),
+                                                            margin: Number((item * state.q_covered * state.p_market) / 100),
                                                         })
                                                     }
                                                 >
@@ -1751,7 +1772,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold'}>
-                                            <span>{state.r_claim > 0 ? state.r_claim.toFixed(4) : 0}%</span>
+                                            <span>{state.r_claim > 0 ? Number(state.r_claim) : 0}%</span>
                                         </div>
                                     </div>
                                     <div
@@ -1767,7 +1788,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
-                                            {state.q_claim > 0 ? state.q_claim.toFixed(4) : 0}
+                                            {state.q_claim > 0 ? Number(state.q_claim) : 0}
                                             <span
                                                 className={'text-[#EB2B3E] pl-[8px]'}
                                                 onClick={() => setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:q_claim')}` })}
