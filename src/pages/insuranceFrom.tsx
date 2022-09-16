@@ -23,7 +23,6 @@ import NotificationInsurance from 'components/layout/notifucationInsurance'
 import Modal from 'components/common/Modal/Modal'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
-import { USDTaddress } from 'components/web3/constants/contractAddress'
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
@@ -174,7 +173,6 @@ export const InsuranceFrom = () => {
             }
         }
     }
-
     useEffect(() => {
         try {
             const result = wallet.getBalance()
@@ -244,6 +242,15 @@ export const InsuranceFrom = () => {
                 if (res.index) {
                     setIndex(res.index)
                 }
+            } else {
+                const defaultToken = {
+                    icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
+                    id: '63187ae8c2ad72eac4d0f363',
+                    name: 'Binance',
+                    symbol: 'BNBUSDT',
+                    type: 'BNB',
+                }
+                return localStorage.setItem('buy_covered_state', JSON.stringify({ symbol: { ...defaultToken } }))
             }
         } catch (error) {
             return console.log(error)
@@ -311,7 +318,7 @@ export const InsuranceFrom = () => {
     }, [selectTime, selectCoin])
 
     useEffect(() => {
-        if (selectCoin) {
+        if (selectCoin.symbol != '') {
             getPrice(selectCoin.symbol, state, setState)
             const data = localStorage.getItem('buy_covered_state')
             if (data) {
@@ -333,30 +340,36 @@ export const InsuranceFrom = () => {
             if (selectTime == '1H' || selectTime == '1D') {
                 timeBegin.setDate(timeEnd.getDate() - 10)
                 fetchApiNami(
-                    `${selectCoin?.type}${unitMoney}`,
+                    `${selectCoin.type ? selectCoin.type : defaultToken.type}${unitMoney}`,
                     `${Math.floor(timeBegin.getTime() / 1000)}`,
                     `${Math.ceil(timeEnd.getTime() / 1000)}`,
                     '1m',
                     setDataChart,
-                ).then(() => setLoadings(false))
+                ).then(() => {
+                    return setLoadings(false)
+                })
             } else if (selectTime == '1W') {
                 timeBegin.setDate(timeEnd.getDate() - 10)
                 fetchApiNami(
-                    `${selectCoin?.type}${unitMoney}`,
+                    `${selectCoin.type ? selectCoin.type : defaultToken.type}${unitMoney}`,
                     `${Math.floor(timeBegin.getTime() / 1000)}`,
                     `${Math.ceil(timeEnd.getTime() / 1000)}`,
                     '1h',
                     setDataChart,
-                ).then(() => setLoadings(false))
+                ).then(() => {
+                    return setLoadings(false)
+                })
             } else {
                 timeBegin.setDate(timeEnd.getDate() - 10)
                 fetchApiNami(
-                    `${selectCoin?.type}${unitMoney}`,
+                    `${selectCoin.type ? selectCoin.type : defaultToken.type}${unitMoney}`,
                     `${Math.floor(timeBegin.getTime() / 1000)}`,
                     `${Math.ceil(timeEnd.getTime() / 1000)}`,
                     '1h',
                     setDataChart,
-                ).then(() => setLoadings(false))
+                ).then(() => {
+                    return setLoadings(false)
+                })
             }
         }
     }
