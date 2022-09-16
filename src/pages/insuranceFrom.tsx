@@ -1574,7 +1574,7 @@ export const InsuranceFrom = () => {
                                         ></ChartComponent>
                                     </Suspense>
                                     <svg
-                                        className={`absolute lg:right-[34px] right-[32px] z-50`}
+                                        className={`absolute lg:right-[34px] right-[32px] z-10`}
                                         width="10"
                                         height={500}
                                         viewBox="0 0 2 240"
