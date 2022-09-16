@@ -24,6 +24,7 @@ export type IProps = {
     handelSetActive: any
     setRes: any
     setIndex: any
+    unit: string
 }
 
 export type IBuyInsurance = {
@@ -47,6 +48,7 @@ export const AcceptBuyInsurance = ({
     handelSetActive,
     setRes,
     setIndex,
+    unit,
 }: Partial<IProps>) => {
     const {
         t,
@@ -56,7 +58,6 @@ export const AcceptBuyInsurance = ({
     const router = useRouter()
     const { width } = useWindowSize()
     const isMobile = width && width < screens.drawer
-    const [isUseNain, setIsUseNain] = useState(false)
 
     useEffect(() => {
         fetch()
@@ -113,13 +114,14 @@ export const AcceptBuyInsurance = ({
                 const dataPost = {
                     buyer: wallet?.account as string,
                     asset: state.symbol.type,
-                    margin: formatPriceToWeiValue(state.margin),
-                    q_covered: formatPriceToWeiValue(state.q_covered),
-                    p_market: formatPriceToWeiValue(data.data[0].p),
-                    p_claim: formatPriceToWeiValue(state.p_claim),
+                    margin: formatPriceToWeiValue(Number(state.margin)),
+                    q_covered: formatPriceToWeiValue(Number(state.q_covered)),
+                    p_market: formatPriceToWeiValue(Number(data.data[0].p)),
+                    p_claim: formatPriceToWeiValue(Number(state.p_claim)),
                     period: state.period,
-                    isUseNain: checkUpgrade,
+                    isUseNain: checkUpgrade && checkUpgrade,
                 }
+                console.log(dataPost)
 
                 const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
                     dataPost.buyer,
@@ -152,6 +154,8 @@ export const AcceptBuyInsurance = ({
                     period: state.period + 2,
                     isUseNain: checkUpgrade,
                 }
+                console.log(dataPost)
+
                 const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
                     dataPost.buyer,
                     dataPost.asset,
@@ -168,6 +172,8 @@ export const AcceptBuyInsurance = ({
                 const id_sc = await buy.wait()
 
                 if (buy && id_sc.events[0].args[0]) {
+                    console.log(buy)
+
                     handlePostInsurance(buy, dataPost, state, Number(id_sc.events[0].args[0]))
                 }
             }
@@ -184,11 +190,12 @@ export const AcceptBuyInsurance = ({
                     transaction_hash: props.hash,
                     id_sc: _id,
                     asset_covered: dataPost.asset,
-                    asset_refund: 'USDT',
+                    asset_refund: dataPost.unit,
                     margin: state.margin,
                     q_covered: Number(state.q_covered),
                     p_claim: Number(state.p_claim),
                     period: state.period,
+                    isUseNain: props.isUseNain,
                 }
                 handelSetActive(true)
                 await buyInsurance(data).then((res) => {
@@ -216,7 +223,7 @@ export const AcceptBuyInsurance = ({
                         <CheckCircle />
                         <span className={'font-semibold text-[#22313F] px-[4px]'}>
                             {`${t('insurance:buy:saved')} `}
-                            <span className={'text-[#EB2B3E]'}>1,000 USDT</span> {t('insurance:buy:sub_saved')}
+                            <span className={'text-[#EB2B3E]'}>1,000 {unit}</span> {t('insurance:buy:sub_saved')}
                         </span>
                     </div>
                 </div>
@@ -236,7 +243,9 @@ export const AcceptBuyInsurance = ({
                                 </div>
                             </div>
                             <div className={'font-semibold'}>
-                                <span className={`${checkUpgrade ? 'line-through text-[#808890] text-xs pr-[8px]' : 'pr-[8px]'}`}>{state.r_claim} %</span>
+                                <span className={`${checkUpgrade ? 'line-through text-[#808890] text-xs pr-[8px]' : 'pr-[8px]'}`}>
+                                    {state.r_claim.toFixed(2)} %
+                                </span>
                                 <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>
                                     {((state.q_claim + (state.q_claim * 5) / 100) / state.margin).toFixed(2)} %
                                 </span>
@@ -251,11 +260,13 @@ export const AcceptBuyInsurance = ({
                                 </div>
                             </div>
                             <div className={'font-semibold '}>
-                                <span className={`${checkUpgrade ? 'line-through text-[#808890] pr-[8px] text-xs' : 'pr-[8px]'}`}>{state.q_claim}</span>{' '}
+                                <span className={`${checkUpgrade ? 'line-through text-[#808890] pr-[8px] text-xs' : 'pr-[8px]'}`}>
+                                    {state.q_claim.toFixed(2)}
+                                </span>{' '}
                                 <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
                                     {(state.q_claim + (state.q_claim * 5) / 100).toFixed(2)}
                                 </span>{' '}
-                                <span className={'text-[#EB2B3E]'}>USDT</span>
+                                <span className={'text-[#EB2B3E]'}>{unit}</span>
                             </div>
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
@@ -267,7 +278,7 @@ export const AcceptBuyInsurance = ({
                                 </div>
                             </div>
                             <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                <span className={'pr-[8px]'}>{state.margin}</span> <span className={'text-[#EB2B3E]'}>USDT</span>
+                                <span className={'pr-[8px]'}>{state.margin.toFixed(2)}</span> <span className={'text-[#EB2B3E]'}>{unit}</span>
                             </div>
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px]">
@@ -305,7 +316,6 @@ export const AcceptBuyInsurance = ({
                                         variants="outlined"
                                         className="py-[8px] px-[24px] rounded-[8px]"
                                         onClick={() => {
-                                            console.log(state.symbol)
                                             getPrice(state.symbol.symbol, state, setState)
                                             setUpdated(true)
                                             setCanBuy(true)
@@ -425,7 +435,7 @@ export const AcceptBuyInsurance = ({
                         <div className="flex flex-row">
                             <span className={'text-sm text-[#22313F]'}>
                                 {`${t('insurance:buy:saved')} `}
-                                <span className={'text-[#EB2B3E] px-[4px]'}>1,000 USDT</span> {t('insurance:buy:sub_saved')}
+                                <span className={'text-[#EB2B3E] px-[4px]'}>1,000 {unit}</span> {t('insurance:buy:sub_saved')}
                             </span>
                         </div>
                     </div>
@@ -442,9 +452,9 @@ export const AcceptBuyInsurance = ({
                                 </div>
                             </div>
                             <div className={'font-semibold'}>
-                                <span className={`${checkUpgrade ? 'line-through text-[#808890]' : 'pr-[8px]'}`}>{state.r_claim}</span>{' '}
+                                <span className={`${checkUpgrade ? 'line-through text-[#808890]' : 'pr-[8px]'}`}>{state.r_claim.toFixed(2)}</span>{' '}
                                 <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>
-                                    {(state.q_claim + (state.q_claim * 5) / 100) / state.margin}
+                                    {((state.q_claim + (state.q_claim * 5) / 100) / state.margin).toFixed(2)}
                                 </span>{' '}
                                 %
                             </div>
@@ -458,11 +468,11 @@ export const AcceptBuyInsurance = ({
                                 </div>
                             </div>
                             <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                <span className={`${checkUpgrade ? 'line-through text-[#808890] pr-[8px]' : 'pr-[8px]'}`}>{state.q_claim}</span>{' '}
+                                <span className={`${checkUpgrade ? 'line-through text-[#808890] pr-[8px]' : 'pr-[8px]'}`}>{state.q_claim.toFixed(2)}</span>{' '}
                                 <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
-                                    {state.q_claim + (state.q_claim * 5) / 100}
+                                    {(state.q_claim + (state.q_claim * 5) / 100).toFixed(2)}
                                 </span>{' '}
-                                <span className={'text-[#EB2B3E] pl-[8px]'}>USDT</span>
+                                <span className={'text-[#EB2B3E] pl-[8px]'}>{unit}</span>
                             </div>
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
@@ -474,7 +484,7 @@ export const AcceptBuyInsurance = ({
                                 </div>
                             </div>
                             <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                <span className={'pr-[2px]'}>{state.margin}</span> <span className={'text-[#EB2B3E] pl-[14px]'}>USDT</span>
+                                <span className={'pr-[2px]'}>{state.margin.toFixed(2)}</span> <span className={'text-[#EB2B3E] pl-[14px]'}>{unit}</span>
                             </div>
                         </div>
                         <div className="flex flex-row justify-between py-[8px] px-[8px]">
