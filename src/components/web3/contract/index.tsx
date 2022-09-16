@@ -12,17 +12,18 @@ export class ContractCaller {
 
     constructor(provider: providers.Web3Provider) {
         this.provider = provider
-        this.insuranceContract = new InsuranceContract(
-            this.provider,
-            contractAddress,
-            INSURANCE_ABI,
-        )
+        this.insuranceContract = new InsuranceContract(this.provider, contractAddress, INSURANCE_ABI)
     }
 
     public async getEtherBalance(from: string) {
         const balance: BigNumber = await this.provider.getBalance(from)
         return weiToEther(balance.toString())
     }
+
+    // public async balanceOf(address: string) {
+    //     const balance: BigNumber = await this.provider.balanceOf(address)
+    //     console.log(this.provider)
+    // }
 
     public async sign(message: string | ethers.utils.Bytes) {
         const signer = this.provider.getSigner()

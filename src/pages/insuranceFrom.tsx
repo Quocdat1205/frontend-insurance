@@ -23,6 +23,7 @@ import NotificationInsurance from 'components/layout/notifucationInsurance'
 import Modal from 'components/common/Modal/Modal'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
+import { USDTaddress } from 'components/web3/constants/contractAddress'
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
@@ -122,20 +123,6 @@ export const InsuranceFrom = () => {
         { menuId: 'help', name: t('insurance:buy:help') },
     ]
 
-    const listTerminology = [
-        { name: 'Q-Covered', description: t('insurance:terminology:q_covered') },
-        { name: 'P-Market', description: t('insurance:terminology:p_market') },
-        { name: 'P-Claim', description: t('insurance:terminology:p_claim') },
-        { name: 'P-Expired', description: t('insurance:terminology:p_expired') },
-        { name: 'P-Refund', description: t('insurance:terminology:p_refund') },
-        { name: 'Period', description: t('insurance:terminology:period') },
-        { name: 'R-Claim', description: t('insurance:terminology:r_claim') },
-        { name: 'Q-Claim', description: t('insurance:terminology:q_claim') },
-        { name: 'Margin', description: t('insurance:terminology:margin') },
-        { name: 'T-Start', description: t('insurance:terminology:t_start') },
-        { name: 'T-Expired', description: t('insurance:terminology:t_expired') },
-    ]
-
     const Leverage = (p_market: number, p_stop: number) => {
         const leverage = Number((p_market / Math.abs(p_market - p_stop)).toFixed(2))
         return leverage < 1 ? 1 : leverage
@@ -192,7 +179,6 @@ export const InsuranceFrom = () => {
         try {
             const result = wallet.getBalance()
             result.then((balance: number) => {
-                console.log(balance, wallet)
                 const tmp = balance / state.p_market
                 console.log('connect success')
                 setUserBalance(tmp)
@@ -338,7 +324,7 @@ export const InsuranceFrom = () => {
 
     const refreshApi = (
         selectTime: string | undefined,
-        selectCoin: { id?: string; name?: string; icon?: string; disable?: boolean | undefined; symbol: any },
+        selectCoin: { id?: string; name?: string; icon?: string; disable?: boolean | undefined; symbol?: string; type: any },
     ) => {
         const timeEnd = new Date()
         const timeBegin = new Date()
@@ -347,7 +333,7 @@ export const InsuranceFrom = () => {
             if (selectTime == '1H' || selectTime == '1D') {
                 timeBegin.setDate(timeEnd.getDate() - 10)
                 fetchApiNami(
-                    `${selectCoin.symbol}`,
+                    `${selectCoin?.type}${unitMoney}`,
                     `${Math.floor(timeBegin.getTime() / 1000)}`,
                     `${Math.ceil(timeEnd.getTime() / 1000)}`,
                     '1m',
@@ -356,7 +342,7 @@ export const InsuranceFrom = () => {
             } else if (selectTime == '1W') {
                 timeBegin.setDate(timeEnd.getDate() - 10)
                 fetchApiNami(
-                    `${selectCoin.symbol}`,
+                    `${selectCoin?.type}${unitMoney}`,
                     `${Math.floor(timeBegin.getTime() / 1000)}`,
                     `${Math.ceil(timeEnd.getTime() / 1000)}`,
                     '1h',
@@ -365,7 +351,7 @@ export const InsuranceFrom = () => {
             } else {
                 timeBegin.setDate(timeEnd.getDate() - 10)
                 fetchApiNami(
-                    `${selectCoin.symbol}`,
+                    `${selectCoin?.type}${unitMoney}`,
                     `${Math.floor(timeBegin.getTime() / 1000)}`,
                     `${Math.ceil(timeEnd.getTime() / 1000)}`,
                     '1h',
