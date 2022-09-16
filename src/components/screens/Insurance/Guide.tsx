@@ -16,7 +16,6 @@ const Guide = ({ start, setStart }: Guideline) => {
     const { t } = useTranslation()
     const step = useRef<number>(0)
     const refGuide = useRef<any>(null)
-    const { width } = useWindowSize()
 
     const getCurrentStep = (e: number) => {
         console.log(e)
@@ -63,23 +62,23 @@ const Guide = ({ start, setStart }: Guideline) => {
         return [
             {
                 selector: '[data-tut="tour_statistics"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_1')} {...props} onClose={onClose} />,
+                content: (props: any) => <Content title={t('insurance:guild:step_title_1')} {...props} top onClose={onClose} />,
                 position: 'bottom',
             },
             {
                 selector: '[data-tut="tour_chart"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_2')} content={contentStep2()} {...props} onClose={onClose} />,
+                content: (props: any) => <Content title={t('insurance:guild:step_title_2')} content={contentStep2()} {...props} top onClose={onClose} />,
                 position: 'bottom',
             },
             {
                 selector: '[data-tut="tour_period"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_3')} content={contentStep1()} {...props} onClose={onClose} />,
-                position: 'center',
+                content: (props: any) => <Content title={t('insurance:guild:step_title_3')} content={contentStep1()} {...props} top onClose={onClose} />,
+                position: 'bottom',
             },
             {
                 selector: '[data-tut="tour_custom"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_4')} {...props} onClose={onClose} />,
-                position: 'top',
+                content: (props: any) => <Content title={t('insurance:guild:step_title_4')} {...props} top onClose={onClose} />,
+                position: 'bottom',
             },
         ]
     }, [])
@@ -102,7 +101,7 @@ const Guide = ({ start, setStart }: Guideline) => {
             steps={tourConfig}
             isOpen={start}
             showCloseButton={false}
-            className={`${step.current === 2 ? 'reactour__arrow__right' : ''} !absolute`}
+            className={`${step.current === 3 ? 'reactour__arrow__right' : ''} !absolute`}
             maskClassName="guideline"
             rounded={6}
             startAt={0}

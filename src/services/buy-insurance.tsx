@@ -12,9 +12,10 @@ export const buyInsurance = async (props: {
     q_covered: number
     p_claim: number
     period: number
+    isUseNain: boolean
 }) => {
     try {
-        const { owner, transaction_hash, id_sc, asset_covered, asset_refund, margin, q_covered, p_claim, period } = props
+        const { owner, transaction_hash, id_sc, asset_covered, asset_refund, margin, q_covered, p_claim, period, isUseNain } = props
 
         const AuthToken = await axios.get(`${Config.env.API_URL}${API_GET_GET_TOKEN}`, { params: { owner: owner.toLowerCase() } })
 
@@ -30,6 +31,7 @@ export const buyInsurance = async (props: {
                 q_covered,
                 p_claim,
                 period,
+                isUseNain,
             },
             { headers: { Authorization: `Bearer ${AuthToken.data}` } },
         )
