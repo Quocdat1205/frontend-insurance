@@ -216,7 +216,7 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
     }, [])
 
     return (
-        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'max-w-[424px]'} containerClassName="z-[100]">
+        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'xl:max-w-[424px]'} containerClassName="z-[100]">
             <div className="text-xl font-medium mb-6 text-center">{t('insurance_history:detailed_terminology')}</div>
 
             <Tabs tab={tab} className="mb-6 text-sm">
