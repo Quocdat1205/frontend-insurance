@@ -25,6 +25,7 @@ import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatNumber, getUnit } from 'utils/utils'
 import useWeb3USDT from 'hooks/useWeb3USDT'
+import { ethers } from 'ethers'
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
@@ -71,7 +72,6 @@ export const InsuranceFrom = () => {
         isShow: false,
         name: '',
     })
-
     const [userBalance, setUserBalance] = useState<number>(0)
     const [listCoin, setListCoin] = useState<ICoin[]>([])
     const [selectCoin, setSelectedCoin] = useState<ICoin>({
@@ -96,7 +96,6 @@ export const InsuranceFrom = () => {
         t_market: new Date(),
         p_expired: 0,
     })
-
     const defaultToken = {
         icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
         id: '63187ae8c2ad72eac4d0f363',
@@ -104,12 +103,9 @@ export const InsuranceFrom = () => {
         symbol: 'BNBUSDT',
         type: 'BNB',
     }
-
     const [dataChart, setDataChart] = useState()
-
     const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', 'ALL']
     const listTabPeriod: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-
     const menu = [
         { menuId: 'home', router: 'home', name: t('insurance:buy:home'), parentId: 0 },
         { menuId: 'buy_covered', router: 'insurance', name: t('insurance:buy:buy_covered'), parentId: 0 },
@@ -125,7 +121,6 @@ export const InsuranceFrom = () => {
         { menuId: 'continue', name: t('insurance:buy:continue') },
         { menuId: 'help', name: t('insurance:buy:help') },
     ]
-
     const tokenAddresses = [
         {
             address: '0x0897202ce1838d0712d357103aae83650a0d426d',
@@ -182,6 +177,15 @@ export const InsuranceFrom = () => {
             }
         }
     }
+
+    useEffect(() => {
+        const getBalanceUsdt = async () => {
+            const balanceUsdt = wallet.account && (await wallet?.contractCaller.usdtContract.contract.balanceOf(wallet.account))
+            console.log(balanceUsdt && ethers.utils.formatEther(balanceUsdt))
+        }
+
+        getBalanceUsdt()
+    }, [])
 
     useEffect(() => {
         if (loadings) {
