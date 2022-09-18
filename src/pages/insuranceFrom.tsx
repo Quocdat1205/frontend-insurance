@@ -9,13 +9,13 @@ import { GetStaticProps } from 'next'
 import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { CheckCircle, LeftArrow, InfoCircle, XMark, ErrorTriggersIcon, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import useWindowSize from 'hooks/useWindowSize'
-import { screens } from 'utils/constants'
+import { screens, stateInsurance } from 'utils/constants'
 import { Suspense } from 'react'
 import store, { RootStore, useAppSelector } from 'redux/store'
 import Config from 'config/config'
@@ -24,6 +24,11 @@ import Modal from 'components/common/Modal/Modal'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatNumber, getUnit } from 'utils/utils'
+import useWeb3USDT from 'hooks/useWeb3USDT'
+import styled from 'styled-components'
+import classnames from 'classnames'
+
+import { ethers } from 'ethers'
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
@@ -36,6 +41,7 @@ export const InsuranceFrom = () => {
         i18n: { language },
     } = useTranslation()
     const wallet = useWeb3Wallet()
+    const USDTBalance = useWeb3USDT()
     const router = useRouter()
     const { width } = useWindowSize()
     const isMobile = width && width <= screens.drawer
@@ -62,29 +68,35 @@ export const InsuranceFrom = () => {
     const [changeUnit2, setChangeUnit2] = useState<boolean>(false)
     const [showCroll, setShowCroll] = useState(false)
     const [errorPCalim, setErrorPCalim] = useState(false)
-    const [showGuide, setShowGuide] = useState<boolean>(true)
+    const [showGuide, setShowGuide] = useState<boolean>(false)
     const [chosing, setChosing] = useState(false)
     const [showGuideModal, setShowGuideModal] = useState<boolean>(false)
     const [showChangeUnit, setShowChangeUnit] = useState({
         isShow: false,
         name: '',
     })
-
     const [userBalance, setUserBalance] = useState<number>(0)
     const [listCoin, setListCoin] = useState<ICoin[]>([])
     const [selectCoin, setSelectedCoin] = useState<ICoin>({
-        icon: '',
-        id: '',
-        name: '',
-        symbol: '',
-        type: '',
+        icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
+        id: '63187ae8c2ad72eac4d0f363',
+        name: 'Binance',
+        symbol: 'BNBUSDT',
+        type: 'BNB',
         disable: false,
     })
     const [state, setState] = useState({
-        timeframe: '',
+        timeframe: 'ALL',
         margin: 0,
         percent_margin: 0,
-        symbol: selectCoin || {},
+        symbol: {
+            icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
+            id: '63187ae8c2ad72eac4d0f363',
+            name: 'Binance',
+            symbol: 'BNBUSDT',
+            type: 'BNB',
+            disable: false,
+        },
         period: 2,
         p_claim: 0,
         q_claim: 0,
@@ -94,20 +106,17 @@ export const InsuranceFrom = () => {
         t_market: new Date(),
         p_expired: 0,
     })
-
     const defaultToken = {
         icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
         id: '63187ae8c2ad72eac4d0f363',
         name: 'Binance',
         symbol: 'BNBUSDT',
         type: 'BNB',
+        disable: false,
     }
-
     const [dataChart, setDataChart] = useState()
-
     const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', 'ALL']
     const listTabPeriod: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-
     const menu = [
         { menuId: 'home', router: 'home', name: t('insurance:buy:home'), parentId: 0 },
         { menuId: 'buy_covered', router: 'insurance', name: t('insurance:buy:buy_covered'), parentId: 0 },
@@ -122,6 +131,20 @@ export const InsuranceFrom = () => {
         { menuId: 'tooltip', name: t('insurance:buy:tooltip') },
         { menuId: 'continue', name: t('insurance:buy:continue') },
         { menuId: 'help', name: t('insurance:buy:help') },
+    ]
+    const tokenAddresses = [
+        {
+            address: '0x0897202ce1838d0712d357103aae83650a0d426d',
+            token: 'USDT',
+        },
+        {
+            address: '0x3d658390460295fb963f54dc0899cfb1c30776df',
+            token: 'USDC',
+        },
+        {
+            address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+            token: 'BUSD',
+        },
     ]
 
     const Leverage = (p_market: number, p_stop: number) => {
@@ -166,6 +189,14 @@ export const InsuranceFrom = () => {
         }
     }
 
+    useEffect(() => {
+        if (loadings) {
+            setTimeout(() => {
+                // setShowGuide(true)
+            }, 5000)
+        }
+    }, [loadings])
+
     const validateQCovered = (value: number) => {
         if (wallet.account) {
             if (value > 0) {
@@ -175,56 +206,58 @@ export const InsuranceFrom = () => {
             }
         }
     }
+
+    useEffect(() => {
+        setLoadings(true)
+        if (stone.setting.assetsToken.length > 0) {
+            let list: ICoin[] = []
+
+            stone.setting.assetsToken.map(async (token: any) => {
+                list.push({
+                    id: token._id,
+                    name: token.name,
+                    icon: token.attachment,
+                    symbol: `${token.symbol}USDT`,
+                    type: token.symbol,
+                    disable: !token.isActive,
+                })
+            })
+            setListCoin(list)
+            setLoadings(false)
+        }
+    }, [store])
+
+    useEffect(() => {
+        if (wallet.account) {
+            getBalanceUsdt()
+        }
+    }, [wallet.account])
+
+    const getBalanceUsdt = async () => {
+        if (state.p_market > 0) {
+            const balanceUsdt = wallet.account && (await wallet?.contractCaller.usdtContract.contract.balanceOf(wallet.account))
+            setUserBalance(Number(formatNumber(Number(balanceUsdt && ethers.utils.formatEther(balanceUsdt)) / state.p_market, 4)))
+        }
+    }
+
+    const setStorage = (value: any) => {
+        localStorage.setItem('buy_covered_state', JSON.stringify(value))
+    }
+
     useEffect(() => {
         try {
-            const result = wallet.getBalance()
-            result.then((balance: number) => {
-                const tmp = balance / state.p_market
-                console.log('connect success')
-                setUserBalance(tmp)
-            })
-
             setLoadings(true)
-            if (stone.setting.assetsToken.length > 0) {
-                let list: ICoin[] = []
-
-                stone.setting.assetsToken.map(async (token: any) => {
-                    list.push({
-                        id: token._id,
-                        name: token.name,
-                        icon: token.attachment,
-                        symbol: `${token.symbol}USDT`,
-                        type: token.symbol,
-                        disable: !token.isActive,
-                    })
-                })
-                setListCoin(list)
-                setLoadings(false)
+            if (typeof window.ethereum !== undefined) {
+                console.log('MetaMask is installed!')
             }
-
-            getPriceBNBUSDT(setPriceBNB)
-
             const data = localStorage.getItem('buy_covered_state')
-
             if (data) {
                 const res = JSON.parse(data)
-                setSelectedCoin({
-                    ...selectCoin,
-                    icon: res.symbol.icon,
-                    id: res.symbol.id,
-                    name: res.symbol.name,
-                    symbol: res.symbol.symbol,
-                    type: res.symbol.type,
-                    disable: res.symbol.disable,
-                })
                 setState({
                     ...state,
-                    percent_margin: res.percent_margin,
-                    period: res.period,
-                    p_claim: res.p_claim,
-                    q_claim: res.q_claim,
-                    r_claim: res.r_claim,
-                    q_covered: res.q_covered,
+                    timeframe: res.timeframe,
+                    margin: res.margin * 1.0,
+                    percent_margin: res.percent_margin * 1.0,
                     symbol: {
                         icon: res.symbol.icon,
                         id: res.symbol.id,
@@ -233,32 +266,28 @@ export const InsuranceFrom = () => {
                         type: res.symbol.type,
                         disable: res.symbol.disable,
                     },
+                    period: res.period * 1.0,
+                    p_claim: res.p_claim * 1.0,
+                    q_claim: res.q_claim * 1.0,
+                    r_claim: res.r_claim * 1.0,
+                    q_covered: res.q_covered * 1.0,
+                    p_market: res.p_market * 1.0,
+                    t_market: res.t_market,
+                    p_expired: res.p_expired * 1.0,
                 })
-
-                if (res.tab) {
-                    setTab(res.tab)
-                }
-                if (res.unitMoney) {
-                    setUnitMoney(res.unitMoney)
-                }
-                if (res.index) {
-                    setIndex(res.index)
-                }
+                setTab(res.tab)
+                setUnitMoney(res.unitMoney)
+                setIndex(res.index)
                 validatePclaim(res.p_claim)
             } else {
-                const defaultToken = {
-                    icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
-                    id: '63187ae8c2ad72eac4d0f363',
-                    name: 'Binance',
-                    symbol: 'BNBUSDT',
-                    type: 'BNB',
-                }
-                return localStorage.setItem('buy_covered_state', JSON.stringify({ symbol: { ...defaultToken } }))
+                setStorage(state)
             }
+            setLoadings(false)
         } catch (error) {
+            setLoadings(false)
             return console.log(error)
         }
-    }, [stone])
+    }, [])
 
     useEffect(() => {
         if (unitMoney) {
@@ -283,14 +312,6 @@ export const InsuranceFrom = () => {
     }, [index])
 
     useEffect(() => {
-        if (state.p_claim != 0) {
-            validatePclaim(state.p_claim)
-            const dataSave = { ...state, index: index, tab: tab }
-            return localStorage.setItem('buy_covered_state', JSON.stringify(dataSave))
-        }
-    }, [state.p_claim])
-
-    useEffect(() => {
         if (state.q_covered > 0) {
             setPercentInsurance((state.q_covered / userBalance) * 100)
         }
@@ -303,14 +324,28 @@ export const InsuranceFrom = () => {
                 const res = JSON.parse(data)
                 const newData = {
                     ...res,
-                    percent_margin: state.percent_margin,
-                    period: state.period,
-                    p_claim: state.p_claim,
-                    q_claim: state.q_claim,
-                    r_claim: state.r_claim,
-                    q_covered: state.q_covered,
+                    timeframe: state.timeframe,
+                    margin: state.margin * 1.0,
+                    percent_margin: state.percent_margin * 1.0,
+                    symbol: {
+                        icon: state.symbol.icon,
+                        id: state.symbol.id,
+                        name: state.symbol.name,
+                        symbol: state.symbol.symbol,
+                        type: state.symbol.type,
+                        disable: state.symbol.disable,
+                    },
+                    period: state.period * 1.0,
+                    p_claim: state.p_claim * 1.0,
+                    q_claim: state.q_claim * 1.0,
+                    r_claim: state.r_claim * 1.0,
+                    q_covered: state.q_covered * 1.0,
+                    p_market: state.p_market * 1.0,
+                    t_market: state.t_market,
+                    p_expired: state.p_expired * 1.0,
                 }
-                localStorage.setItem('buy_covered_state', JSON.stringify(newData))
+
+                setStorage(newData)
             }
         }
     }, [state])
@@ -342,12 +377,7 @@ export const InsuranceFrom = () => {
     useEffect(() => {
         if (selectCoin.symbol != '') {
             getPrice(selectCoin.symbol, state, setState)
-            const data = localStorage.getItem('buy_covered_state')
-            if (data) {
-                const res = JSON.parse(data)
-                const newData = { ...res, symbol: { ...selectCoin } }
-                return localStorage.setItem('buy_covered_state', JSON.stringify(newData))
-            }
+            setState({ ...state, symbol: { ...selectCoin } })
         }
     }, [selectCoin])
 
@@ -441,8 +471,6 @@ export const InsuranceFrom = () => {
             validatePclaim(state.p_claim)
         }
     }, [state.p_claim])
-
-    console.log(state)
 
     return !loadings ? (
         !isMobile ? (
@@ -629,8 +657,8 @@ export const InsuranceFrom = () => {
                                     </div>
                                     <div className={'pb-[8px] pl-[32px] pr-[32px] h-[70px] flex justify-between'}>
                                         <div
-                                            className={`${
-                                                tab > 3 ? 'w-[50%] mr-[12px]' : 'w-full'
+                                            className={`${tab > 3 ? 'w-[50%] mr-[12px]' : 'w-full'} ${
+                                                state.q_covered > userBalance && 'border border-1 border-[#E5544B]'
                                             } flex justify-between border-collapse rounded-[3px] shadow-none`}
                                         >
                                             <Input
@@ -640,12 +668,13 @@ export const InsuranceFrom = () => {
                                                 type={'number'}
                                                 inputName={'Loại tài sản và số lượng tài sản'}
                                                 idInput={'iCoin'}
-                                                value={state.q_covered ? state?.q_covered : 0}
+                                                value={state.q_covered || 0}
                                                 onChange={(a: any) => {
-                                                    setState({
-                                                        ...state,
-                                                        q_covered: Number(a.target.value.replace(/^00+/, '0')),
-                                                    })
+                                                    if (Number(a.target.value) >= 1) {
+                                                        setState({ ...state, q_covered: a.target.value.replace(/^0+/, '') })
+                                                    } else {
+                                                        setState({ ...state, q_covered: Number(a.target.value) })
+                                                    }
 
                                                     setPercentInsurance(0)
                                                 }}
@@ -771,7 +800,11 @@ export const InsuranceFrom = () => {
                                                     idInput={''}
                                                     value={state.margin > 0 ? state?.margin : 0}
                                                     onChange={(a: any) => {
-                                                        setState({ ...state, margin: Number(a.target.value.replace(/^00+/, '0')), percent_margin: 0 })
+                                                        if (Number(a.target.value) >= 1) {
+                                                            setState({ ...state, margin: a.target.value.replace(/^0+/, ''), percent_margin: 0 })
+                                                        } else {
+                                                            setState({ ...state, margin: Number(a.target.value), percent_margin: 0 })
+                                                        }
                                                     }}
                                                     placeholder={''}
                                                 ></Input>
@@ -984,7 +1017,11 @@ export const InsuranceFrom = () => {
                                                     idInput={'iPClaim'}
                                                     value={state.p_claim}
                                                     onChange={(a: any) => {
-                                                        setState({ ...state, p_claim: Number(a.target.value.replace(/^00+/, '0')) })
+                                                        if (Number(a.target.value) >= 1) {
+                                                            setState({ ...state, p_claim: a.target.value.replace(/^0+/, '') })
+                                                        } else {
+                                                            setState({ ...state, p_claim: Number(a.target.value) })
+                                                        }
                                                     }}
                                                     placeholder={`${menu[9].name}`}
                                                 ></Input>
@@ -1065,7 +1102,9 @@ export const InsuranceFrom = () => {
                                         <Tooltip className="max-w-[200px]" id={'r_claim'} placement="right" />
                                     </div>
                                 </div>
-                                <div className={'font-semibold'}>{/* <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span> */}</div>
+                                <div className={'font-semibold'}>
+                                    <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span>
+                                </div>
                             </div>
                             <div
                                 className={`${
@@ -1343,7 +1382,7 @@ export const InsuranceFrom = () => {
                             <Modal
                                 portalId="modal"
                                 isVisible={true}
-                                className=" bg-white absolute bottom-0 rounded-none translate-y-0"
+                                className=" bg-white absolute bottom-0 rounded-none translate-y-0 h-max"
                                 onBackdropCb={() => setShowChangeUnit({ ...showChangeUnit, isShow: false, name: '' })}
                             >
                                 <div className={` bg-white text-sm  mx-auto `}>
@@ -1370,65 +1409,64 @@ export const InsuranceFrom = () => {
                             </Modal>
                         )}
                         {openChangeToken && (
-                            <div className="absolute w-full h-full bg-gray/[0.5] z-50 flex flex-col-reverse">
-                                <div className="bg-white h-[50%] w-full flex flex-col z-50">
-                                    <div
-                                        className="m-[24px] flex flex-row-reverse"
-                                        onClick={() => {
-                                            setOpenChangeToken(false)
-                                        }}
-                                    >
-                                        <XMark></XMark>
-                                    </div>
-                                    <div className="m-[24px] font-semibold text-xl">{t('insurance:buy:asset')}</div>
-                                    {listCoin &&
-                                        listCoin.map((coin, key) => {
-                                            let isPress = false
+                            <Modal
+                                portalId="modal"
+                                isVisible={true}
+                                className=" bg-white absolute bottom-0 rounded-none translate-y-0"
+                                onBackdropCb={() => setOpenChangeToken(false)}
+                            >
+                                <div className="bg-white h-[50%] w-full flex flex-col z-50 text-sm">
+                                    <div className="font-semibold text-xl my-[24px]">{t('insurance:buy:asset')}</div>
+                                    <div>
+                                        {listCoin &&
+                                            listCoin.map((coin, key) => {
+                                                let isPress = false
 
-                                            // @ts-ignore
-                                            return !coin.disable ? (
-                                                <div
-                                                    id={`${coin.id}`}
-                                                    key={key}
-                                                    onMouseDown={() => (isPress = true)}
-                                                    onMouseUp={() => {
-                                                        isPress = false
-                                                        setSelectedCoin(coin)
-                                                        setState({ ...state, symbol: { ...coin } })
-                                                        setOpenChangeToken(false)
-                                                    }}
-                                                    className={`${
-                                                        isPress ? 'bg-[#F2F3F5]' : 'hover:bg-[#F7F8FA]'
-                                                    } flex flex-row justify-start w-full items-center p-3 font-medium`}
-                                                >
-                                                    <img alt={''} src={`${coin.icon}`} width="36" height="36" className={'mr-[5px]'}></img>
-                                                    <div className={'flex flex-row justify-between w-full'}>
-                                                        <span className={'hover:cursor-default'}>{coin.name}</span>
-                                                        {coin.id === selectCoin.id ? <Check size={18} className={'text-[#EB2B3E]'}></Check> : ''}
+                                                // @ts-ignore
+                                                return !coin.disable ? (
+                                                    <div
+                                                        id={`${coin.id}`}
+                                                        key={key}
+                                                        onMouseDown={() => (isPress = true)}
+                                                        onMouseUp={() => {
+                                                            isPress = false
+                                                            setSelectedCoin(coin)
+                                                            setState({ ...state, symbol: { ...coin } })
+                                                            setOpenChangeToken(false)
+                                                        }}
+                                                        className={`${
+                                                            isPress ? 'bg-[#F2F3F5]' : 'hover:bg-[#F7F8FA]'
+                                                        } flex flex-row justify-start w-full items-center p-3 font-medium`}
+                                                    >
+                                                        <img alt={''} src={`${coin.icon}`} width="24" height="24" className={'mr-[12px] rounded-[50%]'}></img>
+                                                        <div className={'flex flex-row justify-between w-full'}>
+                                                            <span className={'hover:cursor-default'}>{coin.name}</span>
+                                                            {coin.id === selectCoin.id ? <Check size={18} className={'text-[#EB2B3E]'}></Check> : ''}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ) : (
-                                                <a
-                                                    id={`${coin.id}`}
-                                                    key={key}
-                                                    className={`hover:bg-[#F7F8FA] flex flex-row justify-start w-full items-center p-3 text-[#E5E7E8] font-medium`}
-                                                >
-                                                    <img
-                                                        alt={''}
-                                                        src={`${coin.icon}`}
-                                                        width="36"
-                                                        height="36"
-                                                        className={'mr-[5px] grayscale hover:cursor-default'}
-                                                    ></img>
-                                                    <div className={'flex flex-row justify-between w-full'}>
-                                                        <span>{coin.name}</span>
-                                                        {coin.id === selectCoin.id ? <Check size={18} className={'text-[#EB2B3E]'}></Check> : ''}
-                                                    </div>
-                                                </a>
-                                            )
-                                        })}
+                                                ) : (
+                                                    <a
+                                                        id={`${coin.id}`}
+                                                        key={key}
+                                                        className={`hover:bg-[#F7F8FA] flex flex-row justify-start w-full items-center p-3 text-[#E5E7E8] font-medium`}
+                                                    >
+                                                        <img
+                                                            alt={''}
+                                                            src={`${coin.icon}`}
+                                                            width="24"
+                                                            height="24"
+                                                            className={'mr-[12px] rounded-[50%] grayscale hover:cursor-default'}
+                                                        ></img>
+                                                        <div className={'flex flex-row justify-between w-full'}>
+                                                            <span>{coin.name}</span>
+                                                            {coin.id === selectCoin.id ? <Check size={18} className={'text-[#EB2B3E]'}></Check> : ''}
+                                                        </div>
+                                                    </a>
+                                                )
+                                            })}
+                                    </div>
                                 </div>
-                            </div>
+                            </Modal>
                         )}
                         {active && (
                             <Modal
@@ -1531,11 +1569,15 @@ export const InsuranceFrom = () => {
                                                 openChangeToken && 'opacity-0'
                                             } `}
                                             placeholder="Số tiền?"
-                                            value={state.q_covered > 0 ? Number(state.q_covered) : 'Số tiền?'}
+                                            value={state.q_covered != undefined ? Number(state.q_covered) : 'Số tiền?'}
                                             name="name"
                                             id="name"
                                             onChange={(a: any) => {
-                                                setState({ ...state, q_covered: Number(a.target.value.replace(/^00+/, '0')) })
+                                                if (Number(a.target.value) >= 1) {
+                                                    setState({ ...state, p_claim: a.target.value.replace(/^0+/, '') })
+                                                } else {
+                                                    setState({ ...state, p_claim: Number(a.target.value) })
+                                                }
                                                 setPercentInsurance(0)
                                             }}
                                         ></input>
@@ -1555,11 +1597,19 @@ export const InsuranceFrom = () => {
                                                 name="name"
                                                 id="name"
                                                 onChange={(a: any) => {
-                                                    setState({
-                                                        ...state,
-                                                        margin: Number(a.target.value),
-                                                        percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
-                                                    })
+                                                    if (Number(a.target.value) >= 1) {
+                                                        setState({
+                                                            ...state,
+                                                            margin: a.target.value.replace(/^0+/, ''),
+                                                            percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
+                                                        })
+                                                    } else {
+                                                        setState({
+                                                            ...state,
+                                                            margin: Number(a.target.value),
+                                                            percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
+                                                        })
+                                                    }
                                                 }}
                                             ></input>
                                         </label>{' '}
@@ -1651,10 +1701,16 @@ export const InsuranceFrom = () => {
                                             idInput={'iPClaim'}
                                             value={state.p_claim}
                                             onChange={(a: any) => {
-                                                if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
-                                                    setState({ ...state, p_claim: 0 })
+                                                if (Number(a.target.value) >= 1) {
+                                                    setState({
+                                                        ...state,
+                                                        p_claim: a.target.value.replace(/^0+/, ''),
+                                                    })
                                                 } else {
-                                                    setState({ ...state, p_claim: Number(a.target.value.replace(/^0+/, '')) })
+                                                    setState({
+                                                        ...state,
+                                                        p_claim: Number(a.target.value),
+                                                    })
                                                 }
                                             }}
                                             placeholder={`${menu[9].name}`}
@@ -1773,7 +1829,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold'}>
-                                            {/* <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span> */}
+                                            <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span>
                                         </div>
                                     </div>
                                     <div
@@ -1967,6 +2023,7 @@ const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGui
 }
 
 const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
+    const [tab, setTab] = useState<number>(0)
     const terms = [
         {
             title: 'Q-Covered',
@@ -2013,20 +2070,63 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
             description: t('insurance:terminology:t_expired'),
         },
     ]
+    const terms1 = [
+        {
+            title: t('common:status:available'),
+            description: t('common:status:explain:available'),
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#00A5FF]/[0.1] text-[#3960E5]',
+        },
+        {
+            title: t('common:status:claim_waiting'),
+            description: t('common:status:explain:claim_waiting'),
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#FBCD2D]/[0.1] text-[#FBCD2D]',
+        },
+        {
+            title: t('common:status:expired'),
+            description: t('common:status:explain:expired'),
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#20C9AC]/[0.1] text-[#52CC74]',
+        },
+        {
+            title: t('common:status:claimed'),
+            description: t('common:status:explain:claimed'),
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#20C9AC]/[0.1] text-[#52CC74]',
+        },
+        {
+            title: t('common:status:refunded'),
+            description: t('common:status:explain:refunded'),
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#B6B4BA]/[0.1] text-[#B2B7BC]',
+        },
+        {
+            title: t('common:status:liquidated'),
+            description: t('common:status:explain:liquidated'),
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#B6B4BA]/[0.1] text-[#B2B7BC]',
+        },
+    ]
+
+    // const optionsState = useMemo(() => {
+    //     return Object.keys(stateInsurance).reduce((acc: any[], key: string) => {
+    //         const _key = String(key).toLowerCase()
+    //         acc.push({ title: t(`common:status:${_key}`), description: t(`common:status:explain:${_key}`) })
+    //         return acc
+    //     }, [])
+    // }, [])
+
     return (
-        <Modal
-            isMobile={isMobile}
-            isVisible={visible}
-            onBackdropCb={onClose}
-            wrapClassName="!p-6"
-            className={'md:max-w-[424px]'}
-            containerClassName="z-[10000]"
-        >
-            <div className="text-xl font-medium mb-8 text-left">{t('insurance:buy:detailed_terminology')}</div>
+        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'max-w-[424px]'} containerClassName="z-[100]">
+            <div className="text-xl font-medium mb-6 text-center">{t('insurance_history:detailed_terminology')}</div>
+
+            <Tabs tab={tab} className="mb-6 text-sm">
+                <TabItem active={tab === 0} onClick={() => setTab(0)}>
+                    Thuật ngữ bảo hiểm
+                </TabItem>
+                <TabItem active={tab === 1} onClick={() => setTab(1)}>
+                    Trạng thái hợp đồng
+                </TabItem>
+            </Tabs>
             <div className="flex flex-col text-sm divide-solid divide-y divide-divider max-h-[70vh] overflow-auto -mx-6 px-6">
-                {terms.map((item: any, index: number) => (
+                {[...(tab === 0 ? terms : terms1)].map((item: any, index: number) => (
                     <div key={index} className="py-3 flex items-center">
-                        <div className="whitespace-nowrap min-w-[30%]">{item.title}</div>
+                        <div className={`whitespace-nowrap min-w-[30%] ${item?.class}`}>{item.title}</div>
                         <div>{item.description}</div>
                     </div>
                 ))}
@@ -2034,5 +2134,24 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
         </Modal>
     )
 }
+
+const Tabs = styled.div.attrs({
+    className: 'mt-6 text-sm flex items-center justify-between h-11 relative',
+})<any>`
+    &:after {
+        content: '';
+        position: absolute;
+        height: 2px;
+        background-color: ${() => colors.red.red};
+        transform: ${({ tab }) => `translate(${tab * 100}%,0)`};
+        width: calc(100% / 2);
+        transition: all 0.2s;
+        bottom: -1px;
+    }
+`
+
+const TabItem = styled.div.attrs<any>(({ active }) => ({
+    className: classnames('px-4 py-3 font-medium whitespace-nowrap border-b-[2px] border-divider', { 'text-red': active }),
+}))<any>``
 
 export default InsuranceFrom

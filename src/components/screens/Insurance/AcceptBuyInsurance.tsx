@@ -12,6 +12,7 @@ import { screens } from 'utils/constants'
 import { useRouter } from 'next/router'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
+import { formatNumber } from 'utils/utils'
 
 export type IProps = {
     state: any
@@ -49,7 +50,7 @@ export const AcceptBuyInsurance = ({
     setRes,
     setIndex,
     unit,
-}: Partial<IProps>) => {
+}: IProps) => {
     const {
         t,
         i18n: { language },
@@ -108,18 +109,20 @@ export const AcceptBuyInsurance = ({
             }
 
             if (!checkUpgrade) {
+                console.log(wallet, state, 'thuc')
+
                 const t_expired = new Date()
                 t_expired.setDate(state.t_market.getDate() + state.period)
 
                 const dataPost = {
                     buyer: wallet?.account as string,
                     asset: state.symbol.type,
-                    margin: formatPriceToWeiValue(Number(state.margin)),
-                    q_covered: formatPriceToWeiValue(Number(state.q_covered)),
-                    p_market: formatPriceToWeiValue(Number(data.data[0].p)),
-                    p_claim: formatPriceToWeiValue(Number(state.p_claim)),
-                    period: state.period,
-                    isUseNain: checkUpgrade && checkUpgrade,
+                    margin: formatPriceToWeiValue(Number(formatNumber(state.margin, 4))),
+                    q_covered: formatPriceToWeiValue(Number(formatNumber(state.q_covered, 4))),
+                    p_market: formatPriceToWeiValue(Number(formatNumber(data.data[0].p, 4))),
+                    p_claim: formatPriceToWeiValue(Number(formatNumber(state.p_claim, 4))),
+                    period: formatPriceToWeiValue(Number(state.period)),
+                    isUseNain: checkUpgrade,
                 }
                 console.log(dataPost)
 
@@ -147,14 +150,14 @@ export const AcceptBuyInsurance = ({
                 const dataPost = {
                     buyer: wallet?.account as string,
                     asset: state.symbol.type,
-                    margin: formatPriceToWeiValue(state.margin),
-                    q_covered: formatPriceToWeiValue(state.q_covered),
-                    p_market: formatPriceToWeiValue(data.data[0].p),
-                    p_claim: formatPriceToWeiValue(state.p_claim),
-                    period: state.period + 2,
+                    margin: formatPriceToWeiValue(Number(formatNumber(state.margin, 4))),
+                    q_covered: formatPriceToWeiValue(Number(formatNumber(state.q_covered, 4))),
+                    p_market: formatPriceToWeiValue(Number(formatNumber(data.data[0].p, 4))),
+                    p_claim: formatPriceToWeiValue(Number(formatNumber(state.p_claim, 4))),
+                    period: formatPriceToWeiValue(Number(state.period) + 2),
                     isUseNain: checkUpgrade,
                 }
-                console.log(dataPost)
+                console.log(state, dataPost)
 
                 const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
                     dataPost.buyer,
