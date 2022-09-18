@@ -24,6 +24,7 @@ import Modal from 'components/common/Modal/Modal'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatNumber, getUnit } from 'utils/utils'
+import useWeb3USDT from 'hooks/useWeb3USDT'
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
@@ -36,6 +37,7 @@ export const InsuranceFrom = () => {
         i18n: { language },
     } = useTranslation()
     const wallet = useWeb3Wallet()
+    const USDTBalance = useWeb3USDT()
     const router = useRouter()
     const { width } = useWindowSize()
     const isMobile = width && width <= screens.drawer
@@ -62,7 +64,7 @@ export const InsuranceFrom = () => {
     const [changeUnit2, setChangeUnit2] = useState<boolean>(false)
     const [showCroll, setShowCroll] = useState(false)
     const [errorPCalim, setErrorPCalim] = useState(false)
-    const [showGuide, setShowGuide] = useState<boolean>(true)
+    const [showGuide, setShowGuide] = useState<boolean>(false)
     const [chosing, setChosing] = useState(false)
     const [showGuideModal, setShowGuideModal] = useState<boolean>(false)
     const [showChangeUnit, setShowChangeUnit] = useState({
@@ -124,6 +126,21 @@ export const InsuranceFrom = () => {
         { menuId: 'help', name: t('insurance:buy:help') },
     ]
 
+    const tokenAddresses = [
+        {
+            address: '0x0897202ce1838d0712d357103aae83650a0d426d',
+            token: 'USDT',
+        },
+        {
+            address: '0x3d658390460295fb963f54dc0899cfb1c30776df',
+            token: 'USDC',
+        },
+        {
+            address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+            token: 'BUSD',
+        },
+    ]
+
     const Leverage = (p_market: number, p_stop: number) => {
         const leverage = Number(formatNumber(p_market / Math.abs(p_market - p_stop), 2))
         return leverage < 1 ? 1 : leverage
@@ -166,6 +183,14 @@ export const InsuranceFrom = () => {
         }
     }
 
+    useEffect(() => {
+        if (loadings) {
+            setTimeout(() => {
+                // setShowGuide(true)
+            }, 5000)
+        }
+    }, [loadings])
+
     const validateQCovered = (value: number) => {
         if (wallet.account) {
             if (value > 0) {
@@ -177,11 +202,21 @@ export const InsuranceFrom = () => {
     }
     useEffect(() => {
         try {
+            if (typeof window.ethereum !== undefined) {
+                return console.log('MetaMask is installed!')
+            }
+
+            const temp = USDTBalance.getBalance()
+            console.log(temp, 'thuc')
+
             const result = wallet.getBalance()
             result.then((balance: number) => {
-                const tmp = balance / state.p_market
-                console.log('connect success')
-                setUserBalance(tmp)
+                console.log(balance)
+
+                if (balance !== undefined) {
+                    const tmp = balance / state.p_market
+                    setUserBalance(tmp)
+                }
             })
 
             setLoadings(true)
@@ -441,8 +476,6 @@ export const InsuranceFrom = () => {
             validatePclaim(state.p_claim)
         }
     }, [state.p_claim])
-
-    console.log(state)
 
     return !loadings ? (
         !isMobile ? (
@@ -1065,7 +1098,9 @@ export const InsuranceFrom = () => {
                                         <Tooltip className="max-w-[200px]" id={'r_claim'} placement="right" />
                                     </div>
                                 </div>
-                                <div className={'font-semibold'}>{/* <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span> */}</div>
+                                <div className={'font-semibold'}>
+                                    <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span>
+                                </div>
                             </div>
                             <div
                                 className={`${
@@ -1343,7 +1378,7 @@ export const InsuranceFrom = () => {
                             <Modal
                                 portalId="modal"
                                 isVisible={true}
-                                className=" bg-white absolute bottom-0 rounded-none translate-y-0"
+                                className=" bg-white absolute bottom-0 rounded-none translate-y-0 h-max"
                                 onBackdropCb={() => setShowChangeUnit({ ...showChangeUnit, isShow: false, name: '' })}
                             >
                                 <div className={` bg-white text-sm  mx-auto `}>
@@ -1370,65 +1405,64 @@ export const InsuranceFrom = () => {
                             </Modal>
                         )}
                         {openChangeToken && (
-                            <div className="absolute w-full h-full bg-gray/[0.5] z-50 flex flex-col-reverse">
-                                <div className="bg-white h-[50%] w-full flex flex-col z-50">
-                                    <div
-                                        className="m-[24px] flex flex-row-reverse"
-                                        onClick={() => {
-                                            setOpenChangeToken(false)
-                                        }}
-                                    >
-                                        <XMark></XMark>
-                                    </div>
-                                    <div className="m-[24px] font-semibold text-xl">{t('insurance:buy:asset')}</div>
-                                    {listCoin &&
-                                        listCoin.map((coin, key) => {
-                                            let isPress = false
+                            <Modal
+                                portalId="modal"
+                                isVisible={true}
+                                className=" bg-white absolute bottom-0 rounded-none translate-y-0"
+                                onBackdropCb={() => setOpenChangeToken(false)}
+                            >
+                                <div className="bg-white h-[50%] w-full flex flex-col z-50 text-sm">
+                                    <div className="font-semibold text-xl my-[24px]">{t('insurance:buy:asset')}</div>
+                                    <div>
+                                        {listCoin &&
+                                            listCoin.map((coin, key) => {
+                                                let isPress = false
 
-                                            // @ts-ignore
-                                            return !coin.disable ? (
-                                                <div
-                                                    id={`${coin.id}`}
-                                                    key={key}
-                                                    onMouseDown={() => (isPress = true)}
-                                                    onMouseUp={() => {
-                                                        isPress = false
-                                                        setSelectedCoin(coin)
-                                                        setState({ ...state, symbol: { ...coin } })
-                                                        setOpenChangeToken(false)
-                                                    }}
-                                                    className={`${
-                                                        isPress ? 'bg-[#F2F3F5]' : 'hover:bg-[#F7F8FA]'
-                                                    } flex flex-row justify-start w-full items-center p-3 font-medium`}
-                                                >
-                                                    <img alt={''} src={`${coin.icon}`} width="36" height="36" className={'mr-[5px]'}></img>
-                                                    <div className={'flex flex-row justify-between w-full'}>
-                                                        <span className={'hover:cursor-default'}>{coin.name}</span>
-                                                        {coin.id === selectCoin.id ? <Check size={18} className={'text-[#EB2B3E]'}></Check> : ''}
+                                                // @ts-ignore
+                                                return !coin.disable ? (
+                                                    <div
+                                                        id={`${coin.id}`}
+                                                        key={key}
+                                                        onMouseDown={() => (isPress = true)}
+                                                        onMouseUp={() => {
+                                                            isPress = false
+                                                            setSelectedCoin(coin)
+                                                            setState({ ...state, symbol: { ...coin } })
+                                                            setOpenChangeToken(false)
+                                                        }}
+                                                        className={`${
+                                                            isPress ? 'bg-[#F2F3F5]' : 'hover:bg-[#F7F8FA]'
+                                                        } flex flex-row justify-start w-full items-center p-3 font-medium`}
+                                                    >
+                                                        <img alt={''} src={`${coin.icon}`} width="24" height="24" className={'mr-[12px] rounded-[50%]'}></img>
+                                                        <div className={'flex flex-row justify-between w-full'}>
+                                                            <span className={'hover:cursor-default'}>{coin.name}</span>
+                                                            {coin.id === selectCoin.id ? <Check size={18} className={'text-[#EB2B3E]'}></Check> : ''}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ) : (
-                                                <a
-                                                    id={`${coin.id}`}
-                                                    key={key}
-                                                    className={`hover:bg-[#F7F8FA] flex flex-row justify-start w-full items-center p-3 text-[#E5E7E8] font-medium`}
-                                                >
-                                                    <img
-                                                        alt={''}
-                                                        src={`${coin.icon}`}
-                                                        width="36"
-                                                        height="36"
-                                                        className={'mr-[5px] grayscale hover:cursor-default'}
-                                                    ></img>
-                                                    <div className={'flex flex-row justify-between w-full'}>
-                                                        <span>{coin.name}</span>
-                                                        {coin.id === selectCoin.id ? <Check size={18} className={'text-[#EB2B3E]'}></Check> : ''}
-                                                    </div>
-                                                </a>
-                                            )
-                                        })}
+                                                ) : (
+                                                    <a
+                                                        id={`${coin.id}`}
+                                                        key={key}
+                                                        className={`hover:bg-[#F7F8FA] flex flex-row justify-start w-full items-center p-3 text-[#E5E7E8] font-medium`}
+                                                    >
+                                                        <img
+                                                            alt={''}
+                                                            src={`${coin.icon}`}
+                                                            width="24"
+                                                            height="24"
+                                                            className={'mr-[12px] rounded-[50%] grayscale hover:cursor-default'}
+                                                        ></img>
+                                                        <div className={'flex flex-row justify-between w-full'}>
+                                                            <span>{coin.name}</span>
+                                                            {coin.id === selectCoin.id ? <Check size={18} className={'text-[#EB2B3E]'}></Check> : ''}
+                                                        </div>
+                                                    </a>
+                                                )
+                                            })}
+                                    </div>
                                 </div>
-                            </div>
+                            </Modal>
                         )}
                         {active && (
                             <Modal
@@ -1531,11 +1565,11 @@ export const InsuranceFrom = () => {
                                                 openChangeToken && 'opacity-0'
                                             } `}
                                             placeholder="Số tiền?"
-                                            value={state.q_covered > 0 ? Number(state.q_covered) : 'Số tiền?'}
+                                            value={state.q_covered != undefined ? Number(state.q_covered) : 'Số tiền?'}
                                             name="name"
                                             id="name"
                                             onChange={(a: any) => {
-                                                setState({ ...state, q_covered: Number(a.target.value.replace(/^00+/, '0')) })
+                                                setState({ ...state, q_covered: Number(a.target.value.replace(/^0[0-9]+/, '0')) })
                                                 setPercentInsurance(0)
                                             }}
                                         ></input>
@@ -1773,7 +1807,7 @@ export const InsuranceFrom = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold'}>
-                                            {/* <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span> */}
+                                            <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span>
                                         </div>
                                     </div>
                                     <div
