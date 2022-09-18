@@ -9,13 +9,13 @@ import { GetStaticProps } from 'next'
 import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CheckCircle, LeftArrow, InfoCircle, XMark, ErrorTriggersIcon, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import useWindowSize from 'hooks/useWindowSize'
-import { screens, stateInsurance } from 'utils/constants'
+import { screens } from 'utils/constants'
 import { Suspense } from 'react'
 import store, { RootStore, useAppSelector } from 'redux/store'
 import Config from 'config/config'
@@ -41,7 +41,6 @@ export const InsuranceFrom = () => {
         i18n: { language },
     } = useTranslation()
     const wallet = useWeb3Wallet()
-    const USDTBalance = useWeb3USDT()
     const router = useRouter()
     const { width } = useWindowSize()
     const isMobile = width && width <= screens.drawer
@@ -52,7 +51,7 @@ export const InsuranceFrom = () => {
     const [isDrop, setDrop] = useState(false)
     const [checkUpgrade, setCheckUpgrade] = useState(false)
     const [clear, setClear] = useState(false)
-    const stone = store.getState()
+    const assetsToken = useAppSelector((state: RootStore) => state.setting.assetsToken)
     const [index, setIndex] = useState<1 | 2>(1)
     const [tab, setTab] = useState<number>(3)
     const [loadings, setLoadings] = useState(true)
@@ -192,7 +191,7 @@ export const InsuranceFrom = () => {
     useEffect(() => {
         if (loadings) {
             setTimeout(() => {
-                // setShowGuide(true)
+                setShowGuide(true)
             }, 5000)
         }
     }, [loadings])
@@ -208,24 +207,22 @@ export const InsuranceFrom = () => {
     }
 
     useEffect(() => {
-        setLoadings(true)
-        if (stone.setting.assetsToken.length > 0) {
-            let list: ICoin[] = []
+        let list: ICoin[] = []
+        assetsToken.map(async (token: any) => {
+            const tmp = {
+                id: token._id,
+                name: token.name,
+                icon: token.attachment,
+                symbol: `${token.symbol}USDT`,
+                type: token.symbol,
+                disable: !token.isActive,
+            }
 
-            stone.setting.assetsToken.map(async (token: any) => {
-                list.push({
-                    id: token._id,
-                    name: token.name,
-                    icon: token.attachment,
-                    symbol: `${token.symbol}USDT`,
-                    type: token.symbol,
-                    disable: !token.isActive,
-                })
-            })
-            setListCoin(list)
-            setLoadings(false)
-        }
-    }, [store])
+            await list.push(tmp)
+        })
+
+        return setListCoin(list)
+    }, [assetsToken])
 
     useEffect(() => {
         if (wallet.account) {
