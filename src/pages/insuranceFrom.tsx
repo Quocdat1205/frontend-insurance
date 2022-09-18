@@ -25,13 +25,10 @@ import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatNumber, getUnit } from 'utils/utils'
 import useWeb3USDT from 'hooks/useWeb3USDT'
-<<<<<<< HEAD
 import styled from 'styled-components'
 import classnames from 'classnames'
 
-=======
 import { ethers } from 'ethers'
->>>>>>> a3ed87c62af7f936b50ae74d194fb428ec5b7f38
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
@@ -81,18 +78,25 @@ export const InsuranceFrom = () => {
     const [userBalance, setUserBalance] = useState<number>(0)
     const [listCoin, setListCoin] = useState<ICoin[]>([])
     const [selectCoin, setSelectedCoin] = useState<ICoin>({
-        icon: '',
-        id: '',
-        name: '',
-        symbol: '',
-        type: '',
+        icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
+        id: '63187ae8c2ad72eac4d0f363',
+        name: 'Binance',
+        symbol: 'BNBUSDT',
+        type: 'BNB',
         disable: false,
     })
     const [state, setState] = useState({
-        timeframe: '',
+        timeframe: 'ALL',
         margin: 0,
         percent_margin: 0,
-        symbol: selectCoin || {},
+        symbol: {
+            icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
+            id: '63187ae8c2ad72eac4d0f363',
+            name: 'Binance',
+            symbol: 'BNBUSDT',
+            type: 'BNB',
+            disable: false,
+        },
         period: 2,
         p_claim: 0,
         q_claim: 0,
@@ -108,6 +112,7 @@ export const InsuranceFrom = () => {
         name: 'Binance',
         symbol: 'BNBUSDT',
         type: 'BNB',
+        disable: false,
     }
     const [dataChart, setDataChart] = useState()
     const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', 'ALL']
@@ -185,15 +190,6 @@ export const InsuranceFrom = () => {
     }
 
     useEffect(() => {
-        const getBalanceUsdt = async () => {
-            const balanceUsdt = wallet.account && (await wallet?.contractCaller.usdtContract.contract.balanceOf(wallet.account))
-            console.log(balanceUsdt && ethers.utils.formatEther(balanceUsdt))
-        }
-
-        getBalanceUsdt()
-    }, [])
-
-    useEffect(() => {
         if (loadings) {
             setTimeout(() => {
                 // setShowGuide(true)
@@ -232,77 +228,64 @@ export const InsuranceFrom = () => {
     }, [store])
 
     useEffect(() => {
+        if (wallet.account) {
+            getBalanceUsdt()
+        }
+    }, [wallet.account])
+
+    const getBalanceUsdt = async () => {
+        if (state.p_market > 0) {
+            const balanceUsdt = wallet.account && (await wallet?.contractCaller.usdtContract.contract.balanceOf(wallet.account))
+            setUserBalance(Number(formatNumber(Number(balanceUsdt && ethers.utils.formatEther(balanceUsdt)) / state.p_market, 4)))
+        }
+    }
+
+    const setStorage = (value: any) => {
+        localStorage.setItem('buy_covered_state', JSON.stringify(value))
+    }
+
+    useEffect(() => {
         try {
             setLoadings(true)
             if (typeof window.ethereum !== undefined) {
                 console.log('MetaMask is installed!')
             }
-
-            const result = wallet.getBalance()
-            result.then((balance: number) => {
-                console.log(balance)
-
-                if (balance !== undefined) {
-                    const tmp = balance / state.p_market
-                    setUserBalance(tmp)
-                }
-            })
-            getPriceBNBUSDT(setPriceBNB)
             const data = localStorage.getItem('buy_covered_state')
             if (data) {
                 const res = JSON.parse(data)
-                setSelectedCoin({
-                    ...selectCoin,
-                    icon: res.symbol.icon,
-                    id: res.symbol.id,
-                    name: res.symbol.name,
-                    symbol: res.symbol.symbol,
-                    type: res.symbol.type,
-                    disable: res.symbol.disable,
-                })
                 setState({
                     ...state,
-                    percent_margin: res.percent_margin,
-                    period: res.period,
-                    p_claim: res.p_claim,
-                    q_claim: res.q_claim,
-                    r_claim: res.r_claim,
-                    q_covered: res.q_covered,
+                    timeframe: res.timeframe,
+                    margin: res.margin * 1.0,
+                    percent_margin: res.percent_margin * 1.0,
                     symbol: {
-                        icon: res.symbol.icon ?? 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
-                        id: res.symbol.id ?? '63187ae8c2ad72eac4d0f363',
-                        name: res.symbol.name ?? 'Binance Coin',
-                        symbol: res.symbol.symbol ?? 'BNBUSDT',
-                        type: res.symbol.type ?? 'BNB',
-                        disable: res.symbol.disable ?? false,
+                        icon: res.symbol.icon,
+                        id: res.symbol.id,
+                        name: res.symbol.name,
+                        symbol: res.symbol.symbol,
+                        type: res.symbol.type,
+                        disable: res.symbol.disable,
                     },
+                    period: res.period * 1.0,
+                    p_claim: res.p_claim * 1.0,
+                    q_claim: res.q_claim * 1.0,
+                    r_claim: res.r_claim * 1.0,
+                    q_covered: res.q_covered * 1.0,
+                    p_market: res.p_market * 1.0,
+                    t_market: res.t_market,
+                    p_expired: res.p_expired * 1.0,
                 })
-
-                if (res.tab) {
-                    setTab(res.tab)
-                }
-                if (res.unitMoney) {
-                    setUnitMoney(res.unitMoney)
-                }
-                if (res.index) {
-                    setIndex(res.index)
-                }
+                setTab(res.tab)
+                setUnitMoney(res.unitMoney)
+                setIndex(res.index)
                 validatePclaim(res.p_claim)
             } else {
-                const defaultToken = {
-                    icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
-                    id: '63187ae8c2ad72eac4d0f363',
-                    name: 'Binance Coin',
-                    symbol: 'BNBUSDT',
-                    type: 'BNB',
-                }
-                setSelectedCoin(defaultToken)
-                return localStorage.setItem('buy_covered_state', JSON.stringify({ symbol: { defaultToken } }))
+                setStorage(state)
             }
             setLoadings(false)
         } catch (error) {
-            return console.log(error)
             setLoadings(false)
+            return console.log(error)
         }
     }, [])
 
@@ -329,14 +312,6 @@ export const InsuranceFrom = () => {
     }, [index])
 
     useEffect(() => {
-        if (state.p_claim != 0) {
-            validatePclaim(state.p_claim)
-            const dataSave = { ...state, index: index, tab: tab }
-            return localStorage.setItem('buy_covered_state', JSON.stringify(dataSave))
-        }
-    }, [state.p_claim])
-
-    useEffect(() => {
         if (state.q_covered > 0) {
             setPercentInsurance((state.q_covered / userBalance) * 100)
         }
@@ -349,14 +324,28 @@ export const InsuranceFrom = () => {
                 const res = JSON.parse(data)
                 const newData = {
                     ...res,
-                    percent_margin: state.percent_margin,
-                    period: state.period,
-                    p_claim: state.p_claim,
-                    q_claim: state.q_claim,
-                    r_claim: state.r_claim,
-                    q_covered: state.q_covered,
+                    timeframe: state.timeframe,
+                    margin: state.margin * 1.0,
+                    percent_margin: state.percent_margin * 1.0,
+                    symbol: {
+                        icon: state.symbol.icon,
+                        id: state.symbol.id,
+                        name: state.symbol.name,
+                        symbol: state.symbol.symbol,
+                        type: state.symbol.type,
+                        disable: state.symbol.disable,
+                    },
+                    period: state.period * 1.0,
+                    p_claim: state.p_claim * 1.0,
+                    q_claim: state.q_claim * 1.0,
+                    r_claim: state.r_claim * 1.0,
+                    q_covered: state.q_covered * 1.0,
+                    p_market: state.p_market * 1.0,
+                    t_market: state.t_market,
+                    p_expired: state.p_expired * 1.0,
                 }
-                localStorage.setItem('buy_covered_state', JSON.stringify(newData))
+
+                setStorage(newData)
             }
         }
     }, [state])
@@ -388,12 +377,7 @@ export const InsuranceFrom = () => {
     useEffect(() => {
         if (selectCoin.symbol != '') {
             getPrice(selectCoin.symbol, state, setState)
-            const data = localStorage.getItem('buy_covered_state')
-            if (data) {
-                const res = JSON.parse(data)
-                const newData = { ...res, symbol: { ...selectCoin } }
-                return localStorage.setItem('buy_covered_state', JSON.stringify(newData))
-            }
+            setState({ ...state, symbol: { ...selectCoin } })
         }
     }, [selectCoin])
 
@@ -673,8 +657,8 @@ export const InsuranceFrom = () => {
                                     </div>
                                     <div className={'pb-[8px] pl-[32px] pr-[32px] h-[70px] flex justify-between'}>
                                         <div
-                                            className={`${
-                                                tab > 3 ? 'w-[50%] mr-[12px]' : 'w-full'
+                                            className={`${tab > 3 ? 'w-[50%] mr-[12px]' : 'w-full'} ${
+                                                state.q_covered > userBalance && 'border border-1 border-[#E5544B]'
                                             } flex justify-between border-collapse rounded-[3px] shadow-none`}
                                         >
                                             <Input
@@ -684,12 +668,13 @@ export const InsuranceFrom = () => {
                                                 type={'number'}
                                                 inputName={'Loại tài sản và số lượng tài sản'}
                                                 idInput={'iCoin'}
-                                                value={state.q_covered ? state?.q_covered : 0}
+                                                value={state.q_covered || 0}
                                                 onChange={(a: any) => {
-                                                    setState({
-                                                        ...state,
-                                                        q_covered: Number(a.target.value.replace(/^00+/, '0')),
-                                                    })
+                                                    if (Number(a.target.value) >= 1) {
+                                                        setState({ ...state, q_covered: a.target.value.replace(/^0+/, '') })
+                                                    } else {
+                                                        setState({ ...state, q_covered: Number(a.target.value) })
+                                                    }
 
                                                     setPercentInsurance(0)
                                                 }}
@@ -815,7 +800,11 @@ export const InsuranceFrom = () => {
                                                     idInput={''}
                                                     value={state.margin > 0 ? state?.margin : 0}
                                                     onChange={(a: any) => {
-                                                        setState({ ...state, margin: Number(a.target.value.replace(/^00+/, '0')), percent_margin: 0 })
+                                                        if (Number(a.target.value) >= 1) {
+                                                            setState({ ...state, margin: a.target.value.replace(/^0+/, ''), percent_margin: 0 })
+                                                        } else {
+                                                            setState({ ...state, margin: Number(a.target.value), percent_margin: 0 })
+                                                        }
                                                     }}
                                                     placeholder={''}
                                                 ></Input>
@@ -1028,7 +1017,11 @@ export const InsuranceFrom = () => {
                                                     idInput={'iPClaim'}
                                                     value={state.p_claim}
                                                     onChange={(a: any) => {
-                                                        setState({ ...state, p_claim: Number(a.target.value.replace(/^00+/, '0')) })
+                                                        if (Number(a.target.value) >= 1) {
+                                                            setState({ ...state, p_claim: a.target.value.replace(/^0+/, '') })
+                                                        } else {
+                                                            setState({ ...state, p_claim: Number(a.target.value) })
+                                                        }
                                                     }}
                                                     placeholder={`${menu[9].name}`}
                                                 ></Input>
@@ -1580,7 +1573,11 @@ export const InsuranceFrom = () => {
                                             name="name"
                                             id="name"
                                             onChange={(a: any) => {
-                                                setState({ ...state, q_covered: Number(a.target.value.replace(/^0[0-9]+/, '0')) })
+                                                if (Number(a.target.value) >= 1) {
+                                                    setState({ ...state, p_claim: a.target.value.replace(/^0+/, '') })
+                                                } else {
+                                                    setState({ ...state, p_claim: Number(a.target.value) })
+                                                }
                                                 setPercentInsurance(0)
                                             }}
                                         ></input>
@@ -1600,11 +1597,19 @@ export const InsuranceFrom = () => {
                                                 name="name"
                                                 id="name"
                                                 onChange={(a: any) => {
-                                                    setState({
-                                                        ...state,
-                                                        margin: Number(a.target.value),
-                                                        percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
-                                                    })
+                                                    if (Number(a.target.value) >= 1) {
+                                                        setState({
+                                                            ...state,
+                                                            margin: a.target.value.replace(/^0+/, ''),
+                                                            percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
+                                                        })
+                                                    } else {
+                                                        setState({
+                                                            ...state,
+                                                            margin: Number(a.target.value),
+                                                            percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
+                                                        })
+                                                    }
                                                 }}
                                             ></input>
                                         </label>{' '}
@@ -1696,10 +1701,16 @@ export const InsuranceFrom = () => {
                                             idInput={'iPClaim'}
                                             value={state.p_claim}
                                             onChange={(a: any) => {
-                                                if (a.target.value * 1 < 0 || a.target.value.length <= 0) {
-                                                    setState({ ...state, p_claim: 0 })
+                                                if (Number(a.target.value) >= 1) {
+                                                    setState({
+                                                        ...state,
+                                                        p_claim: a.target.value.replace(/^0+/, ''),
+                                                    })
                                                 } else {
-                                                    setState({ ...state, p_claim: Number(a.target.value.replace(/^0+/, '')) })
+                                                    setState({
+                                                        ...state,
+                                                        p_claim: Number(a.target.value),
+                                                    })
                                                 }
                                             }}
                                             placeholder={`${menu[9].name}`}

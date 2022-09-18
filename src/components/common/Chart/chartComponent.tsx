@@ -267,6 +267,7 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
 
                 let claimLabel = latitudeClaim.bullets.push(new am4charts.LabelBullet())
                 claimLabel.label.dy = latitudeClaim.data[0].value > state.p_market ? 20 : -20
+                claimLabel.label.horizontalCenter = 1
                 claimLabel.label.fill = am4core.color('#EB2B3E')
                 claimLabel.label.html = ''
                 claimLabel.label.draggable = false
