@@ -123,6 +123,8 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
             chart.data = test_data
             chart.logo.appeared = false
             chart.padding(0, 15, 0, 15)
+            chart.swipeable = true
+
             //cursor
             chart.cursor = new am4charts.XYCursor()
             chart.cursor.lineX.disabled = true
@@ -175,14 +177,6 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
             series.focusable = true
             series.fullWidthLineX = 0.05
             series.fullWidthLineY = 0.05
-
-            chart.events.on('wheeldown', (e: any) => {
-                console.log(series)
-            })
-
-            chart.events.on('wheelup', (e: any) => {
-                console.log(e)
-            })
 
             //chart sub
             let subSeries = chart.series.push(new am4charts.LineSeries())
@@ -271,14 +265,11 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                 )
                 bulletClaim.properties.alwaysShowTooltip = true
 
-                // bulletClaim.tooltip.disable = false
-
                 let claimLabel = latitudeClaim.bullets.push(new am4charts.LabelBullet())
-                claimLabel.label.horizontalCenter = 'left'
-                claimLabel.label.dy = -5
-                claimLabel.label.verticalCenter = 'bottom'
+                claimLabel.label.dy = latitudeClaim.data[0].value > state.p_market ? 20 : -20
                 claimLabel.label.fill = am4core.color('#EB2B3E')
                 claimLabel.label.html = ''
+                claimLabel.label.draggable = false
 
                 if (p_claim > 0) {
                     if (isMobile) {
@@ -308,13 +299,8 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                     claimLabel.label.html = `<div id="claimLabel" class="hover:cursor-pointer items-center flex text-[#808890] text-xs z-[1000]"><span class="mr-[8px]">P-Claim ${latitudeClaim.data[0].value}</span><span class="bg-[#F8F8F8]  rounded-[800px] px-[8px] py-[2px]">0%</span></div>`
                 }
 
-                //label claim
-                // claimLabel.cursorOverStyle = am4core.MouseCursorStyle.verticalResize
-                claimLabel.label.draggable = true
-
-                let interract = am4core.getInteraction()
                 claimLabel.events.on('drag', (event: any) => {
-                    let value = valueAxis.yToValue(event.target.pixelY)
+                    let value = valueAxis.yToValue(event.target.pixelY).toFixed(2)
                     event.target.dataItem.valueY = value
                     const claimLabel = document.getElementById('claimLabel')
                     if (claimLabel) {
@@ -335,12 +321,35 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                     setP_Claim(value)
                 })
 
+                chart.cursor.events.on('cursorpositionchanged', function (ev: any) {
+                    let yAxis = ev.target.chart.yAxes.getIndex(0)
+                    const value = yAxis.positionToValue(yAxis.toAxisPosition(ev.target.yPosition)).toFixed(2)
+                    const claimLabel = document.getElementById('claimLabel')
+
+                    if (claimLabel) {
+                        if (value < state.p_market) {
+                            claimLabel.style.color = '#EB2B3E'
+                            claimLabel.style.backgroundColor = '#FFF1F2'
+                            claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                        } else {
+                            claimLabel.style.color = '#52CC74'
+                            claimLabel.style.backgroundColor = '#F1FFF5'
+                            claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                        }
+                    }
+                    if (ev) {
+                        chart.events.once('up', (e: any) => {
+                            setP_Claim(value)
+                        })
+                    }
+                })
+
                 handleTrendLineStatus(chart, p_claim, state)
             }
         }
     }
 
-    return <div id="chartdiv" style={{ width: '100%', height: '500px' }}></div>
+    return <div id="chartdiv" className="relative" style={{ width: '100%', height: '500px' }}></div>
 }
 
 export default ChartComponent

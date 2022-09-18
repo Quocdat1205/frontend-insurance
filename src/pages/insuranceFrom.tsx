@@ -9,13 +9,13 @@ import { GetStaticProps } from 'next'
 import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { CheckCircle, LeftArrow, InfoCircle, XMark, ErrorTriggersIcon, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import useWindowSize from 'hooks/useWindowSize'
-import { screens } from 'utils/constants'
+import { screens, stateInsurance } from 'utils/constants'
 import { Suspense } from 'react'
 import store, { RootStore, useAppSelector } from 'redux/store'
 import Config from 'config/config'
@@ -25,6 +25,9 @@ import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatNumber, getUnit } from 'utils/utils'
 import useWeb3USDT from 'hooks/useWeb3USDT'
+import styled from 'styled-components'
+import classnames from 'classnames'
+
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
@@ -200,14 +203,33 @@ export const InsuranceFrom = () => {
             }
         }
     }
+
+    useEffect(() => {
+        setLoadings(true)
+        if (stone.setting.assetsToken.length > 0) {
+            let list: ICoin[] = []
+
+            stone.setting.assetsToken.map(async (token: any) => {
+                list.push({
+                    id: token._id,
+                    name: token.name,
+                    icon: token.attachment,
+                    symbol: `${token.symbol}USDT`,
+                    type: token.symbol,
+                    disable: !token.isActive,
+                })
+            })
+            setListCoin(list)
+            setLoadings(false)
+        }
+    }, [store])
+
     useEffect(() => {
         try {
+            setLoadings(true)
             if (typeof window.ethereum !== undefined) {
-                return console.log('MetaMask is installed!')
+                console.log('MetaMask is installed!')
             }
-
-            const temp = USDTBalance.getBalance()
-            console.log(temp, 'thuc')
 
             const result = wallet.getBalance()
             result.then((balance: number) => {
@@ -218,29 +240,8 @@ export const InsuranceFrom = () => {
                     setUserBalance(tmp)
                 }
             })
-
-            setLoadings(true)
-            if (stone.setting.assetsToken.length > 0) {
-                let list: ICoin[] = []
-
-                stone.setting.assetsToken.map(async (token: any) => {
-                    list.push({
-                        id: token._id,
-                        name: token.name,
-                        icon: token.attachment,
-                        symbol: `${token.symbol}USDT`,
-                        type: token.symbol,
-                        disable: !token.isActive,
-                    })
-                })
-                setListCoin(list)
-                setLoadings(false)
-            }
-
             getPriceBNBUSDT(setPriceBNB)
-
             const data = localStorage.getItem('buy_covered_state')
-
             if (data) {
                 const res = JSON.parse(data)
                 setSelectedCoin({
@@ -261,12 +262,12 @@ export const InsuranceFrom = () => {
                     r_claim: res.r_claim,
                     q_covered: res.q_covered,
                     symbol: {
-                        icon: res.symbol.icon,
-                        id: res.symbol.id,
-                        name: res.symbol.name,
-                        symbol: res.symbol.symbol,
-                        type: res.symbol.type,
-                        disable: res.symbol.disable,
+                        icon: res.symbol.icon ?? 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
+                        id: res.symbol.id ?? '63187ae8c2ad72eac4d0f363',
+                        name: res.symbol.name ?? 'Binance Coin',
+                        symbol: res.symbol.symbol ?? 'BNBUSDT',
+                        type: res.symbol.type ?? 'BNB',
+                        disable: res.symbol.disable ?? false,
                     },
                 })
 
@@ -284,16 +285,19 @@ export const InsuranceFrom = () => {
                 const defaultToken = {
                     icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
                     id: '63187ae8c2ad72eac4d0f363',
-                    name: 'Binance',
+                    name: 'Binance Coin',
                     symbol: 'BNBUSDT',
                     type: 'BNB',
                 }
-                return localStorage.setItem('buy_covered_state', JSON.stringify({ symbol: { ...defaultToken } }))
+                setSelectedCoin(defaultToken)
+                return localStorage.setItem('buy_covered_state', JSON.stringify({ symbol: { defaultToken } }))
             }
+            setLoadings(false)
         } catch (error) {
             return console.log(error)
+            setLoadings(false)
         }
-    }, [stone])
+    }, [])
 
     useEffect(() => {
         if (unitMoney) {
@@ -2001,6 +2005,7 @@ const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGui
 }
 
 const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
+    const [tab, setTab] = useState<number>(0)
     const terms = [
         {
             title: 'Q-Covered',
@@ -2047,20 +2052,63 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
             description: t('insurance:terminology:t_expired'),
         },
     ]
+    const terms1 = [
+        {
+            title: t('common:status:available'),
+            description: t('common:status:explain:available'),
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#00A5FF]/[0.1] text-[#3960E5]',
+        },
+        {
+            title: t('common:status:claim_waiting'),
+            description: t('common:status:explain:claim_waiting'),
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#FBCD2D]/[0.1] text-[#FBCD2D]',
+        },
+        {
+            title: t('common:status:expired'),
+            description: t('common:status:explain:expired'),
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#20C9AC]/[0.1] text-[#52CC74]',
+        },
+        {
+            title: t('common:status:claimed'),
+            description: t('common:status:explain:claimed'),
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#20C9AC]/[0.1] text-[#52CC74]',
+        },
+        {
+            title: t('common:status:refunded'),
+            description: t('common:status:explain:refunded'),
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#B6B4BA]/[0.1] text-[#B2B7BC]',
+        },
+        {
+            title: t('common:status:liquidated'),
+            description: t('common:status:explain:liquidated'),
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#B6B4BA]/[0.1] text-[#B2B7BC]',
+        },
+    ]
+
+    // const optionsState = useMemo(() => {
+    //     return Object.keys(stateInsurance).reduce((acc: any[], key: string) => {
+    //         const _key = String(key).toLowerCase()
+    //         acc.push({ title: t(`common:status:${_key}`), description: t(`common:status:explain:${_key}`) })
+    //         return acc
+    //     }, [])
+    // }, [])
+
     return (
-        <Modal
-            isMobile={isMobile}
-            isVisible={visible}
-            onBackdropCb={onClose}
-            wrapClassName="!p-6"
-            className={'md:max-w-[424px]'}
-            containerClassName="z-[10000]"
-        >
-            <div className="text-xl font-medium mb-8 text-left">{t('insurance:buy:detailed_terminology')}</div>
+        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'max-w-[424px]'} containerClassName="z-[100]">
+            <div className="text-xl font-medium mb-6 text-center">{t('insurance_history:detailed_terminology')}</div>
+
+            <Tabs tab={tab} className="mb-6 text-sm">
+                <TabItem active={tab === 0} onClick={() => setTab(0)}>
+                    Thuật ngữ bảo hiểm
+                </TabItem>
+                <TabItem active={tab === 1} onClick={() => setTab(1)}>
+                    Trạng thái hợp đồng
+                </TabItem>
+            </Tabs>
             <div className="flex flex-col text-sm divide-solid divide-y divide-divider max-h-[70vh] overflow-auto -mx-6 px-6">
-                {terms.map((item: any, index: number) => (
+                {[...(tab === 0 ? terms : terms1)].map((item: any, index: number) => (
                     <div key={index} className="py-3 flex items-center">
-                        <div className="whitespace-nowrap min-w-[30%]">{item.title}</div>
+                        <div className={`whitespace-nowrap min-w-[30%] ${item?.class}`}>{item.title}</div>
                         <div>{item.description}</div>
                     </div>
                 ))}
@@ -2068,5 +2116,24 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
         </Modal>
     )
 }
+
+const Tabs = styled.div.attrs({
+    className: 'mt-6 text-sm flex items-center justify-between h-11 relative',
+})<any>`
+    &:after {
+        content: '';
+        position: absolute;
+        height: 2px;
+        background-color: ${() => colors.red.red};
+        transform: ${({ tab }) => `translate(${tab * 100}%,0)`};
+        width: calc(100% / 2);
+        transition: all 0.2s;
+        bottom: -1px;
+    }
+`
+
+const TabItem = styled.div.attrs<any>(({ active }) => ({
+    className: classnames('px-4 py-3 font-medium whitespace-nowrap border-b-[2px] border-divider', { 'text-red': active }),
+}))<any>``
 
 export default InsuranceFrom

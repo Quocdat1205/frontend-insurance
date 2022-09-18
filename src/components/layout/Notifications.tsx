@@ -143,30 +143,37 @@ const Notifications = () => {
     }
 
     const renderNoti = () => {
-        return loading
-            ? loader()
-            : dataSource.list_notice?.map((item: any, index: number) => {
-                  return (
-                      <div onClick={() => onShowDetail(item)} key={index} className="flex items-center sm:px-6 py-4 space-x-4 mb:hover:bg-hover">
-                          <div className="min-w-[40px] min-h-[40px]">
-                              <img src={`/images/icons/${item?.isConfirm ? 'ic_noti_active' : 'ic_noti_inactive'}.png`} width="40" height="40" />
-                          </div>
-                          <div className="flex flex-col space-y-[2px]">
-                              <div
-                                  className="text-sm"
-                                  dangerouslySetInnerHTML={{
-                                      __html: t('common:notification:notice_message', {
-                                          id: item?._id,
-                                          status: t(`common:notification:status:${String(item?.state).toLowerCase()}`),
-                                      }),
-                                  }}
-                              ></div>
-                              <span className="text-xs leading-[1rem] text-gray">{getTimeAgo(item?.createdAt)}</span>
-                          </div>
-                          {!item?.isConfirm && <div className="min-w-[6px] min-h-[6px] bg-red rounded-[50%]" />}
-                      </div>
-                  )
-              })
+        return loading ? (
+            loader()
+        ) : dataSource?.list_notice.length <= 0 ? (
+            <div className="flex flex-col items-center justify-center h-full">
+                <img src="/images/icons/notice_noData.png" className="max-w-[240px] sm:max-w-[160px]" />
+                <span className="text-sm">{t('common:notification:no_notice')}</span>
+            </div>
+        ) : (
+            dataSource?.list_notice?.map((item: any, index: number) => {
+                return (
+                    <div onClick={() => onShowDetail(item)} key={index} className="flex items-center sm:px-6 py-4 space-x-4 mb:hover:bg-hover">
+                        <div className="min-w-[40px] min-h-[40px]">
+                            <img src={`/images/icons/${item?.isConfirm ? 'ic_noti_active' : 'ic_noti_inactive'}.png`} width="40" height="40" />
+                        </div>
+                        <div className="flex flex-col space-y-[2px]">
+                            <div
+                                className="text-sm"
+                                dangerouslySetInnerHTML={{
+                                    __html: t('common:notification:notice_message', {
+                                        id: item?._id,
+                                        status: t(`common:notification:status:${String(item?.state).toLowerCase()}`),
+                                    }),
+                                }}
+                            ></div>
+                            <span className="text-xs leading-[1rem] text-gray">{getTimeAgo(item?.createdAt)}</span>
+                        </div>
+                        {!item?.isConfirm && <div className="min-w-[6px] min-h-[6px] bg-red rounded-[50%]" />}
+                    </div>
+                )
+            })
+        )
     }
 
     const onLoadMore = () => {
@@ -230,7 +237,7 @@ const Notifications = () => {
                             width && width > screens.drawer ? 'left-0' : 'right-0'
                         }  shadow-subMenu rounded-xl min-w-[360px] py-1 bg-white`}
                     >
-                        <div className="font-normal sm:max-h-[500px] overflow-auto px-4 sm:px-0">
+                        <div className="font-normal sm:h-[28rem] overflow-auto px-4 sm:px-0">
                             {renderNoti()}
                             {totalPage > 1 && !loading && hasNext && (
                                 <div onClick={onLoadMore} className="text-red underline text-sm my-3 flex text-center justify-center cursor-pointer">
