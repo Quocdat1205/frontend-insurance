@@ -114,16 +114,16 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                     variants={'primary'}
                                                     className={`bg-[#EB2B3E] w-[80%] m-[24px] mt-[32px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                                                     onClick={() => {
-                                                        localStorage.setItem(
-                                                            'buy_covered_state',
-                                                            JSON.stringify({
-                                                                icon: undefined,
-                                                                id: undefined,
-                                                                name: undefined,
-                                                                symbol: undefined,
-                                                                type: undefined,
-                                                            }),
-                                                        )
+                                                        // localStorage.setItem(
+                                                        //     'buy_covered_state',
+                                                        //     JSON.stringify({
+                                                        //         icon: undefined,
+                                                        //         id: undefined,
+                                                        //         name: undefined,
+                                                        //         symbol: undefined,
+                                                        //         type: undefined,
+                                                        //     }),
+                                                        // )
                                                     }}
                                                 >
                                                     {index == 0
@@ -209,16 +209,16 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                     onClick={() => {
                                                         if (index == 0) {
                                                             router.push('/buy-covered/insurance-history')
-                                                            localStorage.setItem(
-                                                                'buy_covered_state',
-                                                                JSON.stringify({
-                                                                    icon: undefined,
-                                                                    id: undefined,
-                                                                    name: undefined,
-                                                                    symbol: undefined,
-                                                                    type: undefined,
-                                                                }),
-                                                            )
+                                                            // localStorage.setItem(
+                                                            //     'buy_covered_state',
+                                                            //     JSON.stringify({
+                                                            //         icon: undefined,
+                                                            //         id: undefined,
+                                                            //         name: undefined,
+                                                            //         symbol: undefined,
+                                                            //         type: undefined,
+                                                            //     }),
+                                                            // )
                                                         }
                                                     }}
                                                 >

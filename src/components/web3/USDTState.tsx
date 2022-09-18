@@ -52,7 +52,10 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
     }
 
     const getBalance = async () => {
-        const balance = provider && (await provider!.getBalance(account!).then((res) => parseFloat(ethers.utils.formatEther(res))))
+        const balance =
+            provider && (await provider!.getBalance('0x7ef95a0FEE0Dd31b22626fA2e10Ee6A223F8a684'!).then((res) => parseFloat(ethers.utils.formatEther(res))))
+        console.log(balance)
+
         return balance
     }
 
@@ -76,7 +79,6 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
         error,
         connector: getConnectorInfo(connector),
         provider,
-        // balance,
         contractCaller,
         getBalance,
     }
