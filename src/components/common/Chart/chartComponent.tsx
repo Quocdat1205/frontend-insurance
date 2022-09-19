@@ -321,28 +321,29 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                     let value = valueAxis.yToValue(event.target.pixelY)
                     setP_Claim(value)
                 })
+                chart.events.once('down', (e: any) => {
+                    chart.cursor.events.on('cursorpositionchanged', function (ev: any) {
+                        let yAxis = ev.target.chart.yAxes.getIndex(0)
+                        const value = yAxis.positionToValue(yAxis.toAxisPosition(ev.target.yPosition)).toFixed(2)
+                        const claimLabel = document.getElementById('claimLabel')
 
-                chart.cursor.events.on('cursorpositionchanged', function (ev: any) {
-                    let yAxis = ev.target.chart.yAxes.getIndex(0)
-                    const value = yAxis.positionToValue(yAxis.toAxisPosition(ev.target.yPosition)).toFixed(2)
-                    const claimLabel = document.getElementById('claimLabel')
-
-                    if (claimLabel) {
-                        if (value < state.p_market) {
-                            claimLabel.style.color = '#EB2B3E'
-                            claimLabel.style.backgroundColor = '#FFF1F2'
-                            claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
-                        } else {
-                            claimLabel.style.color = '#52CC74'
-                            claimLabel.style.backgroundColor = '#F1FFF5'
-                            claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                        if (claimLabel) {
+                            if (value < state.p_market) {
+                                claimLabel.style.color = '#EB2B3E'
+                                claimLabel.style.backgroundColor = '#FFF1F2'
+                                claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                            } else {
+                                claimLabel.style.color = '#52CC74'
+                                claimLabel.style.backgroundColor = '#F1FFF5'
+                                claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                            }
                         }
-                    }
-                    if (ev) {
-                        chart.events.once('up', (e: any) => {
-                            setP_Claim(value)
-                        })
-                    }
+                        if (ev) {
+                            chart.events.once('up', (e: any) => {
+                                setP_Claim(value)
+                            })
+                        }
+                    })
                 })
 
                 handleTrendLineStatus(chart, p_claim, state)

@@ -517,17 +517,18 @@ export const InsuranceFrom = () => {
                         <Modal
                             portalId="modal"
                             isVisible={!isMobile}
-                            onBackdropCb={() => {}}
+                            onBackdropCb={() => {
+                                setActive(false)
+                                setIndex(1)
+                            }}
                             className="rounded-xl p-6 bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                         >
                             <NotificationInsurance
-                                id={res ? res.data._id : ''}
+                                id={res ? res : ''}
                                 name={`${nameNoti}`}
                                 state={state}
                                 active={active}
-                                setActive={() => {
-                                    setActive(false)
-                                }}
+                                setActive={() => {}}
                                 isMobile={false}
                             />
                         </Modal>
@@ -915,7 +916,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 2,
-                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
+                                                    margin: Number((2 * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -928,7 +929,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 5,
-                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
+                                                    margin: Number((5 * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -941,7 +942,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 7,
-                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
+                                                    margin: Number((7 * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -954,11 +955,11 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 10,
-                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
+                                                    margin: Number((10 * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
-                                            <div className={`${state.percent_margin > 10 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
+                                            <div className={`${state.percent_margin >= 10 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span>10%</span>
                                         </div>
                                     </div>
@@ -1495,17 +1496,18 @@ export const InsuranceFrom = () => {
                             <Modal
                                 portalId="modal"
                                 isVisible={true}
-                                onBackdropCb={() => {}}
+                                onBackdropCb={() => {
+                                    setActive(false)
+                                    setIndex(1)
+                                }}
                                 className="!rounded-[0px] bg-white w-full absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-0"
                             >
                                 <NotificationInsurance
-                                    id={res ? res.data._id : ''}
+                                    id={res ? res : ''}
                                     name={`${nameNoti}`}
                                     state={state}
                                     active={active}
-                                    setActive={() => {
-                                        setActive(false)
-                                    }}
+                                    setActive={() => {}}
                                     isMobile={false}
                                 />
                             </Modal>
@@ -2127,7 +2129,14 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
     ]
 
     return (
-        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'max-w-[424px]'} containerClassName="z-[100]">
+        <Modal
+            isMobile={isMobile}
+            isVisible={visible}
+            onBackdropCb={onClose}
+            wrapClassName="!p-6"
+            className={'max-w-[424px] !min-h-[790px] !h-[790px]'}
+            containerClassName="z-[100]"
+        >
             <div className="text-xl font-medium mb-6 text-center">{t('insurance:buy:detailed_terminology')}</div>
 
             <Tabs tab={tab} className="mb-6 text-sm">

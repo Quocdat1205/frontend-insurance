@@ -4,6 +4,9 @@ import { Loading, SuccessIcon, XMark } from 'components/common/Svg/SvgIcon'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { RootStore, useAppSelector } from 'redux/store'
+import { createSelector } from 'reselect'
+import { formatNumber } from 'utils/utils'
 
 export type iProps = {
     id: string
@@ -18,6 +21,8 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
     const { t } = useTranslation()
     const router = useRouter()
     const [email, setEmail] = useState()
+    const assetsToken = useAppSelector((state: RootStore) => state.setting.assetsToken)
+
     const noti = [
         {
             name: 'success',
@@ -74,14 +79,15 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                 <div className="flex flex-row justify-between py-[16px] px-[8px]">
                                                     <div className={'text-[#808890]'}>Q-Claim</div>
                                                     <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                                        {state.q_claim.toFixed(2)}
+                                                        <span className="mr-[8px]">{Number(formatNumber(state?.q_claim, 2))}</span>
                                                         <span className={'text-[#EB2B3E]'}>USDT</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row justify-between py-[16px] px-[8px] ">
                                                     <div className={'text-[#808890]'}>R-Claim</div>
                                                     <div className={'font-semibold'}>
-                                                        <span>{state.r_claim.toFixed(2)}%</span>
+                                                        <span className="mr-[8px]">{Number(formatNumber(state?.r_claim, 2))}</span>
+                                                        <span>%</span>
                                                     </div>
                                                 </div>
                                             </>
@@ -114,16 +120,29 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                     variants={'primary'}
                                                     className={`bg-[#EB2B3E] w-[80%] m-[24px] mt-[32px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                                                     onClick={() => {
-                                                        // localStorage.setItem(
-                                                        //     'buy_covered_state',
-                                                        //     JSON.stringify({
-                                                        //         icon: undefined,
-                                                        //         id: undefined,
-                                                        //         name: undefined,
-                                                        //         symbol: undefined,
-                                                        //         type: undefined,
-                                                        //     }),
-                                                        // )
+                                                        const newSymbol = {
+                                                            timeframe: 'ALL',
+                                                            margin: 0,
+                                                            percent_margin: 0,
+                                                            symbol: {
+                                                                id: assetsToken[0]._id,
+                                                                name: assetsToken[0].name,
+                                                                icon: assetsToken[0].attachment,
+                                                                symbol: `${assetsToken[0].symbol}USDT`,
+                                                                type: assetsToken[0].symbol,
+                                                                disable: !assetsToken[0].isActive,
+                                                            },
+                                                            period: 2,
+                                                            p_claim: 0,
+                                                            q_claim: 0,
+                                                            r_claim: 0,
+                                                            q_covered: 0,
+                                                            p_market: 0,
+                                                            t_market: 0,
+                                                            p_expired: 0,
+                                                            index: 1,
+                                                        }
+                                                        localStorage.setItem('buy_covered_state', JSON.stringify({ ...newSymbol }))
                                                     }}
                                                 >
                                                     {index == 0
@@ -167,14 +186,15 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                 <div className="flex flex-row justify-between py-[16px] px-[8px]">
                                                     <div className={'text-[#808890]'}>Q-Claim</div>
                                                     <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                                        {state.q_claim}
+                                                        <span className="mr-[8px]">{Number(formatNumber(state?.q_claim, 2))}</span>
                                                         <span className={'text-[#EB2B3E]'}>USDT</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row justify-between py-[16px] px-[8px] ">
                                                     <div className={'text-[#808890]'}>R-Claim</div>
                                                     <div className={'font-semibold'}>
-                                                        <span>{state.r_claim}%</span>
+                                                        <span className="mr-[8px]">{Number(formatNumber(state?.r_claim, 2))}</span>
+                                                        <span>%</span>
                                                     </div>
                                                 </div>
                                             </>
@@ -209,16 +229,29 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                     onClick={() => {
                                                         if (index == 0) {
                                                             router.push('/buy-covered/insurance-history')
-                                                            // localStorage.setItem(
-                                                            //     'buy_covered_state',
-                                                            //     JSON.stringify({
-                                                            //         icon: undefined,
-                                                            //         id: undefined,
-                                                            //         name: undefined,
-                                                            //         symbol: undefined,
-                                                            //         type: undefined,
-                                                            //     }),
-                                                            // )
+                                                            const newSymbol = {
+                                                                timeframe: 'ALL',
+                                                                margin: 0,
+                                                                percent_margin: 0,
+                                                                symbol: {
+                                                                    id: assetsToken[0]._id,
+                                                                    name: assetsToken[0].name,
+                                                                    icon: assetsToken[0].attachment,
+                                                                    symbol: `${assetsToken[0].symbol}USDT`,
+                                                                    type: assetsToken[0].symbol,
+                                                                    disable: !assetsToken[0].isActive,
+                                                                },
+                                                                period: 2,
+                                                                p_claim: 0,
+                                                                q_claim: 0,
+                                                                r_claim: 0,
+                                                                q_covered: 0,
+                                                                p_market: 0,
+                                                                t_market: 0,
+                                                                p_expired: 0,
+                                                                index: 1,
+                                                            }
+                                                            localStorage.setItem('buy_covered_state', JSON.stringify({ ...newSymbol }))
                                                         }
                                                     }}
                                                 >
