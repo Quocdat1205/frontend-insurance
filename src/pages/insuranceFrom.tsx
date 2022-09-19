@@ -919,7 +919,7 @@ export const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${state.percent_margin == 2 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
+                                            <div className={`${state.percent_margin >= 2 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span>2%</span>
                                         </div>
                                         <div
@@ -932,7 +932,7 @@ export const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${5 == state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
+                                            <div className={`${5 <= state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span className={''}>5%</span>
                                         </div>
                                         <div
@@ -945,7 +945,7 @@ export const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${7 == state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
+                                            <div className={`${7 <= state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span className={''}>7%</span>
                                         </div>
                                         <div
@@ -958,7 +958,7 @@ export const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${state.percent_margin == 10 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
+                                            <div className={`${state.percent_margin > 10 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span>10%</span>
                                         </div>
                                     </div>
@@ -1616,20 +1616,20 @@ export const InsuranceFrom = () => {
                                                 type="number"
                                                 className={` text-white pl-[4px] focus-visible:outline-none w-0 border border-1 border-black`}
                                                 placeholder="Số tiền?"
-                                                value={state.margin != undefined ? Number(state.margin) : 'Số tiền?'}
+                                                value={state.margin > 0 ? Number(state.margin) : 0}
                                                 name="name"
                                                 id="name"
                                                 onChange={(a: any) => {
                                                     if (Number(a.target.value) >= 1) {
-                                                        setState({
+                                                        return setState({
                                                             ...state,
                                                             margin: a.target.value.replace(/^0+/, ''),
                                                             percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
                                                         })
                                                     } else {
-                                                        setState({
+                                                        return setState({
                                                             ...state,
-                                                            margin: Number(a.target.value),
+                                                            margin: Number(a.target.value) * 1,
                                                             percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
                                                         })
                                                     }
