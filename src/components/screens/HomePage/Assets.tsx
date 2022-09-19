@@ -51,8 +51,6 @@ const Assets = () => {
             })
 
             if (item) {
-                console.log(item)
-                const res = JSON.parse(state)
                 const newSymbol = {
                     timeframe: 'ALL',
                     margin: 0,

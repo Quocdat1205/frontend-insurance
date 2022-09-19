@@ -97,6 +97,7 @@ export const AcceptBuyInsurance = ({
                 ),
             })
         }
+        setNoti('loading')
 
         try {
             const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${state.symbol.symbol}`)
@@ -109,8 +110,6 @@ export const AcceptBuyInsurance = ({
             }
 
             if (!checkUpgrade) {
-                // console.log(wallet, state, 'thuc')
-
                 const t_expired = new Date()
                 t_expired.setDate(state.t_market.getDate() + state.period)
 
@@ -122,20 +121,15 @@ export const AcceptBuyInsurance = ({
                     p_market: formatPriceToWeiValue(Number(formatNumber(data.data[0].p, 4))),
                     p_claim: formatPriceToWeiValue(Number(formatNumber(state.p_claim, 4))),
                     period: Number(state.period),
-                    isUseNain: checkUpgrade,
+                    isUseNain: false,
                 }
 
                 const allowance = await wallet.contractCaller.usdtContract.contract.allowance(wallet.account, contractAddress)
 
                 const parseAllowance = formatWeiValueToPrice(allowance)
-                console.log(parseAllowance)
 
                 if (parseAllowance < state.margin) {
-                    await wallet.contractCaller.usdtContract.contract
-                        .approve(contractAddress, formatPriceToWeiValue(100), { from: wallet.account })
-                        .then((contract: any) => {
-                            console.log('APPROVE', contract)
-                        })
+                    await wallet.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(1000), { from: wallet.account })
                 }
 
                 const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
@@ -147,12 +141,11 @@ export const AcceptBuyInsurance = ({
                     dataPost.p_claim,
                     dataPost.period,
                     dataPost.isUseNain,
-                    { value: dataPost.margin },
+                    { value: 0 },
                 )
                 await buy.wait()
 
                 const id_sc = await buy.wait()
-                console.log(id_sc.events[2])
 
                 if (buy && id_sc.events[2].args[0]) {
                     handlePostInsurance(buy, dataPost, state, Number(id_sc.events[2].args[0]))
@@ -168,9 +161,16 @@ export const AcceptBuyInsurance = ({
                     p_market: formatPriceToWeiValue(Number(formatNumber(data.data[0].p, 4))),
                     p_claim: formatPriceToWeiValue(Number(formatNumber(state.p_claim, 4))),
                     period: Number(state.period) + 2,
-                    isUseNain: checkUpgrade,
+                    isUseNain: true,
                 }
-                // console.log(state, dataPost)
+
+                const allowance = await wallet.contractCaller.usdtContract.contract.allowance(wallet.account, contractAddress)
+
+                const parseAllowance = formatWeiValueToPrice(allowance)
+
+                if (parseAllowance < state.margin) {
+                    await wallet.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(1000), { from: wallet.account })
+                }
 
                 const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
                     dataPost.buyer,
@@ -181,7 +181,7 @@ export const AcceptBuyInsurance = ({
                     dataPost.p_claim,
                     dataPost.period,
                     dataPost.isUseNain,
-                    { value: dataPost.margin },
+                    { value: 0 },
                 )
                 await buy.wait()
 
@@ -203,18 +203,18 @@ export const AcceptBuyInsurance = ({
                     owner: props.from,
                     transaction_hash: props.hash,
                     id_sc: _id,
-                    asset_covered: dataPost.asset,
-                    asset_refund: dataPost.unit,
+                    asset_covered: dataPost.unit || 'USDT',
+                    asset_refund: dataPost.unit || 'USDT',
                     margin: state.margin,
                     q_covered: Number(state.q_covered),
                     p_claim: Number(state.p_claim),
                     period: state.period,
-                    isUseNain: props.isUseNain,
+                    isUseNain: dataPost.isUseNain,
                 }
                 handelSetActive(true)
                 await buyInsurance(data).then((res) => {
-                    if (res.statusCode === 201) {
-                        setRes(res)
+                    if (res === 201) {
+                        setRes(_id)
                         setNoti('success')
                     }
                 })
@@ -636,7 +636,6 @@ export const AcceptBuyInsurance = ({
                         !isCanBuy ? 'bg-[#E5E7E8]' : 'bg-[#EB2B3E]'
                     }  h-[48px] w-[95%] tiny:w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                     onClick={() => {
-                        setNoti('loading')
                         createContract()
                     }}
                     disable={!isCanBuy}
