@@ -10,8 +10,9 @@ interface Guideline {
     start: boolean
     setStart: (e: boolean) => void
     seen: boolean
+    setShowTerminologyModal: (e: boolean) => void
 }
-const Guideline = ({ start, setStart, seen }: Guideline) => {
+const Guideline = ({ start, setStart, seen, setShowTerminologyModal }: Guideline) => {
     const { t } = useTranslation()
     const step = useRef<number>(0)
     const refGuide = useRef<any>(null)
@@ -36,6 +37,16 @@ const Guideline = ({ start, setStart, seen }: Guideline) => {
             if (_el) _el.scrollIntoView()
         }
     }, [start])
+
+    const onShowGlossary = (e: any) => {
+        let el = e?.target
+        while (el && el !== e.currentTarget && el.tagName !== 'SPAN') {
+            el = el.parentNode
+        }
+        if (el && el.tagName === 'SPAN') {
+            setShowTerminologyModal(true)
+        }
+    }
 
     const tourConfig: any = useMemo(() => {
         return [
@@ -71,7 +82,7 @@ const Guideline = ({ start, setStart, seen }: Guideline) => {
                 selector: '[data-tut="tour_hashID"]',
                 content: (props: any) => (
                     <Content
-                        title={t('insurance_history:guidelines:step_title_2')}
+                        title={t('insurance_history:guidelines:step_title_3')}
                         content={t('insurance_history:guidelines:step_content_3')}
                         {...props}
                         top
@@ -86,11 +97,14 @@ const Guideline = ({ start, setStart, seen }: Guideline) => {
                 content: (props: any) => (
                     <Content
                         title={t('insurance_history:status')}
-                        content={'Bấm để xem lại các bước hướng dẫn, hoặc tìm hiểu thêm về bảng chú giải thuật ngữ nếu gặp khó khăn trong quá trình sử dụng.'}
+                        content={t('insurance_history:guidelines:step_content_4', {
+                            value: `<span class='text-red underline'>${t('insurance_history:the_glossary')}</span>`,
+                        })}
                         {...props}
                         top
                         onClose={onClose}
                         seen={seen}
+                        onClick={onShowGlossary}
                     />
                 ),
                 position: 'bottom',
@@ -100,11 +114,14 @@ const Guideline = ({ start, setStart, seen }: Guideline) => {
                 content: (props: any) => (
                     <Content
                         title={t('insurance_history:guidelines:title')}
-                        content={t('insurance_history:guidelines:step_content_5')}
+                        content={t('insurance_history:guidelines:step_content_5', {
+                            value: `<span class='text-red underline'>${t('insurance_history:terminologies_states')}</span>`,
+                        })}
                         {...props}
                         top
                         onClose={onClose}
                         seen={seen}
+                        onClick={onShowGlossary}
                     />
                 ),
                 position: 'bottom',
@@ -151,7 +168,7 @@ const Guideline = ({ start, setStart, seen }: Guideline) => {
     )
 }
 
-const Content = ({ title, content, step, onClose, top, goTo, seen, ...props }: any) => {
+const Content = ({ title, content, step, onClose, top, goTo, seen, onClick }: any) => {
     const { t } = useTranslation()
     const steps = seen ? 4 : 5
     return (
@@ -173,7 +190,7 @@ const Content = ({ title, content, step, onClose, top, goTo, seen, ...props }: a
                     </div>
                     <div className="mb-4">
                         <div className="mb-2 font-medium">{title}</div>
-                        <div className="text-sm text-txtSecondary">{content}</div>
+                        <div onClick={(e) => onClick && onClick(e)} className="text-sm text-txtSecondary" dangerouslySetInnerHTML={{ __html: content }}></div>
                     </div>
                     <Button onClick={() => onClose(step === steps)} variants="primary" className="text-xs py-2 w-full">
                         {t(step === steps ? 'insurance_history:guidelines:got_it' : 'common:next')}

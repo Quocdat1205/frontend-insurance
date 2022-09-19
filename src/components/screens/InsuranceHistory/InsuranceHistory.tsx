@@ -12,7 +12,7 @@ import { API_CHECK_GUIDE_LINE, API_UPDATE_GUIDE_LINE } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import dynamic from 'next/dynamic'
 import { RootStore, useAppSelector } from 'redux/store'
-import { getUnit } from 'utils/utils'
+import { getUnit, CStatus } from 'utils/utils'
 import { stateInsurance } from 'utils/constants'
 import { StateInsurance } from 'types/types'
 import styled from 'styled-components'
@@ -32,6 +32,7 @@ const InsuranceHistory = () => {
     const [showGuide, setShowGuide] = useState<boolean>(false)
     const refPopover = useRef<any>(null)
     const seen = useRef<boolean>(true)
+    const [hasInsurance, setHasInsurance] = useState<boolean>(true)
 
     useEffect(() => {
         if (showGuide) {
@@ -84,7 +85,7 @@ const InsuranceHistory = () => {
 
     return (
         <>
-            <Guideline seen={seen.current} start={showGuide} setStart={setShowGuide} />
+            <Guideline setShowTerminologyModal={setShowTerminologyModal} seen={seen.current} start={showGuide} setStart={setShowGuide} />
             <TerminologyModal isMobile={isMobile} visible={showTerminologyModal} onClose={() => setShowTerminologyModal(false)} t={t} />
             <GuidelineModal
                 visible={showGuideModal}
@@ -123,14 +124,20 @@ const InsuranceHistory = () => {
                                     }}
                                     className="py-[10px] px-4 hover:bg-hover cursor-pointer"
                                 >
-                                    {t('insurance_history:detailed_terminology')}
+                                    {t('insurance_history:the_glossary')}
                                 </div>
                             </div>
                         </Popover>
                     </div>
-                    {account && <Statistics unitConfig={unitConfig} />}
+                    {((account && hasInsurance) || showGuide) && <Statistics hasInsurance={hasInsurance} unitConfig={unitConfig} />}
                     <CardShadow mobileNoShadow className="sm:mt-12 sm:p-8">
-                        <InsuranceContract unitConfig={unitConfig} showGuide={showGuide} account={account} />
+                        <InsuranceContract
+                            hasInsurance={hasInsurance}
+                            setHasInsurance={setHasInsurance}
+                            unitConfig={unitConfig}
+                            showGuide={showGuide}
+                            account={account}
+                        />
                     </CardShadow>
                     <div className="pt-[30px] sm:pt-12">
                         <div className="sm:text-2xl font-medium">{t('insurance_history:new_cover_assets')}</div>
@@ -151,7 +158,7 @@ const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGui
                     {t('insurance_history:tracking_and_utilizing')}
                 </div>
                 <div onClick={onShowTerminologyModal} className="py-4">
-                    {t('insurance_history:detailed_terminology')}
+                    {t('insurance_history:the_glossary')}
                 </div>
             </div>
         </Modal>
@@ -160,6 +167,11 @@ const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGui
 
 const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
     const [tab, setTab] = useState<number>(0)
+
+    useEffect(() => {
+        setTab(0)
+    }, [visible])
+
     const terms = [
         {
             title: 'Q-Covered',
@@ -210,27 +222,27 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
     const optionsState = useMemo(() => {
         return Object.keys(stateInsurance).reduce((acc: any[], key: string) => {
             const _key = String(key).toLowerCase()
-            acc.push({ title: t(`common:status:${_key}`), description: t(`common:status:explain:${_key}`) })
+            acc.push({ title: stateInsurance[key as keyof StateInsurance], description: t(`common:status:explain:${_key}`) })
             return acc
         }, [])
     }, [])
 
     return (
-        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'max-w-[424px]'} containerClassName="z-[100]">
-            <div className="text-xl font-medium mb-6 text-center">{t('insurance_history:detailed_terminology')}</div>
+        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'lg:max-w-[600px]'} containerClassName="z-[9999999]">
+            <div className="text-xl font-medium mb-6 sm:mb-8 sm:text-center">{t('insurance_history:the_glossary')}</div>
 
             <Tabs tab={tab} className="mb-6 text-sm">
                 <TabItem active={tab === 0} onClick={() => setTab(0)}>
-                    Thuật ngữ bảo hiểm
+                    {t('insurance_history:insurance_terminology')}
                 </TabItem>
                 <TabItem active={tab === 1} onClick={() => setTab(1)}>
-                    Trạng thái hợp đồng
+                    {t('insurance_history:status')}
                 </TabItem>
             </Tabs>
-            <div className="flex flex-col text-sm divide-solid divide-y divide-divider max-h-[70vh] overflow-auto -mx-6 px-6">
-                {terms.map((item: any, index: number) => (
-                    <div key={index} className="py-3 flex items-center">
-                        <div className="whitespace-nowrap min-w-[30%]">{item.title}</div>
+            <div className="flex flex-col text-sm divide-solid divide-y divide-divider overflow-auto -mx-6 px-6">
+                {(!tab ? terms : optionsState).map((item: any, index: number) => (
+                    <div key={index} className={`${!tab ? 'py-3' : 'py-[22px]'} flex items-center space-x-6`}>
+                        <div className={`whitespace-nowrap ${!tab ? 'min-w-[5rem]' : ''}`}>{!tab ? item.title : <CStatus state={item?.title} t={t} />}</div>
                         <div>{item.description}</div>
                     </div>
                 ))}
@@ -240,7 +252,7 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
 }
 
 const Tabs = styled.div.attrs({
-    className: 'mt-6 text-sm flex items-center justify-between h-11 relative',
+    className: 'mt-6 text-sm sm:text-base flex items-center justify-between h-11 relative',
 })<any>`
     &:after {
         content: '';
@@ -255,7 +267,10 @@ const Tabs = styled.div.attrs({
 `
 
 const TabItem = styled.div.attrs<any>(({ active }) => ({
-    className: classnames('px-4 py-3 font-medium whitespace-nowrap border-b-[2px] border-divider', { 'text-red': active }),
+    className: classnames('px-4 py-3 font-medium whitespace-nowrap border-b-[2px] border-divider w-1/2 text-center cursor-pointer', {
+        'text-red': active,
+        'text-gray': !active,
+    }),
 }))<any>``
 
 export default InsuranceHistory

@@ -6,6 +6,8 @@ interface Env {
     NODE_ENV: string
     BSC: string
     CHAINS: string
+    PRICE_API_URL: string
+    NAMI_API_URL: string
 }
 
 const env: Env = {
@@ -16,6 +18,8 @@ const env: Env = {
     NODE_ENV: process.env.NEXT_PUBLIC_NODE_ENV ?? 'dev',
     BSC: process.env.NEXT_PUBLIC_BSCSCAN ?? '',
     CHAINS: process.env.NEXT_PUBLIC_CHAINS ?? '',
+    PRICE_API_URL: process.env.NEXT_PUBLIC_PRICE_API_URL ?? '',
+    NAMI_API_URL: process.env.NEXT_PUBLIC_NAMI_API_URL ?? '',
 }
 
 export default env

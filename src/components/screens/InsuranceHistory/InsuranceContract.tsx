@@ -25,6 +25,8 @@ interface InsuranceContract {
     account: any
     showGuide: boolean
     unitConfig: UnitConfig
+    setHasInsurance: (e: boolean) => void
+    hasInsurance: boolean
 }
 
 const renderStatus = (data: any, t: any) => {
@@ -45,7 +47,7 @@ const renderStatus = (data: any, t: any) => {
             break
     }
     return (
-        <div className={`px-3 cursor-pointer text-xs sm:text-sm font-semibold py-[6px] rounded-[600px] ${bg}`}>
+        <div className={`px-3 cursor-pointer text-center text-xs sm:text-sm font-semibold py-[6px] rounded-[600px] ${bg}`}>
             {t(`common:status:${String(data?.state).toLowerCase()}`)}
         </div>
     )
@@ -134,7 +136,7 @@ export const renderContentStatus = (data: any, t: any) => {
     )
 }
 
-const InsuranceContract = ({ account, showGuide, unitConfig }: InsuranceContract) => {
+const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, hasInsurance }: InsuranceContract) => {
     const { t } = useTranslation()
     const { width } = useWindowSize()
     const router = useRouter()
@@ -160,12 +162,13 @@ const InsuranceContract = ({ account, showGuide, unitConfig }: InsuranceContract
     })
     const [period, setPeriod] = useState<string>('T-Start')
     const firstTime = useRef<boolean>(true)
+    const checkInsurance = useRef<boolean>(true)
     const timer = useRef<any>(null)
 
     useEffect(() => {
         if (!mobile && !firstTime.current) setFilter({ ...filter, skip: 0 })
         if (firstTime.current) firstTime.current = false
-    }, [asset, state, period, date])
+    }, [asset, state, period, date, account])
 
     useEffect(() => {
         clearTimeout(timer.current)
@@ -218,6 +221,10 @@ const InsuranceContract = ({ account, showGuide, unitConfig }: InsuranceContract
                     item['decimalPrice'] = decimalPrice
                     return item
                 })
+                if (checkInsurance.current) {
+                    checkInsurance.current = false
+                    setHasInsurance(data?.insurance.length > 0)
+                }
                 const dataFiter = !isMobile || !filter.skip ? data?.insurance : dataSource.insurance.concat(data?.insurance)
                 setDataSource({
                     count: data?.count,
@@ -399,7 +406,9 @@ const InsuranceContract = ({ account, showGuide, unitConfig }: InsuranceContract
     }
 
     if (isMobile && account)
-        return (
+        return !hasInsurance && !showGuide ? (
+            <NoData account={account} t={t} onBuyInsurance={onBuyInsurance} hasInsurance={hasInsurance} />
+        ) : (
             <InsuranceContractMobile
                 assetsToken={assetsToken}
                 renderStatus={renderStatus}
@@ -423,12 +432,13 @@ const InsuranceContract = ({ account, showGuide, unitConfig }: InsuranceContract
                 onBuyInsurance={onBuyInsurance}
                 showGuide={showGuide}
                 unitConfig={unitConfig}
+                hasInsurance={hasInsurance}
             />
         )
 
     return (
         <>
-            {account && (
+            {account && hasInsurance && (
                 <div className="mb-6 grid grid-rows-3 grid-cols-1 md:grid-rows-2 md:grid-cols-2 lg:grid-rows-1 lg:grid-cols-3 gap-4">
                     <Selectbox
                         value={asset}
@@ -465,15 +475,7 @@ const InsuranceContract = ({ account, showGuide, unitConfig }: InsuranceContract
                 </div>
             )}
             {(dataSource?.insurance?.length <= 0 || !account) && !loading ? (
-                <div className="w-full flex flex-col items-center justify-center pt-8 pb-4 sm:py-0">
-                    <div>
-                        <img className="max-w-[230px] sm:max-w-[310px]" src="/images/icons/bg_noData.png" />
-                    </div>
-                    <div className="mt-4 pb-6">{account ? t('insurance_history:you_have_no_insurance') : t('insurance_history:connecting_wallet_to_buy')}</div>
-                    <Button onClick={onBuyInsurance} className="py-3 px-6 sm:px-20 sm:font-semibold rounded-xl">
-                        {account ? t('common:header:buy_covered') : t('home:home:connect_wallet')}
-                    </Button>
-                </div>
+                <NoData account={account} t={t} onBuyInsurance={onBuyInsurance} hasInsurance={hasInsurance} />
             ) : (
                 <>
                     <DataTable
@@ -488,6 +490,22 @@ const InsuranceContract = ({ account, showGuide, unitConfig }: InsuranceContract
                 </>
             )}
         </>
+    )
+}
+
+const NoData = ({ hasInsurance, onBuyInsurance, t, account }: any) => {
+    return (
+        <div className="w-full flex flex-col items-center justify-center pt-8 pb-4 sm:py-0">
+            <div>
+                <img className="max-w-[230px] sm:max-w-[310px]" src="/images/icons/bg_noData.png" />
+            </div>
+            <div className="mt-4 pb-6">
+                {account ? t(`insurance_history:you_have_no_insurance${hasInsurance ? '_filter' : ''}`) : t('insurance_history:connecting_wallet_to_buy')}
+            </div>
+            <Button onClick={onBuyInsurance} className="py-3 px-6 sm:px-20 sm:font-semibold rounded-xl text-sm sm:text-base">
+                {account ? t('common:header:buy_covered') : t('home:home:connect_wallet')}
+            </Button>
+        </div>
     )
 }
 

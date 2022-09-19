@@ -36,7 +36,7 @@ const RegisterLanding = () => {
             if (data) {
                 setVisible(true)
             } else {
-                Config.toast.show('error', message)
+                Config.toast.show('error', t(`errors:${message}`))
             }
         } catch (e) {
             console.log(e)
@@ -51,9 +51,7 @@ const RegisterLanding = () => {
             <div className="max-w-[1062px] m-auto register-landing flex items-center justify-center pt-20 sm:pt-[10.5rem]">
                 <Background isMobile={isMobile}>
                     <div className="font-semibold text-2xl sm:text-5xl leading-8 sm:leading-10 mb-2 text-red">{t('home:landing:stay_up_to_date')}</div>
-                    <div className="text-center sm:text-left px-5 sm:px-0 text-sm sm:text-base">
-                        {t('home:landing:stay_up_to_date_content')}
-                    </div>
+                    <div className="text-center sm:text-left px-5 sm:px-0 text-sm sm:text-base">{t('home:landing:stay_up_to_date_content')}</div>
                     <div className="mt-8 sm:mt-6 px-3 py-2 bg-white rounded-[3px] border border-red flex items-center">
                         <input
                             value={email}
@@ -77,17 +75,12 @@ const SuccessModal = ({ isVisible, onClose, t }: any) => {
             portalId="modal"
             isVisible={isVisible}
             onBackdropCb={onClose}
-            className="rounded-xl p-6 bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            className="rounded-xl bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         >
-            <div>
-                <div className="flex justify-end">
-                    <X onClick={onClose} size={18} className="cursor-pointer" />
-                </div>
-                <div className="text-center flex flex-col items-center mt-2">
-                    <img width={80} height={80} src="/images/icons/ic_gmail.png" />
-                    <div className="mt-6 text-xl font-medium ">{t('home:landing:register_successfully')}</div>
-                    <span className="text-txtSecondary mt-2 px-4">{t('home:landing:register_content')}</span>
-                </div>
+            <div className="text-center flex flex-col items-center mb-6">
+                <img width={80} height={80} src="/images/icons/ic_gmail.png" />
+                <div className="mt-6 text-xl font-medium ">{t('home:landing:register_successfully')}</div>
+                <span className="text-txtSecondary mt-2 px-4">{t('home:landing:register_content')}</span>
             </div>
         </Modal>
     )

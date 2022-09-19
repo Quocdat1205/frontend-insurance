@@ -1,15 +1,18 @@
 {
     "my_cover": "Hợp đồng của tôi",
     "tracking_and_utilizing": "Cách theo dõi và sử dụng hợp đồng của tôi",
-    "detailed_terminology": "Thuật ngữ chi tiết",
+    "insurance_terminology": "Thuật ngữ bảo hiểm",
     "individual_cover": "Thống kê bảo hiểm cá nhân",
     "qty_of_signed": "Số hợp đồng",
     "new_cover_assets": "Các sản phẩm bảo hiểm mới nhất của Nami",
     "you_have_no_insurance": "Bạn hiện không có hợp đồng bảo hiểm nào.",
+    "you_have_no_insurance_filter": "Bạn hiện không có hợp đồng bảo hiểm nào theo kết quả lọc.",
     "connecting_wallet_to_buy": "Kết nối ví để mua hợp đồng bảo hiểm ngay.",
     "status": "Trạng thái hợp đồng",
     "choose_status": "Chọn trạng thái hợp đồng",
     "insurance_contract": "Hợp đồng bảo hiểm",
+    "the_glossary": "Bảng chú giải thuật ngữ",
+    "terminologies_states": "Thuật ngữ và trạng thái hợp đồng bảo hiểm",
     "guidelines": {
         "title": "Hướng dẫn",
         "step_title_1": "Thống kê bảo hiểm cá nhân",
@@ -18,7 +21,8 @@
         "step_content_2": "Xem và theo dõi các chỉ số của HĐBH tại đây.",
         "step_title_3": "Ấn 'Hướng dẫn' nếu bạn gặp khó khăn khi sử dụng Nami Insurance",
         "step_content_3": "HashID là mã nhận dạng duy nhất cho mỗi HĐBH. Sao chép mã và gửi bộ phận CSKH của Nami khi cần hỗ trợ.",
-        "step_content_5": "Bấm để xem lại các bước hướng dẫn, hoặc tìm hiểu thêm về bảng chú giải thuật ngữ nếu gặp khó khăn trong quá trình sử dụng.",
+        "step_content_4": "Theo dõi trạng thái của hợp đồng bảo hiểm tại đây. Xem mô tả chi tiết cho các trạng thái trong {{value}}.",
+        "step_content_5": "Xem lại hướng dẫn hoặc tìm hiểu thêm về {{value}} nếu gặp khó khăn trong quá trình sử dụng.",
         "got_it": "Đã hiểu"
     }
 }

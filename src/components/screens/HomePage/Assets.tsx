@@ -12,6 +12,13 @@ import 'swiper/css/pagination'
 import { RootStore, useAppSelector } from 'redux/store'
 import { createSelector } from 'reselect'
 import { useRouter } from 'next/router'
+import { TendencyIcon } from 'components/common/Svg/SvgIcon'
+import colors from 'styles/colors'
+import { formatNumber, sparkLineBuilder } from 'utils/utils'
+import fetchApi from 'services/fetch-api'
+import { API_GET_FUTURES_MARKET_WATCH } from 'services/apis'
+import FuturesMarketWatch from 'models/FuturesMarketWatch'
+import { roundTo } from 'round-to'
 
 const getNewAssets = createSelector([(state: RootStore) => state.setting.assetsToken], (assetsToken) => {
     return assetsToken.filter((asset: any) => asset.isNew)
@@ -25,6 +32,7 @@ const Assets = () => {
     const isMobile = width && width < 640
     const router = useRouter()
     const [mount, setMount] = useState(false)
+    const [marketWatch, setMarketWatch] = useState<any[]>([])
 
     const onConnectWallet = () => {
         Config.connectWallet()
@@ -67,23 +75,65 @@ const Assets = () => {
 
     useEffect(() => {
         setMount(true)
+        getMarketWatch()
     }, [])
 
-    const renderNews = () => (
+    const getMarketWatch = async () => {
+        try {
+            const { data } = await fetchApi({
+                url: API_GET_FUTURES_MARKET_WATCH,
+                options: { method: 'GET' },
+                baseURL: '',
+            })
+            if (data) setMarketWatch(data)
+        } catch (e) {
+            console.log(e)
+        } finally {
+        }
+    }
+
+    const renderAssets = () => (
         <div className="d-flex">
-            {assetsToken.map((asset: any, index: number) => (
-                <SwiperSlide key={index}>
-                    <CardShadow className="p-6 flex flex-col space-y-6 w-full">
-                        <div className="flex items-center space-x-3">
-                            <img width="48" height="48" src={asset?.attachment} className="rounded-full" />
-                            <span className="font-medium text-xl">{asset?.name}</span>
-                        </div>
-                        <Button onClick={() => onBuy(asset?._id)} variants="outlined" className="py-3 font-medium text-sm sm:text-base">
-                            {t('home:landing:buy_covered')}
-                        </Button>
-                    </CardShadow>
-                </SwiperSlide>
-            ))}
+            {assetsToken.map((asset: any, index: number) => {
+                const _marketWatch = marketWatch.find((m: any) => m.b === asset?.symbol)
+                const pairPrice = FuturesMarketWatch.create(_marketWatch)
+                const _24hChange = pairPrice?.priceChangePercent * 100 || 0
+                const negative = _24hChange < 0
+                const sparkLineColor = negative ? colors.red.red : colors.success
+                const sparkLine = sparkLineBuilder(asset?.symbol + 'USDT', sparkLineColor)
+
+                return (
+                    <SwiperSlide key={index}>
+                        <CardShadow className="p-6 flex flex-col space-y-6 w-full">
+                            <div className="flex flex-col space-y-2 sm:space-y-4">
+                                <div className="flex items-center space-x-2">
+                                    <img width="32" height="32" src={asset?.attachment} className="rounded-full" />
+                                    <div className="font-semibold sm:font-medium sm:text-xl">
+                                        <span>{asset?.symbol}</span>/<span className="text-txtSecondary">USDT</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <div className={`text-2xl sm:text-[1.875rem] sm:leading-[2.75rem] font-medium ${negative ? 'text-red' : 'text-success'}`}>
+                                        ${pairPrice?.lastPrice}
+                                    </div>
+                                    <div className="flex items-center space-x-1">
+                                        <TendencyIcon down={negative} color={sparkLineColor} />
+                                        <span className={`${negative ? 'text-red' : 'text-success'} font-medium sm:text-xl`}>
+                                            {formatNumber(roundTo(_24hChange, 2), 2, 2, true)}%
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="w-full">
+                                    <img src={sparkLine} alt="Nami Exchange" className="w-full" />
+                                </div>
+                            </div>
+                            <Button onClick={() => onBuy(asset?._id)} variants="outlined" className="py-3 font-medium text-sm sm:text-base">
+                                {t('home:landing:buy_covered')}
+                            </Button>
+                        </CardShadow>
+                    </SwiperSlide>
+                )
+            })}
         </div>
     )
 
@@ -95,14 +145,14 @@ const Assets = () => {
             slidesPerView={4}
             breakpoints={{
                 300: {
-                    slidesPerView: 1.2,
-                    spaceBetween: 16,
-                },
-                640: {
-                    slidesPerView: 2.5,
+                    slidesPerView: 1.05,
                     spaceBetween: 16,
                 },
                 820: {
+                    slidesPerView: 2.5,
+                    spaceBetween: 16,
+                },
+                1080: {
                     slidesPerView: 3,
                     spaceBetween: 16,
                 },
@@ -112,7 +162,7 @@ const Assets = () => {
                 disableOnInteraction: false,
             }}
         >
-            {mount && renderNews()}
+            {mount && renderAssets()}
         </Swiper>
     )
 }

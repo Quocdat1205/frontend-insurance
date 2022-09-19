@@ -64,6 +64,7 @@
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.4.1",
     "reselect": "^4.1.6",
+    "round-to": "^6.0.0",
     "sass": "^1.54.3",
     "socket.io-client": "^4.5.1",
     "styled-components": "^5.3.5",
