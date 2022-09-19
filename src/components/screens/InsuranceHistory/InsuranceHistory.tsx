@@ -165,7 +165,7 @@ const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGui
     )
 }
 
-const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
+export const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
     const [tab, setTab] = useState<number>(0)
 
     useEffect(() => {
@@ -228,7 +228,14 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
     }, [])
 
     return (
-        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'lg:max-w-[600px]'} containerClassName="z-[9999999]">
+        <Modal
+            isMobile={isMobile}
+            isVisible={visible}
+            onBackdropCb={onClose}
+            wrapClassName="!p-6"
+            className={'lg:max-w-[600px]'}
+            containerClassName="z-[9999999]"
+        >
             <div className="text-xl font-medium mb-6 sm:mb-8 sm:text-center">{t('insurance_history:the_glossary')}</div>
 
             <Tabs tab={tab} className="mb-6 text-sm">
