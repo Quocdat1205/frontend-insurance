@@ -19,7 +19,7 @@ const LandingPage = (props: any) => {
 
 export const getStaticProps: GetStaticProps = async ({ locale }: any) => ({
     props: {
-        ...(await serverSideTranslations(locale, ['common', 'home'])),
+        ...(await serverSideTranslations(locale, ['common', 'home', 'errors'])),
     },
 })
 export default LandingPage

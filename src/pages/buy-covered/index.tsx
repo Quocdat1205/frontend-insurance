@@ -9,7 +9,7 @@ const BuyCovered = () => {
 
 export const getStaticProps: GetStaticProps = async ({ locale }: any) => ({
     props: {
-        ...(await serverSideTranslations(locale, ['common', 'insurance'])),
+        ...(await serverSideTranslations(locale, ['common', 'insurance', 'errors'])),
     },
 })
 

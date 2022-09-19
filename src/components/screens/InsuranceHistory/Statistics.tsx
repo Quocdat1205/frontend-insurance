@@ -14,17 +14,18 @@ import { UnitConfig } from 'types/types'
 
 interface Statistics {
     unitConfig: UnitConfig
+    hasInsurance: boolean
 }
-const Statistics = ({ unitConfig }: Statistics) => {
+const Statistics = ({ unitConfig, hasInsurance }: Statistics) => {
     const [day, setDay] = useState(30)
-    const [loading, setLoading] = useState<boolean>(true)
+    const [loading, setLoading] = useState<boolean>(hasInsurance)
     const { account } = useWeb3Wallet()
     const [dataSource, setDataSource] = useState<any>(null)
     const { t } = useTranslation()
 
     useEffect(() => {
-        if (account) getIndividualContract(30)
-    }, [account])
+        if (account && hasInsurance) getIndividualContract(30)
+    }, [account, hasInsurance])
 
     const onChangeDay = (_day: number) => {
         if (loading) return
