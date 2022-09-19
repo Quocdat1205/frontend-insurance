@@ -1529,7 +1529,7 @@ export const InsuranceFrom = () => {
                                             setShowGuideModal(true)
                                         }}
                                     >
-                                        {t('insurance:buy:help_short')}
+                                        {t('insurance:guild:title')}
                                     </span>
 
                                     <GuidelineModal
