@@ -8,15 +8,16 @@ import { screens } from 'utils/constants'
 interface layoutInsurance {
     children: ReactNode
     handleClick?: any
+    hiddenHeader?: boolean
 }
 
-const LayoutInsurance = ({ children, handleClick }: layoutInsurance) => {
+const LayoutInsurance = ({ children, handleClick, hiddenHeader }: layoutInsurance) => {
     const { t } = useTranslation()
     const { width } = useWindowSize()
     const isMobile = width && width < screens.drawer
     return !isMobile ? (
         <div className="relative" onClick={handleClick}>
-            <Header />
+            {!hiddenHeader && <Header />}
             <Breadcrumbs>{[`${t('insurance:buy:home')}`, `${t('insurance:buy:buy_covered')}`]}</Breadcrumbs>
             {children}
         </div>

@@ -17,18 +17,18 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
 import { Suspense } from 'react'
-import store, { RootStore, useAppSelector } from 'redux/store'
+import { RootStore, useAppSelector } from 'redux/store'
 import Config from 'config/config'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
 import Modal from 'components/common/Modal/Modal'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatNumber, getUnit } from 'utils/utils'
-import useWeb3USDT from 'hooks/useWeb3USDT'
 import styled from 'styled-components'
 import classnames from 'classnames'
 
 import { ethers } from 'ethers'
+import InsuranceContractLoading from 'components/screens/InsuranceHistory/InsuranceContractLoading'
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
@@ -41,11 +41,11 @@ export const InsuranceFrom = () => {
         i18n: { language },
     } = useTranslation()
     const wallet = useWeb3Wallet()
+    const { account } = useWeb3Wallet()
     const router = useRouter()
     const { width } = useWindowSize()
     const isMobile = width && width <= screens.drawer
 
-    const unitConfig = useAppSelector((state: RootStore) => getUnit(state, 'USDT'))
     const [percentInsurance, setPercentInsurance] = useState<number>(0)
     const [selectTime, setSelectTime] = useState<string>('ALL')
     const [isDrop, setDrop] = useState(false)
@@ -55,7 +55,6 @@ export const InsuranceFrom = () => {
     const [index, setIndex] = useState<1 | 2>(1)
     const [tab, setTab] = useState<number>(3)
     const [loadings, setLoadings] = useState(true)
-    const [priceBNB, setPriceBNB] = useState(0)
     const [openChangeToken, setOpenChangeToken] = useState(false)
     const [active, setActive] = useState<boolean>(false)
     const [nameNoti, setNameNoti] = useState<'success' | 'expired' | 'expired1' | 'email' | 'loading'>('loading')
@@ -70,6 +69,7 @@ export const InsuranceFrom = () => {
     const [showGuide, setShowGuide] = useState<boolean>(false)
     const [chosing, setChosing] = useState(false)
     const [showGuideModal, setShowGuideModal] = useState<boolean>(false)
+    const [thisFisrt, setThisFisrt] = useState(true)
     const [showChangeUnit, setShowChangeUnit] = useState({
         isShow: false,
         name: '',
@@ -192,7 +192,7 @@ export const InsuranceFrom = () => {
         if (loadings) {
             setTimeout(() => {
                 setShowGuide(true)
-            }, 5000)
+            }, 1500)
         }
     }, [loadings])
 
@@ -225,28 +225,35 @@ export const InsuranceFrom = () => {
     }, [assetsToken])
 
     useEffect(() => {
-        if (wallet.account) {
-            getBalanceUsdt()
+        try {
+            if (typeof window.ethereum !== undefined) {
+                console.log('MetaMask is installed!')
+            }
+            if (account) {
+                setTimeout(() => {
+                    getUSDT()
+                }, 5000)
+            }
+        } catch (error) {
+            console.log('error get USDT balance')
         }
-    }, [wallet.account])
+    }, [account])
 
-    const getBalanceUsdt = async () => {
-        if (state.p_market > 0) {
-            const balanceUsdt = wallet.account && (await wallet?.contractCaller.usdtContract.contract.balanceOf(wallet.account))
-            setUserBalance(Number(formatNumber(Number(balanceUsdt && ethers.utils.formatEther(balanceUsdt)) / state.p_market, 4)))
+    const getUSDT = async () => {
+        const balanceUsdt = await wallet.contractCaller.usdtContract.contract.balanceOf(account)
+        if (balanceUsdt) {
+            setUserBalance(Number(formatNumber(Number(ethers.utils.formatEther(await balanceUsdt)) / Number(state.p_market), 4)))
         }
     }
-
     const setStorage = (value: any) => {
         localStorage.setItem('buy_covered_state', JSON.stringify(value))
+        setThisFisrt(false)
     }
 
     useEffect(() => {
         try {
             setLoadings(true)
-            if (typeof window.ethereum !== undefined) {
-                console.log('MetaMask is installed!')
-            }
+
             const data = localStorage.getItem('buy_covered_state')
             if (data) {
                 const res = JSON.parse(data)
@@ -272,11 +279,22 @@ export const InsuranceFrom = () => {
                     t_market: res.t_market,
                     p_expired: res.p_expired * 1.0,
                 })
+                setSelectedCoin({
+                    icon: res.symbol.icon,
+                    id: res.symbol.id,
+                    name: res.symbol.name,
+                    symbol: res.symbol.symbol,
+                    type: res.symbol.type,
+                    disable: res.symbol.disable,
+                })
                 setTab(res.tab)
                 setUnitMoney(res.unitMoney)
                 setIndex(res.index)
                 validatePclaim(res.p_claim)
+                setThisFisrt(true)
             } else {
+                setThisFisrt(false)
+
                 setStorage(state)
             }
             setLoadings(false)
@@ -315,7 +333,7 @@ export const InsuranceFrom = () => {
     }, [state.q_covered])
 
     useEffect(() => {
-        if (state) {
+        if (state && !thisFisrt) {
             const data = localStorage.getItem('buy_covered_state')
             if (data) {
                 const res = JSON.parse(data)
@@ -341,9 +359,11 @@ export const InsuranceFrom = () => {
                     t_market: state.t_market,
                     p_expired: state.p_expired * 1.0,
                 }
-
                 setStorage(newData)
             }
+        }
+        if (thisFisrt) {
+            return setThisFisrt(false)
         }
     }, [state])
 
@@ -362,7 +382,6 @@ export const InsuranceFrom = () => {
             const timeBegin = new Date()
             timeBegin.setDate(timeEnd.getDate() - 10)
             setState({ ...state, t_market: timeEnd })
-            setLoadings(true)
             getPrice(listCoin[0].symbol, state, setState)
         }
     }, [listCoin])
@@ -469,10 +488,19 @@ export const InsuranceFrom = () => {
         }
     }, [state.p_claim])
 
+    useEffect(() => {
+        if (showGuide) {
+            return setTab(3)
+        } else {
+            return
+        }
+    }, [showGuide])
+
     return !loadings ? (
         !isMobile ? (
             <>
                 <LayoutInsurance
+                    hiddenHeader={showGuide}
                     handleClick={() => {
                         setDrop(false)
                         setChosing(false)
@@ -1571,9 +1599,9 @@ export const InsuranceFrom = () => {
                                             id="name"
                                             onChange={(a: any) => {
                                                 if (Number(a.target.value) >= 1) {
-                                                    setState({ ...state, p_claim: a.target.value.replace(/^0+/, '') })
+                                                    setState({ ...state, q_covered: a.target.value.replace(/^0+/, '') })
                                                 } else {
-                                                    setState({ ...state, p_claim: Number(a.target.value) })
+                                                    setState({ ...state, q_covered: Number(a.target.value) })
                                                 }
                                                 setPercentInsurance(0)
                                             }}
@@ -1912,7 +1940,7 @@ export const InsuranceFrom = () => {
             </>
         )
     ) : (
-        <></>
+        <InsuranceContractLoading />
     )
 }
 
@@ -2100,17 +2128,9 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
         },
     ]
 
-    // const optionsState = useMemo(() => {
-    //     return Object.keys(stateInsurance).reduce((acc: any[], key: string) => {
-    //         const _key = String(key).toLowerCase()
-    //         acc.push({ title: t(`common:status:${_key}`), description: t(`common:status:explain:${_key}`) })
-    //         return acc
-    //     }, [])
-    // }, [])
-
     return (
         <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'max-w-[424px]'} containerClassName="z-[100]">
-            <div className="text-xl font-medium mb-6 text-center">{t('insurance_history:detailed_terminology')}</div>
+            <div className="text-xl font-medium mb-6 text-center">{t('insurance:buy:detailed_terminology')}</div>
 
             <Tabs tab={tab} className="mb-6 text-sm">
                 <TabItem active={tab === 0} onClick={() => setTab(0)}>

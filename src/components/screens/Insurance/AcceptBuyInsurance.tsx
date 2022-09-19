@@ -13,6 +13,7 @@ import { useRouter } from 'next/router'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatNumber } from 'utils/utils'
+import { contractAddress } from 'components/web3/constants/contractAddress'
 
 export type IProps = {
     state: any
@@ -64,8 +65,6 @@ export const AcceptBuyInsurance = ({
         fetch()
     }, [])
 
-    console.log(wallet)
-
     const fetch = async () => {
         try {
             const e = await wallet.contractCaller.insuranceContract.contract.filters.EBuyInsurance()
@@ -109,7 +108,7 @@ export const AcceptBuyInsurance = ({
             }
 
             if (!checkUpgrade) {
-                console.log(wallet, state, 'thuc')
+                // console.log(wallet, state, 'thuc')
 
                 const t_expired = new Date()
                 t_expired.setDate(state.t_market.getDate() + state.period)
@@ -121,29 +120,33 @@ export const AcceptBuyInsurance = ({
                     q_covered: formatPriceToWeiValue(Number(formatNumber(state.q_covered, 4))),
                     p_market: formatPriceToWeiValue(Number(formatNumber(data.data[0].p, 4))),
                     p_claim: formatPriceToWeiValue(Number(formatNumber(state.p_claim, 4))),
-                    period: formatPriceToWeiValue(Number(state.period)),
+                    period: Number(state.period),
                     isUseNain: checkUpgrade,
                 }
-                console.log(dataPost)
 
-                const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
-                    dataPost.buyer,
-                    dataPost.asset,
-                    dataPost.margin,
-                    dataPost.q_covered,
-                    dataPost.p_market,
-                    dataPost.p_claim,
-                    dataPost.period,
-                    dataPost.isUseNain,
-                    { value: dataPost.margin },
-                )
-                await buy.wait()
+                await wallet.contractCaller.usdtContract.allowance(wallet.account, contractAddress).then((contract: any) => {
+                    console.log(contract)
+                })
 
-                const id_sc = await buy.wait()
+                // const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
+                //     dataPost.buyer,
+                //     dataPost.asset,
+                //     dataPost.margin,
+                //     dataPost.q_covered,
+                //     dataPost.p_market,
+                //     dataPost.p_claim,
+                //     dataPost.period,
+                //     dataPost.isUseNain,
+                //     { value: dataPost.margin },
+                // )
+                // await buy.wait()
 
-                if (buy && id_sc.events[0].args[0]) {
-                    handlePostInsurance(buy, dataPost, state, Number(id_sc.events[0].args[0]))
-                }
+                // const id_sc = await buy.wait()
+                // console.log(buy)
+
+                // if (buy && id_sc.events[0].args[0]) {
+                //     handlePostInsurance(buy, dataPost, state, Number(id_sc.events[0].args[0]))
+                // }
             }
 
             if (checkUpgrade) {
@@ -154,10 +157,10 @@ export const AcceptBuyInsurance = ({
                     q_covered: formatPriceToWeiValue(Number(formatNumber(state.q_covered, 4))),
                     p_market: formatPriceToWeiValue(Number(formatNumber(data.data[0].p, 4))),
                     p_claim: formatPriceToWeiValue(Number(formatNumber(state.p_claim, 4))),
-                    period: formatPriceToWeiValue(Number(state.period) + 2),
+                    period: Number(state.period) + 2,
                     isUseNain: checkUpgrade,
                 }
-                console.log(state, dataPost)
+                // console.log(state, dataPost)
 
                 const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
                     dataPost.buyer,
@@ -175,7 +178,7 @@ export const AcceptBuyInsurance = ({
                 const id_sc = await buy.wait()
 
                 if (buy && id_sc.events[0].args[0]) {
-                    console.log(buy)
+                    // console.log(buy)
 
                     handlePostInsurance(buy, dataPost, state, Number(id_sc.events[0].args[0]))
                 }
@@ -557,9 +560,7 @@ export const AcceptBuyInsurance = ({
                                             type="radio"
                                             id="test1"
                                             checked={checkUpgrade}
-                                            onChange={(e) => {
-                                                console.log(e)
-                                            }}
+                                            onChange={(e) => {}}
                                             onClick={() => setCheckUpgrade(!checkUpgrade)}
                                         />
                                         <CheckBoxIcon
@@ -573,9 +574,7 @@ export const AcceptBuyInsurance = ({
                                             checkBorderColor="#EB2B3E"
                                             className="hover:cursor-pointer mr-[8px]"
                                             onClick={() => setCheckUpgrade(!checkUpgrade)}
-                                            onChange={(e: any) => {
-                                                console.log(e)
-                                            }}
+                                            onChange={(e: any) => {}}
                                         />
                                         <label htmlFor="test1" className="select-none text-sm text-[#22313F] font-semibold">
                                             {t('insurance:buy:upgrade')}

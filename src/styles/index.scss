@@ -226,6 +226,8 @@ input[type='number'] {
     margin: 16px 0;
     position: relative;
     border: 1px solid white;
+    margin-left: 12px !important;
+
     &::before {
         content: '';
         position: absolute;
@@ -244,6 +246,14 @@ input[type='number'] {
     &::before {
         right: 12px;
         left: unset;
+    }
+}
+
+.reactour__arrow__new {
+    &::before {
+        transform: rotate(149deg) translate(749%, -1081%);
+        right: unset;
+        left: 12px;
     }
 }
 
