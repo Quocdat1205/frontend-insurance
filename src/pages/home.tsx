@@ -32,7 +32,7 @@ export const getStaticProps: GetStaticProps = async ({ locale }: any) => {
     return {
         props: {
             news: news,
-            ...(await serverSideTranslations(locale, ['common', 'home', 'insurance'])),
+            ...(await serverSideTranslations(locale, ['common', 'home', 'insurance', 'errors'])),
         },
     }
 }

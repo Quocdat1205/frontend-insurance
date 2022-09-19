@@ -9,13 +9,13 @@ import { GetStaticProps } from 'next'
 import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { CheckCircle, LeftArrow, InfoCircle, XMark, ErrorTriggersIcon, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import useWindowSize from 'hooks/useWindowSize'
-import { screens } from 'utils/constants'
+import { screens, stateInsurance } from 'utils/constants'
 import { Suspense } from 'react'
 import { RootStore, useAppSelector } from 'redux/store'
 import Config from 'config/config'
@@ -23,12 +23,14 @@ import NotificationInsurance from 'components/layout/notifucationInsurance'
 import Modal from 'components/common/Modal/Modal'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
-import { formatNumber, getUnit } from 'utils/utils'
+import { CStatus, formatNumber, getUnit } from 'utils/utils'
 import styled from 'styled-components'
 import classnames from 'classnames'
 
 import { ethers } from 'ethers'
 import InsuranceContractLoading from 'components/screens/InsuranceHistory/InsuranceContractLoading'
+import { StateInsurance } from 'types/types'
+import { TerminologyModal } from 'components/screens/InsuranceHistory/InsuranceHistory'
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
@@ -77,11 +79,11 @@ export const InsuranceFrom = () => {
     const [userBalance, setUserBalance] = useState<number>(0)
     const [listCoin, setListCoin] = useState<ICoin[]>([])
     const [selectCoin, setSelectedCoin] = useState<ICoin>({
-        icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
-        id: '63187ae8c2ad72eac4d0f363',
-        name: 'Binance',
-        symbol: 'BNBUSDT',
-        type: 'BNB',
+        icon: '',
+        id: '',
+        name: '',
+        symbol: '',
+        type: '',
         disable: false,
     })
     const [state, setState] = useState({
@@ -89,11 +91,11 @@ export const InsuranceFrom = () => {
         margin: 0,
         percent_margin: 0,
         symbol: {
-            icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
-            id: '63187ae8c2ad72eac4d0f363',
-            name: 'Binance',
-            symbol: 'BNBUSDT',
-            type: 'BNB',
+            icon: '',
+            id: '',
+            name: '',
+            symbol: '',
+            type: '',
             disable: false,
         },
         period: 2,
@@ -105,14 +107,7 @@ export const InsuranceFrom = () => {
         t_market: new Date(),
         p_expired: 0,
     })
-    const defaultToken = {
-        icon: 'https://sgp1.digitaloceanspaces.com/nami-dev/52ee9631-90f3-42e6-a05f-22ea01066e56-bnb.jpeg',
-        id: '63187ae8c2ad72eac4d0f363',
-        name: 'Binance',
-        symbol: 'BNBUSDT',
-        type: 'BNB',
-        disable: false,
-    }
+
     const [dataChart, setDataChart] = useState()
     const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', 'ALL']
     const listTabPeriod: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
@@ -130,20 +125,6 @@ export const InsuranceFrom = () => {
         { menuId: 'tooltip', name: t('insurance:buy:tooltip') },
         { menuId: 'continue', name: t('insurance:buy:continue') },
         { menuId: 'help', name: t('insurance:buy:help') },
-    ]
-    const tokenAddresses = [
-        {
-            address: '0x0897202ce1838d0712d357103aae83650a0d426d',
-            token: 'USDT',
-        },
-        {
-            address: '0x3d658390460295fb963f54dc0899cfb1c30776df',
-            token: 'USDC',
-        },
-        {
-            address: '0x6b175474e89094c44da98b954eedeac495271d0f',
-            token: 'BUSD',
-        },
     ]
 
     const Leverage = (p_market: number, p_stop: number) => {
@@ -164,17 +145,18 @@ export const InsuranceFrom = () => {
     }
 
     const validatePclaim = (value: number) => {
-        if (wallet.account) {
-            if (value > state.p_market + (2 * state.p_market) / 100 && value < state.p_market + (70 * state.p_market) / 100) {
-                setErrorPCalim(true)
-                return validateMargin(state.margin)
-            } else if (value > state.p_market - (70 * state.p_market) / 100 && value < state.p_market - (2 * state.p_market) / 100) {
-                setErrorPCalim(true)
-                return validateMargin(state.margin)
-            } else {
-                setErrorPCalim(false)
-                return setClear(false)
-            }
+        console.log('duong', (state.p_market * 1 + (2 * state.p_market) / 100).toFixed(3), (state.p_market * 1 + (70 * state.p_market) / 100).toFixed(3))
+        console.log('am', (state.p_market * 1 - (70 * state.p_market) / 100).toFixed(3), (state.p_market * 1 - (2 * state.p_market) / 100).toFixed(3))
+
+        if (value > state.p_market * 1 + (2 * state.p_market) / 100 && value < state.p_market * 1 + (70 * state.p_market) / 100) {
+            setErrorPCalim(true)
+            return validateMargin(state.margin)
+        } else if (value > state.p_market * 1 - (70 * state.p_market) / 100 && value < state.p_market * 1 - (2 * state.p_market) / 100) {
+            setErrorPCalim(true)
+            return validateMargin(state.margin)
+        } else {
+            setErrorPCalim(false)
+            return setClear(false)
         }
     }
 
@@ -250,54 +232,58 @@ export const InsuranceFrom = () => {
         setThisFisrt(false)
     }
 
-    useEffect(() => {
-        try {
-            setLoadings(true)
+    const getStorage = async () => {
+        setLoadings(true)
 
-            const data = localStorage.getItem('buy_covered_state')
-            if (data) {
-                const res = JSON.parse(data)
-                setState({
-                    ...state,
-                    timeframe: res.timeframe,
-                    margin: res.margin * 1.0,
-                    percent_margin: res.percent_margin * 1.0,
-                    symbol: {
-                        icon: res.symbol.icon,
-                        id: res.symbol.id,
-                        name: res.symbol.name,
-                        symbol: res.symbol.symbol,
-                        type: res.symbol.type,
-                        disable: res.symbol.disable,
-                    },
-                    period: res.period * 1.0,
-                    p_claim: res.p_claim * 1.0,
-                    q_claim: res.q_claim * 1.0,
-                    r_claim: res.r_claim * 1.0,
-                    q_covered: res.q_covered * 1.0,
-                    p_market: res.p_market * 1.0,
-                    t_market: res.t_market,
-                    p_expired: res.p_expired * 1.0,
-                })
-                setSelectedCoin({
+        const data = await localStorage.getItem('buy_covered_state')
+        if (data) {
+            const res = JSON.parse(data)
+            setState({
+                ...state,
+                timeframe: res.timeframe,
+                margin: res.margin * 1.0,
+                percent_margin: res.percent_margin * 1.0,
+                symbol: {
                     icon: res.symbol.icon,
                     id: res.symbol.id,
                     name: res.symbol.name,
                     symbol: res.symbol.symbol,
                     type: res.symbol.type,
                     disable: res.symbol.disable,
-                })
-                setTab(res.tab)
-                setUnitMoney(res.unitMoney)
-                setIndex(res.index)
-                validatePclaim(res.p_claim)
-                setThisFisrt(true)
-            } else {
-                setThisFisrt(false)
+                },
+                period: res.period * 1.0,
+                p_claim: res.p_claim * 1.0,
+                q_claim: res.q_claim * 1.0,
+                r_claim: res.r_claim * 1.0,
+                q_covered: res.q_covered * 1.0,
+                p_market: res.p_market * 1.0,
+                t_market: res.t_market,
+                p_expired: res.p_expired * 1.0,
+            })
+            setSelectedCoin({
+                icon: res.symbol.icon,
+                id: res.symbol.id,
+                name: res.symbol.name,
+                symbol: res.symbol.symbol,
+                type: res.symbol.type,
+                disable: res.symbol.disable,
+            })
+            setTab(res.tab)
+            setUnitMoney(res.unitMoney)
+            setIndex(res.index)
+            validatePclaim(res.p_claim)
+            setThisFisrt(true)
+            refreshApi(selectTime, selectCoin)
+        } else {
+            setThisFisrt(false)
+            setStorage(state)
+        }
+        setLoadings(false)
+    }
 
-                setStorage(state)
-            }
-            setLoadings(false)
+    useEffect(() => {
+        try {
+            getStorage()
         } catch (error) {
             setLoadings(false)
             return console.log(error)
@@ -333,7 +319,7 @@ export const InsuranceFrom = () => {
     }, [state.q_covered])
 
     useEffect(() => {
-        if (state && !thisFisrt) {
+        if (state) {
             const data = localStorage.getItem('buy_covered_state')
             if (data) {
                 const res = JSON.parse(data)
@@ -342,14 +328,6 @@ export const InsuranceFrom = () => {
                     timeframe: state.timeframe,
                     margin: state.margin * 1.0,
                     percent_margin: state.percent_margin * 1.0,
-                    symbol: {
-                        icon: state.symbol.icon,
-                        id: state.symbol.id,
-                        name: state.symbol.name,
-                        symbol: state.symbol.symbol,
-                        type: state.symbol.type,
-                        disable: state.symbol.disable,
-                    },
                     period: state.period * 1.0,
                     p_claim: state.p_claim * 1.0,
                     q_claim: state.q_claim * 1.0,
@@ -388,6 +366,17 @@ export const InsuranceFrom = () => {
 
     useEffect(() => {
         refreshApi(selectTime, selectCoin)
+        const data = localStorage.getItem('buy_covered_state')
+        if (data) {
+            let res = JSON.parse(data)
+            res.symbol.icon = state.symbol.icon
+            res.symbol.id = state.symbol.id
+            res.symbol.name = state.symbol.name
+            res.symbol.symbol = state.symbol.symbol
+            res.symbol.type = state.symbol.type
+            res.symbol.disable = state.symbol.disable
+            localStorage.setItem('buy_covered_state', JSON.stringify(res))
+        }
     }, [selectTime, selectCoin])
 
     useEffect(() => {
@@ -401,6 +390,8 @@ export const InsuranceFrom = () => {
         selectTime: string | undefined,
         selectCoin: { id?: string; name?: string; icon?: string; disable?: boolean | undefined; symbol?: string; type: any },
     ) => {
+        console.log(selectCoin)
+
         const timeEnd = new Date()
         const timeBegin = new Date()
         setLoadings(true)
@@ -408,7 +399,7 @@ export const InsuranceFrom = () => {
             if (selectTime == '1H' || selectTime == '1D') {
                 timeBegin.setDate(timeEnd.getDate() - 10)
                 fetchApiNami(
-                    `${selectCoin.type ? selectCoin.type : defaultToken.type}${unitMoney}`,
+                    `${selectCoin.type && selectCoin.type}${unitMoney}`,
                     `${Math.floor(timeBegin.getTime() / 1000)}`,
                     `${Math.ceil(timeEnd.getTime() / 1000)}`,
                     '1m',
@@ -419,7 +410,7 @@ export const InsuranceFrom = () => {
             } else if (selectTime == '1W') {
                 timeBegin.setDate(timeEnd.getDate() - 10)
                 fetchApiNami(
-                    `${selectCoin.type ? selectCoin.type : defaultToken.type}${unitMoney}`,
+                    `${selectCoin.type && selectCoin.type}${unitMoney}`,
                     `${Math.floor(timeBegin.getTime() / 1000)}`,
                     `${Math.ceil(timeEnd.getTime() / 1000)}`,
                     '1h',
@@ -430,7 +421,7 @@ export const InsuranceFrom = () => {
             } else {
                 timeBegin.setDate(timeEnd.getDate() - 10)
                 fetchApiNami(
-                    `${selectCoin.type ? selectCoin.type : defaultToken.type}${unitMoney}`,
+                    `${selectCoin.type && selectCoin.type}${unitMoney}`,
                     `${Math.floor(timeBegin.getTime() / 1000)}`,
                     `${Math.ceil(timeEnd.getTime() / 1000)}`,
                     '1h',
@@ -511,7 +502,7 @@ export const InsuranceFrom = () => {
                 >
                     {index == 1 && <Guide start={showGuide} setStart={setShowGuide} />}
 
-                    {showDetails && <TerminologyModal isMobile={isMobile} visible={showDetails} onClose={() => setShowDetails(false)} t={t} />}
+                    {<TerminologyModal isMobile={isMobile} visible={showDetails} onClose={() => setShowDetails(false)} t={t} />}
 
                     {active && (
                         <Modal
@@ -708,7 +699,7 @@ export const InsuranceFrom = () => {
                                             ></Input>
                                             <Popover className="relative w-[40%] outline-none bg-[#F7F8FA] focus:ring-0 rounded-none shadow-none flex items-center justify-center pr-[21px]">
                                                 {state.q_covered > userBalance && (
-                                                    <div className="absolute right-0 top-[-50px] text-xs z-[100] w-max border border-1 border-[#EB2B3E] p-[8px] rounded-md tooltip">
+                                                    <div className="absolute right-0 max-h-[32px] flex top-[-50px] text-xs z-[100] w-max border border-1 border-[#EB2B3E] p-[8px] rounded-md tooltip">
                                                         <div className="flex flex-row items-center justify-center">
                                                             <div className="mr-[8px] items-center justify-center">
                                                                 <ErrorTriggersIcon />
@@ -726,13 +717,13 @@ export const InsuranceFrom = () => {
                                                 >
                                                     <img
                                                         alt={''}
-                                                        src={`${selectCoin ? selectCoin.icon : defaultToken.icon}`}
+                                                        src={`${selectCoin && selectCoin.icon}`}
                                                         width="20"
                                                         height="20"
                                                         className={'mr-[4px] rounded-[50%]'}
                                                     ></img>
                                                     <span className={'w-max flex flex-start font-semibold text-[#EB2B3E] text-base'}>
-                                                        {selectCoin ? selectCoin.name : defaultToken.name}
+                                                        {selectCoin && selectCoin.name}
                                                     </span>
                                                     {!chosing ? (
                                                         <ChevronDown size={18} className={'mt-1 text-[#22313F]'}></ChevronDown>
@@ -1333,7 +1324,7 @@ export const InsuranceFrom = () => {
             <>
                 {!wallet.account ? (
                     <>
-                        {showDetails && <TerminologyModal isMobile={isMobile} visible={showDetails} onClose={() => setShowDetails(false)} t={t} />}
+                        {<TerminologyModal isMobile={isMobile} visible={showDetails} onClose={() => setShowDetails(false)} t={t} />}
                         <div style={{ background: 'linear-gradient(180deg, rgba(244, 63, 94, 0.15) 0%, rgba(254, 205, 211, 0) 100%)' }}>
                             <div className="px-[16px] pt-[8px]" onClick={() => router.push('/home')}>
                                 <XMark />
@@ -1946,7 +1937,7 @@ export const InsuranceFrom = () => {
 
 export const getStaticProps: GetStaticProps = async ({ locale }: any) => ({
     props: {
-        ...(await serverSideTranslations(locale, ['common', 'insurance', 'home'])),
+        ...(await serverSideTranslations(locale, ['common', 'home', 'insurance', 'insurance_history', 'errors'])),
     },
 })
 
@@ -1964,6 +1955,7 @@ export const fetchApiNami = async (symbol: string, from: string, to: string, res
                 '&resolution=' +
                 resolution,
         )
+
         let list = await response.json()
         let data: { date: number; value: any }[] = []
         list.map((item: any) => {
@@ -2046,136 +2038,5 @@ const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGui
         </Modal>
     )
 }
-
-const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
-    const [tab, setTab] = useState<number>(0)
-    const terms = [
-        {
-            title: 'Q-Covered',
-            description: t('insurance:terminology:q_covered'),
-        },
-        {
-            title: 'P-Market',
-            description: t('insurance:terminology:p_market'),
-        },
-        {
-            title: 'P-Claim',
-            description: t('insurance:terminology:p_claim'),
-        },
-        {
-            title: 'P-Expired',
-            description: t('insurance:terminology:p_expired'),
-        },
-        {
-            title: 'P-Refund',
-            description: t('insurance:terminology:p_refund'),
-        },
-        {
-            title: 'Period',
-            description: t('insurance:terminology:period'),
-        },
-        {
-            title: 'R-Claim',
-            description: t('insurance:terminology:r_claim'),
-        },
-        {
-            title: 'Q-Claim',
-            description: t('insurance:terminology:q_claim'),
-        },
-        {
-            title: 'Margin',
-            description: t('insurance:terminology:margin'),
-        },
-        {
-            title: 'T-Start',
-            description: t('insurance:terminology:t_start'),
-        },
-        {
-            title: 'T-Expired',
-            description: t('insurance:terminology:t_expired'),
-        },
-    ]
-    const terms1 = [
-        {
-            title: t('common:status:available'),
-            description: t('common:status:explain:available'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#00A5FF]/[0.1] text-[#3960E5]',
-        },
-        {
-            title: t('common:status:claim_waiting'),
-            description: t('common:status:explain:claim_waiting'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#FBCD2D]/[0.1] text-[#FBCD2D]',
-        },
-        {
-            title: t('common:status:expired'),
-            description: t('common:status:explain:expired'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#20C9AC]/[0.1] text-[#52CC74]',
-        },
-        {
-            title: t('common:status:claimed'),
-            description: t('common:status:explain:claimed'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#20C9AC]/[0.1] text-[#52CC74]',
-        },
-        {
-            title: t('common:status:refunded'),
-            description: t('common:status:explain:refunded'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#B6B4BA]/[0.1] text-[#B2B7BC]',
-        },
-        {
-            title: t('common:status:liquidated'),
-            description: t('common:status:explain:liquidated'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#B6B4BA]/[0.1] text-[#B2B7BC]',
-        },
-    ]
-
-    return (
-        <Modal
-            isMobile={isMobile}
-            isVisible={visible}
-            onBackdropCb={onClose}
-            wrapClassName="!p-6"
-            className={'max-w-[424px] !min-h-[790px] !h-[790px]'}
-            containerClassName="z-[100]"
-        >
-            <div className="text-xl font-medium mb-6 text-center">{t('insurance:buy:detailed_terminology')}</div>
-
-            <Tabs tab={tab} className="mb-6 text-sm">
-                <TabItem active={tab === 0} onClick={() => setTab(0)}>
-                    {t('insurance:guild:title1')}
-                </TabItem>
-                <TabItem active={tab === 1} onClick={() => setTab(1)}>
-                    {t('insurance:guild:title2')}
-                </TabItem>
-            </Tabs>
-            <div className="flex flex-col text-sm divide-solid divide-y divide-divider max-h-[70vh] overflow-auto -mx-6 px-6">
-                {[...(tab === 0 ? terms : terms1)].map((item: any, index: number) => (
-                    <div key={index} className="py-3 flex items-center">
-                        <div className={`whitespace-nowrap min-w-[30%] ${item?.class}`}>{item.title}</div>
-                        <div>{item.description}</div>
-                    </div>
-                ))}
-            </div>
-        </Modal>
-    )
-}
-
-const Tabs = styled.div.attrs({
-    className: 'mt-6 text-sm flex items-center justify-between h-11 relative',
-})<any>`
-    &:after {
-        content: '';
-        position: absolute;
-        height: 2px;
-        background-color: ${() => colors.red.red};
-        transform: ${({ tab }) => `translate(${tab * 100}%,0)`};
-        width: calc(100% / 2);
-        transition: all 0.2s;
-        bottom: -1px;
-    }
-`
-
-const TabItem = styled.div.attrs<any>(({ active }) => ({
-    className: classnames('px-4 py-3 font-medium whitespace-nowrap border-b-[2px] border-divider', { 'text-red': active }),
-}))<any>``
 
 export default InsuranceFrom

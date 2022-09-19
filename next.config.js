@@ -22,7 +22,7 @@ const nextConfig = withPlugins([[withBundleAnalyzer], [withFonts]], {
         includePaths: [path.join(__dirname, 'styles')],
     },
     images: {
-        domains: ['blog.nami.today'],
+        domains: ['blog.nami.today', 'datav2.nami.exchange'],
     },
     distDir: process.env.BUILD_DIR || 'build',
     styledComponents: true,

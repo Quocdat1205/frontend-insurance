@@ -25,6 +25,7 @@
       "config": ["src/config/*"],
       "styles": ["src/styles/*"],
       "hooks": ["src/hooks/*"],
+      "models": ["src/models/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

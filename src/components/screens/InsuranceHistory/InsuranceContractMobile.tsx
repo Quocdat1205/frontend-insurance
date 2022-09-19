@@ -34,6 +34,7 @@ interface InsuranceContractMobile {
     onBuyInsurance: () => void
     showGuide: boolean
     unitConfig: UnitConfig
+    hasInsurance: boolean
 }
 
 const InsuranceContractMobile = ({
@@ -48,6 +49,7 @@ const InsuranceContractMobile = ({
     onBuyInsurance,
     showGuide,
     unitConfig,
+    hasInsurance,
     ...props
 }: InsuranceContractMobile) => {
     const [showFilter, setShowFilter] = useState(false)
@@ -134,7 +136,7 @@ const InsuranceContractMobile = ({
                     ) : (
                         <div className="w-full flex flex-col items-center justify-center pb-4 ">
                             <img className="max-w-[230px] sm:max-w-[310px]" src="/images/icons/bg_noData.png" />
-                            <div className="text-sm text-center px-4">{t('insurance_history:you_have_no_insurance')}</div>
+                            <div className="text-sm text-center px-4">{t(`insurance_history:you_have_no_insurance${hasInsurance ? '_filter' : ''}`)}</div>
                         </div>
                     )
                 ) : (
