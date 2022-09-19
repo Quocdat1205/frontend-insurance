@@ -109,10 +109,14 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
 
     useEffect(() => {
         InitChart(dataChart)
-        // ref.current.renderer
+
         setP_Market(chart.data[chart.data.length - 1]?.value)
         setPClaim(PClaim)
     }, [dataChart, p_claim, p_expired, state.period])
+
+    useEffect(() => {
+        InitChart(dataChart)
+    }, [data])
 
     const InitChart = async (test_data: Idata[]) => {
         am4core.unuseTheme(am4themes_animated)
