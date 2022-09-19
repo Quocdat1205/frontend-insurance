@@ -17,18 +17,18 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
 import { Suspense } from 'react'
-import store, { RootStore, useAppSelector } from 'redux/store'
+import { RootStore, useAppSelector } from 'redux/store'
 import Config from 'config/config'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
 import Modal from 'components/common/Modal/Modal'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatNumber, getUnit } from 'utils/utils'
-import useWeb3USDT from 'hooks/useWeb3USDT'
 import styled from 'styled-components'
 import classnames from 'classnames'
 
 import { ethers } from 'ethers'
+import InsuranceContractLoading from 'components/screens/InsuranceHistory/InsuranceContractLoading'
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
@@ -41,11 +41,11 @@ export const InsuranceFrom = () => {
         i18n: { language },
     } = useTranslation()
     const wallet = useWeb3Wallet()
+    const { account } = useWeb3Wallet()
     const router = useRouter()
     const { width } = useWindowSize()
     const isMobile = width && width <= screens.drawer
 
-    const unitConfig = useAppSelector((state: RootStore) => getUnit(state, 'USDT'))
     const [percentInsurance, setPercentInsurance] = useState<number>(0)
     const [selectTime, setSelectTime] = useState<string>('ALL')
     const [isDrop, setDrop] = useState(false)
@@ -55,7 +55,6 @@ export const InsuranceFrom = () => {
     const [index, setIndex] = useState<1 | 2>(1)
     const [tab, setTab] = useState<number>(3)
     const [loadings, setLoadings] = useState(true)
-    const [priceBNB, setPriceBNB] = useState(0)
     const [openChangeToken, setOpenChangeToken] = useState(false)
     const [active, setActive] = useState<boolean>(false)
     const [nameNoti, setNameNoti] = useState<'success' | 'expired' | 'expired1' | 'email' | 'loading'>('loading')
@@ -70,6 +69,7 @@ export const InsuranceFrom = () => {
     const [showGuide, setShowGuide] = useState<boolean>(false)
     const [chosing, setChosing] = useState(false)
     const [showGuideModal, setShowGuideModal] = useState<boolean>(false)
+    const [thisFisrt, setThisFisrt] = useState(true)
     const [showChangeUnit, setShowChangeUnit] = useState({
         isShow: false,
         name: '',
@@ -192,7 +192,7 @@ export const InsuranceFrom = () => {
         if (loadings) {
             setTimeout(() => {
                 setShowGuide(true)
-            }, 5000)
+            }, 1500)
         }
     }, [loadings])
 
@@ -225,28 +225,35 @@ export const InsuranceFrom = () => {
     }, [assetsToken])
 
     useEffect(() => {
-        if (wallet.account) {
-            getBalanceUsdt()
+        try {
+            if (typeof window.ethereum !== undefined) {
+                console.log('MetaMask is installed!')
+            }
+            if (account) {
+                setTimeout(() => {
+                    getUSDT()
+                }, 5000)
+            }
+        } catch (error) {
+            console.log('error get USDT balance')
         }
-    }, [wallet.account])
+    }, [account])
 
-    const getBalanceUsdt = async () => {
-        if (state.p_market > 0) {
-            const balanceUsdt = wallet.account && (await wallet?.contractCaller.usdtContract.contract.balanceOf(wallet.account))
-            setUserBalance(Number(formatNumber(Number(balanceUsdt && ethers.utils.formatEther(balanceUsdt)) / state.p_market, 4)))
+    const getUSDT = async () => {
+        const balanceUsdt = await wallet.contractCaller.usdtContract.contract.balanceOf(account)
+        if (balanceUsdt) {
+            setUserBalance(Number(formatNumber(Number(ethers.utils.formatEther(await balanceUsdt)) / Number(state.p_market), 4)))
         }
     }
-
     const setStorage = (value: any) => {
         localStorage.setItem('buy_covered_state', JSON.stringify(value))
+        setThisFisrt(false)
     }
 
     useEffect(() => {
         try {
             setLoadings(true)
-            if (typeof window.ethereum !== undefined) {
-                console.log('MetaMask is installed!')
-            }
+
             const data = localStorage.getItem('buy_covered_state')
             if (data) {
                 const res = JSON.parse(data)
@@ -272,11 +279,22 @@ export const InsuranceFrom = () => {
                     t_market: res.t_market,
                     p_expired: res.p_expired * 1.0,
                 })
+                setSelectedCoin({
+                    icon: res.symbol.icon,
+                    id: res.symbol.id,
+                    name: res.symbol.name,
+                    symbol: res.symbol.symbol,
+                    type: res.symbol.type,
+                    disable: res.symbol.disable,
+                })
                 setTab(res.tab)
                 setUnitMoney(res.unitMoney)
                 setIndex(res.index)
                 validatePclaim(res.p_claim)
+                setThisFisrt(true)
             } else {
+                setThisFisrt(false)
+
                 setStorage(state)
             }
             setLoadings(false)
@@ -315,7 +333,7 @@ export const InsuranceFrom = () => {
     }, [state.q_covered])
 
     useEffect(() => {
-        if (state) {
+        if (state && !thisFisrt) {
             const data = localStorage.getItem('buy_covered_state')
             if (data) {
                 const res = JSON.parse(data)
@@ -341,9 +359,11 @@ export const InsuranceFrom = () => {
                     t_market: state.t_market,
                     p_expired: state.p_expired * 1.0,
                 }
-
                 setStorage(newData)
             }
+        }
+        if (thisFisrt) {
+            return setThisFisrt(false)
         }
     }, [state])
 
@@ -362,7 +382,6 @@ export const InsuranceFrom = () => {
             const timeBegin = new Date()
             timeBegin.setDate(timeEnd.getDate() - 10)
             setState({ ...state, t_market: timeEnd })
-            setLoadings(true)
             getPrice(listCoin[0].symbol, state, setState)
         }
     }, [listCoin])
@@ -469,10 +488,19 @@ export const InsuranceFrom = () => {
         }
     }, [state.p_claim])
 
+    useEffect(() => {
+        if (showGuide) {
+            return setTab(3)
+        } else {
+            return
+        }
+    }, [showGuide])
+
     return !loadings ? (
         !isMobile ? (
             <>
                 <LayoutInsurance
+                    hiddenHeader={showGuide}
                     handleClick={() => {
                         setDrop(false)
                         setChosing(false)
@@ -531,7 +559,7 @@ export const InsuranceFrom = () => {
                                 </span>
                             </div>
 
-                            <Popover className="relative">
+                            <Popover className="relative" data-tut="tour_custom" id="tour_custom">
                                 <Popover.Button
                                     className={
                                         'border border-[0.5] text-base border-[#F7F8FA] rounded-[6px] h-[40px] w-auto py-[8px] px-[12px] flex flex-row bg-[#F7F8FA] shadow focus-visible:outline-none'
@@ -891,7 +919,7 @@ export const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${state.percent_margin == 2 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
+                                            <div className={`${state.percent_margin >= 2 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span>2%</span>
                                         </div>
                                         <div
@@ -904,7 +932,7 @@ export const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${5 == state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
+                                            <div className={`${5 <= state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span className={''}>5%</span>
                                         </div>
                                         <div
@@ -917,7 +945,7 @@ export const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${7 == state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
+                                            <div className={`${7 <= state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span className={''}>7%</span>
                                         </div>
                                         <div
@@ -930,7 +958,7 @@ export const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${state.percent_margin == 10 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
+                                            <div className={`${state.percent_margin > 10 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span>10%</span>
                                         </div>
                                     </div>
@@ -1250,9 +1278,7 @@ export const InsuranceFrom = () => {
                                 {menu[11].name}
                             </button>
                             <Menu>
-                                <Menu.Button data-tut="tour_custom" id="tour_custom" className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}>
-                                    {menu[12].name}
-                                </Menu.Button>
+                                <Menu.Button className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}>{menu[12].name}</Menu.Button>
                                 <Menu.Items
                                     className={'flex flex-col text-[#22313F]'}
                                     style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
@@ -1501,7 +1527,7 @@ export const InsuranceFrom = () => {
                                             setShowGuideModal(true)
                                         }}
                                     >
-                                        {t('insurance:buy:help_short')}
+                                        {t('insurance:guild:title')}
                                     </span>
 
                                     <GuidelineModal
@@ -1571,9 +1597,9 @@ export const InsuranceFrom = () => {
                                             id="name"
                                             onChange={(a: any) => {
                                                 if (Number(a.target.value) >= 1) {
-                                                    setState({ ...state, p_claim: a.target.value.replace(/^0+/, '') })
+                                                    setState({ ...state, q_covered: a.target.value.replace(/^0+/, '') })
                                                 } else {
-                                                    setState({ ...state, p_claim: Number(a.target.value) })
+                                                    setState({ ...state, q_covered: Number(a.target.value) })
                                                 }
                                                 setPercentInsurance(0)
                                             }}
@@ -1582,7 +1608,7 @@ export const InsuranceFrom = () => {
                                     <span className="text-[#EB2B3E]">{selectCoin.type}</span>
                                 </div>
                                 {tab == 6 && (
-                                    <div>
+                                    <div data-tut="tour_custom" id="tour_custom">
                                         <span>{t('insurance:buy:title_change_margin')}</span>{' '}
                                         <label className={`${state.margin == 0 ? 'text-[#B2B7BC]' : 'text-[#EB2B3E]'} max-w-[245] relative ml-[6xp]`}>
                                             {state.margin > 0 ? Number(state.margin) : 'Số tiền?'}
@@ -1590,20 +1616,20 @@ export const InsuranceFrom = () => {
                                                 type="number"
                                                 className={` text-white pl-[4px] focus-visible:outline-none w-0 border border-1 border-black`}
                                                 placeholder="Số tiền?"
-                                                value={state.margin > 0 ? Number(state.margin) : 'Số tiền?'}
+                                                value={state.margin > 0 ? Number(state.margin) : 0}
                                                 name="name"
                                                 id="name"
                                                 onChange={(a: any) => {
                                                     if (Number(a.target.value) >= 1) {
-                                                        setState({
+                                                        return setState({
                                                             ...state,
                                                             margin: a.target.value.replace(/^0+/, ''),
                                                             percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
                                                         })
                                                     } else {
-                                                        setState({
+                                                        return setState({
                                                             ...state,
-                                                            margin: Number(a.target.value),
+                                                            margin: Number(a.target.value) * 1,
                                                             percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
                                                         })
                                                     }
@@ -1912,7 +1938,7 @@ export const InsuranceFrom = () => {
             </>
         )
     ) : (
-        <></>
+        <InsuranceContractLoading />
     )
 }
 
@@ -2071,53 +2097,45 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
         {
             title: t('common:status:available'),
             description: t('common:status:explain:available'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#00A5FF]/[0.1] text-[#3960E5]',
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#00A5FF]/[0.1] text-[#3960E5]',
         },
         {
             title: t('common:status:claim_waiting'),
             description: t('common:status:explain:claim_waiting'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#FBCD2D]/[0.1] text-[#FBCD2D]',
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#FBCD2D]/[0.1] text-[#FBCD2D]',
         },
         {
             title: t('common:status:expired'),
             description: t('common:status:explain:expired'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#20C9AC]/[0.1] text-[#52CC74]',
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#20C9AC]/[0.1] text-[#52CC74]',
         },
         {
             title: t('common:status:claimed'),
             description: t('common:status:explain:claimed'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#20C9AC]/[0.1] text-[#52CC74]',
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#20C9AC]/[0.1] text-[#52CC74]',
         },
         {
             title: t('common:status:refunded'),
             description: t('common:status:explain:refunded'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#B6B4BA]/[0.1] text-[#B2B7BC]',
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#B6B4BA]/[0.1] text-[#B2B7BC]',
         },
         {
             title: t('common:status:liquidated'),
             description: t('common:status:explain:liquidated'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#B6B4BA]/[0.1] text-[#B2B7BC]',
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#B6B4BA]/[0.1] text-[#B2B7BC]',
         },
     ]
 
-    // const optionsState = useMemo(() => {
-    //     return Object.keys(stateInsurance).reduce((acc: any[], key: string) => {
-    //         const _key = String(key).toLowerCase()
-    //         acc.push({ title: t(`common:status:${_key}`), description: t(`common:status:explain:${_key}`) })
-    //         return acc
-    //     }, [])
-    // }, [])
-
     return (
         <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'max-w-[424px]'} containerClassName="z-[100]">
-            <div className="text-xl font-medium mb-6 text-center">{t('insurance_history:detailed_terminology')}</div>
+            <div className="text-xl font-medium mb-6 text-center">{t('insurance:buy:detailed_terminology')}</div>
 
             <Tabs tab={tab} className="mb-6 text-sm">
                 <TabItem active={tab === 0} onClick={() => setTab(0)}>
-                    Thuật ngữ bảo hiểm
+                    {t('insurance:guild:title1')}
                 </TabItem>
                 <TabItem active={tab === 1} onClick={() => setTab(1)}>
-                    Trạng thái hợp đồng
+                    {t('insurance:guild:title2')}
                 </TabItem>
             </Tabs>
             <div className="flex flex-col text-sm divide-solid divide-y divide-divider max-h-[70vh] overflow-auto -mx-6 px-6">

@@ -33,7 +33,7 @@ export const getServerSideProps = async ({ locale, query }: any) => {
             return {
                 props: {
                     slug: query.slug,
-                    ...(await serverSideTranslations(locale, ['common', 'home', 'insurance', 'insurance_history'])),
+                    ...(await serverSideTranslations(locale, ['common', 'home', 'insurance', 'insurance_history', 'errors'])),
                 },
             }
         }

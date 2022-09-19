@@ -1,15 +1,18 @@
 {
     "my_cover": "My cover",
     "tracking_and_utilizing": "Tracking and utilizing my contract",
-    "detailed_terminology": "Detailed terminology",
+    "insurance_terminology": "Insurance Terminology",
     "individual_cover": "Individual Cover Stats",
     "qty_of_signed": "Quantity of contracts",
     "new_cover_assets": "New cover assets",
     "you_have_no_insurance": "You have no insurance contract.",
+    "you_have_no_insurance_filter": "You have no insurance according to the filter results.",
     "connecting_wallet_to_buy": "Connecting wallet to buy Insurance Contract.",
     "status": "Status",
     "choose_status": "Choose Status",
     "insurance_contract": "Insurance Contract",
+    "the_glossary": "The Glossary",
+    "terminologies_states": "terminologies and states of the Insurance contract",
     "guidelines": {
         "title": "Guidelines",
         "step_title_1": "Individual insurance contract stats",
@@ -17,8 +20,9 @@
         "step_title_2": "Insurance contract details",
         "step_content_2": "Please click here to view and monitor your IC.",
         "step_title_3": "Press 'tutorial' if you are having trouble using Nami Insurance.",
-        "step_content_3": "HashID là mã nhận dạng duy nhất cho mỗi HĐBH. Sao chép mã và gửi bộ phận CSKH của Nami khi cần hỗ trợ.",
-        "step_content_5": "Bấm để xem lại các bước hướng dẫn, hoặc tìm hiểu thêm về bảng chú giải thuật ngữ nếu gặp khó khăn trong quá trình sử dụng.",
+        "step_content_3": "Hasd ID is a unique code for each Insurance Contract. Copy the code and send it to customer service team when you need help.",
+        "step_content_4": "Follow the status of your insurance policy here. See detailed descriptions for all states in {{value}}.",
+        "step_content_5": "Review the tutorial or learn more about {{value}} if you are having trouble using it.",
         "got_it": "Got it"
     }
 }

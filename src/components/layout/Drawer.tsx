@@ -39,7 +39,7 @@ const Drawer = ({ visible, onClose, children }: any) => {
         <Portal portalId="Drawer">
             <div
                 className={classnames(
-                    'flex flex-col fixed top-[4rem] h-[calc(100%-4rem--1px)] w-full z-[20] bg-shadow/[0.3] overflow-hidden',
+                    'flex flex-col fixed top-[4rem] h-full w-full z-[20] bg-shadow/[0.3] overflow-hidden',
                     { invisible: !visible },
                     { visible: visible },
                 )}
@@ -47,7 +47,7 @@ const Drawer = ({ visible, onClose, children }: any) => {
             >
                 <div
                     className={classnames(
-                        'ease-in-out transition-all flex items-end duration-300 h-full right-0 fixed',
+                        'ease-in-out transition-all flex items-end duration-300 h-[calc(100%-4rem--1px)] right-0 fixed',
                         { 'translate-x-full': !visible },
                         { 'translate-x-0': visible },
                     )}

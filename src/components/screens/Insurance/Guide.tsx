@@ -1,5 +1,5 @@
 import { useTranslation } from 'next-i18next'
-import React, { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock'
 import styled from 'styled-components'
 import { X } from 'react-feather'
@@ -7,6 +7,7 @@ import { LeftArrow } from 'components/common/Svg/SvgIcon'
 import Button from 'components/common/Button/Button'
 import Tour from 'reactour'
 import useWindowSize from 'hooks/useWindowSize'
+import { screens } from 'utils/constants'
 
 interface Guideline {
     start: boolean
@@ -16,23 +17,24 @@ const Guide = ({ start, setStart }: Guideline) => {
     const { t } = useTranslation()
     const step = useRef<number>(0)
     const refGuide = useRef<any>(null)
+    const [count, setCount] = useState<number>(0)
+    const { width } = useWindowSize()
+    const isMobile = width && width <= screens.drawer
 
     const getCurrentStep = (e: number) => {
         if (e === 1) {
             const _el = document.querySelector('#tour_chart')
-            step.current = e
             if (_el) _el.scrollIntoView()
         }
         if (e === 2) {
             const _el = document.querySelector('#tour_period')
             if (_el) _el.scrollIntoView()
-            step.current = e
         }
         if (e === 3) {
             const _el = document.querySelector('#tour_custom')
             if (_el) _el.scrollIntoView()
-            step.current = e
         }
+        setCount(e)
     }
 
     useEffect(() => {
@@ -61,23 +63,23 @@ const Guide = ({ start, setStart }: Guideline) => {
         return [
             {
                 selector: '[data-tut="tour_statistics"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_1')} {...props} onClose={onClose} />,
+                content: (props: any) => <Content title={t('insurance:guild:step_title_1')} top {...props} onClose={onClose} />,
                 position: 'bottom',
             },
             {
                 selector: '[data-tut="tour_chart"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_2')} content={contentStep2()} {...props} onClose={onClose} />,
+                content: (props: any) => <Content title={t('insurance:guild:step_title_2')} content={contentStep2()} top {...props} onClose={onClose} />,
                 position: 'bottom',
             },
             {
                 selector: '[data-tut="tour_period"]',
-                content: (props: any) => <Content title={t('insurance:guild:step_title_3')} content={contentStep1()} {...props} onClose={onClose} />,
+                content: (props: any) => <Content title={t('insurance:guild:step_title_3')} content={contentStep1()} top {...props} onClose={onClose} />,
                 position: 'bottom',
             },
             {
                 selector: '[data-tut="tour_custom"]',
                 content: (props: any) => <Content title={t('insurance:guild:step_title_4')} top {...props} onClose={onClose} />,
-                position: 'right',
+                position: isMobile ? 'top' : 'bottom',
             },
         ]
     }, [])
@@ -86,6 +88,7 @@ const Guide = ({ start, setStart }: Guideline) => {
         if (!e) {
             if (refGuide.current.state.current === tourConfig.length - 1) {
                 setStart(false)
+                setCount(0)
             } else {
                 refGuide.current.nextStep()
             }
@@ -100,7 +103,7 @@ const Guide = ({ start, setStart }: Guideline) => {
             steps={tourConfig}
             isOpen={start}
             showCloseButton={false}
-            className={`${step.current == 3 ? 'reactour__arrow__right' : ''} !max-w-md  `}
+            className={`${count == 3 && 'reactour__arrow__right'} !max-w-md  `}
             maskClassName="guideline "
             rounded={6}
             startAt={0}

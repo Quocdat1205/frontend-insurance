@@ -86,6 +86,8 @@
     },
     "guild": {
         "title": "Hướng dẫn",
+        "title1": "Thuật ngữ bảo hiểm",
+        "title2": "Trạng thái hợp đồng",
         "step_title_1": "Loại và số lượng tài sản",
         "step_title_2": "Chọn nhanh P-claim bằng cách kéo mức giá trên biểu đồ theo phương dọc hoặc nhập P-claim mong muốn",
         "step_title_3": "Chọn Period",
