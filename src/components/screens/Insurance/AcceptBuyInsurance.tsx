@@ -14,6 +14,7 @@ import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatNumber } from 'utils/utils'
 import { contractAddress } from 'components/web3/constants/contractAddress'
+import { formatWeiValueToPrice } from '../../../utils/format'
 
 export type IProps = {
     state: any
@@ -124,14 +125,15 @@ export const AcceptBuyInsurance = ({
                     isUseNain: checkUpgrade,
                 }
 
-                await wallet.contractCaller.usdtContract.contract.allowance(wallet.account, contractAddress).then((contract: any) => {
-                    console.log(contract)
-                })
-                console.log(wallet)
+                const allowance = await wallet.contractCaller.usdtContract.contract.allowance(wallet.account, contractAddress)
 
-                await wallet.contractCaller.usdtContract.contract.approve(wallet.account, formatPriceToWeiValue(20)).then((contract: any) => {
-                    console.log(contract)
-                })
+                const parseAllowance = formatWeiValueToPrice(allowance)
+
+                if (parseAllowance < state.margin) {
+                    await wallet.contractCaller.usdtContract.contract.approve(wallet.account, formatPriceToWeiValue(20)).then((contract: any) => {
+                        console.log('APPROVE', contract)
+                    })
+                }
 
                 const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
                     dataPost.buyer,
@@ -142,16 +144,16 @@ export const AcceptBuyInsurance = ({
                     dataPost.p_claim,
                     dataPost.period,
                     dataPost.isUseNain,
-                    { value: dataPost.margin },
+                    { value: 0 },
                 )
                 await buy.wait()
 
                 const id_sc = await buy.wait()
-                console.log(buy)
+                console.log(id_sc.events[2])
 
-                // if (buy && id_sc.events[0].args[0]) {
-                //     handlePostInsurance(buy, dataPost, state, Number(id_sc.events[0].args[0]))
-                // }
+                if (buy && id_sc.events[2].args[0]) {
+                    handlePostInsurance(buy, dataPost, state, Number(id_sc.events[2].args[0]))
+                }
             }
 
             if (checkUpgrade) {
@@ -182,10 +184,8 @@ export const AcceptBuyInsurance = ({
 
                 const id_sc = await buy.wait()
 
-                if (buy && id_sc.events[0].args[0]) {
-                    // console.log(buy)
-
-                    handlePostInsurance(buy, dataPost, state, Number(id_sc.events[0].args[0]))
+                if (buy && id_sc.events[2].args[0]) {
+                    handlePostInsurance(buy, dataPost, state, Number(id_sc.events[2].args[0]))
                 }
             }
         } catch (err) {
