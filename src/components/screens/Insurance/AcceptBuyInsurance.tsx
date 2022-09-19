@@ -124,25 +124,30 @@ export const AcceptBuyInsurance = ({
                     isUseNain: checkUpgrade,
                 }
 
-                await wallet.contractCaller.usdtContract.allowance(wallet.account, contractAddress).then((contract: any) => {
+                await wallet.contractCaller.usdtContract.contract.allowance(wallet.account, contractAddress).then((contract: any) => {
+                    console.log(contract)
+                })
+                console.log(wallet)
+
+                await wallet.contractCaller.usdtContract.contract.approve(wallet.account, formatPriceToWeiValue(20)).then((contract: any) => {
                     console.log(contract)
                 })
 
-                // const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
-                //     dataPost.buyer,
-                //     dataPost.asset,
-                //     dataPost.margin,
-                //     dataPost.q_covered,
-                //     dataPost.p_market,
-                //     dataPost.p_claim,
-                //     dataPost.period,
-                //     dataPost.isUseNain,
-                //     { value: dataPost.margin },
-                // )
-                // await buy.wait()
+                const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
+                    dataPost.buyer,
+                    dataPost.asset,
+                    dataPost.margin,
+                    dataPost.q_covered,
+                    dataPost.p_market,
+                    dataPost.p_claim,
+                    dataPost.period,
+                    dataPost.isUseNain,
+                    { value: dataPost.margin },
+                )
+                await buy.wait()
 
-                // const id_sc = await buy.wait()
-                // console.log(buy)
+                const id_sc = await buy.wait()
+                console.log(buy)
 
                 // if (buy && id_sc.events[0].args[0]) {
                 //     handlePostInsurance(buy, dataPost, state, Number(id_sc.events[0].args[0]))

@@ -79,7 +79,7 @@ const Guide = ({ start, setStart }: Guideline) => {
             {
                 selector: '[data-tut="tour_custom"]',
                 content: (props: any) => <Content title={t('insurance:guild:step_title_4')} top {...props} onClose={onClose} />,
-                position: isMobile ? 'top' : 'right',
+                position: isMobile ? 'top' : 'bottom',
             },
         ]
     }, [])
@@ -103,7 +103,7 @@ const Guide = ({ start, setStart }: Guideline) => {
             steps={tourConfig}
             isOpen={start}
             showCloseButton={false}
-            className={`${isMobile ? count == 3 && 'reactour__arrow__right' : count == 3 && 'reactour__arrow__new'} !max-w-md  `}
+            className={`${count == 3 && 'reactour__arrow__right'} !max-w-md  `}
             maskClassName="guideline "
             rounded={6}
             startAt={0}

@@ -559,7 +559,7 @@ export const InsuranceFrom = () => {
                                 </span>
                             </div>
 
-                            <Popover className="relative">
+                            <Popover className="relative" data-tut="tour_custom" id="tour_custom">
                                 <Popover.Button
                                     className={
                                         'border border-[0.5] text-base border-[#F7F8FA] rounded-[6px] h-[40px] w-auto py-[8px] px-[12px] flex flex-row bg-[#F7F8FA] shadow focus-visible:outline-none'
@@ -919,7 +919,7 @@ export const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${state.percent_margin == 2 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
+                                            <div className={`${state.percent_margin >= 2 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span>2%</span>
                                         </div>
                                         <div
@@ -932,7 +932,7 @@ export const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${5 == state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
+                                            <div className={`${5 <= state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span className={''}>5%</span>
                                         </div>
                                         <div
@@ -945,7 +945,7 @@ export const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${7 == state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
+                                            <div className={`${7 <= state.percent_margin ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span className={''}>7%</span>
                                         </div>
                                         <div
@@ -958,7 +958,7 @@ export const InsuranceFrom = () => {
                                                 })
                                             }}
                                         >
-                                            <div className={`${state.percent_margin == 10 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
+                                            <div className={`${state.percent_margin > 10 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span>10%</span>
                                         </div>
                                     </div>
@@ -1278,9 +1278,7 @@ export const InsuranceFrom = () => {
                                 {menu[11].name}
                             </button>
                             <Menu>
-                                <Menu.Button data-tut="tour_custom" id="tour_custom" className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}>
-                                    {menu[12].name}
-                                </Menu.Button>
+                                <Menu.Button className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}>{menu[12].name}</Menu.Button>
                                 <Menu.Items
                                     className={'flex flex-col text-[#22313F]'}
                                     style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
@@ -1610,7 +1608,7 @@ export const InsuranceFrom = () => {
                                     <span className="text-[#EB2B3E]">{selectCoin.type}</span>
                                 </div>
                                 {tab == 6 && (
-                                    <div>
+                                    <div data-tut="tour_custom" id="tour_custom">
                                         <span>{t('insurance:buy:title_change_margin')}</span>{' '}
                                         <label className={`${state.margin == 0 ? 'text-[#B2B7BC]' : 'text-[#EB2B3E]'} max-w-[245] relative ml-[6xp]`}>
                                             {state.margin > 0 ? Number(state.margin) : 'Số tiền?'}
@@ -1618,20 +1616,20 @@ export const InsuranceFrom = () => {
                                                 type="number"
                                                 className={` text-white pl-[4px] focus-visible:outline-none w-0 border border-1 border-black`}
                                                 placeholder="Số tiền?"
-                                                value={state.margin > 0 ? Number(state.margin) : 'Số tiền?'}
+                                                value={state.margin > 0 ? Number(state.margin) : 0}
                                                 name="name"
                                                 id="name"
                                                 onChange={(a: any) => {
                                                     if (Number(a.target.value) >= 1) {
-                                                        setState({
+                                                        return setState({
                                                             ...state,
                                                             margin: a.target.value.replace(/^0+/, ''),
                                                             percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
                                                         })
                                                     } else {
-                                                        setState({
+                                                        return setState({
                                                             ...state,
-                                                            margin: Number(a.target.value),
+                                                            margin: Number(a.target.value) * 1,
                                                             percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
                                                         })
                                                     }
@@ -2099,32 +2097,32 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
         {
             title: t('common:status:available'),
             description: t('common:status:explain:available'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#00A5FF]/[0.1] text-[#3960E5]',
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#00A5FF]/[0.1] text-[#3960E5]',
         },
         {
             title: t('common:status:claim_waiting'),
             description: t('common:status:explain:claim_waiting'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#FBCD2D]/[0.1] text-[#FBCD2D]',
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#FBCD2D]/[0.1] text-[#FBCD2D]',
         },
         {
             title: t('common:status:expired'),
             description: t('common:status:explain:expired'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#20C9AC]/[0.1] text-[#52CC74]',
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#20C9AC]/[0.1] text-[#52CC74]',
         },
         {
             title: t('common:status:claimed'),
             description: t('common:status:explain:claimed'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#20C9AC]/[0.1] text-[#52CC74]',
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#20C9AC]/[0.1] text-[#52CC74]',
         },
         {
             title: t('common:status:refunded'),
             description: t('common:status:explain:refunded'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#B6B4BA]/[0.1] text-[#B2B7BC]',
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#B6B4BA]/[0.1] text-[#B2B7BC]',
         },
         {
             title: t('common:status:liquidated'),
             description: t('common:status:explain:liquidated'),
-            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] text-center bg-[#B6B4BA]/[0.1] text-[#B2B7BC]',
+            class: 'py-[6px] px-[12px] rounded-[600px] mr-[24px] my-[22px] text-center bg-[#B6B4BA]/[0.1] text-[#B2B7BC]',
         },
     ]
 
@@ -2134,10 +2132,10 @@ const TerminologyModal = ({ visible, onClose, t, isMobile }: any) => {
 
             <Tabs tab={tab} className="mb-6 text-sm">
                 <TabItem active={tab === 0} onClick={() => setTab(0)}>
-                    Thuật ngữ bảo hiểm
+                    {t('insurance:guild:title1')}
                 </TabItem>
                 <TabItem active={tab === 1} onClick={() => setTab(1)}>
-                    Trạng thái hợp đồng
+                    {t('insurance:guild:title2')}
                 </TabItem>
             </Tabs>
             <div className="flex flex-col text-sm divide-solid divide-y divide-divider max-h-[70vh] overflow-auto -mx-6 px-6">
