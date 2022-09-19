@@ -128,11 +128,14 @@ export const AcceptBuyInsurance = ({
                 const allowance = await wallet.contractCaller.usdtContract.contract.allowance(wallet.account, contractAddress)
 
                 const parseAllowance = formatWeiValueToPrice(allowance)
+                console.log(parseAllowance)
 
                 if (parseAllowance < state.margin) {
-                    await wallet.contractCaller.usdtContract.contract.approve(wallet.account, formatPriceToWeiValue(20)).then((contract: any) => {
-                        console.log('APPROVE', contract)
-                    })
+                    await wallet.contractCaller.usdtContract.contract
+                        .approve(contractAddress, formatPriceToWeiValue(100), { from: wallet.account })
+                        .then((contract: any) => {
+                            console.log('APPROVE', contract)
+                        })
                 }
 
                 const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
@@ -144,7 +147,7 @@ export const AcceptBuyInsurance = ({
                     dataPost.p_claim,
                     dataPost.period,
                     dataPost.isUseNain,
-                    { value: 0 },
+                    { value: dataPost.margin },
                 )
                 await buy.wait()
 
@@ -272,7 +275,7 @@ export const AcceptBuyInsurance = ({
                             </div>
                             <div className={'font-semibold '}>
                                 <span className={`${checkUpgrade ? 'line-through text-[#808890] pr-[8px] text-xs' : 'pr-[8px]'}`}>
-                                    {state.q_claim.toFixed(2)}
+                                    {state?.q_claim?.toFixed(2)}
                                 </span>{' '}
                                 <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
                                     {(state.q_claim + (state.q_claim * 5) / 100).toFixed(2)}

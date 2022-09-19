@@ -915,7 +915,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 2,
-                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
+                                                    margin: Number((2 * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -928,7 +928,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 5,
-                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
+                                                    margin: Number((5 * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -941,7 +941,7 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 7,
-                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
+                                                    margin: Number((7 * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
@@ -954,11 +954,11 @@ export const InsuranceFrom = () => {
                                                 setState({
                                                     ...state,
                                                     percent_margin: 10,
-                                                    margin: Number((state.percent_margin * state.q_covered * state.p_market) / 100),
+                                                    margin: Number((10 * state.q_covered * state.p_market) / 100),
                                                 })
                                             }}
                                         >
-                                            <div className={`${state.percent_margin > 10 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
+                                            <div className={`${state.percent_margin >= 10 ? 'bg-[#EB2B3E]' : 'bg-[#F2F3F5]'} h-[5px] w-[80%] rounded-sm`}></div>
                                             <span>10%</span>
                                         </div>
                                     </div>
