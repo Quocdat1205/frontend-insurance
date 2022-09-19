@@ -19,7 +19,7 @@ export const buyInsurance = async (props: {
 
         const AuthToken = await axios.get(`${Config.env.API_URL}${API_GET_GET_TOKEN}`, { params: { owner: owner.toLowerCase() } })
 
-        const { data } = await axios.post(
+        const { status } = await axios.post(
             `${Config.env.API_URL}${API_GET_BUY_INSURANCE}`,
             {
                 owner,
@@ -36,9 +36,7 @@ export const buyInsurance = async (props: {
             { headers: { Authorization: `Bearer ${AuthToken.data}` } },
         )
 
-        console.log(data)
-
-        return data
+        return status
     } catch (error) {
         console.error(error)
         return false
