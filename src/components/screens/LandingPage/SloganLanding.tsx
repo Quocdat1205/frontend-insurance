@@ -25,7 +25,7 @@ const SloganLanding = () => {
                     </div>
                 </div>
                 <div className="max-w-[848px] 3xl:max-w-[75rem] w-full flex justify-end">
-                    <img src="/images/screens/landing-page/ic_slider.png" className="sm:h-[calc(100vh-450px)] -mr-[30px]" />
+                    <img src="/images/screens/landing-page/ic_slider.gif" className="sm:h-[calc(100vh-450px)]" />
                 </div>
             </div>
         </section>
