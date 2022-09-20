@@ -16,7 +16,6 @@ import { formatNumber } from 'utils/utils'
 import { contractAddress } from 'components/web3/constants/contractAddress'
 import { Popover } from '@headlessui/react'
 import { ChevronDown } from 'react-feather'
-import InsuranceContractLoading from '../InsuranceHistory/InsuranceContractLoading'
 import Modal from 'components/common/Modal/Modal'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
 
@@ -738,7 +737,7 @@ const AcceptBuyInsurance = () => {
             </div>
         )
     ) : (
-        <InsuranceContractLoading />
+        <></>
     )
 }
 
