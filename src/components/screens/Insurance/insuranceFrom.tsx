@@ -4,7 +4,6 @@ import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import Button from 'components/common/Button/Button'
 import axios from 'axios'
 import { Menu, Popover, Switch, Tab } from '@headlessui/react'
-import { AcceptBuyInsurance } from '../components/screens/Insurance/AcceptBuyInsurance'
 import { GetStaticProps } from 'next'
 import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
@@ -33,7 +32,7 @@ const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
 //chart
-const ChartComponent = dynamic(() => import('../components/common/Chart/chartComponent'), { ssr: false, suspense: true })
+const ChartComponent = dynamic(() => import('./chartComponent'), { ssr: false, suspense: true })
 
 export const InsuranceFrom = () => {
     const {
@@ -187,21 +186,45 @@ export const InsuranceFrom = () => {
     }
 
     useEffect(() => {
-        let list: ICoin[] = []
-        assetsToken.map(async (token: any) => {
-            const tmp = {
-                id: token._id,
-                name: token.name,
-                icon: token.attachment,
-                symbol: `${token.symbol}USDT`,
-                type: token.symbol,
-                disable: !token.isActive,
+        if (assetsToken) {
+            let list: ICoin[] = []
+            assetsToken.map(async (token: any) => {
+                const tmp = {
+                    id: token._id,
+                    name: token.name,
+                    icon: token.attachment,
+                    symbol: `${token.symbol}USDT`,
+                    type: token.symbol,
+                    disable: !token.isActive,
+                }
+
+                await list.push(tmp)
+            })
+
+            if (list.length > 0) {
+                setState({
+                    ...state,
+                    symbol: {
+                        icon: list[0].icon,
+                        id: list[0].id,
+                        name: list[0].name,
+                        symbol: list[0].symbol,
+                        type: list[0].type,
+                        disable: list[0].disable,
+                    },
+                })
+                setSelectedCoin({
+                    icon: list[0].icon,
+                    id: list[0].id,
+                    name: list[0].name,
+                    symbol: list[0].symbol,
+                    type: list[0].type,
+                    disable: list[0].disable,
+                })
+
+                return setListCoin(list)
             }
-
-            await list.push(tmp)
-        })
-
-        return setListCoin(list)
+        }
     }, [assetsToken])
 
     useEffect(() => {
@@ -220,9 +243,11 @@ export const InsuranceFrom = () => {
     }, [account])
 
     const getUSDT = async () => {
-        const balanceUsdt = await wallet.contractCaller.usdtContract.contract.balanceOf(account)
-        if (balanceUsdt) {
-            setUserBalance(Number(formatNumber(Number(ethers.utils.formatEther(await balanceUsdt)) / Number(state.p_market), 4)))
+        if (wallet) {
+            const balanceUsdt = await wallet.contractCaller.usdtContract.contract.balanceOf(account)
+            if (balanceUsdt) {
+                setUserBalance(Number(formatNumber(Number(ethers.utils.formatEther(await balanceUsdt)) / Number(state.p_market), 4)))
+            }
         }
     }
     const setStorage = (value: any) => {
@@ -236,45 +261,35 @@ export const InsuranceFrom = () => {
         const data = await localStorage.getItem('buy_covered_state')
         if (data) {
             const res = JSON.parse(data)
-            setState({
-                ...state,
-                timeframe: res.timeframe,
-                margin: res.margin * 1.0,
-                percent_margin: res.percent_margin * 1.0,
-                symbol: {
+            if (res.symbol.id) {
+                setState({
+                    ...state,
+                    symbol: {
+                        icon: res.symbol.icon,
+                        id: res.symbol.id,
+                        name: res.symbol.name,
+                        symbol: res.symbol.symbol,
+                        type: res.symbol.type,
+                        disable: res.symbol.disable,
+                    },
+                })
+                setSelectedCoin({
                     icon: res.symbol.icon,
                     id: res.symbol.id,
                     name: res.symbol.name,
                     symbol: res.symbol.symbol,
                     type: res.symbol.type,
                     disable: res.symbol.disable,
-                },
-                period: res.period * 1.0,
-                p_claim: res.p_claim * 1.0,
-                q_claim: res.q_claim * 1.0,
-                r_claim: res.r_claim * 1.0,
-                q_covered: res.q_covered * 1.0,
-                p_market: res.p_market * 1.0,
-                t_market: res.t_market,
-                p_expired: res.p_expired * 1.0,
-            })
-            setSelectedCoin({
-                icon: res.symbol.icon,
-                id: res.symbol.id,
-                name: res.symbol.name,
-                symbol: res.symbol.symbol,
-                type: res.symbol.type,
-                disable: res.symbol.disable,
-            })
-            setTab(res.tab)
-            setUnitMoney(res.unitMoney)
-            setIndex(res.index)
-            validatePclaim(res.p_claim)
-            setThisFisrt(true)
-            refreshApi(selectTime, selectCoin)
+                })
+                setTab(res.tab)
+                setUnitMoney(res.unitMoney)
+                setIndex(res.index)
+                setThisFisrt(true)
+                refreshApi(selectTime, selectCoin)
+            }
         } else {
             setThisFisrt(false)
-            setStorage(state)
+            setStorage(selectCoin)
         }
         setLoadings(false)
     }
@@ -286,7 +301,7 @@ export const InsuranceFrom = () => {
             setLoadings(false)
             return console.log(error)
         }
-    }, [])
+    }, [listCoin])
 
     useEffect(() => {
         if (unitMoney) {
@@ -317,33 +332,6 @@ export const InsuranceFrom = () => {
     }, [state.q_covered])
 
     useEffect(() => {
-        if (state) {
-            const data = localStorage.getItem('buy_covered_state')
-            if (data) {
-                const res = JSON.parse(data)
-                const newData = {
-                    ...res,
-                    timeframe: state.timeframe,
-                    margin: state.margin * 1.0,
-                    percent_margin: state.percent_margin * 1.0,
-                    period: state.period * 1.0,
-                    p_claim: state.p_claim * 1.0,
-                    q_claim: state.q_claim * 1.0,
-                    r_claim: state.r_claim * 1.0,
-                    q_covered: state.q_covered * 1.0,
-                    p_market: state.p_market * 1.0,
-                    t_market: state.t_market,
-                    p_expired: state.p_expired * 1.0,
-                }
-                setStorage(newData)
-            }
-        }
-        if (thisFisrt) {
-            return setThisFisrt(false)
-        }
-    }, [state])
-
-    useEffect(() => {
         const data = localStorage.getItem('buy_covered_state')
         if (data) {
             const res = JSON.parse(data)
@@ -367,12 +355,12 @@ export const InsuranceFrom = () => {
         const data = localStorage.getItem('buy_covered_state')
         if (data) {
             let res = JSON.parse(data)
-            res.symbol.icon = state.symbol.icon
-            res.symbol.id = state.symbol.id
-            res.symbol.name = state.symbol.name
-            res.symbol.symbol = state.symbol.symbol
-            res.symbol.type = state.symbol.type
-            res.symbol.disable = state.symbol.disable
+            res.icon = state.symbol.icon
+            res.id = state.symbol.id
+            res.name = state.symbol.name
+            res.symbol = state.symbol.symbol
+            res.type = state.symbol.type
+            res.disable = state.symbol.disable
             localStorage.setItem('buy_covered_state', JSON.stringify(res))
         }
     }, [selectTime, selectCoin])
@@ -1260,7 +1248,16 @@ export const InsuranceFrom = () => {
                                 }flex items-center justify-center rounded-lg px-auto py-auto font-semibold py-[12px] px-[148px]`}
                                 onClick={() => {
                                     if (clear) {
-                                        setIndex(2)
+                                        router.push('/buy-covered/info-covered', {
+                                            pathname: '/buy-covered/info-covered',
+                                            query: {
+                                                r_claim: state.r_claim,
+                                                q_claim: state.q_claim,
+                                                margin: state.margin,
+                                                period: state.period,
+                                                t_market: state.t_market.toString(),
+                                            },
+                                        })
                                     }
                                 }}
                                 disabled={!clear}
@@ -1300,21 +1297,6 @@ export const InsuranceFrom = () => {
                                 </Menu.Items>
                             </Menu>
                         </div>
-                    )}
-                    {index == 2 && (
-                        <AcceptBuyInsurance
-                            state={state}
-                            setState={setState}
-                            menu={menu}
-                            checkUpgrade={checkUpgrade}
-                            setCheckUpgrade={setCheckUpgrade}
-                            getPrice={getPrice}
-                            handelSetActive={setActive}
-                            setNoti={setNameNoti}
-                            setRes={setRes}
-                            setIndex={setIndex}
-                            unit={unitMoney}
-                        ></AcceptBuyInsurance>
                     )}
                 </LayoutInsurance>
             </>
@@ -1899,7 +1881,16 @@ export const InsuranceFrom = () => {
                                         }flex items-center justify-center rounded-lg px-auto py-auto font-semibold py-[12px] px-[148px]`}
                                         onClick={() => {
                                             if (clear) {
-                                                setIndex(2)
+                                                router.push('/buy-covered/info-covered', {
+                                                    pathname: '/buy-covered/info-covered',
+                                                    query: {
+                                                        r_claim: state.r_claim,
+                                                        q_claim: state.q_claim,
+                                                        margin: state.margin,
+                                                        period: state.period,
+                                                        t_market: state.t_market.toString(),
+                                                    },
+                                                })
                                             }
                                         }}
                                         disabled={!clear}
@@ -1908,21 +1899,6 @@ export const InsuranceFrom = () => {
                                     </button>
                                 </div>
                             </div>
-                        )}
-                        {index == 2 && (
-                            <AcceptBuyInsurance
-                                state={state}
-                                setState={setState}
-                                menu={menu}
-                                checkUpgrade={checkUpgrade}
-                                setCheckUpgrade={setCheckUpgrade}
-                                getPrice={getPrice}
-                                handelSetActive={setActive}
-                                setNoti={setNameNoti}
-                                setRes={setRes}
-                                setIndex={setIndex}
-                                unit={unitMoney}
-                            ></AcceptBuyInsurance>
                         )}
                     </>
                 )}
@@ -2145,11 +2121,5 @@ const TabItem = styled.div.attrs<any>(({ active }) => ({
         'text-gray': !active,
     }),
 }))<any>``
-
-export const getStaticProps: GetStaticProps = async ({ locale }: any) => ({
-    props: {
-        ...(await serverSideTranslations(locale, ['common', 'home', 'insurance', 'errors'])),
-    },
-})
 
 export default InsuranceFrom
