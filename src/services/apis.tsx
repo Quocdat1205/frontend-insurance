@@ -18,3 +18,4 @@ export const API_UPDATE_GUIDE_LINE: string = 'v1/update-guide-line'
 //futures
 export const API_GET_UNIT_CONFIG: string = Config.env.NAMI_API_URL + '/api/v3/asset/config'
 export const API_GET_FUTURES_MARKET_WATCH = Config.env.NAMI_API_URL + '/api/v3/futures/ticker'
+export const API_GET_PRICE_CHART = Config.env.PRICE_API_URL + '/api/v1/chart/history'
