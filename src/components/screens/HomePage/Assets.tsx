@@ -19,6 +19,10 @@ import fetchApi from 'services/fetch-api'
 import { API_GET_FUTURES_MARKET_WATCH } from 'services/apis'
 import FuturesMarketWatch from 'models/FuturesMarketWatch'
 import { roundTo } from 'round-to'
+import dynamic from 'next/dynamic'
+const LineChart = dynamic(() => import('components/common/Chart/LineChart'), {
+    ssr: false,
+})
 
 const getNewAssets = createSelector([(state: RootStore) => state.setting.assetsToken], (assetsToken) => {
     return assetsToken.filter((asset: any) => asset.isNew)
@@ -130,7 +134,7 @@ const Assets = () => {
                 const _24hChange = pairPrice?.priceChangePercent * 100 || 0
                 const negative = _24hChange < 0
                 const sparkLineColor = negative ? colors.red.red : colors.success
-                const sparkLine = sparkLineBuilder(asset?.symbol + 'USDT', sparkLineColor)
+                // const sparkLine = sparkLineBuilder(asset?.symbol + 'USDT', sparkLineColor)
 
                 return (
                     <SwiperSlide key={index}>
@@ -154,7 +158,8 @@ const Assets = () => {
                                     </div>
                                 </div>
                                 <div className="w-full">
-                                    <img src={sparkLine} alt="Nami Exchange" className="w-full" />
+                                    <LineChart symbol={asset?.symbol + 'USDT'} negative={negative} />
+                                    {/* <img src={sparkLine} alt="Nami Exchange" className="w-full" /> */}
                                 </div>
                             </div>
                             <Button onClick={() => onBuy(asset?._id)} variants="outlined" className="py-3 font-medium text-sm sm:text-base">
