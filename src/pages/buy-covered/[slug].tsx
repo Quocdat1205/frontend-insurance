@@ -1,5 +1,6 @@
 import Breadcrumbs from 'components/layout/Breadcrumbs'
 import LayoutWeb3 from 'components/layout/LayoutWeb3'
+import { InsuranceFormLoading } from 'components/screens/Insurance/insuranceFormLoading'
 import InsuranceContractLoading from 'components/screens/InsuranceHistory/InsuranceContractLoading'
 import Config from 'config/config'
 import { useTranslation } from 'next-i18next'
@@ -12,7 +13,6 @@ const InsuranceHistory = dynamic(() => import('components/screens/InsuranceHisto
 
 const AcceptBuyInsurance = dynamic(() => import('components/screens/Insurance/AcceptBuyInsurance'), {
     ssr: false,
-    loading: () => <InsuranceContractLoading />,
 })
 const Insurance = ({ slug }: any) => {
     const { t } = useTranslation()
