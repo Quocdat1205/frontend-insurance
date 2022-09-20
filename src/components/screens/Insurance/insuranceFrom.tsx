@@ -709,7 +709,7 @@ const InsuranceFrom = () => {
                                                     } flex justify-between border-collapse rounded-[3px] shadow-none w-full`}
                                                 >
                                                     <Input
-                                                        className={' font-semibold appearance-none bg-hover outline-none focus:ring-0 shadow-none w-full'}
+                                                        className={'appearance-none bg-hover outline-none focus:ring-0 shadow-none w-full'}
                                                         type={'number'}
                                                         inputName={'Loại tài sản và số lượng tài sản'}
                                                         idInput={'iCoin'}
@@ -727,7 +727,7 @@ const InsuranceFrom = () => {
                                                     />
                                                     <Popover className="relative outline-none bg-hover focus:ring-0 shadow-none flex items-center justify-center pr-4 h-11 sm:h-12">
                                                         {state.q_covered > userBalance && (
-                                                            <div className="absolute right-0 max-h-8 flex top-[-50px] text-xs z-[100] w-max border border-1 border-red p-2 rounded-md tooltip">
+                                                            <div className="absolute right-0 max-h-8 flex top-[-50px] text-xs z-[100] w-max border border-1 border-red p-2 rounded-md">
                                                                 <div className="flex flex-row items-center justify-center">
                                                                     <div className="mr-[8px] items-center justify-center">
                                                                         <ErrorTriggersIcon />
@@ -833,7 +833,7 @@ const InsuranceFrom = () => {
                                                         } ml-[12px] flex justify-between border-collapse rounded-[3px] shadow-none w-full`}
                                                     >
                                                         <Input
-                                                            className={'font-semibold appearance-none bg-hover outline-none focus:ring-0 shadow-none w-full'}
+                                                            className={'appearance-none bg-hover outline-none focus:ring-0 shadow-none w-full'}
                                                             type={'number'}
                                                             inputName={'P-Claim'}
                                                             idInput={''}
@@ -897,28 +897,28 @@ const InsuranceFrom = () => {
                                                     onClick={() => setState({ ...state, q_covered: (25 / 100) * userBalance })}
                                                 >
                                                     <div className={`${percentInsurance >= 25 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span>25%</span>
+                                                    <span className={percentInsurance === 25 ? 'text-red' : 'text-gray'}>25%</span>
                                                 </div>
                                                 <div
                                                     className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
                                                     onClick={() => setState({ ...state, q_covered: (50 / 100) * userBalance })}
                                                 >
                                                     <div className={`${percentInsurance >= 50 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span className={''}>50%</span>
+                                                    <span className={percentInsurance === 50 ? 'text-red' : 'text-gray'}>50%</span>
                                                 </div>
                                                 <div
                                                     className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
                                                     onClick={() => setState({ ...state, q_covered: (75 / 100) * userBalance })}
                                                 >
                                                     <div className={`${percentInsurance >= 75 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span className={''}>75%</span>
+                                                    <span className={percentInsurance === 75 ? 'text-red' : 'text-gray'}>75%</span>
                                                 </div>
                                                 <div
                                                     className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
                                                     onClick={() => setState({ ...state, q_covered: userBalance })}
                                                 >
                                                     <div className={`${percentInsurance >= 100 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span>100%</span>
+                                                    <span className={percentInsurance === 100 ? 'text-red' : 'text-gray'}>100%</span>
                                                 </div>
                                             </div>
 
@@ -934,7 +934,7 @@ const InsuranceFrom = () => {
                                                     }}
                                                 >
                                                     <div className={`${state.percent_margin >= 2 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span>2%</span>
+                                                    <span className={state.percent_margin === 2 ? 'text-red' : 'text-gray'}>2%</span>
                                                 </div>
                                                 <div
                                                     className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
@@ -947,7 +947,7 @@ const InsuranceFrom = () => {
                                                     }}
                                                 >
                                                     <div className={`${5 <= state.percent_margin ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span className={''}>5%</span>
+                                                    <span className={state.percent_margin === 5 ? 'text-red' : 'text-gray'}>5%</span>
                                                 </div>
                                                 <div
                                                     className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
@@ -960,7 +960,7 @@ const InsuranceFrom = () => {
                                                     }}
                                                 >
                                                     <div className={`${7 <= state.percent_margin ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span className={''}>7%</span>
+                                                    <span className={state.percent_margin === 7 ? 'text-red' : 'text-gray'}>7%</span>
                                                 </div>
                                                 <div
                                                     className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
@@ -973,13 +973,13 @@ const InsuranceFrom = () => {
                                                     }}
                                                 >
                                                     <div className={`${state.percent_margin >= 10 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span>10%</span>
+                                                    <span className={state.percent_margin === 10 ? 'text-red' : 'text-gray'}>10%</span>
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/*end head*/}
-                                        <div data-tut="tour_chart" id="tour_chart">
+                                        <div data-tut="tour_chart" id="tour_chart" className="mt-6 mb-4">
                                             {/*body*/}
                                             <div className={'flex flex-row relative'}>
                                                 <Suspense fallback={`Loading...`}>
@@ -992,10 +992,10 @@ const InsuranceFrom = () => {
                                                         setP_Market={(data: number) => setState({ ...state, p_market: data })}
                                                     ></ChartComponent>
                                                     <svg
-                                                        className={`absolute lg:right-[34px] right-[32px] z-10`}
-                                                        width="10"
+                                                        className={`absolute right-0 z-10`}
+                                                        width="3"
                                                         height={500}
-                                                        viewBox="0 0 2 240"
+                                                        viewBox="0 0 2 500"
                                                         fill="none"
                                                         xmlns="http://www.w3.org/2000/svg"
                                                     >
@@ -1003,7 +1003,7 @@ const InsuranceFrom = () => {
                                                             x1="1"
                                                             y1="3.5011e-08"
                                                             x2="0.999987"
-                                                            y2="240"
+                                                            y2="500"
                                                             stroke="#B2B7BC"
                                                             strokeWidth="150"
                                                             strokeDasharray="0.74 3.72"
@@ -1021,8 +1021,8 @@ const InsuranceFrom = () => {
                                                         <div
                                                             key={key}
                                                             className={`${
-                                                                selectTime == time ? 'text-red' : 'text-[#808890]'
-                                                            } hover:cursor-pointer font-medium  text-base`}
+                                                                selectTime == time ? 'text-red' : 'text-txtSecondary'
+                                                            } hover:cursor-pointer font-medium  text-sm`}
                                                             onClick={() => {
                                                                 setSelectTime(time)
                                                             }}
@@ -1034,8 +1034,8 @@ const InsuranceFrom = () => {
                                             </div>
                                             {/*P-Claim*/}
                                             {
-                                                <div className={'my-[24px] text-sm text-[#808890]'}>
-                                                    <span className={'flex flex-row items-center mr-[4px]'}>
+                                                <div className={'my-[24px] text-sm'}>
+                                                    <span className={'flex flex-row items-center mr-[4px] text-txtSecondary'}>
                                                         <span className={'mr-[8px]'}>P-Claim</span>
                                                         <div data-tip={t('insurance:terminology:p_claim')} data-for={`p_claim`}>
                                                             <InfoCircle size={14} color={colors.txtSecondary} />
@@ -1048,7 +1048,7 @@ const InsuranceFrom = () => {
                                                         }`}
                                                     >
                                                         <Input
-                                                            className={'w-[90%] font-semibold appearance-none bg-hover outline-none focus:ring-0 shadow-none '}
+                                                            className={'w-[90%] appearance-none bg-hover outline-none focus:ring-0 shadow-none '}
                                                             type={'number'}
                                                             inputName={'P-Claim'}
                                                             idInput={'iPClaim'}
@@ -1062,7 +1062,9 @@ const InsuranceFrom = () => {
                                                             }}
                                                             placeholder={`${menu[9].name}`}
                                                         ></Input>
-                                                        <div className={'bg-hover w-[10%] shadow-none flex items-center justify-end px-[16px]'}>
+                                                        <div
+                                                            className={'bg-hover w-[10%] shadow-none flex items-center justify-end px-[16px] text-txtSecondary'}
+                                                        >
                                                             {unitMoney}
                                                         </div>
                                                     </div>
@@ -1076,8 +1078,8 @@ const InsuranceFrom = () => {
                                         </div>
 
                                         {/* Period */}
-                                        <div className={'mt-5 text-sm text-[#808890]'} data-tut="tour_period" id="tour_period">
-                                            <span className="flex flex-row items-center">
+                                        <div className={'mt-5 text-sm '} data-tut="tour_period" id="tour_period">
+                                            <span className="flex flex-row items-center text-txtSecondary">
                                                 <span className={'mr-[8px]'}>Period ({menu[8].name})</span>
                                                 <div data-tip={t('insurance:terminology:period')} data-for={`period`}>
                                                     <InfoCircle size={14} color={colors.txtSecondary} />
@@ -1099,7 +1101,7 @@ const InsuranceFrom = () => {
                                                             <div
                                                                 key={key}
                                                                 className={`${
-                                                                    state.period == item && 'bg-pink text-red'
+                                                                    state.period == item && 'bg-pink text-red font-semibold'
                                                                 } bg-hover rounded-[300px] px-4 py-1 flex justify-center items-center hover:cursor-pointer ${
                                                                     isMobile && !(item == 15) && 'mr-[12px]'
                                                                 }`}
@@ -1120,7 +1122,7 @@ const InsuranceFrom = () => {
                             {index == 1 && (
                                 <div
                                     className={
-                                        'max-w-screen-md lg:max-w-screen-md xl:max-w-screen-lg m-auto flex flex-row justify-center items-center mt-[24px] hover:cursor-default z-50'
+                                        'max-w-screen-md lg:max-w-screen-md xl:max-w-screen-lg m-auto flex flex-row justify-center items-center mt-[24px] hover:cursor-default z-50 space-x-2 xl:space-x-3'
                                     }
                                     onClick={() => {
                                         setDrop(false)
@@ -1130,53 +1132,53 @@ const InsuranceFrom = () => {
                                     <div
                                         className={`${
                                             tab == 4 ? 'hidden' : ''
-                                        } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px]`}
+                                        } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-divider border-0.5 px-5 py-4`}
                                     >
-                                        <div className={'text-[#808890] flex flex-row items-center'}>
+                                        <div className={'text-txtSecondary flex flex-row items-center'}>
                                             <span className={'mr-[8px]'}>R-Claim</span>
                                             <div data-tip={t('insurance:terminology:r_claim')} data-for={`r_claim`}>
                                                 <InfoCircle size={14} color={colors.txtSecondary} />
                                                 <Tooltip className="max-w-[200px]" id={'r_claim'} placement="right" />
                                             </div>
                                         </div>
-                                        <div className={'font-semibold'}>
+                                        <div className={''}>
                                             <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span>
                                         </div>
                                     </div>
                                     <div
                                         className={`${
                                             tab == 5 ? 'hidden' : ''
-                                        } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] mx-[8px] xl:mx-[12px]`}
+                                        } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-divider border-0.5 px-5 py-4 `}
                                     >
-                                        <div className={'text-[#808890] flex flex-row items-center'}>
+                                        <div className={'text-txtSecondary flex flex-row items-center'}>
                                             <span className={'mr-[8px]'}>Q-Claim</span>
                                             <div data-tip={t('insurance:terminology:q_claim')} data-for={`q_claim`}>
                                                 <InfoCircle size={14} color={colors.txtSecondary} />
                                                 <Tooltip className="max-w-[200px]" id={'q_claim'} placement="right" />
                                             </div>
                                         </div>
-                                        <div className={'font-semibold flex flex-row justify-center items-center hover:cursor-pointer relative max-h-[24px]'}>
+                                        <div className={'flex flex-row justify-center items-center hover:cursor-pointer relative max-h-[24px]'}>
                                             {state.q_claim > 0 ? Number(formatNumber(state?.q_claim, 2)) : 0}
-                                            <span className={'text-red pl-[8px]'}>{unitMoney}</span>
+                                            <span className={'text-red pl-2 mr-1'}>{unitMoney}</span>
                                             <div className="relative">
                                                 <Popover className="relative">
                                                     <Popover.Button
-                                                        className={'my-[16px] text-[#22313F] underline hover:cursor-pointer '}
+                                                        className={'my-4 text-txtPrimary underline hover:cursor-pointer '}
                                                         onClick={() => setChangeUnit(!changeUnit)}
                                                     >
-                                                        {!changeUnit ? <ChevronDown></ChevronDown> : <ChevronUp></ChevronUp>}
+                                                        {!changeUnit ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
                                                     </Popover.Button>
                                                     <Popover.Panel
-                                                        className="flex flex-col text-[#22313F] absolute  top-[63px] right-[-15px] bg-white z-[100] rounded"
+                                                        className="flex flex-col text-txtPrimary absolute  top-[63px] right-[-15px] bg-white z-[100] rounded"
                                                         style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
                                                     >
                                                         {({ close }) => (
-                                                            <div className="flex flex-col justify-center h-full ">
+                                                            <div className="flex flex-col justify-center h-full font-normal text-sm">
                                                                 {['USDT', 'BUSD', 'USDC'].map((e, key) => {
                                                                     return (
                                                                         <div
                                                                             key={key}
-                                                                            className={` py-[8px] px-[16px] hover:bg-hover font-normal`}
+                                                                            className={` py-2 px-4 hover:bg-hover`}
                                                                             onClick={() => {
                                                                                 setUnitMoney(e)
                                                                                 setChangeUnit(false)
@@ -1197,32 +1199,32 @@ const InsuranceFrom = () => {
                                     <div
                                         className={`${
                                             tab == 6 ? 'hidden' : ''
-                                        } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-[#E5E7E8] border-0.5 px-[24px] py-[16px] `}
+                                        } flex flex-row justify-between items-center w-[33%] rounded-[12px] border border-divider border-0.5 px-5 py-4`}
                                     >
-                                        <div className={'text-[#808890] flex flex-row items-center'}>
+                                        <div className={'text-txtSecondary flex flex-row items-center'}>
                                             <span className={'mr-[8px]'}>Margin</span>
                                             <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
                                                 <InfoCircle size={14} color={colors.txtSecondary} />
                                                 <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
                                             </div>
                                         </div>
-                                        <div className={'font-semibold flex flex-row items-center justify-center hover:cursor-pointer relative max-h-[24px]'}>
+                                        <div className={'flex flex-row items-center justify-center hover:cursor-pointer relative max-h-[24px]'}>
                                             {state.margin > 0 ? Number(formatNumber(state?.margin, 2)) : 0}
-                                            <span className={'text-red pl-[8px]'}>{unitMoney}</span>
+                                            <span className={'text-red pl-2 mr-1'}>{unitMoney}</span>
                                             <div className="relative">
                                                 <Popover className="relative">
                                                     <Popover.Button
-                                                        className={'my-[16px] text-[#22313F] underline hover:cursor-pointer '}
+                                                        className={'my-[16px] text-txtPrimary underline hover:cursor-pointer'}
                                                         onClick={() => setChangeUnit1(!changeUnit1)}
                                                     >
-                                                        {!changeUnit1 ? <ChevronDown></ChevronDown> : <ChevronUp></ChevronUp>}
+                                                        {!changeUnit1 ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
                                                     </Popover.Button>
                                                     <Popover.Panel
-                                                        className="flex flex-col text-[#22313F] absolute  top-[63px] right-[-15px] bg-white z-[100] rounded"
+                                                        className="flex flex-col text-txtPrimary absolute  top-[63px] right-[-15px] bg-white z-[100] rounded"
                                                         style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
                                                     >
                                                         {({ close }) => (
-                                                            <div className="flex flex-col justify-center h-full ">
+                                                            <div className="flex flex-col justify-center h-full font-normal text-sm">
                                                                 {['USDT', 'BUSD', 'USDC'].map((e, key) => {
                                                                     return (
                                                                         <div
@@ -1259,7 +1261,7 @@ const InsuranceFrom = () => {
                                         }}
                                     >
                                         <CheckCircle></CheckCircle>
-                                        <span className={'font-semibold text-[#22313F] px-[4px]'}>
+                                        <span className={'font-medium text-txtPrimary px-[4px]'}>
                                             {`${t('insurance:buy:saved')} `}
                                             <span className={'text-red'}>1,000 {unitMoney}</span> {t('insurance:buy:sub_saved')}
                                         </span>
@@ -1278,7 +1280,7 @@ const InsuranceFrom = () => {
                                 >
                                     <button
                                         className={`${
-                                            clear ? 'bg-red text-white border border-red' : 'text-white bg-[#E5E7E8] border border-[#E5E7E8]'
+                                            clear ? 'bg-red text-white border border-red' : 'text-white bg-divider border border-divider'
                                         }flex items-center justify-center rounded-lg px-auto py-auto font-semibold py-[12px] px-[148px]`}
                                         onClick={() => {
                                             if (clear) {
@@ -1299,9 +1301,9 @@ const InsuranceFrom = () => {
                                         {menu[11].name}
                                     </button>
                                     <Menu>
-                                        <Menu.Button className={'my-[16px] text-[#00ABF9] underline hover:cursor-pointer'}>{menu[12].name}</Menu.Button>
+                                        <Menu.Button className={'my-[16px] text-blue underline hover:cursor-pointer'}>{menu[12].name}</Menu.Button>
                                         <Menu.Items
-                                            className={'flex flex-col text-[#22313F]'}
+                                            className={'flex flex-col text-txtPrimary'}
                                             style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
                                         >
                                             <Menu.Item>
@@ -1348,7 +1350,7 @@ const InsuranceFrom = () => {
                                         <img src={'/images/buyInsurance.png'} width="269" height="212" className="w-[269px] h-auto" />
                                     </div>
                                 </div>
-                                <div className="flex flex-col items-center pt-[16px] text-[#22313F]">
+                                <div className="flex flex-col items-center pt-[16px] text-txtPrimary">
                                     <span className="text-xl font-semibold ">Nami Insurance</span>
                                     <span className="text-center">
                                         {t('insurance:mobile_login:sub_title1')} - {t('insurance:mobile_login:sub_title2')}
@@ -1360,8 +1362,8 @@ const InsuranceFrom = () => {
                                             <BxDollarCircle />
                                         </div>
                                         <div className="flex flex-col pr-[7px]">
-                                            <span className="text-[#22313F] text-sm font-semibold">{t('insurance:mobile_login:token')}</span>
-                                            <span className="text-sm text-[#808890]">{t('insurance:mobile_login:token_detail')}</span>
+                                            <span className="text-txtPrimary text-sm font-semibold">{t('insurance:mobile_login:token')}</span>
+                                            <span className="text-sm text-txtSecondary">{t('insurance:mobile_login:token_detail')}</span>
                                         </div>
                                     </div>
                                     <div className="flex flex-row my-[24px]">
@@ -1369,8 +1371,8 @@ const InsuranceFrom = () => {
                                             <BxLineChartDown />
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-[#22313F] text-sm font-semibold">{t('insurance:mobile_login:p_claim')}</span>
-                                            <span className="text-sm text-[#808890]">{t('insurance:mobile_login:p_claim_detail')}</span>
+                                            <span className="text-txtPrimary text-sm font-semibold">{t('insurance:mobile_login:p_claim')}</span>
+                                            <span className="text-sm text-txtSecondary">{t('insurance:mobile_login:p_claim_detail')}</span>
                                         </div>
                                     </div>
                                     <div className="flex flex-row">
@@ -1378,8 +1380,8 @@ const InsuranceFrom = () => {
                                             <BxCaledarCheck />
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-[#22313F] text-sm font-semibold">{t('insurance:mobile_login:period')}</span>
-                                            <span className="text-sm text-[#808890]">{t('insurance:mobile_login:period_detial')}</span>
+                                            <span className="text-txtPrimary text-sm font-semibold">{t('insurance:mobile_login:period')}</span>
+                                            <span className="text-sm text-txtSecondary">{t('insurance:mobile_login:period_detial')}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1415,7 +1417,7 @@ const InsuranceFrom = () => {
                                         <div className={` bg-white text-sm  mx-auto `}>
                                             <div className="flex flex-col justify-center my-[24px]">
                                                 <div className="font-medium text-xl">{showChangeUnit.name}</div>
-                                                <div className="mt-[32px] divide-y divide-[#E5E7E8] text-[#22313F] w-full">
+                                                <div className="mt-[32px] divide-y divide-divider text-txtPrimary w-full">
                                                     {['USDT', 'USDC', 'BUSD'].map((item, key) => {
                                                         return (
                                                             <div
@@ -1481,7 +1483,7 @@ const InsuranceFrom = () => {
                                                             <a
                                                                 id={`${coin.id}`}
                                                                 key={key}
-                                                                className={`hover:bg-hover flex flex-row justify-start w-full items-center p-3 text-[#E5E7E8] font-medium`}
+                                                                className={`hover:bg-hover flex flex-row justify-start w-full items-center p-3 text-divider font-medium`}
                                                             >
                                                                 <img
                                                                     alt={''}
@@ -1533,7 +1535,7 @@ const InsuranceFrom = () => {
                                         </div>
                                         <div data-tut="tour_custom" id="tour_custom" className={`h-[32px] flex flex-row mx-[16px]`}>
                                             <span
-                                                className={'text-[#00ABF9] underline hover:cursor-pointer pr-[16px] flex items-center'}
+                                                className={'text-blue underline hover:cursor-pointer pr-[16px] flex items-center'}
                                                 onClick={() => {
                                                     setShowGuideModal(true)
                                                 }}
@@ -1682,10 +1684,10 @@ const InsuranceFrom = () => {
                                                 ></ChartComponent>
                                             </Suspense>
                                             <svg
-                                                className={`absolute lg:right-[34px] right-[32px] z-10`}
-                                                width="10"
+                                                className={`absolute right-0 z-10`}
+                                                width="3"
                                                 height={500}
-                                                viewBox="0 0 2 240"
+                                                viewBox="0 0 2 500"
                                                 fill="none"
                                                 xmlns="http://www.w3.org/2000/svg"
                                             >
@@ -1693,7 +1695,7 @@ const InsuranceFrom = () => {
                                                     x1="1"
                                                     y1="3.5011e-08"
                                                     x2="0.999987"
-                                                    y2="240"
+                                                    y2="500"
                                                     stroke="#B2B7BC"
                                                     strokeWidth="150"
                                                     strokeDasharray="0.74 3.72"
@@ -1706,8 +1708,8 @@ const InsuranceFrom = () => {
                                                     <div
                                                         key={key}
                                                         className={`${
-                                                            selectTime == time ? 'text-red' : 'text-[#808890]'
-                                                        } hover:cursor-pointer font-medium  text-base`}
+                                                            selectTime == time ? 'text-red' : 'text-txtSecondary'
+                                                        } hover:cursor-pointer font-medium  text-sm`}
                                                         onClick={() => {
                                                             setSelectTime(time)
                                                         }}
@@ -1719,7 +1721,7 @@ const InsuranceFrom = () => {
                                         </div>
                                         <div className={'my-[24px] px-[32px]'}>
                                             <span className={'flex flex-row items-center '}>
-                                                <span className={'mr-[6px] text-[#808890] text-sm'}>P-Claim</span>
+                                                <span className={'mr-[6px] text-txtSecondary text-sm'}>P-Claim</span>
                                                 <div data-tip={t('insurance:terminology:p_claim')} data-for={`p_claim`}>
                                                     <InfoCircle size={14} color={colors.txtSecondary} />
                                                     <Tooltip className="max-w-[200px]" id={'p_claim'} placement="right" />
@@ -1731,7 +1733,7 @@ const InsuranceFrom = () => {
                                                 }`}
                                             >
                                                 <Input
-                                                    className={'w-[90%] font-semibold appearance-none bg-hover outline-none focus:ring-0 shadow-none '}
+                                                    className={'w-[90%] appearance-none bg-hover outline-none focus:ring-0 shadow-none '}
                                                     type={'number'}
                                                     inputName={'P-Claim'}
                                                     idInput={'iPClaim'}
@@ -1761,7 +1763,7 @@ const InsuranceFrom = () => {
 
                                 {/* Period */}
                                 {index == 1 && (
-                                    <div data-tut="tour_period" id="tour_period" className={'mt-5 pl-[32px] pr-[32px] pb-[32px] text-sm text-[#808890]'}>
+                                    <div data-tut="tour_period" id="tour_period" className={'mt-5 pl-[32px] pr-[32px] pb-[32px] text-sm text-txtSecondary'}>
                                         <span className="flex flex-row items-center">
                                             <span className={'mr-[8px]'}>Period ({menu[8].name})</span>
                                             <div data-tip={t('insurance:terminology:period')} data-for={`period`}>
@@ -1803,7 +1805,7 @@ const InsuranceFrom = () => {
                                 {tab == 6 && index == 1 && (
                                     <div className={'mt-5 pl-[32px] pr-[32px] pb-[32px]'}>
                                         <span className={'flex flex-row items-center'}>
-                                            <span className={'mr-[6px] text-[#808890] text-sm'}>Margin</span>
+                                            <span className={'mr-[6px] text-txtSecondary text-sm'}>Margin</span>
                                             <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
                                                 <InfoCircle size={14} color={colors.txtSecondary} />
                                                 <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
@@ -1846,7 +1848,7 @@ const InsuranceFrom = () => {
                                     >
                                         <div className={'flex justify-center items-center mt-[24px]'}>
                                             <CheckCircle></CheckCircle>
-                                            <span className={'text-sm text-[#22313F] px-[4px] font-semibold'}>
+                                            <span className={'text-sm text-txtPrimary px-[4px] font-semibold'}>
                                                 {t('insurance:buy:saved')}
                                                 <span className={'text-red'}> 1,000 {unitMoney}</span> {t('insurance:buy:sub_saved')}
                                             </span>
@@ -1857,7 +1859,7 @@ const InsuranceFrom = () => {
                                                     tab == 4 ? 'hidden' : ''
                                                 } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[16px] mx-[12px]`}
                                             >
-                                                <div className={'text-[#808890] flex flex-row items-center'}>
+                                                <div className={'text-txtSecondary flex flex-row items-center'}>
                                                     <span className={'mr-[8px]'}>R-Claim</span>
                                                     <div data-tip={t('insurance:terminology:r_claim')} data-for={`r_claim`}>
                                                         <InfoCircle size={14} color={colors.txtSecondary} />
@@ -1873,7 +1875,7 @@ const InsuranceFrom = () => {
                                                     tab == 5 ? 'hidden' : ''
                                                 } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[16px] mx-[12px]`}
                                             >
-                                                <div className={'text-[#808890] flex flex-row items-center'}>
+                                                <div className={'text-txtSecondary flex flex-row items-center'}>
                                                     <span className={'mr-[8px]'}>Q-Claim</span>
                                                     <div data-tip={t('insurance:terminology:q_claim')} data-for={`q_claim`}>
                                                         <InfoCircle size={14} color={colors.txtSecondary} />
@@ -1897,7 +1899,7 @@ const InsuranceFrom = () => {
                                                     tab == 6 ? 'hidden' : ''
                                                 } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[16px] mx-[12px]`}
                                             >
-                                                <div className={'text-[#808890] flex flex-row items-center'}>
+                                                <div className={'text-txtSecondary flex flex-row items-center'}>
                                                     <span className={'mr-[8px]'}>Margin</span>
                                                     <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
                                                         <InfoCircle size={14} color={colors.txtSecondary} />
@@ -1921,7 +1923,7 @@ const InsuranceFrom = () => {
                                         <div className={`flex flex-col justify-center items-center mb-[32px]`}>
                                             <button
                                                 className={`${
-                                                    clear ? 'bg-red text-white border border-red' : 'text-white bg-[#E5E7E8] border border-[#E5E7E8]'
+                                                    clear ? 'bg-red text-white border border-red' : 'text-white bg-divider border border-divider'
                                                 }flex items-center justify-center rounded-lg px-auto py-auto font-semibold py-[12px] px-[148px]`}
                                                 onClick={() => {
                                                     if (clear) {
