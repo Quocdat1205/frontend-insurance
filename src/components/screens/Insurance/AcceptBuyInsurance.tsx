@@ -17,7 +17,6 @@ import { contractAddress } from 'components/web3/constants/contractAddress'
 import { Popover } from '@headlessui/react'
 import { ChevronDown } from 'react-feather'
 import InsuranceContractLoading from '../InsuranceHistory/InsuranceContractLoading'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import Modal from 'components/common/Modal/Modal'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
 
