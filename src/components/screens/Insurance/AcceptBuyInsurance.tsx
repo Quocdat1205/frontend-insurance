@@ -464,6 +464,16 @@ const AcceptBuyInsurance = () => {
             </div>
         ) : (
             <div className="relative">
+                <Modal
+                    portalId="modal"
+                    isVisible={active}
+                    onBackdropCb={() => {
+                        setActive(false)
+                    }}
+                    className="rounded-xl p-6 bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                >
+                    <NotificationInsurance id={res ? res : ''} name={`${Noti}`} state={state} active={active} setActive={() => {}} isMobile={false} />
+                </Modal>
                 <div className="relative flex flex-col">
                     <div className="mt-[32px] mx-[24px] flex flex-row-reverse">
                         <span
