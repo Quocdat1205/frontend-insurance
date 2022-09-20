@@ -15,6 +15,7 @@ import colors from 'styles/colors'
 import { formatNumber } from 'utils/utils'
 import { contractAddress } from 'components/web3/constants/contractAddress'
 import { formatWeiValueToPrice } from '../../../utils/format'
+import { isMobile as mobile } from 'react-device-detect'
 
 export type IProps = {
     state: any
@@ -60,7 +61,7 @@ export const AcceptBuyInsurance = ({
     const wallet = useWeb3Wallet()
     const router = useRouter()
     const { width } = useWindowSize()
-    const isMobile = width && width < screens.drawer
+    const isMobile = (width && width < screens.drawer) || mobile
 
     useEffect(() => {
         fetch()
