@@ -502,9 +502,11 @@ const NoData = ({ hasInsurance, onBuyInsurance, t, account }: any) => {
             <div className="mt-4 pb-6">
                 {account ? t(`insurance_history:you_have_no_insurance${hasInsurance ? '_filter' : ''}`) : t('insurance_history:connecting_wallet_to_buy')}
             </div>
-            <Button onClick={onBuyInsurance} className="py-3 px-6 sm:px-20 sm:font-semibold rounded-xl text-sm sm:text-base">
-                {account ? t('common:header:buy_covered') : t('home:home:connect_wallet')}
-            </Button>
+            {!hasInsurance && (
+                <Button onClick={onBuyInsurance} className="py-3 px-6 sm:px-20 sm:font-semibold rounded-xl text-sm sm:text-base">
+                    {account ? t('common:header:buy_covered') : t('home:home:connect_wallet')}
+                </Button>
+            )}
         </div>
     )
 }

@@ -58,7 +58,7 @@ const HeaderLanding = () => {
             </div>
             {isMobile && (
                 <Drawer visible={visible} onClose={() => setVisible(false)}>
-                    <div className="w-full">
+                    <div>
                         <div className="mb-8">
                             <Menu data={menu} />
                         </div>
