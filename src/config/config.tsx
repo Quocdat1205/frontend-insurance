@@ -86,7 +86,7 @@ class Config {
             name: 'common:header:insurance_history',
             parentId: 'buy-covered-parent',
             icon: '/images/icons/Ic_menu_users.png',
-        }
+        },
     ]
 }
 

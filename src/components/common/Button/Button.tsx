@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import React, { ReactNode } from 'react'
 
 interface Props {
-    variants?: 'outlined' | 'primary' | 'gradient'
+    variants?: 'outlined' | 'primary' | 'gradient' | 'not_clear'
     children: ReactNode
     className?: string
     onClick?: () => void
