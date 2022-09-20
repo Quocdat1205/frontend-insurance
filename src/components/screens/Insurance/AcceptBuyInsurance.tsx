@@ -60,6 +60,7 @@ const AcceptBuyInsurance = () => {
     const [loading, setLoading] = useState<boolean>(false)
     const [active, setActive] = useState<boolean>(false)
     const [res, setRes] = useState(null)
+    const [saved, setSaved] = useState(0)
 
     useEffect(() => {
         fetch()
@@ -68,10 +69,19 @@ const AcceptBuyInsurance = () => {
 
     const getData = async () => {
         setLoading(true)
-        const data = await localStorage.getItem('info_covered_state')
-        if (data) {
-            const res = JSON.parse(data)
+        const dataSate = await localStorage.getItem('info_covered_state')
+        if (dataSate) {
+            const res = JSON.parse(dataSate)
             setState({ ...res })
+            const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${res.symbol}${res.unit}`)
+
+            if (res.p_claim < data.data[0].p) {
+                setSaved(res.q_claim + res.q_covered * (res.q_claim - data.data[0].p) - res.margin + res.q_covered * Math.abs(res.q_claim - data.data[0].p))
+            }
+
+            if (res.p_claim > data.data[0].p) {
+                setSaved(res.q_claim + res.q_covered * (res.q_claim - data.data[0].p) - res.margin)
+            }
         }
         setLoading(false)
     }
@@ -269,7 +279,10 @@ const AcceptBuyInsurance = () => {
                             <CheckCircle />
                             <span className={'font-semibold text-[#22313F] px-[4px]'}>
                                 {`${t('insurance:buy:saved')} `}
-                                <span className={'text-[#EB2B3E]'}>1,000 {state && state.unit}</span> {t('insurance:buy:sub_saved')}
+                                <span className={'text-[#EB2B3E]'}>
+                                    {saved} {state && state.unit}
+                                </span>{' '}
+                                {t('insurance:buy:sub_saved')}
                             </span>
                         </div>
                     </div>
@@ -491,7 +504,10 @@ const AcceptBuyInsurance = () => {
                             <div className="flex flex-row">
                                 <span className={'text-sm text-[#22313F]'}>
                                     {`${t('insurance:buy:saved')} `}
-                                    <span className={'text-[#EB2B3E] px-[4px]'}>1,000 {state?.unit}</span> {t('insurance:buy:sub_saved')}
+                                    <span className={'text-[#EB2B3E] px-[4px]'}>
+                                        {saved} {state?.unit}
+                                    </span>{' '}
+                                    {t('insurance:buy:sub_saved')}
                                 </span>
                             </div>
                         </div>
