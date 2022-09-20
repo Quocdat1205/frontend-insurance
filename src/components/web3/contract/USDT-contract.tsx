@@ -13,8 +13,6 @@ class USDT_Contract {
 
     async balanceOf(address: string): Promise<number> {
         const value = await this.contract.balanceOf(address)
-        console.log(this.contract)
-
         return weiToEther(value)
     }
 
