@@ -37,29 +37,27 @@ export const AcceptBuyInsurance = () => {
     const [price, setPrice] = useState<number>(0)
     const [checkUpgrade, setCheckUpgrade] = useState<boolean>(false)
     const state: IProps = router.query
+    const [isUpdated, setUpdated] = useState<boolean>(false)
+    const [isCanBuy, setCanBuy] = useState<boolean>(false)
 
     useEffect(() => {
         fetch()
     }, [])
 
     useEffect(() => {
-        if (router.query) {
-            console.log(router.query)
+        if (router) {
+            console.log(router)
         }
     }, [router])
 
     const fetch = async () => {
         try {
-            const e = await wallet.contractCaller.insuranceContract.contract.filters.EBuyInsurance()
-
-            const filter = await wallet.contractCaller.insuranceContract.contract.queryFilter(e, 22658137, 22658137 + 1000)
+            // const e = await wallet.contractCaller.insuranceContract.contract.filters.EBuyInsurance()
+            // const filter = await wallet.contractCaller.insuranceContract.contract.queryFilter(e, 22658137, 22658137 + 1000)
         } catch (err) {
             console.log(err)
         }
     }
-
-    const [isUpdated, setUpdated] = useState<boolean>(false)
-    const [isCanBuy, setCanBuy] = useState<boolean>(false)
 
     const onConnectWallet = () => {
         try {
@@ -90,8 +88,6 @@ export const AcceptBuyInsurance = () => {
             //     }
             // }
             // if (!checkUpgrade) {
-            //     const t_expired = new Date()
-            //     t_expired.setDate(state.t_market.getDate() + state.period)
             //     const dataPost = {
             //         buyer: wallet?.account as string,
             //         asset: state.symbol.type,

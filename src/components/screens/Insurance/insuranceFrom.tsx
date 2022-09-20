@@ -4,7 +4,6 @@ import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import Button from 'components/common/Button/Button'
 import axios from 'axios'
 import { Menu, Popover, Switch, Tab } from '@headlessui/react'
-import { GetStaticProps } from 'next'
 import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
@@ -12,7 +11,6 @@ import { useEffect, useState } from 'react'
 import { CheckCircle, LeftArrow, InfoCircle, XMark, ErrorTriggersIcon, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens, stateInsurance } from 'utils/constants'
 import { Suspense, useMemo } from 'react'
@@ -48,16 +46,12 @@ export const InsuranceFrom = () => {
     const [percentInsurance, setPercentInsurance] = useState<number>(0)
     const [selectTime, setSelectTime] = useState<string>('ALL')
     const [isDrop, setDrop] = useState(false)
-    const [checkUpgrade, setCheckUpgrade] = useState(false)
     const [clear, setClear] = useState(false)
     const assetsToken = useAppSelector((state: RootStore) => state.setting.assetsToken)
     const [index, setIndex] = useState<1 | 2>(1)
     const [tab, setTab] = useState<number>(3)
     const [loadings, setLoadings] = useState(true)
     const [openChangeToken, setOpenChangeToken] = useState(false)
-    const [active, setActive] = useState<boolean>(false)
-    const [nameNoti, setNameNoti] = useState<'success' | 'expired' | 'expired1' | 'email' | 'loading'>('loading')
-    const [res, setRes] = useState<any>()
     const [showDetails, setShowDetails] = useState(false)
     const [unitMoney, setUnitMoney] = useState('USDT')
     const [changeUnit, setChangeUnit] = useState<boolean>(false)
@@ -68,7 +62,6 @@ export const InsuranceFrom = () => {
     const [showGuide, setShowGuide] = useState<boolean>(false)
     const [chosing, setChosing] = useState(false)
     const [showGuideModal, setShowGuideModal] = useState<boolean>(false)
-    const [thisFisrt, setThisFisrt] = useState(true)
     const [showChangeUnit, setShowChangeUnit] = useState({
         isShow: false,
         name: '',
@@ -142,9 +135,6 @@ export const InsuranceFrom = () => {
     }
 
     const validatePclaim = (value: number) => {
-        console.log('duong', (state.p_market * 1 + (2 * state.p_market) / 100).toFixed(3), (state.p_market * 1 + (70 * state.p_market) / 100).toFixed(3))
-        console.log('am', (state.p_market * 1 - (70 * state.p_market) / 100).toFixed(3), (state.p_market * 1 - (2 * state.p_market) / 100).toFixed(3))
-
         if (value > state.p_market * 1 + (2 * state.p_market) / 100 && value < state.p_market * 1 + (70 * state.p_market) / 100) {
             setErrorPCalim(true)
             return validateMargin(state.margin)
@@ -165,6 +155,18 @@ export const InsuranceFrom = () => {
                 return setClear(false)
             }
         }
+    }
+
+    const handleNext = () => {
+        return router.push('/buy-covered/info-covered', {
+            pathname: '/buy-covered/info-covered',
+            query: {
+                r_claim: state.r_claim,
+                q_claim: state.q_claim,
+                margin: state.margin,
+                period: state.period,
+            },
+        })
     }
 
     useEffect(() => {
@@ -252,7 +254,6 @@ export const InsuranceFrom = () => {
     }
     const setStorage = (value: any) => {
         localStorage.setItem('buy_covered_state', JSON.stringify(value))
-        setThisFisrt(false)
     }
 
     const getStorage = async () => {
@@ -284,11 +285,9 @@ export const InsuranceFrom = () => {
                 setTab(res.tab)
                 setUnitMoney(res.unitMoney)
                 setIndex(res.index)
-                setThisFisrt(true)
                 refreshApi(selectTime, selectCoin)
             }
         } else {
-            setThisFisrt(false)
             setStorage(selectCoin)
         }
         setLoadings(false)
@@ -376,8 +375,6 @@ export const InsuranceFrom = () => {
         selectTime: string | undefined,
         selectCoin: { id?: string; name?: string; icon?: string; disable?: boolean | undefined; symbol?: string; type: any },
     ) => {
-        console.log(selectCoin)
-
         const timeEnd = new Date()
         const timeBegin = new Date()
         setLoadings(true)
@@ -490,7 +487,7 @@ export const InsuranceFrom = () => {
 
                     {<TerminologyModal isMobile={isMobile} visible={showDetails} onClose={() => setShowDetails(false)} t={t} />}
 
-                    {active && (
+                    {/* {active && (
                         <Modal
                             portalId="modal"
                             isVisible={!isMobile}
@@ -509,7 +506,7 @@ export const InsuranceFrom = () => {
                                 isMobile={false}
                             />
                         </Modal>
-                    )}
+                    )} */}
 
                     {
                         // head Insurance
@@ -1248,16 +1245,7 @@ export const InsuranceFrom = () => {
                                 }flex items-center justify-center rounded-lg px-auto py-auto font-semibold py-[12px] px-[148px]`}
                                 onClick={() => {
                                     if (clear) {
-                                        router.push('/buy-covered/info-covered', {
-                                            pathname: '/buy-covered/info-covered',
-                                            query: {
-                                                r_claim: state.r_claim,
-                                                q_claim: state.q_claim,
-                                                margin: state.margin,
-                                                period: state.period,
-                                                t_market: state.t_market.toString(),
-                                            },
-                                        })
+                                        handleNext()
                                     }
                                 }}
                                 disabled={!clear}
@@ -1463,7 +1451,7 @@ export const InsuranceFrom = () => {
                                 </div>
                             </Modal>
                         )}
-                        {active && (
+                        {/* {active && (
                             <Modal
                                 portalId="modal"
                                 isVisible={true}
@@ -1482,7 +1470,7 @@ export const InsuranceFrom = () => {
                                     isMobile={false}
                                 />
                             </Modal>
-                        )}
+                        )} */}
                         {index == 1 && (
                             //sticky
                             <div className={`h-[32px] flex flex-row justify-between items-center mx-[16px] mt-[24px] mb-[16px]  top-0 bg-white z-50`}>
@@ -1881,16 +1869,7 @@ export const InsuranceFrom = () => {
                                         }flex items-center justify-center rounded-lg px-auto py-auto font-semibold py-[12px] px-[148px]`}
                                         onClick={() => {
                                             if (clear) {
-                                                router.push('/buy-covered/info-covered', {
-                                                    pathname: '/buy-covered/info-covered',
-                                                    query: {
-                                                        r_claim: state.r_claim,
-                                                        q_claim: state.q_claim,
-                                                        margin: state.margin,
-                                                        period: state.period,
-                                                        t_market: state.t_market.toString(),
-                                                    },
-                                                })
+                                                handleNext()
                                             }
                                         }}
                                         disabled={!clear}

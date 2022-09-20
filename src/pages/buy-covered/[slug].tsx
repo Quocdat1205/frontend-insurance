@@ -31,7 +31,6 @@ const Insurance = ({ slug }: any) => {
                     <Breadcrumbs>
                         <div>{t('common:header:home')}</div>
                         <div>{t('common:header:buy_covered')}</div>
-                        <div>{t('common:header:insurance_history')}</div>
                     </Breadcrumbs>
                     <AcceptBuyInsurance />
                 </LayoutWeb3>
