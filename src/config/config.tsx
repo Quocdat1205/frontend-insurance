@@ -87,13 +87,6 @@ class Config {
             parentId: 'buy-covered-parent',
             icon: '/images/icons/Ic_menu_users.png',
         },
-        {
-            menuId: 'info-covered',
-            router: '/buy-covered/info-covered',
-            name: 'common:header:buy_covered',
-            parentId: 'buy-covered-parent',
-            icon: '/images/icons/Ic_menu_users.png',
-        },
     ]
 }
 

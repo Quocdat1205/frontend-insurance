@@ -1,11 +1,14 @@
 import Button from 'components/common/Button/Button'
 import { Input } from 'components/common/Input/input'
-import { Loading, SuccessIcon, XMark } from 'components/common/Svg/SvgIcon'
+import { Loading, SuccessIcon } from 'components/common/Svg/SvgIcon'
+import Config from 'config/config'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { RootStore, useAppSelector } from 'redux/store'
 import { createSelector } from 'reselect'
+import { API_SUBSCRIBE } from 'services/apis'
+import fetchApi from 'services/fetch-api'
 import { formatNumber } from 'utils/utils'
 
 export type iProps = {
@@ -20,8 +23,8 @@ export type iProps = {
 const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }: iProps) => {
     const { t } = useTranslation()
     const router = useRouter()
-    const [email, setEmail] = useState()
-    const assetsToken = useAppSelector((state: RootStore) => state.setting.assetsToken)
+    const [email, setEmail] = useState('')
+    const [clear, setClear] = useState(false)
 
     const noti = [
         {
@@ -57,6 +60,26 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
         },
     ]
 
+    const handleAPISubscribe = (email: string) => {
+        fetchApi({ url: API_SUBSCRIBE, options: { method: 'POST' }, params: { email: email } }).then((res) => {
+            if (res.statusCode == 201) {
+                Config.toast.show('success', 'Successful')
+                setActive(false)
+            }
+        })
+    }
+
+    useEffect(() => {
+        const checkEmail = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/
+
+        if (checkEmail.test(email)) {
+            setClear(true)
+        }
+        if (!checkEmail.test(email)) {
+            setClear(false)
+        }
+    }, [email])
+
     return active ? (
         isMobile ? (
             <>
@@ -65,22 +88,23 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                         if (item.name === name) {
                             return (
                                 <div key={index} className={`${index != 3 && 'divide-[#E5E7E8] divide-y '} bg-white text-sm  w-full mx-auto `}>
-                                    <div className="flex flex-col justify-center items-center my-[24px]">
+                                    <div className="flex flex-col justify-center items-center my-[24px] text-xl font-medium">
                                         {noti[index].icon}
                                         <div className="text-center w-[70%] pt-[24px]">
-                                            {noti[index].description} <span className="text-[#EB2B3E]">{name != 'success' && name != 'email' ? id : ''}</span>{' '}
+                                            {noti[index].description}{' '}
+                                            <span className="text-[#EB2B3E]">{name != 'success' && name != 'email' && name != 'loading' ? id : ''}</span>{' '}
                                             {noti[index].sub_Description}
                                             {noti[index].reason && <div className="text-center text-[#808890]">{noti[index].reason}</div>}
                                         </div>
                                     </div>
-                                    <div className="flex flex-col justify-center mx-[24px]">
+                                    <div className="flex flex-col justify-center mx-[24px] ">
                                         {index < 3 && (
                                             <>
-                                                <div className="flex flex-row justify-between py-[16px] px-[8px]">
+                                                <div className="flex flex-row justify-between py-[16px] px-[8px] text-base">
                                                     <div className={'text-[#808890]'}>Q-Claim</div>
                                                     <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                                                         <span className="mr-[8px]">{Number(formatNumber(state?.q_claim, 2))}</span>
-                                                        <span className={'text-[#EB2B3E]'}>USDT</span>
+                                                        <span className={''}>USDT</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row justify-between py-[16px] px-[8px] ">
@@ -94,7 +118,7 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                         )}
                                         {index == 3 && (
                                             <>
-                                                <div className={''}>
+                                                <div className={'text-base'}>
                                                     <span className="pb-[8px]">Email</span>
                                                     <Input
                                                         className={'w-full bg-[#F7F8FA] py-[12px] px-[16px]'}
@@ -115,35 +139,25 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                             </>
                                         )}
                                         {name !== 'loading' && (
-                                            <div className="flex justify-center items-center">
+                                            <div className={`flex justify-center items-center text-base`}>
                                                 <Button
                                                     variants={'primary'}
-                                                    className={`bg-[#EB2B3E] w-[80%] m-[24px] mt-[32px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
+                                                    className={`${
+                                                        !clear && index == 3 ? 'bg-[#E5E7E8]' : 'bg-[#EB2B3E]'
+                                                    } h-[48px] !w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                                                     onClick={() => {
-                                                        const newSymbol = {
-                                                            timeframe: 'ALL',
-                                                            margin: 0,
-                                                            percent_margin: 0,
-                                                            symbol: {
-                                                                id: assetsToken[0]._id,
-                                                                name: assetsToken[0].name,
-                                                                icon: assetsToken[0].attachment,
-                                                                symbol: `${assetsToken[0].symbol}USDT`,
-                                                                type: assetsToken[0].symbol,
-                                                                disable: !assetsToken[0].isActive,
-                                                            },
-                                                            period: 2,
-                                                            p_claim: 0,
-                                                            q_claim: 0,
-                                                            r_claim: 0,
-                                                            q_covered: 0,
-                                                            p_market: 0,
-                                                            t_market: 0,
-                                                            p_expired: 0,
-                                                            index: 1,
+                                                        if (index == 0) {
+                                                            localStorage.removeItem('buy_covered_state')
+                                                            return router.push('/buy-covered/insurance-history')
                                                         }
-                                                        localStorage.setItem('buy_covered_state', JSON.stringify({ ...newSymbol }))
+                                                        if (index == 3) {
+                                                            return handleAPISubscribe(email)
+                                                        }
+                                                        if (index != 0 && index != 3) {
+                                                            return router.push('/buy-covered/insurance-history')
+                                                        }
                                                     }}
+                                                    disable={!clear && index == 3}
                                                 >
                                                     {index == 0
                                                         ? `${t('insurance:final:complete')}`
@@ -167,15 +181,11 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                         if (item.name === name) {
                             return (
                                 <div key={index} className={` bg-white text-sm w-full mx-auto `}>
-                                    {name != 'loading' && name != 'success' && (
-                                        <div className="m-[24px] flex flex-row-reverse" onClick={setActive}>
-                                            <XMark></XMark>
-                                        </div>
-                                    )}
-                                    <div className="flex flex-col justify-center items-center my-[24px]">
+                                    <div className="flex flex-col justify-center items-center my-[24px]  text-xl font-medium">
                                         {noti[index].icon}
-                                        <div className="text-center w-[70%] pt-[24px]">
-                                            {noti[index].description} <span className="text-[#EB2B3E]">{name != 'success' && name != 'email' ? id : ''}</span>{' '}
+                                        <div className="text-center pt-[24px]">
+                                            {noti[index].description}{' '}
+                                            <span className="text-[#EB2B3E]">{name != 'success' && name != 'email' && name != 'loading' ? id : ''}</span>{' '}
                                             {noti[index].sub_Description}
                                             {noti[index].reason && <div className="text-center text-[#808890]">{noti[index].reason}</div>}
                                         </div>
@@ -183,11 +193,11 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                     <div className="flex flex-col justify-center mx-[24px] border-t border-1 border-[#E5E7E8]">
                                         {index < 3 && (
                                             <>
-                                                <div className="flex flex-row justify-between py-[16px] px-[8px]">
+                                                <div className="flex flex-row justify-between py-[16px] px-[8px] font-base">
                                                     <div className={'text-[#808890]'}>Q-Claim</div>
                                                     <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                                                         <span className="mr-[8px]">{Number(formatNumber(state?.q_claim, 2))}</span>
-                                                        <span className={'text-[#EB2B3E]'}>USDT</span>
+                                                        <span className={''}>USDT</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row justify-between py-[16px] px-[8px] ">
@@ -222,41 +232,28 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                             </>
                                         )}
                                         {name != 'loading' && (
-                                            <div className="flex justify-center items-center">
+                                            <div className="flex justify-center items-center text-base">
                                                 <Button
                                                     variants={'primary'}
-                                                    className={`bg-[#EB2B3E] w-[80%] m-[24px] mt-[32px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
+                                                    className={`${
+                                                        !clear && index == 3 ? 'bg-[#E5E7E8]' : 'bg-[#EB2B3E]'
+                                                    }  h-[48px] !w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                                                     onClick={() => {
                                                         if (index == 0) {
-                                                            router.push('/buy-covered/insurance-history')
-                                                            const newSymbol = {
-                                                                timeframe: 'ALL',
-                                                                margin: 0,
-                                                                percent_margin: 0,
-                                                                symbol: {
-                                                                    id: assetsToken[0]._id,
-                                                                    name: assetsToken[0].name,
-                                                                    icon: assetsToken[0].attachment,
-                                                                    symbol: `${assetsToken[0].symbol}USDT`,
-                                                                    type: assetsToken[0].symbol,
-                                                                    disable: !assetsToken[0].isActive,
-                                                                },
-                                                                period: 2,
-                                                                p_claim: 0,
-                                                                q_claim: 0,
-                                                                r_claim: 0,
-                                                                q_covered: 0,
-                                                                p_market: 0,
-                                                                t_market: 0,
-                                                                p_expired: 0,
-                                                                index: 1,
-                                                            }
-                                                            localStorage.setItem('buy_covered_state', JSON.stringify({ ...newSymbol }))
+                                                            localStorage.removeItem('buy_covered_state')
+                                                            return router.push('/buy-covered/insurance-history')
+                                                        }
+                                                        if (index == 3) {
+                                                            return handleAPISubscribe(email)
+                                                        }
+                                                        if (index != 0 && index != 3) {
+                                                            return router.push('/buy-covered/insurance-history')
                                                         }
                                                     }}
+                                                    disable={!clear && index == 3}
                                                 >
                                                     {index == 0
-                                                        ? `Xem hợp đồng chi tiết`
+                                                        ? `${t('insurance:final:complete')}`
                                                         : index == 3
                                                         ? `${t('insurance:final:confirm_email')}`
                                                         : `${t('insurance:final:buy_again')}`}

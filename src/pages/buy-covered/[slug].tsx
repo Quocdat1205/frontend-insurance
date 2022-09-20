@@ -44,9 +44,16 @@ const Insurance = ({ slug }: any) => {
 export const getServerSideProps = async ({ locale, query }: any) => {
     try {
         const isValid = Config.homeMenu.find((router: any) => router.menuId === query.slug)
-        console.log(query, 'thuc')
 
         if (isValid) {
+            return {
+                props: {
+                    slug: query.slug,
+                    ...(await serverSideTranslations(locale, ['common', 'home', 'insurance', 'insurance_history', 'errors'])),
+                },
+            }
+        }
+        if (query.slug === 'info-covered') {
             return {
                 props: {
                     slug: query.slug,
