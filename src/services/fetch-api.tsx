@@ -11,10 +11,12 @@ const fetchApi = async ({ url, options, params, cancelToken, timeout, baseURL }:
             method: 'GET',
             baseURL: baseURL ?? API_URL,
             url,
-            withCredentials: true,
+            // withCredentials: true,
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': '*',
             },
             cancelToken,
             timeout,
