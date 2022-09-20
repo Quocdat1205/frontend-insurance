@@ -4,6 +4,7 @@ import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import Button from 'components/common/Button/Button'
 import axios from 'axios'
 import { Menu, Popover, Switch, Tab } from '@headlessui/react'
+import { AcceptBuyInsurance } from 'components/screens/Insurance/AcceptBuyInsurance'
 import { GetStaticProps } from 'next'
 import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
@@ -33,9 +34,9 @@ const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
 //chart
-const ChartComponent = dynamic(() => import('./chartComponent'), { ssr: false, suspense: true })
+const ChartComponent = dynamic(() => import('components/screens/Insurance/chartComponent'), { ssr: false, suspense: true })
 
-export const InsuranceFrom = () => {
+const InsuranceFrom = () => {
     const {
         t,
         i18n: { language },
@@ -187,45 +188,21 @@ export const InsuranceFrom = () => {
     }
 
     useEffect(() => {
-        if (assetsToken) {
-            let list: ICoin[] = []
-            assetsToken.map(async (token: any) => {
-                const tmp = {
-                    id: token._id,
-                    name: token.name,
-                    icon: token.attachment,
-                    symbol: `${token.symbol}USDT`,
-                    type: token.symbol,
-                    disable: !token.isActive,
-                }
-
-                await list.push(tmp)
-            })
-
-            if (list.length > 0) {
-                setState({
-                    ...state,
-                    symbol: {
-                        icon: list[0].icon,
-                        id: list[0].id,
-                        name: list[0].name,
-                        symbol: list[0].symbol,
-                        type: list[0].type,
-                        disable: list[0].disable,
-                    },
-                })
-                setSelectedCoin({
-                    icon: list[0].icon,
-                    id: list[0].id,
-                    name: list[0].name,
-                    symbol: list[0].symbol,
-                    type: list[0].type,
-                    disable: list[0].disable,
-                })
-
-                return setListCoin(list)
+        let list: ICoin[] = []
+        assetsToken.map(async (token: any) => {
+            const tmp = {
+                id: token._id,
+                name: token.name,
+                icon: token.attachment,
+                symbol: `${token.symbol}USDT`,
+                type: token.symbol,
+                disable: !token.isActive,
             }
-        }
+
+            await list.push(tmp)
+        })
+
+        return setListCoin(list)
     }, [assetsToken])
 
     useEffect(() => {
@@ -244,11 +221,9 @@ export const InsuranceFrom = () => {
     }, [account])
 
     const getUSDT = async () => {
-        if (wallet) {
-            const balanceUsdt = await wallet.contractCaller.usdtContract.contract.balanceOf(account)
-            if (balanceUsdt) {
-                setUserBalance(Number(formatNumber(Number(ethers.utils.formatEther(await balanceUsdt)) / Number(state.p_market), 4)))
-            }
+        const balanceUsdt = await wallet.contractCaller.usdtContract.contract.balanceOf(account)
+        if (balanceUsdt) {
+            setUserBalance(Number(formatNumber(Number(ethers.utils.formatEther(await balanceUsdt)) / Number(state.p_market), 4)))
         }
     }
     const setStorage = (value: any) => {
@@ -262,35 +237,45 @@ export const InsuranceFrom = () => {
         const data = await localStorage.getItem('buy_covered_state')
         if (data) {
             const res = JSON.parse(data)
-            if (res.symbol.id) {
-                setState({
-                    ...state,
-                    symbol: {
-                        icon: res.symbol.icon,
-                        id: res.symbol.id,
-                        name: res.symbol.name,
-                        symbol: res.symbol.symbol,
-                        type: res.symbol.type,
-                        disable: res.symbol.disable,
-                    },
-                })
-                setSelectedCoin({
+            setState({
+                ...state,
+                timeframe: res.timeframe,
+                margin: res.margin * 1.0,
+                percent_margin: res.percent_margin * 1.0,
+                symbol: {
                     icon: res.symbol.icon,
                     id: res.symbol.id,
                     name: res.symbol.name,
                     symbol: res.symbol.symbol,
                     type: res.symbol.type,
                     disable: res.symbol.disable,
-                })
-                setTab(res.tab)
-                setUnitMoney(res.unitMoney)
-                setIndex(res.index)
-                setThisFisrt(true)
-                refreshApi(selectTime, selectCoin)
-            }
+                },
+                period: res.period * 1.0,
+                p_claim: res.p_claim * 1.0,
+                q_claim: res.q_claim * 1.0,
+                r_claim: res.r_claim * 1.0,
+                q_covered: res.q_covered * 1.0,
+                p_market: res.p_market * 1.0,
+                t_market: res.t_market,
+                p_expired: res.p_expired * 1.0,
+            })
+            setSelectedCoin({
+                icon: res.symbol.icon,
+                id: res.symbol.id,
+                name: res.symbol.name,
+                symbol: res.symbol.symbol,
+                type: res.symbol.type,
+                disable: res.symbol.disable,
+            })
+            setTab(res.tab)
+            setUnitMoney(res.unitMoney)
+            setIndex(res.index)
+            validatePclaim(res.p_claim)
+            setThisFisrt(true)
+            refreshApi(selectTime, selectCoin)
         } else {
             setThisFisrt(false)
-            setStorage(selectCoin)
+            setStorage(state)
         }
         setLoadings(false)
     }
@@ -302,7 +287,7 @@ export const InsuranceFrom = () => {
             setLoadings(false)
             return console.log(error)
         }
-    }, [listCoin])
+    }, [])
 
     useEffect(() => {
         if (unitMoney) {
@@ -333,6 +318,33 @@ export const InsuranceFrom = () => {
     }, [state.q_covered])
 
     useEffect(() => {
+        if (state) {
+            const data = localStorage.getItem('buy_covered_state')
+            if (data) {
+                const res = JSON.parse(data)
+                const newData = {
+                    ...res,
+                    timeframe: state.timeframe,
+                    margin: state.margin * 1.0,
+                    percent_margin: state.percent_margin * 1.0,
+                    period: state.period * 1.0,
+                    p_claim: state.p_claim * 1.0,
+                    q_claim: state.q_claim * 1.0,
+                    r_claim: state.r_claim * 1.0,
+                    q_covered: state.q_covered * 1.0,
+                    p_market: state.p_market * 1.0,
+                    t_market: state.t_market,
+                    p_expired: state.p_expired * 1.0,
+                }
+                setStorage(newData)
+            }
+        }
+        if (thisFisrt) {
+            return setThisFisrt(false)
+        }
+    }, [state])
+
+    useEffect(() => {
         const data = localStorage.getItem('buy_covered_state')
         if (data) {
             const res = JSON.parse(data)
@@ -356,12 +368,12 @@ export const InsuranceFrom = () => {
         const data = localStorage.getItem('buy_covered_state')
         if (data) {
             let res = JSON.parse(data)
-            res.icon = state.symbol.icon
-            res.id = state.symbol.id
-            res.name = state.symbol.name
-            res.symbol = state.symbol.symbol
-            res.type = state.symbol.type
-            res.disable = state.symbol.disable
+            res.symbol.icon = state.symbol.icon
+            res.symbol.id = state.symbol.id
+            res.symbol.name = state.symbol.name
+            res.symbol.symbol = state.symbol.symbol
+            res.symbol.type = state.symbol.type
+            res.symbol.disable = state.symbol.disable
             localStorage.setItem('buy_covered_state', JSON.stringify(res))
         }
     }, [selectTime, selectCoin])
@@ -630,7 +642,7 @@ export const InsuranceFrom = () => {
                                     <div
                                         className={`${
                                             !isMobile
-                                                ? 'shadow border border-1 border-divider h-auto rounded-xl mt-8 max-w-screen-md lg:max-w-screen-md xl:max-w-screen-lg m-auto p-8'
+                                                ? 'shadow border border-1 border-divider h-auto rounded-xl mt-8 max-w-[912px] xl:max-w-screen-lg m-auto p-8'
                                                 : ''
                                         }`}
                                         onClick={() => {
@@ -1042,8 +1054,8 @@ export const InsuranceFrom = () => {
                                             </span>
                                             <Tab.Group>
                                                 <Tab.List
-                                                    className={`flex flex-row justify-between mt-[20px]  ${isMobile ? 'w-full' : 'w-[85%]'} ${
-                                                        isMobile && showCroll ? 'overflow-scroll' : ' overflow-hidden'
+                                                    className={`flex flex-row mt-4 space-x-3  w-full ${
+                                                        isMobile && showCroll ? 'overflow-scroll' : ''
                                                     }`}
                                                     onTouchStart={() => {
                                                         setShowCroll(true)
@@ -1057,8 +1069,8 @@ export const InsuranceFrom = () => {
                                                             <div
                                                                 key={key}
                                                                 className={`${
-                                                                    state.period == item && 'bg-[#FFF1F2] text-red'
-                                                                } bg-hover rounded-[300px] p-3 h-[32px] w-[49px] flex justify-center items-center hover:cursor-pointer ${
+                                                                    state.period == item && 'bg-pink text-red'
+                                                                } bg-hover rounded-[300px] px-4 py-1 flex justify-center items-center hover:cursor-pointer ${
                                                                     isMobile && !(item == 15) && 'mr-[12px]'
                                                                 }`}
                                                                 onClick={() => setState({ ...state, period: item })}
@@ -2025,17 +2037,11 @@ const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGui
                     }}
                     className="py-4"
                 >
-                    {t('insurance:buy:detailed_terminology')}
+                    {t('insurance:guild:the_glossary')}
                 </div>
             </div>
         </Modal>
     )
 }
-
-export const getStaticProps: GetStaticProps = async ({ locale }: any) => ({
-    props: {
-        ...(await serverSideTranslations(locale, ['common', 'home', 'insurance', 'errors'])),
-    },
-})
 
 export default InsuranceFrom

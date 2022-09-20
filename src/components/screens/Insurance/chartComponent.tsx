@@ -96,7 +96,7 @@ export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number,
     }
 }
 
-export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, state, isMobile }: iProps) => {
+const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, state, isMobile }: iProps) => {
     const [dataChart, setDataChart] = useState([])
     const [PClaim, setPClaim] = useState(p_claim)
     const router = useRouter()
