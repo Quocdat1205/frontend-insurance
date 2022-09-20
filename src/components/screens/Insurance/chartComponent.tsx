@@ -96,7 +96,7 @@ export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number,
     }
 }
 
-export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, state, isMobile }: iProps) => {
+const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, state, isMobile }: iProps) => {
     const [dataChart, setDataChart] = useState([])
     const [PClaim, setPClaim] = useState(p_claim)
     const router = useRouter()
@@ -204,7 +204,14 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
             bullet.circle.strokeWidth = 2
             bullet.circle.propertyFields.radius = '1'
 
-            handleTrendLine(chart, p_claim, state)
+            if (
+                (p_claim > state.p_market * 1 + (2 * state.p_market) / 100 && p_claim < state.p_market * 1 + (70 * state.p_market) / 100) ||
+                (p_claim > state.p_market * 1 - (70 * state.p_market) / 100 && p_claim < state.p_market * 1 - (2 * state.p_market) / 100)
+            ) {
+                handleTrendLine(chart, p_claim, state)
+            } else {
+                handleTrendLine(chart, 0, state)
+            }
 
             // //Label bullet main
             let latitudeLabel = subSeries.bullets.push(new am4charts.LabelBullet())
@@ -248,7 +255,10 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                 expiredLabel.label.fill = am4core.color('#B2B7BC')
             }
 
-            if (p_claim >= 0) {
+            if (
+                (p_claim > state.p_market * 1 + (2 * state.p_market) / 100 && p_claim < state.p_market * 1 + (70 * state.p_market) / 100) ||
+                (p_claim > state.p_market * 1 - (70 * state.p_market) / 100 && p_claim < state.p_market * 1 - (2 * state.p_market) / 100)
+            ) {
                 const timeEnd = new Date()
                 timeEnd.setDate(timeEnd.getDate() + 4)
 
@@ -297,7 +307,7 @@ export const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Cla
                         </span></div>`
                     }
                 }
-                if (p_claim == 0 || p_claim == state.p_market) {
+                if (p_claim == state.p_market) {
                     if (!isMobile) {
                         claimLabel.label.html = `<div id="claimLabel" class="hover:cursor-pointer text-[#808890] text-xs z-[1000] bg-[#F7F8FA] rounded-[800px] px-[16px] py-[4px]"><span class="mr-[8px]">P-Claim ${latitudeClaim.data[0].value}</span> <span>0%</span></div>`
                     }
