@@ -23,8 +23,8 @@ import { formatNumber } from 'utils/utils'
 import { ethers } from 'ethers'
 import colors from 'styles/colors'
 import classnames from 'classnames'
-import InsuranceContractLoading from 'components/screens/InsuranceHistory/InsuranceContractLoading'
 import GlossaryModal from 'components/screens/Glossary/GlossaryModal'
+import { InsuranceFormLoading } from './insuranceFormLoading'
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
@@ -270,7 +270,6 @@ const InsuranceFrom = () => {
             setThisFisrt(false)
             setStorage(state)
         }
-        setLoadings(false)
     }
 
     const refreshApi = (
@@ -355,7 +354,6 @@ const InsuranceFrom = () => {
                 getUSDT()
             }
         } catch (error) {
-            setLoadings(false)
             console.log('error get USDT balance')
         }
     }, [account])
@@ -1928,7 +1926,7 @@ const InsuranceFrom = () => {
                     </>
                 )
             ) : (
-                <InsuranceContractLoading />
+                <InsuranceFormLoading isMobile={!isMobile} />
             )}
         </>
     )
