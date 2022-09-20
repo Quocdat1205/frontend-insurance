@@ -1,12 +1,16 @@
 import Breadcrumbs from 'components/layout/Breadcrumbs'
 import LayoutWeb3 from 'components/layout/LayoutWeb3'
-import { AcceptBuyInsurance } from 'components/screens/Insurance/AcceptBuyInsurance'
 import InsuranceContractLoading from 'components/screens/InsuranceHistory/InsuranceContractLoading'
 import Config from 'config/config'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import dynamic from 'next/dynamic'
 const InsuranceHistory = dynamic(() => import('components/screens/InsuranceHistory/InsuranceHistory'), {
+    ssr: false,
+    loading: () => <InsuranceContractLoading />,
+})
+
+const AcceptBuyInsurance = dynamic(() => import('components/screens/Insurance/AcceptBuyInsurance'), {
     ssr: false,
     loading: () => <InsuranceContractLoading />,
 })
@@ -40,6 +44,8 @@ const Insurance = ({ slug }: any) => {
 export const getServerSideProps = async ({ locale, query }: any) => {
     try {
         const isValid = Config.homeMenu.find((router: any) => router.menuId === query.slug)
+        console.log(query, 'thuc')
+
         if (isValid) {
             return {
                 props: {

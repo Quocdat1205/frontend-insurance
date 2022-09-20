@@ -158,15 +158,19 @@ export const InsuranceFrom = () => {
     }
 
     const handleNext = () => {
-        return router.push('/buy-covered/info-covered', {
-            pathname: '/buy-covered/info-covered',
-            query: {
-                r_claim: state.r_claim,
-                q_claim: state.q_claim,
-                margin: state.margin,
-                period: state.period,
-            },
-        })
+        const query = {
+            r_claim: formatNumber(state.r_claim, 2),
+            q_claim: formatNumber(state.q_claim, 4),
+            margin: formatNumber(state.margin, 4),
+            period: state.period,
+            symbol: selectCoin?.type,
+            unit: unitMoney,
+            p_claim: state.p_claim,
+            tab: menu[tab]?.name,
+            q_covered: state.q_covered,
+        }
+        localStorage.setItem('info_covered_state', JSON.stringify(query))
+        return router.push('/buy-covered/info-covered')
     }
 
     useEffect(() => {
