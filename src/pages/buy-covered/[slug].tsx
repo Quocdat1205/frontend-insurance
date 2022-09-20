@@ -1,5 +1,6 @@
 import Breadcrumbs from 'components/layout/Breadcrumbs'
 import LayoutWeb3 from 'components/layout/LayoutWeb3'
+import { AcceptBuyInsurance } from 'components/screens/Insurance/AcceptBuyInsurance'
 import InsuranceContractLoading from 'components/screens/InsuranceHistory/InsuranceContractLoading'
 import Config from 'config/config'
 import { useTranslation } from 'next-i18next'
@@ -22,6 +23,17 @@ const Insurance = ({ slug }: any) => {
                         <div>{t('common:header:insurance_history')}</div>
                     </Breadcrumbs>
                     <InsuranceHistory />
+                </LayoutWeb3>
+            )
+        case 'info-covered':
+            return (
+                <LayoutWeb3 sponsor={false}>
+                    <Breadcrumbs>
+                        <div>{t('common:header:home')}</div>
+                        <div>{t('common:header:buy_covered')}</div>
+                        <div>{t('common:header:insurance_history')}</div>
+                    </Breadcrumbs>
+                    <AcceptBuyInsurance />
                 </LayoutWeb3>
             )
     }
