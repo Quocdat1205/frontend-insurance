@@ -1178,7 +1178,7 @@ const InsuranceFrom = () => {
                                                                     return (
                                                                         <div
                                                                             key={key}
-                                                                            className={` py-2 px-4 hover:bg-hover`}
+                                                                            className={` py-2 px-4 hover:bg-hover font-normal`}
                                                                             onClick={() => {
                                                                                 setUnitMoney(e)
                                                                                 setChangeUnit(false)
