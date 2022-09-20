@@ -83,5 +83,17 @@
         "period": "Chọn Period",
         "period_detial": "Chọn kỳ hạn (period) cho hợp đồng bảo hiểm của bạn",
         "connect_wallet": "Kết nối ví để bắt đầu"
+    },
+    "guild": {
+        "the_glossary": "Bảng chú giải thuật ngữ",
+        "title": "Hướng dẫn",
+        "title1": "Thuật ngữ bảo hiểm",
+        "title2": "Trạng thái hợp đồng",
+        "step_title_1": "Loại và số lượng tài sản",
+        "step_title_2": "Chọn nhanh P-claim bằng cách kéo mức giá trên biểu đồ theo phương dọc hoặc nhập P-claim mong muốn",
+        "step_title_3": "Chọn Period",
+        "step_title_4": "Ấn \"Tuỳ chỉnh\" để cá nhân hoá hợp đồng bảo hiểm theo nhu cầu",
+        "next": "Tiếp theo",
+        "got_it": "Đã hiểu"
     }
 }

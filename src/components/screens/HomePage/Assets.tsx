@@ -48,14 +48,44 @@ const Assets = () => {
                 ),
             })
         } else {
+            console.log(id)
+
             let state: any = localStorage.getItem('buy_covered_state')
-            if (state) {
-                state = JSON.parse(state)
-                state!.symbol = { id }
-            } else {
-                localStorage.setItem('buy_covered_state', JSON.stringify({ symbol: { id } }))
+
+            const item = assetsToken.find((token: any) => {
+                console.log(token)
+
+                if (token._id === id) return token
+            })
+
+            if (item) {
+                const newSymbol = {
+                    timeframe: 'ALL',
+                    margin: 0,
+                    percent_margin: 0,
+                    symbol: {
+                        id: item._id,
+                        name: item.name,
+                        icon: item.attachment,
+                        symbol: `${item.symbol}USDT`,
+                        type: item.symbol,
+                        disable: !item.isActive,
+                    },
+                    period: 2,
+                    p_claim: 0,
+                    q_claim: 0,
+                    r_claim: 0,
+                    q_covered: 0,
+                    p_market: 0,
+                    t_market: 0,
+                    p_expired: 0,
+                    index: 1,
+                }
+                localStorage.setItem('buy_covered_state', JSON.stringify({ ...newSymbol }))
             }
-            router.push('/buy-covered')
+            setTimeout(() => {
+                router.push('/buy-covered')
+            }, 2000)
         }
     }
 

@@ -2,10 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "fonts";
-@import "fonts";
-@import "datepicker";
-@import "pagination";
+@import 'fonts';
+@import 'fonts';
+@import 'datepicker';
+@import 'pagination';
 
 html,
 body {
@@ -182,31 +182,20 @@ input::-webkit-inner-spin-button {
     margin: 0;
 }
 
-input[type="number"] {
+input[type='number'] {
     -moz-appearance: textfield;
 }
 
 /* Tooltip container */
-.tooltip {
-    position: relative;
-}
-
-/* Tooltip text */
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: max-content;
-    color: #000;
-    background-color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    /* Position the tooltip text - see examples below! */
+.tooltip::after {
+    content: ' ';
     position: absolute;
-    z-index: 1;
-}
-
-/* Show the tooltip text when you mouse over the tooltip container */
-.tooltip:hover .tooltiptext {
-    visibility: visible;
+    top: 100%; /* At the bottom of the tooltip */
+    left: 80%;
+    margin-left: -5px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: #eb2b3e white transparent transparent;
 }
 
 .guideline {
@@ -232,13 +221,15 @@ input[type="number"] {
 .reactour__helper--is-open {
     background-color: white;
     padding: 16px !important;
-    width: calc(100vw - 16px) !important;
-    max-width: calc(100vw - 26px) !important;
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 26px);
     margin: 16px 0;
     position: relative;
     border: 1px solid white;
+    margin-left: 12px !important;
+
     &::before {
-        content: "";
+        content: '';
         position: absolute;
         display: block;
         width: 0px;
@@ -255,6 +246,14 @@ input[type="number"] {
     &::before {
         right: 12px;
         left: unset;
+    }
+}
+
+.reactour__arrow__new {
+    &::before {
+        transform: rotate(149deg) translate(749%, -1081%);
+        right: unset;
+        left: 12px;
     }
 }
 

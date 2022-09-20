@@ -9,6 +9,11 @@ const InsuranceHistory = dynamic(() => import('components/screens/InsuranceHisto
     ssr: false,
     loading: () => <InsuranceContractLoading />,
 })
+
+const AcceptBuyInsurance = dynamic(() => import('components/screens/Insurance/AcceptBuyInsurance'), {
+    ssr: false,
+    loading: () => <InsuranceContractLoading />,
+})
 const Insurance = ({ slug }: any) => {
     const { t } = useTranslation()
 
@@ -24,11 +29,23 @@ const Insurance = ({ slug }: any) => {
                     <InsuranceHistory />
                 </LayoutWeb3>
             )
+        case 'info-covered':
+            return (
+                <LayoutWeb3 sponsor={false}>
+                    <Breadcrumbs>
+                        <div>{t('common:header:home')}</div>
+                        <div>{t('common:header:buy_covered')}</div>
+                    </Breadcrumbs>
+                    <AcceptBuyInsurance />
+                </LayoutWeb3>
+            )
     }
 }
 export const getServerSideProps = async ({ locale, query }: any) => {
     try {
         const isValid = Config.homeMenu.find((router: any) => router.menuId === query.slug)
+        console.log(query, 'thuc')
+
         if (isValid) {
             return {
                 props: {

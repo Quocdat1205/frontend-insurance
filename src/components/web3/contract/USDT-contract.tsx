@@ -1,20 +1,19 @@
 import { BigNumber, Contract, ethers, providers } from 'ethers'
-
 import { weiToEther } from 'components/web3/Web3Types'
-import { INSURANCE_ABI } from 'components/web3/constants/abi/INSURANCE_ABI'
+import { USDT_ABI } from 'components/web3/constants/abi/USDT_ABI'
 
-class ContractInterface {
+class USDT_Contract {
     provider: providers.Web3Provider
-
     contract: Contract
 
     constructor(provider: providers.Web3Provider, contractAddress: string, contractAbi?: any) {
         this.provider = provider
-        this.contract = new ethers.Contract(contractAddress, contractAbi || INSURANCE_ABI, provider.getSigner())
+        this.contract = new ethers.Contract(contractAddress, contractAbi || USDT_ABI, provider.getSigner())
     }
 
-    async getBalance(address: string): Promise<number> {
+    async balanceOf(address: string): Promise<number> {
         const value = await this.contract.balanceOf(address)
+        console.log(this.contract)
 
         return weiToEther(value)
     }
@@ -30,4 +29,4 @@ class ContractInterface {
     }
 }
 
-export default ContractInterface
+export default USDT_Contract
