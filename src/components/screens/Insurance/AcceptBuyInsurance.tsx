@@ -40,6 +40,7 @@ export type IState = {
     unit: string
     tab: string
     q_covered: number
+    p_market: number
 }
 
 const AcceptBuyInsurance = () => {
@@ -73,14 +74,15 @@ const AcceptBuyInsurance = () => {
         if (dataSate) {
             const res = JSON.parse(dataSate)
             setState({ ...res })
-            const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${res.symbol}${res.unit}`)
 
-            if (res.p_claim < data.data[0].p) {
-                setSaved(res.q_claim + res.q_covered * (res.q_claim - data.data[0].p) - res.margin + res.q_covered * Math.abs(res.q_claim - data.data[0].p))
+            if (res.p_claim < res.p_market) {
+                console.log(res, res.q_claim + res.q_covered * (res.q_claim - res.p_market) - res.margin + res.q_covered * Math.abs(res.q_claim - res.p_market))
+
+                setSaved(res.q_claim + res.q_covered * (res.q_claim - res.p_market) - res.margin + res.q_covered * Math.abs(res.q_claim - res.p_market))
             }
 
-            if (res.p_claim > data.data[0].p) {
-                setSaved(res.q_claim + res.q_covered * (res.q_claim - data.data[0].p) - res.margin)
+            if (res.p_claim > res.p_market) {
+                setSaved(res.q_claim + res.q_covered * (res.q_claim - res.p_market) - res.margin)
             }
         }
         setLoading(false)
@@ -102,6 +104,14 @@ const AcceptBuyInsurance = () => {
             console.log(err)
         }
     }
+    useEffect(() => {
+        setInterval(() => {
+            if (isUpdated) {
+                setUpdated(false)
+                setCanBuy(false)
+            }
+        }, 10000)
+    })
 
     const createContract = async () => {
         if (!wallet.account) {
@@ -121,8 +131,11 @@ const AcceptBuyInsurance = () => {
                 const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${state.symbol}${state.unit}`)
 
                 if (data.data.length > 0) {
-                    if (data.data[0].p != price) {
+                    const min = data.data[0].p - data.data[0].p * 0.05
+                    const max = data.data[0].p + data.data[0].p * 0.05
+                    if (price > max || price < min) {
                         setUpdated(false)
+                        Config.toast.show('error', t('insurance:buy:price_had_update'))
                         return setCanBuy(false)
                     }
                 }
@@ -196,6 +209,8 @@ const AcceptBuyInsurance = () => {
             }
         } catch (err) {
             console.log(err)
+            setNoti('')
+            setActive(false)
         }
     }
 
@@ -236,11 +251,23 @@ const AcceptBuyInsurance = () => {
                     portalId="modal"
                     isVisible={active}
                     onBackdropCb={() => {
-                        setActive(false)
+                        if (Noti == 'email') {
+                            setActive(false)
+                        }
+                        if (Noti != 'email') {
+                            setNoti('email')
+                        }
                     }}
-                    className="rounded-xl p-6 bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                    className="rounded-xl p-6 bg-white max-w-[424px] absolute left-1/2 top-1/2 "
                 >
-                    <NotificationInsurance id={res ? res : ''} name={`${Noti}`} state={state} active={active} setActive={() => {}} isMobile={false} />
+                    <NotificationInsurance
+                        id={res ? res : ''}
+                        name={`${Noti}`}
+                        state={state}
+                        active={active}
+                        setActive={() => setActive(false)}
+                        isMobile={false}
+                    />
                 </Modal>
                 {
                     // head Insurance
@@ -280,7 +307,7 @@ const AcceptBuyInsurance = () => {
                             <span className={'font-semibold text-[#22313F] px-[4px]'}>
                                 {`${t('insurance:buy:saved')} `}
                                 <span className={'text-[#EB2B3E]'}>
-                                    {saved} {state && state.unit}
+                                    {saved.toFixed(4)} {state && state.unit}
                                 </span>{' '}
                                 {t('insurance:buy:sub_saved')}
                             </span>
@@ -482,7 +509,7 @@ const AcceptBuyInsurance = () => {
                     onBackdropCb={() => {
                         setActive(false)
                     }}
-                    className="rounded-xl p-6 bg-white max-w-[424px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                    className="rounded-xl p-6 bg-white  absolute left-1/2 top-1/2 -translate-x-1/2 !translate-y-1"
                 >
                     <NotificationInsurance id={res ? res : ''} name={`${Noti}`} state={state} active={active} setActive={() => {}} isMobile={false} />
                 </Modal>
@@ -505,7 +532,7 @@ const AcceptBuyInsurance = () => {
                                 <span className={'text-sm text-[#22313F]'}>
                                     {`${t('insurance:buy:saved')} `}
                                     <span className={'text-[#EB2B3E] px-[4px]'}>
-                                        {saved} {state?.unit}
+                                        {saved.toFixed(4)} {state?.unit}
                                     </span>{' '}
                                     {t('insurance:buy:sub_saved')}
                                 </span>

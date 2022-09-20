@@ -222,6 +222,8 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             latitudeLabel.label.verticalCenter = 'bottom'
             latitudeLabel.label.fill = am4core.color('#B2B7BC')
 
+            console.log(p_expired)
+
             if (p_expired) {
                 //chart Expired
                 let latitudeExpired = chart.series.push(new am4charts.LineSeries())
@@ -249,8 +251,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 let expiredLabel = latitudeExpired.bullets.push(new am4charts.LabelBullet())
                 expiredLabel.label.text = `P-Expired: $${latitudeExpired.data[0].value}`
                 expiredLabel.label.horizontalCenter = 'middle'
-                expiredLabel.label.dx = 50
-                expiredLabel.label.dy = 30
+                expiredLabel.label.dy = latitudeExpired.data[0].value > state.p_market ? 23 : -23
                 expiredLabel.label.verticalCenter = 'bottom'
                 expiredLabel.label.fill = am4core.color('#B2B7BC')
             }
@@ -285,6 +286,9 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 claimLabel.label.fill = am4core.color('#EB2B3E')
                 claimLabel.label.html = ''
                 claimLabel.label.draggable = false
+                if (isMobile) {
+                    claimLabel.label.dx = -58
+                }
 
                 if (p_claim > 0) {
                     if (isMobile) {
@@ -365,7 +369,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
         }
     }
 
-    return <div id="chartdiv" className="relative" style={{ width: '100%', height: '500px' }}></div>
+    return <div id="chartdiv" className="relative" style={{ width: '100%', height: '300px' }}></div>
 }
 
 export default ChartComponent

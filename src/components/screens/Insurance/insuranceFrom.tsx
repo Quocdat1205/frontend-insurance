@@ -66,6 +66,8 @@ const InsuranceFrom = () => {
     const [chosing, setChosing] = useState(false)
     const [showGuideModal, setShowGuideModal] = useState<boolean>(false)
     const [thisFisrt, setThisFisrt] = useState(true)
+    const [saved, setSaved] = useState<number>(0)
+    const [minQ_covered, setMinQ_covered] = useState(0)
     const [showChangeUnit, setShowChangeUnit] = useState({
         isShow: false,
         name: '',
@@ -129,19 +131,18 @@ const InsuranceFrom = () => {
     const P_stop = (p_market: number, p_claim: number, hedge: number) => {
         const diffStopfutures = 0 / 100
         const ratio_min_profit = Math.abs(p_claim - p_market) / p_market / 2
+
         if (p_claim > p_market) {
-            const p_stop = Number(formatNumber((p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100, 2))
-            return Math.abs(p_stop) / 100
+            const p_stop = ((p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2)
+
+            return Math.abs(Number(p_stop)) / 100
         } else {
-            const p_stop = Number(formatNumber((p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100, 2))
-            return Math.abs(p_stop) / 100
+            const p_stop = ((p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2)
+            return Math.abs(Number(p_stop)) / 100
         }
     }
 
     const validatePclaim = (value: number) => {
-        // console.log('duong', (state.p_market * 1 + (2 * state.p_market) / 100).toFixed(3), (state.p_market * 1 + (70 * state.p_market) / 100).toFixed(3))
-        // console.log('am', (state.p_market * 1 - (70 * state.p_market) / 100).toFixed(3), (state.p_market * 1 - (2 * state.p_market) / 100).toFixed(3))
-
         if (value > state.p_market * 1 + (2 * state.p_market) / 100 && value < state.p_market * 1 + (70 * state.p_market) / 100) {
             setErrorPCalim(true)
             return validateMargin(state.margin)
@@ -174,15 +175,16 @@ const InsuranceFrom = () => {
 
     const handleNext = () => {
         const query = {
-            r_claim: formatNumber(state.r_claim, 2),
-            q_claim: formatNumber(state.q_claim, 4),
-            margin: formatNumber(state.margin, 4),
-            period: state.period,
+            r_claim: Number(formatNumber(state.r_claim, 2)),
+            q_claim: Number(formatNumber(state.q_claim, 4)),
+            margin: Number(formatNumber(state.margin, 4)),
+            period: Number(state.period),
             symbol: selectCoin?.type,
             unit: unitMoney,
-            p_claim: state.p_claim,
+            p_claim: Number(state.p_claim),
             tab: menu[tab]?.name,
-            q_covered: state.q_covered,
+            q_covered: Number(state.q_covered),
+            p_market: Number(state.p_market),
         }
         localStorage.setItem('info_covered_state', JSON.stringify(query))
         return router.push('/buy-covered/info-covered')
@@ -462,6 +464,18 @@ const InsuranceFrom = () => {
         }
     }, [selectCoin])
 
+    const createSaved = async () => {
+        if (state.p_claim < state.p_market) {
+            setSaved(
+                state.q_claim + state.q_covered * (state.q_claim - state.p_market) - state.margin + state.q_covered * Math.abs(state.q_claim - state.p_market),
+            )
+        }
+
+        if (state.p_claim > state.p_market) {
+            setSaved(state.q_claim + state.q_covered * (state.q_claim - state.p_market) - state.margin)
+        }
+    }
+
     useEffect(() => {
         if (state.q_covered) {
             const percent: number = Math.floor((state.q_covered / userBalance) * 100)
@@ -469,35 +483,45 @@ const InsuranceFrom = () => {
         }
 
         if (tab == 3) {
-            if (state.q_covered && state.p_claim) {
+            if (state.q_covered || state.p_claim) {
                 const margin = Number((10 * state.q_covered * state.p_market) / 100)
                 const userCapital = margin
                 const systemCapital = userCapital
                 const hedge_capital = userCapital + systemCapital
                 const hedge = Number(margin / (state.q_covered * state.p_market))
-                const p_stop = P_stop(state.p_market, state.p_claim, hedge)
+                const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
                 const laverage = Leverage(state.p_market, p_stop)
                 const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
                 const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
                 setState({ ...state, q_claim: q_claim, r_claim: Number(q_claim / margin) * 100, p_expired: Math.floor(p_stop), margin: margin })
             }
+            createSaved()
         }
 
         if (tab == 6) {
-            if (state.q_covered && state.p_claim && state.margin) {
+            if (state.q_covered || state.p_claim || state.margin) {
                 const userCapital = state.margin
                 const systemCapital = userCapital
                 const hedge_capital = userCapital + systemCapital
                 const hedge = Number(state.margin / (state.q_covered * state.p_market))
-                const p_stop = P_stop(state.p_market, state.p_claim, hedge)
+                const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
                 const laverage = Leverage(state.p_market, p_stop)
                 const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
                 const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + state.margin
                 setState({ ...state, q_claim: q_claim, r_claim: Number(q_claim / state.margin) * 100, p_expired: Math.floor(p_stop) })
             }
+            createSaved()
         }
         validatePclaim(state.p_claim)
     }, [state.q_covered, state.margin, state.p_claim])
+
+    useEffect(() => {
+        if (percentInsurance) {
+            const defaultMargin = 15
+            const min = defaultMargin / (percentInsurance / 100)
+            setMinQ_covered(min)
+        }
+    }, [percentInsurance, state.margin, state.q_covered])
 
     useEffect(() => {
         if (state.p_claim > 0) {
@@ -700,13 +724,22 @@ const InsuranceFrom = () => {
                                                         placeholder={'0'}
                                                     />
                                                     <Popover className="relative outline-none bg-hover focus:ring-0 shadow-none flex items-center justify-center pr-4 h-11 sm:h-12">
-                                                        {state.q_covered > userBalance && (
+                                                        {(state.q_covered > userBalance || state.q_covered < Number(minQ_covered.toFixed(2))) && (
                                                             <div className="absolute right-0 max-h-8 flex top-[-50px] text-xs z-[100] w-max border border-1 border-red p-2 rounded-md">
                                                                 <div className="flex flex-row items-center justify-center">
                                                                     <div className="mr-[8px] items-center justify-center">
                                                                         <ErrorTriggersIcon />
                                                                     </div>
-                                                                    <div>{`Số dư khả dụng: ${userBalance}`}</div>
+                                                                    {state.q_covered > userBalance && (
+                                                                        <div>{`${
+                                                                            language == 'vi' ? 'Số dư khả dụng: ' : 'available balances: '
+                                                                        } ${userBalance}`}</div>
+                                                                    )}
+                                                                    {state.q_covered < Number(minQ_covered.toFixed(2)) && (
+                                                                        <div>{`${language == 'vi' ? 'Số dư tối thiểu: ' : 'Minimum balance: '} ${Number(
+                                                                            minQ_covered.toFixed(2),
+                                                                        )}`}</div>
+                                                                    )}
                                                                 </div>
                                                             </div>
                                                         )}
@@ -870,28 +903,28 @@ const InsuranceFrom = () => {
                                                     className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                     onClick={() => setState({ ...state, q_covered: (25 / 100) * userBalance })}
                                                 >
-                                                    <div className={`${percentInsurance >= 25 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
+                                                    <div className={`${percentInsurance == 25 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
                                                     <span className={percentInsurance === 25 ? 'text-red' : 'text-gray'}>25%</span>
                                                 </div>
                                                 <div
                                                     className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
                                                     onClick={() => setState({ ...state, q_covered: (50 / 100) * userBalance })}
                                                 >
-                                                    <div className={`${percentInsurance >= 50 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
+                                                    <div className={`${percentInsurance == 50 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
                                                     <span className={percentInsurance === 50 ? 'text-red' : 'text-gray'}>50%</span>
                                                 </div>
                                                 <div
                                                     className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
                                                     onClick={() => setState({ ...state, q_covered: (75 / 100) * userBalance })}
                                                 >
-                                                    <div className={`${percentInsurance >= 75 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
+                                                    <div className={`${percentInsurance == 75 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
                                                     <span className={percentInsurance === 75 ? 'text-red' : 'text-gray'}>75%</span>
                                                 </div>
                                                 <div
                                                     className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
                                                     onClick={() => setState({ ...state, q_covered: userBalance })}
                                                 >
-                                                    <div className={`${percentInsurance >= 100 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
+                                                    <div className={`${percentInsurance == 100 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
                                                     <span className={percentInsurance === 100 ? 'text-red' : 'text-gray'}>100%</span>
                                                 </div>
                                             </div>
@@ -907,7 +940,7 @@ const InsuranceFrom = () => {
                                                         })
                                                     }}
                                                 >
-                                                    <div className={`${state.percent_margin >= 2 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
+                                                    <div className={`${state.percent_margin == 2 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
                                                     <span className={state.percent_margin === 2 ? 'text-red' : 'text-gray'}>2%</span>
                                                 </div>
                                                 <div
@@ -920,7 +953,7 @@ const InsuranceFrom = () => {
                                                         })
                                                     }}
                                                 >
-                                                    <div className={`${5 <= state.percent_margin ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
+                                                    <div className={`${5 == state.percent_margin ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
                                                     <span className={state.percent_margin === 5 ? 'text-red' : 'text-gray'}>5%</span>
                                                 </div>
                                                 <div
@@ -933,7 +966,7 @@ const InsuranceFrom = () => {
                                                         })
                                                     }}
                                                 >
-                                                    <div className={`${7 <= state.percent_margin ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
+                                                    <div className={`${7 == state.percent_margin ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
                                                     <span className={state.percent_margin === 7 ? 'text-red' : 'text-gray'}>7%</span>
                                                 </div>
                                                 <div
@@ -946,7 +979,7 @@ const InsuranceFrom = () => {
                                                         })
                                                     }}
                                                 >
-                                                    <div className={`${state.percent_margin >= 10 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
+                                                    <div className={`${state.percent_margin == 10 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
                                                     <span className={state.percent_margin === 10 ? 'text-red' : 'text-gray'}>10%</span>
                                                 </div>
                                             </div>
@@ -961,14 +994,14 @@ const InsuranceFrom = () => {
                                                         data={dataChart}
                                                         state={state ? state : null}
                                                         p_claim={Number(state && state.p_claim)}
-                                                        p_expired={state.p_expired > 0 ? state.p_expired : undefined}
+                                                        p_expired={Number(state.p_expired)}
                                                         setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
                                                         setP_Market={(data: number) => setState({ ...state, p_market: data })}
                                                     ></ChartComponent>
                                                     <svg
                                                         className={`absolute right-0 z-10`}
                                                         width="3"
-                                                        height={500}
+                                                        height={300}
                                                         viewBox="0 0 2 500"
                                                         fill="none"
                                                         xmlns="http://www.w3.org/2000/svg"
@@ -1226,7 +1259,7 @@ const InsuranceFrom = () => {
 
                             {
                                 //description
-                                index == 1 && (
+                                index == 1 && state.q_covered > 0 && state.p_claim > 0 && (
                                     <div
                                         className={'flex justify-center items-center mt-[24px] max-w-screen-layout 4xl:max-w-screen-3xl m-auto'}
                                         onClick={() => {
@@ -1237,7 +1270,10 @@ const InsuranceFrom = () => {
                                         <CheckCircle></CheckCircle>
                                         <span className={'font-medium text-txtPrimary px-[4px]'}>
                                             {`${t('insurance:buy:saved')} `}
-                                            <span className={'text-red'}>1,000 {unitMoney}</span> {t('insurance:buy:sub_saved')}
+                                            <span className={'text-red'}>
+                                                {saved.toFixed(4)} {unitMoney}
+                                            </span>{' '}
+                                            {t('insurance:buy:sub_saved')}
                                         </span>
                                     </div>
                                 )
@@ -1406,7 +1442,7 @@ const InsuranceFrom = () => {
                                     <Modal
                                         portalId="modal"
                                         isVisible={true}
-                                        className=" bg-white absolute bottom-0 translate-y-0"
+                                        className=" bg-white absolute bottom-0 !translate-y-1"
                                         onBackdropCb={() => setOpenChangeToken(false)}
                                     >
                                         <div className="bg-white h-[50%] w-full flex flex-col z-50 text-sm">
@@ -1622,7 +1658,7 @@ const InsuranceFrom = () => {
                                                     data={dataChart}
                                                     state={state ? state : null}
                                                     p_claim={Number(state && state.p_claim)}
-                                                    p_expired={state.p_expired > 0 ? state.p_expired : undefined}
+                                                    p_expired={Number(state.p_expired)}
                                                     setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
                                                     setP_Market={(data: number) => setState({ ...state, p_market: data })}
                                                     isMobile={isMobile}
@@ -1631,7 +1667,7 @@ const InsuranceFrom = () => {
                                             <svg
                                                 className={`absolute right-0 z-10`}
                                                 width="3"
-                                                height={500}
+                                                height={300}
                                                 viewBox="0 0 2 500"
                                                 fill="none"
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -1789,15 +1825,20 @@ const InsuranceFrom = () => {
                                             setDrop(false)
                                             setChosing(false)
                                         }}
-                                        className={`${clear ? 'visible' : 'invisible'}`}
+                                        className={`${clear ? 'visible' : 'invisible'} items-center w-[300px] xs:w-full`}
                                     >
-                                        <div className={'flex justify-center items-center mt-[24px]'}>
-                                            <CheckCircle></CheckCircle>
-                                            <span className={'text-sm text-txtPrimary px-[4px] font-semibold'}>
-                                                {t('insurance:buy:saved')}
-                                                <span className={'text-red'}> 1,000 {unitMoney}</span> {t('insurance:buy:sub_saved')}
-                                            </span>
-                                        </div>
+                                        {state.q_covered > 0 && state.p_claim > 0 && (
+                                            <div className={'flex justify-center items-center mt-[24px] mx-[16px]'}>
+                                                <CheckCircle></CheckCircle>
+                                                <span className={'text-sm text-txtPrimary w-[230px] xs:w-full px-[4px] font-semibold'}>
+                                                    {t('insurance:buy:saved')}
+                                                    <span className={'text-red'}>
+                                                        {saved.toFixed(4)} {unitMoney}
+                                                    </span>
+                                                    {t('insurance:buy:sub_saved')}
+                                                </span>
+                                            </div>
+                                        )}
                                         <div className={'flex flex-col mt-[24px] hover:cursor-default'}>
                                             <div
                                                 className={`${
@@ -1865,11 +1906,11 @@ const InsuranceFrom = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className={`flex flex-col justify-center items-center mb-[32px]`}>
+                                        <div className={`flex flex-col justify-center items-center mb-[32px] mx-[16px]`}>
                                             <button
                                                 className={`${
                                                     clear ? 'bg-red text-white border border-red' : 'text-white bg-divider border border-divider'
-                                                }flex items-center justify-center rounded-lg px-auto py-auto font-semibold py-[12px] px-[148px]`}
+                                                }flex items-center justify-center rounded-lg px-auto py-auto font-semibold py-[12px] !px-[100px] xs:px-[148px]`}
                                                 onClick={() => {
                                                     if (clear) {
                                                         handleNext()
