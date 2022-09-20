@@ -16,7 +16,7 @@ import { screens } from 'utils/constants'
 import { Suspense } from 'react'
 import { RootStore, useAppSelector } from 'redux/store'
 import Config from 'config/config'
-import NotificationInsurance from 'components/layout/notifucationInsurance'
+// import NotificationInsurance from 'components/layout/notifucationInsurance'
 import Modal from 'components/common/Modal/Modal'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import { formatNumber } from 'utils/utils'
@@ -139,8 +139,8 @@ const InsuranceFrom = () => {
     }
 
     const validatePclaim = (value: number) => {
-        console.log('duong', (state.p_market * 1 + (2 * state.p_market) / 100).toFixed(3), (state.p_market * 1 + (70 * state.p_market) / 100).toFixed(3))
-        console.log('am', (state.p_market * 1 - (70 * state.p_market) / 100).toFixed(3), (state.p_market * 1 - (2 * state.p_market) / 100).toFixed(3))
+        // console.log('duong', (state.p_market * 1 + (2 * state.p_market) / 100).toFixed(3), (state.p_market * 1 + (70 * state.p_market) / 100).toFixed(3))
+        // console.log('am', (state.p_market * 1 - (70 * state.p_market) / 100).toFixed(3), (state.p_market * 1 - (2 * state.p_market) / 100).toFixed(3))
 
         if (value > state.p_market * 1 + (2 * state.p_market) / 100 && value < state.p_market * 1 + (70 * state.p_market) / 100) {
             setErrorPCalim(true)
@@ -472,12 +472,9 @@ const InsuranceFrom = () => {
             const percent: number = Math.floor((state.q_covered / userBalance) * 100)
             setPercentInsurance(percent)
         }
-        if (selectCoin) {
-            setState({ ...state, symbol: selectCoin })
-        }
 
         if (tab == 3) {
-            if (state.period || state.q_covered || state.p_claim) {
+            if (state.q_covered && state.p_claim) {
                 const margin = Number((10 * state.q_covered * state.p_market) / 100)
                 const userCapital = margin
                 const systemCapital = userCapital
@@ -492,7 +489,7 @@ const InsuranceFrom = () => {
         }
 
         if (tab == 6) {
-            if (state.period || state.q_covered || state.p_claim || state.margin) {
+            if (state.q_covered && state.p_claim && state.margin) {
                 const userCapital = state.margin
                 const systemCapital = userCapital
                 const hedge_capital = userCapital + systemCapital
@@ -505,7 +502,7 @@ const InsuranceFrom = () => {
             }
         }
         validatePclaim(state.p_claim)
-    }, [state.q_covered, state.period, selectCoin, state.margin, state.p_claim, state.percent_margin])
+    }, [state.q_covered, state.margin, state.p_claim])
 
     useEffect(() => {
         if (state.p_claim > 0) {
@@ -538,7 +535,7 @@ const InsuranceFrom = () => {
                                 setChangeUnit1(false)
                             }}
                         >
-                            {active && (
+                            {/* {active && (
                                 <Modal
                                     portalId="modal"
                                     isVisible={!isMobile}
@@ -557,7 +554,7 @@ const InsuranceFrom = () => {
                                         isMobile={false}
                                     />
                                 </Modal>
-                            )}
+                            )} */}
 
                             {
                                 // head Insurance
@@ -873,7 +870,7 @@ const InsuranceFrom = () => {
                                                                                 return (
                                                                                     <div
                                                                                         key={key}
-                                                                                        className={`py-2 text-sm px-4 hover:bg-hover`}
+                                                                                        className={`py-2 text-sm px-4 hover:bg-hover font-normal`}
                                                                                         onClick={() => {
                                                                                             setUnitMoney(e)
                                                                                             setChangeUnit2(false)
@@ -1179,7 +1176,7 @@ const InsuranceFrom = () => {
                                                                     return (
                                                                         <div
                                                                             key={key}
-                                                                            className={` py-[8px] px-[16px] hover:bg-hover`}
+                                                                            className={` py-[8px] px-[16px] hover:bg-hover font-normal`}
                                                                             onClick={() => {
                                                                                 setUnitMoney(e)
                                                                                 setChangeUnit(false)
@@ -1230,7 +1227,7 @@ const InsuranceFrom = () => {
                                                                     return (
                                                                         <div
                                                                             key={key}
-                                                                            className={` py-[8px] px-[16px] hover:bg-hover`}
+                                                                            className={` py-[8px] px-[16px] hover:bg-hover font-normal`}
                                                                             onClick={() => {
                                                                                 setUnitMoney(e)
                                                                                 setChangeUnit1(false)
@@ -1423,7 +1420,7 @@ const InsuranceFrom = () => {
                                                         return (
                                                             <div
                                                                 key={key}
-                                                                className="w-full flex flex-row justify-between items-center hover:bg-gray-1 hover:pl-[8px]"
+                                                                className="w-full flex flex-row justify-between items-center hover:bg-gray-1 hover:pl-[8px] font-normal"
                                                                 onClick={() => {
                                                                     setUnitMoney(item)
                                                                     setShowChangeUnit({ ...showChangeUnit, isShow: false, name: '' })
@@ -1504,7 +1501,7 @@ const InsuranceFrom = () => {
                                         </div>
                                     </Modal>
                                 )}
-                                {active && (
+                                {/* {active && (
                                     <Modal
                                         portalId="modal"
                                         isVisible={true}
@@ -1523,7 +1520,7 @@ const InsuranceFrom = () => {
                                             isMobile={false}
                                         />
                                     </Modal>
-                                )}
+                                )} */}
                                 {index == 1 && (
                                     //sticky
                                     <div className={`h-[32px] flex flex-row justify-between items-center mx-[16px] mt-[24px] mb-[16px]  top-0 bg-white z-50`}>
