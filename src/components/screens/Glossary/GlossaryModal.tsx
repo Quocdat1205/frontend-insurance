@@ -109,7 +109,7 @@ const GlossaryModal = ({ visible, onClose }: GlossaryModal) => {
 }
 
 const Tabs = styled.div.attrs({
-    className: 'mt-6 text-sm sm:text-base flex items-center justify-between h-11 relative',
+    className: 'mt-6 text-sm sm:text-base flex items-center justify-between h-11 relative after:-bottom-[1px] sm:after:-bottom-[3px]',
 })<any>`
     &:after {
         content: '';
@@ -119,7 +119,6 @@ const Tabs = styled.div.attrs({
         transform: ${({ tab }) => `translate(${tab * 100}%,0)`};
         width: calc(100% / 2);
         transition: all 0.2s;
-        bottom: -1px;
     }
 `
 

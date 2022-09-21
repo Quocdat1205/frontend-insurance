@@ -157,7 +157,7 @@ const Assets = () => {
                                         </span>
                                     </div>
                                 </div>
-                                <div className="w-full">
+                                <div className="w-full max-h-[100px]">
                                     <LineChart symbol={asset?.symbol + 'USDT'} negative={negative} />
                                     {/* <img src={sparkLine} alt="Nami Exchange" className="w-full" /> */}
                                 </div>

@@ -19,7 +19,7 @@
     },
     "header": {
         "home": "Home",
-        "buy_covered": "Buy Cover",
+        "buy_covered": "Buy Insurance",
         "insurance_history": "Insurance History"
     },
     "days": "Days",
@@ -60,5 +60,5 @@
         }
     },
     "next": "Next",
-    "slogan": "High payback low risk nbe"
+    "slogan": "Change risk to payback"
 }
