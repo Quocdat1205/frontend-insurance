@@ -13,7 +13,7 @@ interface LineChart {
 
 const LineChart = ({ symbol, negative }: LineChart) => {
     const chart = useRef<any>(null)
-    const [dataSource, setDataSource] = useState<{ time: []; price: [] }>({
+    const [dataSource, setDataSource] = useState<{ time: any[]; price: any[] }>({
         time: [],
         price: [],
     })
