@@ -16,12 +16,12 @@ const SloganLanding = () => {
                         <Button className="w-full sm:w-max h-12 sm:text-base sm:h-full whitespace-nowrap !rounded-xl px-6 py-4 leading-6">
                             {t('home:landing:buy_covered')}
                         </Button>
-                        <Button
+                        {/* <Button
                             variants="outlined"
                             className="w-full sm:w-max h-12 sm:text-base sm:h-full px-6 py-[0.875rem] leading-6 whitespace-nowrap !rounded-xl"
                         >
                             {t('home:landing:buy_nain')}
-                        </Button>
+                        </Button> */}
                     </div>
                 </div>
                 <div className="max-w-[848px] 3xl:max-w-[75rem] w-full flex justify-end">
