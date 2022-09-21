@@ -248,6 +248,7 @@ module.exports = {
                 banner: '0px -4px 10px rgba(235, 43, 62, 0.1)',
                 card: '0px 6px 18px rgba(9, 30, 66, 0.05)',
                 subMenu: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)',
+                dropdown: '0px 3px 5px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.31)'
             },
             cursor: {
                 grabbing: 'grabbing',

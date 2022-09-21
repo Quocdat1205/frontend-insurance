@@ -3,6 +3,7 @@ import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themes_animated from '@amcharts/amcharts4/themes/animated'
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
+import { throttle, debounce } from 'lodash'
 
 export type iProps = {
     p_expired?: any
@@ -107,16 +108,24 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
         if (data && data.length > 0) setDataChart(data)
     }, [data])
 
+    const timer = useRef<any>(null)
     useEffect(() => {
-        InitChart(dataChart)
-
-        setP_Market(chart.data[chart.data.length - 1]?.value)
-        setPClaim(PClaim)
+        clearTimeout(timer.current)
+        timer.current = setTimeout(() => {
+            InitChart(dataChart)
+        }, 500)
+        if (chart) {
+            setP_Market(chart.data[chart.data.length - 1]?.value)
+            setPClaim(PClaim)
+        }
+        return () => {
+            if (chart) chart.dispose()
+        }
     }, [dataChart, p_claim, p_expired, state.period])
 
-    useEffect(() => {
-        InitChart(dataChart)
-    }, [data])
+    // useEffect(() => {
+    //     InitChart(dataChart)
+    // }, [data])
 
     const InitChart = async (test_data: Idata[]) => {
         am4core.unuseTheme(am4themes_animated)
@@ -221,9 +230,6 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             latitudeLabel.label.dy = -5
             latitudeLabel.label.verticalCenter = 'bottom'
             latitudeLabel.label.fill = am4core.color('#B2B7BC')
-
-            console.log(p_expired)
-
             if (p_expired) {
                 //chart Expired
                 let latitudeExpired = chart.series.push(new am4charts.LineSeries())
