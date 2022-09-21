@@ -280,7 +280,7 @@ const InsuranceFrom = () => {
     ) => {
         const timeEnd = new Date()
         const timeBegin = new Date()
-        setLoadings(true)
+        // setLoadings(true)
         if (selectCoin) {
             if (selectTime == '1H' || selectTime == '1D') {
                 timeBegin.setDate(timeEnd.getDate() - 10)
@@ -840,6 +840,7 @@ const InsuranceFrom = () => {
                                                         value={state.q_covered}
                                                         onChange={(e: any) => onHandleChange('q_covered', e)}
                                                         customSuffix={renderPopoverQCover}
+                                                        decimal={8}
                                                     />
                                                 </div>
 
@@ -853,6 +854,7 @@ const InsuranceFrom = () => {
                                                             value={state.margin}
                                                             onChange={(e: any) => onHandleChange('margin', e)}
                                                             customSuffix={renderPopoverMargin}
+                                                            decimal={8}
                                                         />
                                                     </div>
                                                 )}
@@ -1017,6 +1019,7 @@ const InsuranceFrom = () => {
                                                     customSuffix={() => unitMoney}
                                                     suffixClassName="text-txtSecondary"
                                                     placeholder={`${menu[9].name}`}
+                                                    decimal={8}
                                                 />
                                                 {/* {!errorPCalim && state.p_claim != 0 && (
                                                     <span className="flex flex-row text-[#E5544B] mt-[8px]">
