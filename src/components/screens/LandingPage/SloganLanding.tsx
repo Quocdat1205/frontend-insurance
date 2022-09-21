@@ -7,10 +7,10 @@ const SloganLanding = () => {
     return (
         <section className="px-4 lg:px-20">
             <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto slider-landing flex flex-col space-y-6 sm:space-y-0 sm:flex-row items-center justify-between mt-[4.25rem] sm:mt-9 h-[calc(100vh-300px)] sm:h-auto">
-                <div className="flex flex-col space-y-6 sm:space-y-9 w-max">
-                    <div className="flex flex-col text-[2rem] text-center sm:text-left lg:text-[3rem] font-bold sm:font-semibold whitespace-nowrap leading-[2.625rem] sm:leading-[3.875rem] 3xl:text-[3.375rem] 3xl:leading-[5rem]">
-                        <span>Đây là slogan </span>
-                        <span className="text-gradient">của Nami Insurance</span>
+                <div className="flex flex-col space-y-6 sm:space-y-9 w-full">
+                    <div className="flex flex-col space-y-2 text-center sm:text-left font-semibold">
+                        <span className="text-gradient text-4xl sm:text-[3.5rem] sm:leading-[4.25rem]">Nami Insurance</span>
+                        <span className="text-4xl sm:text-[3rem] sm:leading-[4rem]">{t('common:slogan')}</span>
                     </div>
                     <div className="flex items-center justify-between sm:justify-start space-x-4 text-sm font-semibold">
                         <Button className="w-full sm:w-max h-12 sm:text-base sm:h-full whitespace-nowrap !rounded-xl px-6 py-4 leading-6">
@@ -25,7 +25,7 @@ const SloganLanding = () => {
                     </div>
                 </div>
                 <div className="max-w-[848px] 3xl:max-w-[75rem] w-full flex justify-end">
-                    <img src="/images/screens/landing-page/ic_slider.gif" className="sm:h-[calc(100vh-450px)]" />
+                    <img src="/images/screens/landing-page/ic_slider.gif" className="lg:h-[calc(100vh-450px)]" />
                 </div>
             </div>
         </section>
