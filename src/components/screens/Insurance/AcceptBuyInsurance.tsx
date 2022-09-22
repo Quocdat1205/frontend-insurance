@@ -75,8 +75,6 @@ const AcceptBuyInsurance = () => {
             setState({ ...res })
 
             if (res.p_claim < res.p_market) {
-                console.log(res, res.q_claim + res.q_covered * (res.q_claim - res.p_market) - res.margin + res.q_covered * Math.abs(res.q_claim - res.p_market))
-
                 setSaved(res.q_claim + res.q_covered * (res.q_claim - res.p_market) - res.margin + res.q_covered * Math.abs(res.q_claim - res.p_market))
             }
 
