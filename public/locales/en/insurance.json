@@ -67,7 +67,7 @@
         "margin": "Margin of insurance contract"
     },
     "error": {
-        "p_claim": "Error messenge"
+        "p_claim": "Giá trị không hợp lệ"
     },
     "unit": {
         "margin": "Unit asset Margin",

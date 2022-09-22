@@ -239,7 +239,7 @@ const InsuranceFrom = () => {
                     disable: res.disable,
                 },
             })
-            if (res.symbol) {
+            if (res.symbol != '') {
                 setSelectedCoin({
                     icon: res.icon,
                     id: res.id,
@@ -250,7 +250,6 @@ const InsuranceFrom = () => {
                 })
                 setState({
                     ...state,
-
                     symbol: {
                         icon: res.icon,
                         id: res.id,
@@ -258,6 +257,26 @@ const InsuranceFrom = () => {
                         symbol: res.symbol,
                         type: res.type,
                         disable: res.disable,
+                    },
+                })
+            } else {
+                setSelectedCoin({
+                    icon: listCoin[0].icon,
+                    id: listCoin[0].id,
+                    name: listCoin[0].name,
+                    symbol: listCoin[0].symbol,
+                    type: listCoin[0].type,
+                    disable: listCoin[0].disable,
+                })
+                setState({
+                    ...state,
+                    symbol: {
+                        icon: listCoin[0].icon,
+                        id: listCoin[0].id,
+                        name: listCoin[0].name,
+                        symbol: listCoin[0].symbol,
+                        type: listCoin[0].type,
+                        disable: listCoin[0].disable,
                     },
                 })
             }
@@ -334,14 +353,6 @@ const InsuranceFrom = () => {
             await list.push(tmp)
         })
         if (list.length > 0) {
-            setSelectedCoin({
-                icon: list[0].icon,
-                id: list[0].id,
-                name: list[0].name,
-                symbol: list[0].symbol,
-                type: list[0].type,
-                disable: list[0].disable,
-            })
             return setListCoin(list)
         }
     }, [assetsToken])
@@ -438,7 +449,6 @@ const InsuranceFrom = () => {
             const timeBegin = new Date()
             timeBegin.setDate(timeEnd.getDate() - 10)
             setState({ ...state, t_market: timeEnd })
-            getPrice(listCoin[0].symbol, state, setState)
         }
     }, [listCoin])
 
@@ -465,60 +475,55 @@ const InsuranceFrom = () => {
     }, [selectCoin])
 
     const createSaved = async () => {
+        const x = state.q_claim + state.q_covered * (state.p_claim - state.p_market)
+
         if (state.p_claim < state.p_market) {
-            setSaved(
-                state.q_claim + state.q_covered * (state.q_claim - state.p_market) - state.margin + state.q_covered * Math.abs(state.q_claim - state.p_market),
-            )
+            setSaved(x - state.margin + state.q_covered * Math.abs(state.q_claim - state.p_market))
         }
 
         if (state.p_claim > state.p_market) {
-            setSaved(state.q_claim + state.q_covered * (state.q_claim - state.p_market) - state.margin)
+            setSaved(x - state.margin)
         }
     }
 
     useEffect(() => {
-        if (state.q_covered) {
+        if (state.q_covered > 0) {
             const percent: number = Math.floor((state.q_covered / userBalance) * 100)
             setPercentInsurance(percent)
         }
 
-        if (tab == 3) {
-            if (state.q_covered || state.p_claim) {
-                const margin = Number((10 * state.q_covered * state.p_market) / 100)
-                const userCapital = margin
-                const systemCapital = userCapital
-                const hedge_capital = userCapital + systemCapital
-                const hedge = Number(margin / (state.q_covered * state.p_market))
-                const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
-                const laverage = Leverage(state.p_market, p_stop)
-                const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-                const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
-                setState({ ...state, q_claim: q_claim, r_claim: Number(q_claim / margin) * 100, p_expired: Math.floor(p_stop), margin: margin })
-            }
-            createSaved()
+        if (state.q_covered && state.p_claim) {
+            const margin = Number((10 * state.q_covered * state.p_market) / 100)
+            const userCapital = margin
+            const systemCapital = userCapital
+            const hedge_capital = userCapital + systemCapital
+            const hedge = Number(margin / (state.q_covered * state.p_market))
+            const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
+            const laverage = Leverage(state.p_market, p_stop)
+            const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
+            const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
+            setState({ ...state, q_claim: q_claim, r_claim: Number(q_claim / margin) * 100, p_expired: Math.floor(p_stop), margin: margin })
         }
 
-        if (tab == 6) {
-            if (state.q_covered || state.p_claim || state.margin) {
-                const userCapital = state.margin
-                const systemCapital = userCapital
-                const hedge_capital = userCapital + systemCapital
-                const hedge = Number(state.margin / (state.q_covered * state.p_market))
-                const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
-                const laverage = Leverage(state.p_market, p_stop)
-                const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-                const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + state.margin
-                setState({ ...state, q_claim: q_claim, r_claim: Number(q_claim / state.margin) * 100, p_expired: Math.floor(p_stop) })
-            }
-            createSaved()
+        if (state.q_covered && state.p_claim && state.margin) {
+            const userCapital = state.margin
+            const systemCapital = userCapital
+            const hedge_capital = userCapital + systemCapital
+            const hedge = Number(state.margin / (state.q_covered * state.p_market))
+            const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
+            const laverage = Leverage(state.p_market, p_stop)
+            const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
+            const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + state.margin
+            setState({ ...state, q_claim: q_claim, r_claim: Number(q_claim / state.margin) * 100, p_expired: Math.floor(p_stop) })
         }
+        createSaved()
         validatePclaim(state.p_claim)
     }, [state.q_covered, state.margin, state.p_claim])
 
     useEffect(() => {
         if (percentInsurance) {
-            const defaultMargin = 15
-            const min = defaultMargin / (percentInsurance / 100)
+            const defaultMargin = 8
+            const min = (defaultMargin * 100) / (10 * state.p_market)
             setMinQ_covered(min)
         }
     }, [percentInsurance, state.margin, state.q_covered])
@@ -551,8 +556,18 @@ const InsuranceFrom = () => {
             </div>`
                 break
             case 'p_claim':
+                const min = state.p_claim > state.p_market ? state.p_market * 1 + 2 * state.p_market : state.p_market * 1 + (70 * state.p_market) / 100
+                const max = state.p_claim > state.p_market ? state.p_market * 1 - (70 * state.p_market) / 100 : state.p_market * 1 - (2 * state.p_market) / 100
                 rs.isValid = errorPCalim || state.p_claim <= 0
-                rs.message = t('insurance:error:p_claim')
+                rs.message = `<div class="flex items-center">
+                ${t('insurance:error:p_claim')}: ${min.toFixed(2)} < P Claim < ${max.toFixed(2)}
+                </div>`
+                break
+            case 'margin':
+                rs.isValid = state.margin < (2 / 100) * state.q_covered * state.p_market || state.margin > (10 / 100) * state.q_covered * state.p_market
+                rs.message = `<div class="flex items-center">
+                ${t('insurance:error:p_claim')}: ${(state.q_covered * 2) / 100} < P Claim < ${(state.q_covered * 10) / 100}
+                </div>`
                 break
             default:
                 break
@@ -665,7 +680,7 @@ const InsuranceFrom = () => {
             case 'q_covered':
             case 'p_claim':
                 setState({ ...state, [key]: value })
-                setPercentInsurance(0)
+                setPercentInsurance(8)
                 break
             case 'margin':
                 setState({ ...state, margin: value, percent_margin: 0 })
@@ -851,7 +866,8 @@ const InsuranceFrom = () => {
                                                         } ml-[12px] flex justify-between border-collapse rounded-[3px] shadow-none w-full`}
                                                     >
                                                         <InputNumber
-                                                            value={state.margin}
+                                                            validator={validator('margin')}
+                                                            value={state.q_covered > 0 ? state.margin : 0}
                                                             onChange={(e: any) => onHandleChange('margin', e)}
                                                             customSuffix={renderPopoverMargin}
                                                             decimal={8}
@@ -896,11 +912,13 @@ const InsuranceFrom = () => {
                                                 <div
                                                     className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
                                                     onClick={() => {
-                                                        setState({
-                                                            ...state,
-                                                            percent_margin: 2,
-                                                            margin: Number((2 * state.q_covered * state.p_market) / 100),
-                                                        })
+                                                        if (state.q_covered > 0) {
+                                                            setState({
+                                                                ...state,
+                                                                percent_margin: 2,
+                                                                margin: Number((2 * state.q_covered) / 100),
+                                                            })
+                                                        }
                                                     }}
                                                 >
                                                     <div className={`${state.percent_margin == 2 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
@@ -909,11 +927,13 @@ const InsuranceFrom = () => {
                                                 <div
                                                     className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
                                                     onClick={() => {
-                                                        setState({
-                                                            ...state,
-                                                            percent_margin: 5,
-                                                            margin: Number((5 * state.q_covered * state.p_market) / 100),
-                                                        })
+                                                        if (state.q_covered > 0) {
+                                                            setState({
+                                                                ...state,
+                                                                percent_margin: 5,
+                                                                margin: Number((5 * state.q_covered) / 100),
+                                                            })
+                                                        }
                                                     }}
                                                 >
                                                     <div className={`${5 == state.percent_margin ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
@@ -922,11 +942,13 @@ const InsuranceFrom = () => {
                                                 <div
                                                     className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
                                                     onClick={() => {
-                                                        setState({
-                                                            ...state,
-                                                            percent_margin: 7,
-                                                            margin: Number((7 * state.q_covered * state.p_market) / 100),
-                                                        })
+                                                        if (state.q_covered > 0) {
+                                                            setState({
+                                                                ...state,
+                                                                percent_margin: 7,
+                                                                margin: Number((7 * state.q_covered) / 100),
+                                                            })
+                                                        }
                                                     }}
                                                 >
                                                     <div className={`${7 == state.percent_margin ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
@@ -935,11 +957,13 @@ const InsuranceFrom = () => {
                                                 <div
                                                     className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
                                                     onClick={() => {
-                                                        setState({
-                                                            ...state,
-                                                            percent_margin: 10,
-                                                            margin: Number((10 * state.q_covered * state.p_market) / 100),
-                                                        })
+                                                        if (state.q_covered > 0) {
+                                                            setState({
+                                                                ...state,
+                                                                percent_margin: 10,
+                                                                margin: Number((10 * state.q_covered) / 100),
+                                                            })
+                                                        }
                                                     }}
                                                 >
                                                     <div className={`${state.percent_margin == 10 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
