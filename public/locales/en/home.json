@@ -30,7 +30,30 @@
         "products_sponsored_by": "Products sponsored by",
         "register_successfully": "Register successfully",
         "register_content": "The lasted information will be sent to you. Please check email regularly",
-        "email_invalid": "Confirmation email invalid. Please try again."
+        "email_invalid": "Confirmation email invalid. Please try again.",
+
+        "faq_type_asset_q": "Các tài sản được Nami Insurance bảo chứng hiện tại bao gồm những loại nào? ",
+        "faq_type_asset_a": "Tính đến hiện hiện, bao gồm: Bitcoin (BTC); Binance coin (BNB); Ethereum (ETH)",
+        "faq_type_asset_link": "Hướng dẫn Ký quỹ bảo hiểm",
+
+        "faq_title": "Những câu hỏi thường gặp",
+        "faq_type_asset_q": "Các tài sản được Nami Insurance bảo chứng hiện tại bao gồm những loại nào?",
+        "faq_type_asset_a": "Tính đến hiện hiện, bao gồm: Bitcoin (BTC); Binance coin (BNB); Ethereum (ETH) \nXem thêm: ",
+        "faq_type_asset_link": "Hướng dẫn Ký quỹ bảo hiểm",
+
+        "faq_claim_q": "Tôi có thể Ký quỹ và Nhận chi trả bằng những Coin/Token nào?",
+        "faq_claim_a": "Đơn vị Ký quỹ: USDT \n Đơn vị Nhận chi trả: USDT và Tài sản được bảo hiểm",
+
+        "faq_period_q": "Tôi có thể ký quỹ hợp đồng bảo hiểm với kỳ hạn tối thiểu bao nhiêu ngày?",
+        "faq_period_a": "Tối thiểu là 2 ngày và tối đa là 15 ngày \nThời hạn hợp đồng bảo hiểm ảnh hưởng đến chi trả bảo hiểm (Q-Claim) ",
+
+        "faq_claim_when_q": "Tôi được nhận chi trả bảo hiểm ngay khi chạm giá không?",
+        "faq_claim_when_a": "Khi chạm mức giá bảo hiểm (P-Claim), trạng thái HĐBH chuyển sang \"Đợi chi trả\". Hệ thống chuyển On-chain tự động khoản nhận chi trả (Q-Claim) đến ví người dùng vào ngày kết thúc hợp đồng\nXem thêm: ",
+        "faq_claim_when_link": "Hệ thống thuật ngữ Nami Insurance",
+
+        "faq_claim_how_q": "Tôi có thể ký quỹ 2 HĐBH cùng loại tài sản tại 1 thời điểm không?",
+        "faq_claim_how_a": "Được, người dùng nhận được 2 HĐBH độc lập và có thể kiểm tra trên Explorer\nXem thêm:",
+        "faq_claim_how_link": "Hướng dẫn kiểm trả HĐBH của bạn"
     },
     "home": {
         "connect_wallet": "Connect Wallet",
