@@ -222,6 +222,16 @@ const InsuranceFrom = () => {
         setThisFisrt(false)
     }
 
+    const updateFormPercentMargin = (value: number) => {
+        if (state.q_covered > 0) {
+            setState({
+                ...state,
+                percent_margin: value,
+                margin: Number((value * state.q_covered) / 100),
+            })
+        }
+    }
+
     const getStorage = async () => {
         setLoadings(true)
 
@@ -878,97 +888,37 @@ const InsuranceFrom = () => {
                                         </div>
                                         <div className="flex flex-row w-full space-x-6 text-xs font-semibold">
                                             <div className={`flex flex-row justify-between space-x-4 ${tab == 6 ? 'w-1/2' : 'w-full'}`}>
-                                                <div
-                                                    className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
-                                                    onClick={() => setState({ ...state, q_covered: (25 / 100) * userBalance })}
-                                                >
-                                                    <div className={`${percentInsurance == 25 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span className={percentInsurance === 25 ? 'text-red' : 'text-gray'}>25%</span>
-                                                </div>
-                                                <div
-                                                    className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
-                                                    onClick={() => setState({ ...state, q_covered: (50 / 100) * userBalance })}
-                                                >
-                                                    <div className={`${percentInsurance == 50 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span className={percentInsurance === 50 ? 'text-red' : 'text-gray'}>50%</span>
-                                                </div>
-                                                <div
-                                                    className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
-                                                    onClick={() => setState({ ...state, q_covered: (75 / 100) * userBalance })}
-                                                >
-                                                    <div className={`${percentInsurance == 75 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span className={percentInsurance === 75 ? 'text-red' : 'text-gray'}>75%</span>
-                                                </div>
-                                                <div
-                                                    className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
-                                                    onClick={() => setState({ ...state, q_covered: userBalance })}
-                                                >
-                                                    <div className={`${percentInsurance == 100 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span className={percentInsurance === 100 ? 'text-red' : 'text-gray'}>100%</span>
-                                                </div>
+                                                {[25, 50, 75, 100].map((item, key) => {
+                                                    return (
+                                                        <div
+                                                            key={key}
+                                                            className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
+                                                            onClick={() => setState({ ...state, q_covered: (item / 100) * userBalance })}
+                                                        >
+                                                            <div className={`${percentInsurance == item ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
+                                                            <span className={percentInsurance === item ? 'text-red' : 'text-gray'}>{item}%</span>
+                                                        </div>
+                                                    )
+                                                })}
                                             </div>
 
                                             <div className={`flex flex-row justify-between space-x-4 ${tab == 6 ? 'w-1/2' : 'hidden'}`}>
-                                                <div
-                                                    className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
-                                                    onClick={() => {
-                                                        if (state.q_covered > 0) {
-                                                            setState({
-                                                                ...state,
-                                                                percent_margin: 2,
-                                                                margin: Number((2 * state.q_covered) / 100),
-                                                            })
-                                                        }
-                                                    }}
-                                                >
-                                                    <div className={`${state.percent_margin == 2 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span className={state.percent_margin === 2 ? 'text-red' : 'text-gray'}>2%</span>
-                                                </div>
-                                                <div
-                                                    className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
-                                                    onClick={() => {
-                                                        if (state.q_covered > 0) {
-                                                            setState({
-                                                                ...state,
-                                                                percent_margin: 5,
-                                                                margin: Number((5 * state.q_covered) / 100),
-                                                            })
-                                                        }
-                                                    }}
-                                                >
-                                                    <div className={`${5 == state.percent_margin ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span className={state.percent_margin === 5 ? 'text-red' : 'text-gray'}>5%</span>
-                                                </div>
-                                                <div
-                                                    className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
-                                                    onClick={() => {
-                                                        if (state.q_covered > 0) {
-                                                            setState({
-                                                                ...state,
-                                                                percent_margin: 7,
-                                                                margin: Number((7 * state.q_covered) / 100),
-                                                            })
-                                                        }
-                                                    }}
-                                                >
-                                                    <div className={`${7 == state.percent_margin ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span className={state.percent_margin === 7 ? 'text-red' : 'text-gray'}>7%</span>
-                                                </div>
-                                                <div
-                                                    className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
-                                                    onClick={() => {
-                                                        if (state.q_covered > 0) {
-                                                            setState({
-                                                                ...state,
-                                                                percent_margin: 10,
-                                                                margin: Number((10 * state.q_covered) / 100),
-                                                            })
-                                                        }
-                                                    }}
-                                                >
-                                                    <div className={`${state.percent_margin == 10 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                    <span className={state.percent_margin === 10 ? 'text-red' : 'text-gray'}>10%</span>
-                                                </div>
+                                                {[2, 5, 7, 10].map((item, key) => {
+                                                    return (
+                                                        <div
+                                                            key={key}
+                                                            className={'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'}
+                                                            onClick={() => {
+                                                                updateFormPercentMargin(item)
+                                                            }}
+                                                        >
+                                                            <div
+                                                                className={`${state.percent_margin == item ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}
+                                                            ></div>
+                                                            <span className={state.percent_margin === item ? 'text-red' : 'text-gray'}>{item}%</span>
+                                                        </div>
+                                                    )
+                                                })}
                                             </div>
                                         </div>
 
