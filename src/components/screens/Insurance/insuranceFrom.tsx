@@ -25,6 +25,8 @@ import colors from 'styles/colors'
 import classnames from 'classnames'
 import GlossaryModal from 'components/screens/Glossary/GlossaryModal'
 import { InsuranceFormLoading } from './insuranceFormLoading'
+import InputNumber from 'components/common/Input/InputNumber'
+
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
 })
@@ -278,7 +280,7 @@ const InsuranceFrom = () => {
     ) => {
         const timeEnd = new Date()
         const timeBegin = new Date()
-        setLoadings(true)
+        // setLoadings(true)
         if (selectCoin) {
             if (selectTime == '1H' || selectTime == '1D') {
                 timeBegin.setDate(timeEnd.getDate() - 10)
@@ -535,6 +537,144 @@ const InsuranceFrom = () => {
         }
     }, [showGuide])
 
+    const validator = (key: string) => {
+        const rs = { isValid: true, message: '' }
+        switch (key) {
+            case 'q_covered':
+                rs.isValid = !(state.q_covered > userBalance || state.q_covered < Number(minQ_covered.toFixed(2)))
+                rs.message = `<div class="flex items-center">
+                ${
+                    state.q_covered > userBalance
+                        ? t('common:available', { value: `${formatNumber(userBalance)}` })
+                        : t('common:minimum_balance', { value: formatNumber(Number(minQ_covered.toFixed(2))) })
+                }
+            </div>`
+                break
+            case 'p_claim':
+                rs.isValid = errorPCalim || state.p_claim <= 0
+                rs.message = t('insurance:error:p_claim')
+                break
+            default:
+                break
+        }
+
+        return rs
+    }
+
+    const renderPopoverQCover = () => (
+        <Popover className="relative outline-none bg-hover focus:ring-0 flex items-center justify-center">
+            <Popover.Button
+                id={'popoverInsurance'}
+                className={'flex flex-row justify-end w-full items-center focus:border-0 focus:ring-0 active:border-0'}
+                onClick={() => {
+                    setChosing(!chosing)
+                }}
+            >
+                <img alt={''} src={`${selectCoin && selectCoin.icon}`} width="20" height="20" className={'mr-1 rounded-[50%]'}></img>
+                <span className={'whitespace-nowrap text-red mr-2'}>{selectCoin && selectCoin.name}</span>
+                <div className="min-w-[1rem]">{!chosing ? <ChevronDown size={16} /> : <ChevronUp size={16} />}</div>
+            </Popover.Button>
+            <Popover.Panel className="absolute z-50 bg-white top-12 -right-3 w-[360px] rounded-[3px] shadow-dropdown">
+                {({ close }) => (
+                    <div className="flex flex-col focus:border-0 focus:ring-0 active:border-0">
+                        {listCoin &&
+                            listCoin.map((coin, key) => {
+                                let isPress = false
+                                // @ts-ignore
+                                return !coin.disable ? (
+                                    <div
+                                        id={`${coin.id}`}
+                                        key={key}
+                                        onMouseDown={() => (isPress = true)}
+                                        onMouseUp={() => {
+                                            isPress = false
+                                            setSelectedCoin(coin)
+                                            setState({ ...state, symbol: { ...coin } })
+                                            setChosing(false)
+                                        }}
+                                        onClick={() => close()}
+                                        className={`${
+                                            isPress ? 'bg-gray-1' : 'hover:bg-hover'
+                                        } flex flex-row justify-start w-full items-center p-3 font-medium`}
+                                    >
+                                        <div className="max-w-[20px] mr-[8px] max-h-[20px] ">
+                                            <img alt={''} src={`${coin.icon}`} width="20" height="20" className={'mr-[5px] rounded-[50%]'}></img>
+                                        </div>
+                                        <div className={'flex flex-row justify-between w-full text-sm'}>
+                                            <span className={'hover:cursor-default'}>{coin.name}</span>
+                                            {coin.id === selectCoin.id ? <Check size={16} className={'text-red'}></Check> : ''}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <a
+                                        id={`${coin.id}`}
+                                        key={key}
+                                        className={`hover:bg-hover flex flex-row justify-start w-full items-center p-3 text-divider font-medium`}
+                                    >
+                                        <img alt={''} src={`${coin.icon}`} width="36" height="36" className={'mr-[5px] grayscale hover:cursor-default'}></img>
+                                        <div className={'flex flex-row justify-between w-full'}>
+                                            <span>{coin.name}</span>
+                                            {coin.id === selectCoin.id ? <Check size={16} className={'text-red'}></Check> : ''}
+                                        </div>
+                                    </a>
+                                )
+                            })}
+                    </div>
+                )}
+            </Popover.Panel>
+        </Popover>
+    )
+
+    const renderPopoverMargin = () => (
+        <Popover className="relative">
+            <Popover.Button className={'flex items-center space-x-2 hover:cursor-pointer'} onClick={() => setChangeUnit2(!changeUnit2)}>
+                <span className="text-red">{unitMoney}</span> {!changeUnit2 ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+            </Popover.Button>
+            <Popover.Panel
+                className="flex flex-col min-w-[18rem] absolute top-12 -right-3 bg-white z-[100] rounded-[3px] shadow-dropdown"
+                style={{
+                    boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)',
+                }}
+            >
+                {({ close }) => (
+                    <div className="flex flex-col justify-center h-full ">
+                        {['USDT', 'BUSD', 'USDC'].map((e, key) => {
+                            return (
+                                <div
+                                    key={key}
+                                    className={`py-2 text-sm px-4 cursor-pointer hover:bg-hover font-normal`}
+                                    onClick={() => {
+                                        setUnitMoney(e)
+                                        setChangeUnit2(false)
+                                        close()
+                                    }}
+                                >
+                                    <span>{e}</span>
+                                </div>
+                            )
+                        })}
+                    </div>
+                )}
+            </Popover.Panel>
+        </Popover>
+    )
+
+    const onHandleChange = (key: string, e: any) => {
+        const value = +e.value
+        switch (key) {
+            case 'q_covered':
+            case 'p_claim':
+                setState({ ...state, [key]: value })
+                setPercentInsurance(0)
+                break
+            case 'margin':
+                setState({ ...state, margin: value, percent_margin: 0 })
+                break
+            default:
+                break
+        }
+    }
+
     return (
         <>
             {<GlossaryModal visible={showDetails} onClose={() => setShowDetails(false)} />}
@@ -580,10 +720,9 @@ const InsuranceFrom = () => {
 
                                     <Popover className="relative" data-tut="tour_custom" id="tour_custom">
                                         <Popover.Button
-                                            className={classnames(
-                                                'rounded-md h-[40px] w-auto py-2 px-3 flex items-center space-x-2 bg-hover shadow focus-visible:outline-none',
-                                                { 'bg-[#EDEEF0]': isDrop },
-                                            )}
+                                            className={classnames('rounded-md h-10 w-auto py-2 px-3 flex items-center space-x-2 bg-hover', {
+                                                'bg-[#EDEEF0]': isDrop,
+                                            })}
                                             onClick={() => setDrop(!isDrop)}
                                         >
                                             <span>{menu[tab]?.name}</span>
@@ -680,16 +819,12 @@ const InsuranceFrom = () => {
                                     >
                                         {/*head*/}
                                         <div id="tour_statistics" data-tut="tour_statistics">
-                                            <div className={'pb-2 text-sm leading-5 text-txtSecondary flex flex-row justify-start items-center'}>
-                                                <div className={'w-1/2 flex flex-row items-center'}>
-                                                    <span className={'mr-2'}>{menu[7].name}</span>
-                                                    <div data-tip={t('insurance:terminology:q_covered')} data-for={`q-covered`}>
-                                                        <InfoCircle size={14} color={colors.txtSecondary} />
-                                                        <Tooltip className="max-w-[200px]" id={'q-covered'} placement="right" />
-                                                    </div>
+                                            <div className={'pb-2 text-sm leading-5 text-txtSecondary flex items-center space-x-6'}>
+                                                <div className={'w-full flex flex-row items-center'}>
+                                                    <span>{menu[7].name}</span>
                                                 </div>
                                                 {tab == 6 && (
-                                                    <div className={'w-1/2 flex flex-row items-center'}>
+                                                    <div className={'w-full flex flex-row items-center'}>
                                                         <span className={'mr-2'}>Margin</span>
                                                         <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
                                                             <InfoCircle size={14} color={colors.txtSecondary} />
@@ -699,137 +834,14 @@ const InsuranceFrom = () => {
                                                 )}
                                             </div>
                                             <div className={'pb-2 space-x-6 flex justify-between'}>
-                                                <div
-                                                    className={`${
-                                                        state.q_covered > userBalance && 'border border-1 border-error'
-                                                    } flex justify-between border-collapse rounded-[3px] shadow-none w-full`}
-                                                >
-                                                    <Input
-                                                        className={'appearance-none bg-hover outline-none focus:ring-0 shadow-none w-full'}
-                                                        type={'number'}
-                                                        inputName={'Loại tài sản và số lượng tài sản'}
-                                                        idInput={'iCoin'}
-                                                        value={state.q_covered || 0}
-                                                        onChange={(a: any) => {
-                                                            if (Number(a.target.value) >= 1) {
-                                                                setState({ ...state, q_covered: a.target.value.replace(/^0+/, '') })
-                                                            } else {
-                                                                setState({ ...state, q_covered: Number(a.target.value) })
-                                                            }
-
-                                                            setPercentInsurance(0)
-                                                        }}
-                                                        placeholder={'0'}
+                                                <div className={`flex justify-between border-collapse rounded-[3px] shadow-none w-full`}>
+                                                    <InputNumber
+                                                        validator={validator('q_covered')}
+                                                        value={state.q_covered}
+                                                        onChange={(e: any) => onHandleChange('q_covered', e)}
+                                                        customSuffix={renderPopoverQCover}
+                                                        decimal={8}
                                                     />
-                                                    <Popover className="relative outline-none bg-hover focus:ring-0 shadow-none flex items-center justify-center pr-4 h-11 sm:h-12">
-                                                        {(state.q_covered > userBalance || state.q_covered < Number(minQ_covered.toFixed(2))) && (
-                                                            <div className="absolute right-0 max-h-8 flex top-[-50px] text-xs z-[100] w-max border border-1 border-red p-2 rounded-md">
-                                                                <div className="flex flex-row items-center justify-center">
-                                                                    <div className="mr-[8px] items-center justify-center">
-                                                                        <ErrorTriggersIcon />
-                                                                    </div>
-                                                                    {state.q_covered > userBalance && (
-                                                                        <div>{`${
-                                                                            language == 'vi' ? 'Số dư khả dụng: ' : 'available balances: '
-                                                                        } ${userBalance} `}</div>
-                                                                    )}
-                                                                    -
-                                                                    {state.q_covered < Number(minQ_covered.toFixed(2)) && (
-                                                                        <div>{` ${language == 'vi' ? 'Số dư tối thiểu: ' : 'Minimum balance: '} ${Number(
-                                                                            minQ_covered.toFixed(2),
-                                                                        )}`}</div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                        <Popover.Button
-                                                            id={'popoverInsurance'}
-                                                            className={
-                                                                'flex flex-row justify-end w-full items-center focus:border-0 focus:ring-0 active:border-0'
-                                                            }
-                                                            onClick={() => {
-                                                                setChosing(!chosing)
-                                                            }}
-                                                        >
-                                                            <img
-                                                                alt={''}
-                                                                src={`${selectCoin && selectCoin.icon}`}
-                                                                width="20"
-                                                                height="20"
-                                                                className={'mr-1 rounded-[50%]'}
-                                                            ></img>
-                                                            <span className={'whitespace-nowrap text-red mr-2'}>{selectCoin && selectCoin.name}</span>
-                                                            <div className="min-w-[1rem]">{!chosing ? <ChevronDown size={16} /> : <ChevronUp size={16} />}</div>
-                                                        </Popover.Button>
-                                                        <Popover.Panel className="absolute z-50 bg-white top-[88px] right-0  w-[360px] rounded shadow">
-                                                            {({ close }) => (
-                                                                <div className="flex flex-col focus:border-0 focus:ring-0 active:border-0">
-                                                                    {listCoin &&
-                                                                        listCoin.map((coin, key) => {
-                                                                            let isPress = false
-                                                                            // @ts-ignore
-                                                                            return !coin.disable ? (
-                                                                                <div
-                                                                                    id={`${coin.id}`}
-                                                                                    key={key}
-                                                                                    onMouseDown={() => (isPress = true)}
-                                                                                    onMouseUp={() => {
-                                                                                        isPress = false
-                                                                                        setSelectedCoin(coin)
-                                                                                        setState({ ...state, symbol: { ...coin } })
-                                                                                        setChosing(false)
-                                                                                    }}
-                                                                                    onClick={() => close()}
-                                                                                    className={`${
-                                                                                        isPress ? 'bg-gray-1' : 'hover:bg-hover'
-                                                                                    } flex flex-row justify-start w-full items-center p-3 font-medium`}
-                                                                                >
-                                                                                    <div className="max-w-[20px] mr-[8px] max-h-[20px] ">
-                                                                                        <img
-                                                                                            alt={''}
-                                                                                            src={`${coin.icon}`}
-                                                                                            width="20"
-                                                                                            height="20"
-                                                                                            className={'mr-[5px] rounded-[50%]'}
-                                                                                        ></img>
-                                                                                    </div>
-                                                                                    <div className={'flex flex-row justify-between w-full text-sm'}>
-                                                                                        <span className={'hover:cursor-default'}>{coin.name}</span>
-                                                                                        {coin.id === selectCoin.id ? (
-                                                                                            <Check size={16} className={'text-red'}></Check>
-                                                                                        ) : (
-                                                                                            ''
-                                                                                        )}
-                                                                                    </div>
-                                                                                </div>
-                                                                            ) : (
-                                                                                <a
-                                                                                    id={`${coin.id}`}
-                                                                                    key={key}
-                                                                                    className={`hover:bg-hover flex flex-row justify-start w-full items-center p-3 text-divider font-medium`}
-                                                                                >
-                                                                                    <img
-                                                                                        alt={''}
-                                                                                        src={`${coin.icon}`}
-                                                                                        width="36"
-                                                                                        height="36"
-                                                                                        className={'mr-[5px] grayscale hover:cursor-default'}
-                                                                                    ></img>
-                                                                                    <div className={'flex flex-row justify-between w-full'}>
-                                                                                        <span>{coin.name}</span>
-                                                                                        {coin.id === selectCoin.id ? (
-                                                                                            <Check size={16} className={'text-red'}></Check>
-                                                                                        ) : (
-                                                                                            ''
-                                                                                        )}
-                                                                                    </div>
-                                                                                </a>
-                                                                            )
-                                                                        })}
-                                                                </div>
-                                                            )}
-                                                        </Popover.Panel>
-                                                    </Popover>
                                                 </div>
 
                                                 {tab > 3 && (
@@ -838,60 +850,12 @@ const InsuranceFrom = () => {
                                                             tab > 3 ? '' : 'hidden'
                                                         } ml-[12px] flex justify-between border-collapse rounded-[3px] shadow-none w-full`}
                                                     >
-                                                        <Input
-                                                            className={'appearance-none bg-hover outline-none focus:ring-0 shadow-none w-full'}
-                                                            type={'number'}
-                                                            inputName={'P-Claim'}
-                                                            idInput={''}
-                                                            value={state.margin > 0 ? state?.margin : 0}
-                                                            onChange={(a: any) => {
-                                                                if (Number(a.target.value) >= 1) {
-                                                                    setState({ ...state, margin: a.target.value.replace(/^0+/, ''), percent_margin: 0 })
-                                                                } else {
-                                                                    setState({ ...state, margin: Number(a.target.value), percent_margin: 0 })
-                                                                }
-                                                            }}
-                                                            placeholder={''}
+                                                        <InputNumber
+                                                            value={state.margin}
+                                                            onChange={(e: any) => onHandleChange('margin', e)}
+                                                            customSuffix={renderPopoverMargin}
+                                                            decimal={8}
                                                         />
-                                                        <div
-                                                            className={
-                                                                'bg-hover w-[10%] shadow-none space-x-2 flex items-center justify-end px-4 select-none hover:cursor-pointer h-11 sm:h-12'
-                                                            }
-                                                        >
-                                                            <span className="text-red">{unitMoney}</span>
-                                                            <Popover className="relative">
-                                                                <Popover.Button
-                                                                    className={'my-4  underline hover:cursor-pointer '}
-                                                                    onClick={() => setChangeUnit2(!changeUnit2)}
-                                                                >
-                                                                    {!changeUnit2 ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-                                                                </Popover.Button>
-                                                                <Popover.Panel
-                                                                    className="flex flex-col absolute  top-[63px] right-[-15px] bg-white z-[100] rounded"
-                                                                    style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
-                                                                >
-                                                                    {({ close }) => (
-                                                                        <div className="flex flex-col justify-center h-full ">
-                                                                            {['USDT', 'BUSD', 'USDC'].map((e, key) => {
-                                                                                return (
-                                                                                    <div
-                                                                                        key={key}
-                                                                                        className={`py-2 text-sm px-4 hover:bg-hover font-normal`}
-                                                                                        onClick={() => {
-                                                                                            setUnitMoney(e)
-                                                                                            setChangeUnit2(false)
-                                                                                            close()
-                                                                                        }}
-                                                                                    >
-                                                                                        <span>{e}</span>
-                                                                                    </div>
-                                                                                )
-                                                                            })}
-                                                                        </div>
-                                                                    )}
-                                                                </Popover.Panel>
-                                                            </Popover>
-                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
@@ -996,7 +960,7 @@ const InsuranceFrom = () => {
                                                         p_expired={Number(state.p_expired)}
                                                         setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
                                                         setP_Market={(data: number) => setState({ ...state, p_market: data })}
-                                                    ></ChartComponent>
+                                                    />
                                                     <svg
                                                         className={`absolute right-0 z-10`}
                                                         width="3"
@@ -1039,48 +1003,30 @@ const InsuranceFrom = () => {
                                                 })}
                                             </div>
                                             {/*P-Claim*/}
-                                            {
-                                                <div className={'my-[24px] text-sm'}>
-                                                    <span className={'flex flex-row items-center mr-[4px] text-txtSecondary'}>
-                                                        <span className={'mr-[8px]'}>P-Claim</span>
-                                                        <div data-tip={t('insurance:terminology:p_claim')} data-for={`p_claim`}>
-                                                            <InfoCircle size={14} color={colors.txtSecondary} />
-                                                            <Tooltip className="max-w-[200px]" id={'p_claim'} placement="right" />
-                                                        </div>
-                                                    </span>
-                                                    <div
-                                                        className={`mt-[8px] flex justify-between border-collapse rounded-[3px] shadow-none text-base ${
-                                                            !errorPCalim && state.p_claim != 0 && 'border border-1 border-red'
-                                                        }`}
-                                                    >
-                                                        <Input
-                                                            className={'w-[90%] appearance-none bg-hover outline-none focus:ring-0 shadow-none '}
-                                                            type={'number'}
-                                                            inputName={'P-Claim'}
-                                                            idInput={'iPClaim'}
-                                                            value={state.p_claim}
-                                                            onChange={(a: any) => {
-                                                                if (Number(a.target.value) >= 1) {
-                                                                    setState({ ...state, p_claim: a.target.value.replace(/^0+/, '') })
-                                                                } else {
-                                                                    setState({ ...state, p_claim: Number(a.target.value) })
-                                                                }
-                                                            }}
-                                                            placeholder={`${menu[9].name}`}
-                                                        ></Input>
-                                                        <div
-                                                            className={'bg-hover w-[10%] shadow-none flex items-center justify-end px-[16px] text-txtSecondary'}
-                                                        >
-                                                            {unitMoney}
-                                                        </div>
+                                            <div className={'my-6'}>
+                                                <span className={'flex flex-row items-center text-txtSecondary text-sm'}>
+                                                    <span className={'mr-2'}>P-Claim</span>
+                                                    <div data-tip={t('insurance:terminology:p_claim')} data-for={`p_claim`}>
+                                                        <InfoCircle size={14} color={colors.txtSecondary} />
+                                                        <Tooltip className="max-w-[200px]" id={'p_claim'} placement="right" />
                                                     </div>
-                                                    {!errorPCalim && state.p_claim != 0 && (
-                                                        <span className="flex flex-row text-[#E5544B] mt-[8px]">
-                                                            <ErrorTriggersIcon /> <span className="pl-[6px]">{t('insurance:error:p_claim')}</span>
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            }
+                                                </span>
+                                                <InputNumber
+                                                    className="mt-2"
+                                                    validator={validator('p_claim')}
+                                                    value={state.p_claim}
+                                                    onChange={(e: any) => onHandleChange('p_claim', e)}
+                                                    customSuffix={() => unitMoney}
+                                                    suffixClassName="text-txtSecondary"
+                                                    placeholder={`${menu[9].name}`}
+                                                    decimal={8}
+                                                />
+                                                {/* {!errorPCalim && state.p_claim != 0 && (
+                                                    <span className="flex flex-row text-[#E5544B] mt-[8px]">
+                                                        <ErrorTriggersIcon /> <span className="pl-[6px]">{t('insurance:error:p_claim')}</span>
+                                                    </span>
+                                                )} */}
+                                            </div>
                                         </div>
 
                                         {/* Period */}

@@ -11,9 +11,9 @@ const Slogan = () => {
     return (
         <Background isMobile={isMobile}>
             <div className="flex flex-col items-center space-y-6 w-full">
-                <div className="flex flex-col text-[2rem] text-center lg:text-[3rem] font-bold sm:font-semibold whitespace-nowrap leading-[2.625rem] sm:leading-[3.875rem]">
-                    <span>Đây là slogan </span>
-                    <span className="text-gradient">của Nami Insurance</span>
+                <div className="flex flex-col text-center font-bold ">
+                    <span className="text-gradient text-4xl sm:text-[3.5rem] sm:leading-[4.25rem]">Nami Insurance </span>
+                    <span className="text-4xl sm:text-[3rem] sm:leading-[4rem]">{t('common:slogan')}</span>
                 </div>
             </div>
         </Background>

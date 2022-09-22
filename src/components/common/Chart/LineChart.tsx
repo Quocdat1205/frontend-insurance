@@ -13,7 +13,7 @@ interface LineChart {
 
 const LineChart = ({ symbol, negative }: LineChart) => {
     const chart = useRef<any>(null)
-    const [dataSource, setDataSource] = useState<{ time: []; price: [] }>({
+    const [dataSource, setDataSource] = useState<{ time: any[]; price: any[] }>({
         time: [],
         price: [],
     })
@@ -29,10 +29,10 @@ const LineChart = ({ symbol, negative }: LineChart) => {
             resolution: '1h',
         }
         const data = await fetchApi({ url: API_GET_PRICE_CHART, baseURL: '', params: params })
-        if (data) {
+        if (data && Array.isArray(data)) {
             setDataSource({
-                time: data.map((rs: any) => rs[0]),
-                price: data.map((rs: any) => rs[1]),
+                time: data?.map((rs: any) => rs[0]),
+                price: data?.map((rs: any) => rs[1]),
             })
         }
     }
@@ -100,7 +100,7 @@ const LineChart = ({ symbol, negative }: LineChart) => {
             },
         },
     }
-    return <Line ref={chart} data={data} options={options} />
+    return <Line height={100} ref={chart} data={data} options={options} />
 }
 
 export default LineChart
