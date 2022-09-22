@@ -731,10 +731,11 @@ const InsuranceFrom = () => {
                                                                     {state.q_covered > userBalance && (
                                                                         <div>{`${
                                                                             language == 'vi' ? 'Số dư khả dụng: ' : 'available balances: '
-                                                                        } ${userBalance}`}</div>
+                                                                        } ${userBalance} `}</div>
                                                                     )}
+                                                                    -
                                                                     {state.q_covered < Number(minQ_covered.toFixed(2)) && (
-                                                                        <div>{`${language == 'vi' ? 'Số dư tối thiểu: ' : 'Minimum balance: '} ${Number(
+                                                                        <div>{` ${language == 'vi' ? 'Số dư tối thiểu: ' : 'Minimum balance: '} ${Number(
                                                                             minQ_covered.toFixed(2),
                                                                         )}`}</div>
                                                                     )}
