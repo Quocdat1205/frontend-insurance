@@ -1,21 +1,23 @@
+import { createNullLogger } from '@algolia/logger-common'
+import detectEthereumProvider from '@metamask/detect-provider'
+import acorn from 'acorn'
+import { useTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
+import React, { useMemo, useState } from 'react'
+import { isMobile } from 'react-device-detect'
+import { ChevronDown, ChevronUp, X } from 'react-feather';
 import Button from 'components/common/Button/Button'
 import ButtonLanguage from 'components/common/Button/ButtonLanguage'
 import Menu from 'components/common/Menu/Menu'
 import { MenuIcon } from 'components/common/Svg/SvgIcon'
 import Drawer from 'components/layout/Drawer'
+import Notifications from 'components/layout/Notifications'
 import { ChainDataList } from 'components/web3/constants/chains'
 import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import useWindowSize from 'hooks/useWindowSize'
-import { useTranslation } from 'next-i18next'
-import React, { useMemo, useState } from 'react'
-import { screens } from 'utils/constants'
-import { X } from 'react-feather'
-import Notifications from 'components/layout/Notifications'
-import { useRouter } from 'next/router'
 import { RootStore, useAppSelector } from 'redux/store'
-import detectEthereumProvider from '@metamask/detect-provider'
-import { isMobile } from 'react-device-detect'
+import { screens } from 'utils/constants'
 
 const Header = () => {
     const { t } = useTranslation()
@@ -24,6 +26,7 @@ const Header = () => {
     const router = useRouter()
     const isMobile = width && width < screens.drawer
     const [visible, setVisible] = useState<boolean>(false)
+    const [isHover, setIsHover] = useState<boolean>(false)
     const loading_account = useAppSelector((state: RootStore) => state.setting.loading_account)
 
     const onConnect = async () => {
@@ -35,14 +38,37 @@ const Header = () => {
         }
     }
 
-    const network = useMemo(() => {
-        return ChainDataList[chain?.id]
-    }, [account, chain])
+    const network = useMemo(() => ChainDataList[chain?.id], [account, chain])
 
     const onChangeMenu = (e: any) => {
         if (isMobile && e?.children.length > 0) return
         if (e.router) router.push(e.router)
     }
+
+    const handleMouseHover= (show: boolean) => {
+        setIsHover(show)
+    }
+
+    const NameComponent = ({ network, accounnt, isMobile }: any) => (
+        <div className="p-2 bg-hover rounded-[5px] flex items-center space-x-2">
+            <img src={network?.icon} width={24} height={24} />
+            <div>{network?.chain}</div>
+            <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-2">{`${account?.substr(0, isMobile ? 2 : 4)}...${account?.substr(-4)}`}</div>
+            {/* <ChevronDown size={18} /> */}
+            {isHover ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+        </div>
+    )
+
+    const props = {
+        network,
+        account,
+        isMobile,
+    }
+
+    const menuConfig = [
+        { menuId: 'account-info', router: '/', name: NameComponent, parentId: 0, isNameComponent: true, hideArrowIcon: true, nameComponentProps: { ...props } },
+        ...Config.subMenu,
+    ]
 
     return (
         <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[50]">
@@ -54,21 +80,34 @@ const Header = () => {
                     {!isMobile && (
                         <div className="hidden mb:block">
                             <Menu data={Config.homeMenu} onChange={onChangeMenu} />
+                            {/* <Menu data={menuConfig} onChange={onChangeMenu} network={network} acount={account} isMobile={isMobile}/> */}
                         </div>
                     )}
                     {!loading_account && (
                         <div className="flex items-center space-x-5 sm:space-x-6 cursor-pointer">
-                            {network && !isMobile && <Notifications />}
-                            {account && network && (
+                            {network && <Notifications />}
+                            {account && network && !isMobile && (
+                                <Menu data={menuConfig} cbOnMouseOut={handleMouseHover} cbOnMouseOver={handleMouseHover} />
+                                // <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
+                                //     <img src={network.icon} width={24} height={24} />
+                                //     <div>{network.chain}</div>
+                                //     <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1">
+                                //         {`${account.substr(0, isMobile ? 2 : 4)}...${account.substr(-4)}`}
+                                //     </div>
+                                // </div>
+                            )}
+                            {account && network && isMobile && (
+                                // <Menu data={menuConfig} network={network} acount={account} isMobile={isMobile}/>
                                 <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
                                     <img src={network.icon} width={24} height={24} />
                                     <div>{network.chain}</div>
                                     <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1">
-                                        {account.substr(0, isMobile ? 2 : 4) + '...' + account.substr(-4)}
+                                        {`${account.substr(0, isMobile ? 2 : 4)}...${account.substr(-4)}`}
                                     </div>
                                 </div>
                             )}
-                            {network && isMobile && <Notifications />}
+
+                            {/* {network && isMobile && <Notifications />} */}
                             {!isMobile && <ButtonLanguage />}
                             {!account && (
                                 <Button onClick={onConnect} className="font-semibold px-4 py-2 space-x-2">
@@ -88,7 +127,7 @@ const Header = () => {
                 <Drawer visible={visible} onClose={() => setVisible(false)}>
                     <div>
                         <div className="mb-8">
-                            <Menu data={Config.homeMenu} onChange={onChangeMenu} />
+                            <Menu data={Config.homeMenuMobile} onChange={onChangeMenu} />
                         </div>
                         {!network && (
                             <div className="mx-4">
