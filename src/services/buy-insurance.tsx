@@ -38,7 +38,7 @@ export const buyInsurance = async (props: {
 
         console.log(data)
 
-        return data.status
+        return data.data.status
     } catch (error) {
         console.error(error)
         return false

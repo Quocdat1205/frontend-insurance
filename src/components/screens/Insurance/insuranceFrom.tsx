@@ -42,13 +42,15 @@ const InsuranceFrom = () => {
     const router = useRouter()
     const { width } = useWindowSize()
     const isMobile = width && width <= screens.drawer
+    const { assetsToken, pairConfigs } = useAppSelector((state: RootStore) => {
+        return state.setting
+    })
 
     const [percentInsurance, setPercentInsurance] = useState<number>(0)
     const [selectTime, setSelectTime] = useState<string>('ALL')
     const [isDrop, setDrop] = useState(false)
     // const [checkUpgrade, setCheckUpgrade] = useState(false)
     const [clear, setClear] = useState(false)
-    const assetsToken = useAppSelector((state: RootStore) => state.setting.assetsToken)
     const [index, setIndex] = useState<1 | 2>(1)
     const [tab, setTab] = useState<number>(3)
     const [loadings, setLoadings] = useState(true)
@@ -77,6 +79,7 @@ const InsuranceFrom = () => {
     })
     const [userBalance, setUserBalance] = useState<number>(0)
     const [listCoin, setListCoin] = useState<ICoin[]>([])
+    const [pair_configs, setPairConfigs] = useState<any>({})
     const [selectCoin, setSelectedCoin] = useState<ICoin>({
         icon: '',
         id: '',
@@ -284,6 +287,15 @@ const InsuranceFrom = () => {
                 percent_margin: value,
                 margin: Number((value / 100) * state.q_covered * state.p_market),
             })
+        }
+    }
+
+    const getConfig = (symbol: string) => {
+        if (pairConfigs) {
+            const item = pairConfigs.find((i: any) => {
+                return i.baseAsset === symbol
+            })
+            return setPairConfigs({ ...item })
         }
     }
 
@@ -536,6 +548,7 @@ const InsuranceFrom = () => {
         if (selectCoin.symbol != '') {
             getPrice(selectCoin.symbol, state, setState)
             setState({ ...state, symbol: { ...selectCoin } })
+            getConfig(selectCoin.type)
         }
     }, [selectCoin])
 
@@ -568,6 +581,8 @@ const InsuranceFrom = () => {
             const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
             const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
             setState({ ...state, q_claim: q_claim, r_claim: Number(q_claim / margin) * 100, p_expired: Math.floor(p_stop), margin: margin })
+
+            console.log(laverage * 2 * (margin / state.p_market))
         }
 
         if (state.q_covered && state.p_claim && state.margin) {
@@ -587,8 +602,9 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         if (percentInsurance) {
-            const defaultMargin = 10
-            const min = defaultMargin / ((10 / 100) * state.p_market)
+            console.log(pair_configs.filter)
+
+            const min = 8 / ((10 / 100) * state.p_market)
             setMinQ_covered(min)
         }
     }, [percentInsurance, state.margin, state.q_covered])
