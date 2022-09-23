@@ -1,9 +1,9 @@
 import colors from 'styles/colors'
 import { IconSvg } from 'types/types'
 
-export const RightArrow = ({ size = 16, color = 'white' }: any) => {
+export const RightArrow = ({ size = 16, color = 'white', className='' }: any) => {
     return (
-        <svg width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className={className} width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
                 d="M1.99988 8.66685L11.7239 8.66685L8.19521 12.1955L9.13788 13.1382L14.2759 8.00018L9.13788 2.86218L8.19521 3.80485L11.7239 7.33352L1.99988 7.33352L1.99988 8.66685Z"
                 fill={color}
@@ -448,6 +448,13 @@ export const CopyIcon = ({ size = 12, color = '#B2B7BC' }: IconSvg) => {
             </defs>
         </svg>
     )
+}
+
+export const DownArrow = ({size=12, color='#000', className=''}: IconSvg) => {
+    return <svg className={className} width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1.70703 7.70703L6.00003 3.41403L10.293 7.70703L11.707 6.29303L6.00003 0.586031L0.293031 6.29303L1.70703 7.70703Z" fill="#B2B7BC"/>
+    </svg>
+
 }
 
 const HistoryIcon = ({ size = 12, color = '#B2B7BC' }: IconSvg) => {
