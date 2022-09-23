@@ -147,7 +147,6 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                     } h-[48px] !w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                                                     onClick={() => {
                                                         if (index == 0) {
-                                                            localStorage.removeItem('buy_covered_state')
                                                             return router.push('/buy-covered/insurance-history')
                                                         }
                                                         if (index == 3) {
@@ -240,7 +239,6 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                     }  h-[48px] !w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                                                     onClick={() => {
                                                         if (index == 0) {
-                                                            localStorage.removeItem('buy_covered_state')
                                                             return router.push('/buy-covered/insurance-history')
                                                         }
                                                         if (index == 3) {

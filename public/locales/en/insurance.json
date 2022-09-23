@@ -11,14 +11,15 @@
         "help_short": "Guide",
         "quality_and_type": "Quantity of the covered asset",
         "continue": "Continue",
-        "saved": "Save",
-        "sub_saved": "compared to not getting covered.",
+        "saved": "Savings",
+        "save": "Save",
+        "sub_saved": "versus no insurance",
         "info_covered": "Cover Details",
         "day": "Days",
         "accept_buy": "I agree to",
         "accept_buy_sub": "the terms of service",
-        "notified": "Get 100% of margin amount when asset price reaches",
-        "notified_sub": "at the last day of period.",
+        "notified": "Get 100% Margin when P-Market reaches between",
+        "notified_sub": "at T-Expired",
         "price_had_update": "Updated Price",
         "accept": "Confirm",
         "period": "Period",
@@ -37,6 +38,12 @@
         "detailed_terminology": "Detailed terminology",
         "help1": "How to buy Cover",
         "asset": "Asset"
+    },
+    "buy_mobile": {
+        "q_covered": "You want to get covered for",
+        "at": "at",
+        "and": "and",
+        "margin": "Margin is"
     },
     "final": {
         "succes": "Successfully purchased Insurance Contract",
