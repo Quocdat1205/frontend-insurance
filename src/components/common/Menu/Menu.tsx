@@ -7,7 +7,7 @@ import styled from 'styled-components'
 import useWindowSize from 'hooks/useWindowSize'
 import { IconSvg } from 'types/types'
 import { screens } from 'utils/constants'
-import { isFunction } from 'utils/utils'
+import { isFunction } from 'utils/utils';
 
 interface MenuItem {
     name?: any
@@ -19,7 +19,6 @@ interface MenuItem {
     menuId: string
     parentId?: string | number
     // when the name is custom react node
-    isNameComponent?: boolean
     nameComponentProps?: any
     parent?: string | number,
     // show arrow down when the menu has children
@@ -68,9 +67,11 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
 
     const handleOnMouseOut = (e: any) => {
         e.stopPropagation()
-        setActive(false)
 
-        if (isMobile) return
+        if (isMobile) {
+            return;
+        }
+        setActive(false)
         setIsHover(false)
         if (cbOnMouseOut) {
             if (isFunction(cbOnMouseOut)) cbOnMouseOut(false)
@@ -111,8 +112,8 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
             return <img className="min-w-6 min-h-6 w-6 h-6" src={menu.icon} />
         }
 
-        const Name = ({ name, isNameComponent = false, ...nameProps }: any) => {
-            if (!isNameComponent) return <span>{t(menu.name)}</span>
+        const Name = ({ name, ...nameProps }: any) => {
+            if (typeof name === 'string' || name instanceof String) return <span>{t(menu.name)}</span>
             // custom name component
             const Component = name
             return (
@@ -121,12 +122,11 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
                 </>
             )
         }
-        if (menu.menuId === 'account-info') console.log('menu', menu)
         return (
             <ItemMenu
                 key={index}
                 onClick={(e) => onToggleMenu(e, menu)}
-                onMouseOut={handleOnMouseOut}
+                // onMouseOut={handleOnMouseOut}
                 className={classnames('', {
                     'sub-menu': hasChildren,
                     'active-menu': _active,
@@ -137,22 +137,21 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
                     <div className="flex items-center space-x-4 px-4">
                         {menu?.icon && <Icon isIconSvg={menu?.isIconSvg} icon={menu.icon} />}
                         {/* custom parent component: component passed from config as [name] props */}
-                        <Name name={menu.name} isNameComponent={menu?.isNameComponent} {...menu?.nameComponentProps} />
-                        {/* {menu?.isNameComponent ? <NameComponent component={menu.name} {...menu.nameComponentProps} /> : <span>{t(menu.name)}</span>} */}
+                        <Name name={menu.name} {...menu?.nameComponentProps} />
                     </div>
                 ) : (
                     <div
                         className={classnames('flex items-center justify-between sm:justify-start space-x-2 cursor-pointer text-sm px-4', {
-                            // 'pb-3': _active,
+                            'pb-3': _active && isMobile,
                         })}
                     >
                         <div className="space-x-4 flex items-center">
                             {menu?.icon && <Icon isIconSvg={menu?.isIconSvg} icon={menu.icon} />}
-                            <Name name={menu.name} isNameComponent={menu?.isNameComponent} {...menu?.nameComponentProps} />
+                            <Name name={menu.name} {...menu?.nameComponentProps} />
                         </div>
-                        {/* {isMobile && (!_active ? <ChevronDown size={18} /> : <ChevronUp size={18} />)} */}
+                        {isMobile && (!_active ? <ChevronDown size={18} /> : <ChevronUp size={18} />)}
                         {/* {!isHover || ( isMobile && !active  ) ? <ChevronDown size={18} /> : <ChevronUp size={18} />} */}
-                        { !menu?.hideArrowIcon && (!isHover ? <ChevronDown size={18} /> : <ChevronUp size={18} />)}
+                        { !menu?.hideArrowIcon && !isMobile && (!isHover ? <ChevronDown size={18} /> : <ChevronUp size={18} />)}
                     </div>
                 )}
                 {hasChildren && (
