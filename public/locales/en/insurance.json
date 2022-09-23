@@ -1,7 +1,7 @@
 {
     "buy": {
         "home": "Home",
-        "buy_covered": "Buy Insurance",
+        "buy_covered": "Buy Cover",
         "back_to_home": "Back to Home",
         "default": "Default",
         "change": "Customize",
@@ -11,14 +11,15 @@
         "help_short": "Guide",
         "quality_and_type": "Quantity of the covered asset",
         "continue": "Continue",
-        "saved": "Save",
-        "sub_saved": "compared to not getting covered.",
+        "saved": "Savings",
+        "save": "Save",
+        "sub_saved": "versus no insurance",
         "info_covered": "Cover Details",
         "day": "Days",
         "accept_buy": "I agree to",
         "accept_buy_sub": "the terms of service",
-        "notified": "Get 100% of margin amount when asset price reaches",
-        "notified_sub": "at the last day of period.",
+        "notified": "Get 100% Margin when P-Market reaches between",
+        "notified_sub": "at T-Expired",
         "price_had_update": "Updated Price",
         "accept": "Confirm",
         "period": "Period",
@@ -35,8 +36,14 @@
         "quality": "Quantity",
         "title_change_margin": "and Margin is",
         "detailed_terminology": "Detailed terminology",
-        "help1": "How to buy Insurance",
+        "help1": "How to buy Cover",
         "asset": "Asset"
+    },
+    "buy_mobile": {
+        "q_covered": "You want to get covered for",
+        "at": "at",
+        "and": "and",
+        "margin": "Margin is"
     },
     "final": {
         "succes": "Successfully purchased Insurance Contract",
@@ -67,7 +74,7 @@
         "margin": "Margin of insurance contract"
     },
     "error": {
-        "p_claim": "Error messenge"
+        "p_claim": "Giá trị không hợp lệ"
     },
     "unit": {
         "margin": "Unit asset Margin",

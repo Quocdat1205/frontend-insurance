@@ -20,7 +20,13 @@
     "header": {
         "home": "Trang chủ",
         "buy_covered": "Mua bảo hiểm",
-        "insurance_history": "Lịch sử bảo hiểm"
+        "insurance_history": "Lịch sử bảo hiểm",
+        "commission_policy": "Chính sách hoa hồng",
+        "recent_transactions": "Giao dịch gần đây",
+        "my_covered_contract": "Hợp đồng bảo hiểm của tôi",
+        "update_my_email": "Cập nhật email của tôi",
+        "disconnect": "Ngắt kết nối",
+        "account_info_title": "Quản lý ví cá nhân"
     },
     "days": "Ngày",
     "asset_type": "Loại tài sản",

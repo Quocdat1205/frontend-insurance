@@ -15,9 +15,10 @@ import { formatPriceToWeiValue, formatWeiValueToPrice } from 'utils/format'
 import { formatNumber } from 'utils/utils'
 import { contractAddress } from 'components/web3/constants/contractAddress'
 import { Popover } from '@headlessui/react'
-import { ChevronDown } from 'react-feather'
+import { ChevronDown, ChevronUp } from 'react-feather'
 import Modal from 'components/common/Modal/Modal'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
+import { Input } from 'components/common/Input/input'
 
 export type IBuyInsurance = {
     createInsurance: number
@@ -55,12 +56,14 @@ const AcceptBuyInsurance = () => {
     const [price, setPrice] = useState<number>(0)
     const [checkUpgrade, setCheckUpgrade] = useState<boolean>(false)
     const [state, setState] = useState<IState>()
-    const [isUpdated, setUpdated] = useState<boolean>(false)
-    const [isCanBuy, setCanBuy] = useState<boolean>(false)
+    const [isUpdated, setUpdated] = useState<boolean>(true)
+    const [isCanBuy, setCanBuy] = useState<boolean>(true)
     const [loading, setLoading] = useState<boolean>(false)
     const [active, setActive] = useState<boolean>(false)
     const [res, setRes] = useState(null)
     const [saved, setSaved] = useState(0)
+    const [changeUnit, setChangeUnit] = useState(false)
+    const [referral, setReferral] = useState('')
 
     useEffect(() => {
         fetch()
@@ -75,13 +78,11 @@ const AcceptBuyInsurance = () => {
             setState({ ...res })
 
             if (res.p_claim < res.p_market) {
-                console.log(res, res.q_claim + res.q_covered * (res.q_claim - res.p_market) - res.margin + res.q_covered * Math.abs(res.q_claim - res.p_market))
-
-                setSaved(res.q_claim + res.q_covered * (res.q_claim - res.p_market) - res.margin + res.q_covered * Math.abs(res.q_claim - res.p_market))
+                setSaved(res.q_claim + res.q_covered * (res.p_claim - res.p_market) - res.margin + res.q_covered * Math.abs(res.p_claim - res.p_market))
             }
 
             if (res.p_claim > res.p_market) {
-                setSaved(res.q_claim + res.q_covered * (res.q_claim - res.p_market) - res.margin)
+                setSaved(res.q_claim + res.q_covered * (res.p_claim - res.p_market) - res.margin)
             }
         }
         setLoading(false)
@@ -105,9 +106,13 @@ const AcceptBuyInsurance = () => {
     }
     useEffect(() => {
         setInterval(() => {
+            if (Noti === 'loading') {
+                return
+            }
             if (isUpdated) {
                 setUpdated(false)
                 setCanBuy(false)
+                return
             }
         }, 10000)
     })
@@ -167,6 +172,7 @@ const AcceptBuyInsurance = () => {
                         { value: 0 },
                     )
                     await buy.wait()
+
                     const id_sc = await buy.wait()
                     if (buy && id_sc.events[2].args[0]) {
                         handlePostInsurance(buy, dataPost, state, Number(id_sc.events[2].args[0]))
@@ -186,7 +192,9 @@ const AcceptBuyInsurance = () => {
                     const allowance = await wallet.contractCaller.usdtContract.contract.allowance(wallet.account, contractAddress)
                     const parseAllowance = formatWeiValueToPrice(allowance)
                     if (parseAllowance < state.margin) {
-                        await wallet.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(1000), { from: wallet.account })
+                        await wallet.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(state.margin), {
+                            from: wallet.account,
+                        })
                     }
                     const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
                         dataPost.buyer,
@@ -216,12 +224,14 @@ const AcceptBuyInsurance = () => {
     const handlePostInsurance = async (props: any, dataPost: any, state: any, _id: any) => {
         if (props) {
             try {
+                console.log(state)
+
                 const data = {
-                    owner: props.from,
+                    owner: props.from.toLowerCase(),
                     transaction_hash: props.hash,
                     id_sc: _id,
-                    asset_covered: dataPost.unit || 'USDT',
-                    asset_refund: dataPost.unit || 'USDT',
+                    asset_covered: dataPost.asset,
+                    asset_refund: state.symbol,
                     margin: Number(state.margin),
                     q_covered: Number(state.q_covered),
                     p_claim: Number(state.p_claim),
@@ -243,6 +253,19 @@ const AcceptBuyInsurance = () => {
         }
     }
 
+    const rangeOfRefund = () => {
+        if (state) {
+            const p_refund = 0.05 * state.p_market
+
+            if (p_refund > state.p_claim) {
+                return ` ${state.p_claim} - ${p_refund} `
+            }
+            if (p_refund < state.p_claim) {
+                return ` ${p_refund} - ${state.p_claim} `
+            }
+        }
+    }
+
     return !loading && state != undefined ? (
         !isMobile ? (
             <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
@@ -250,10 +273,10 @@ const AcceptBuyInsurance = () => {
                     portalId="modal"
                     isVisible={active}
                     onBackdropCb={() => {
-                        if (Noti == 'email') {
+                        if (Noti == 'email' || Noti == 'loading') {
                             setActive(false)
                         }
-                        if (Noti != 'email') {
+                        if (Noti != 'email' && Noti != 'loading') {
                             setNoti('email')
                         }
                     }}
@@ -274,7 +297,7 @@ const AcceptBuyInsurance = () => {
                         <div className="flex items-center font-semibold text-base">
                             <LeftArrow></LeftArrow>
                             <span
-                                className={' text-[#22313F] hover:cursor-pointer ml-[8px]'}
+                                className={' text-txtPrimary hover:cursor-pointer ml-[8px]'}
                                 onClick={() => {
                                     return router.push('/buy-covered')
                                 }}
@@ -286,7 +309,7 @@ const AcceptBuyInsurance = () => {
                         <Popover className="relative" data-tut="tour_custom" id="tour_custom">
                             <Popover.Button
                                 className={
-                                    'border border-[0.5] text-base border-[#F7F8FA] rounded-[6px] h-[40px] w-auto py-[8px] px-[12px] flex flex-row bg-[#F7F8FA] shadow focus-visible:outline-none'
+                                    'border border-[0.5] text-base border-hover rounded-[6px] h-[40px] w-auto py-[8px] px-[12px] flex flex-row bg-hover shadow focus-visible:outline-none'
                                 }
                             >
                                 {state.tab}
@@ -303,10 +326,10 @@ const AcceptBuyInsurance = () => {
                     <div className="relative bg-white" style={{ borderRadius: '5px 5px 0 0' }}>
                         <div className={'flex justify-center items-center my-[32px]'}>
                             <CheckCircle />
-                            <span className={'font-semibold text-[#22313F] px-[4px]'}>
+                            <span className={'font-semibold text-txtPrimary px-[4px]'}>
                                 {`${t('insurance:buy:saved')} `}
-                                <span className={'text-[#EB2B3E]'}>
-                                    {saved.toFixed(4)} {state && state.unit}
+                                <span className={'text-redPrimary'}>
+                                    ${saved.toFixed(4)} {state && state.unit}
                                 </span>{' '}
                                 {t('insurance:buy:sub_saved')}
                             </span>
@@ -318,9 +341,9 @@ const AcceptBuyInsurance = () => {
                     </div>
 
                     <div className="bg-[white] p-[1px]" style={{ borderRadius: '0 0 5px 5px' }}>
-                        <div className="p-[32px] pb-[24px] pt-0">
-                            <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
-                                <div className={'text-[#808890] flex items-center'}>
+                        <div className="p-[2rem] pb-[3rem] pt-0">
+                            <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
+                                <div className={'text-txtSecondary flex items-center'}>
                                     <span className={'mr-[8px]'}>R-Claim</span>
                                     <div data-tip={t('insurance:terminology:r_claim')} data-for={`r-claim`}>
                                         <InfoCircle size={14} color={colors.txtSecondary} />
@@ -328,7 +351,7 @@ const AcceptBuyInsurance = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold'}>
-                                    <span className={`${checkUpgrade ? 'line-through text-[#808890] text-xs pr-[8px]' : 'pr-[8px]'}`}>
+                                    <span className={`${checkUpgrade ? 'line-through text-txtSecondary text-xs pr-[8px]' : 'pr-[8px]'}`}>
                                         {formatNumber(state?.r_claim, 2)} %
                                     </span>
                                     <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>
@@ -337,25 +360,57 @@ const AcceptBuyInsurance = () => {
                                 </div>
                             </div>
                             <div className="flex flex-row justify-between py-[8px] px-[8px]">
-                                <div className={'text-[#808890] flex flex-row items-center'}>
+                                <div className={'text-txtSecondary flex flex-row items-center'}>
                                     <span className={'mr-[8px]'}>Q-Claim</span>
                                     <div data-tip={t('insurance:terminology:q_claim')} data-for={`q_claim`}>
                                         <InfoCircle size={14} color={colors.txtSecondary} />
                                         <Tooltip className="max-w-[200px] !left-[120px] !top-[179px]" id={'q_claim'} placement="right" />
                                     </div>
                                 </div>
-                                <div className={'font-semibold '}>
-                                    <span className={`${checkUpgrade ? 'line-through text-[#808890] pr-[8px] text-xs' : 'pr-[8px]'}`}>
+                                <div className={'font-semibold flex flex-row items-center'}>
+                                    <span className={`${checkUpgrade ? 'line-through text-txtSecondary pr-[8px] text-xs' : 'pr-[8px]'}`}>
                                         {formatNumber(state?.q_claim, 4)}
                                     </span>{' '}
                                     <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
                                         {formatNumber(state?.q_claim + (state?.q_claim * 5) / 100, 4)}
                                     </span>{' '}
-                                    <span className={'text-[#EB2B3E]'}>{state?.unit}</span>
+                                    <span className={'text-redPrimary'}>{state?.unit}</span>
+                                    <Popover className="relative">
+                                        <Popover.Button
+                                            className={'my-4 text-txtPrimary underline hover:cursor-pointer '}
+                                            onClick={() => setChangeUnit(!changeUnit)}
+                                        >
+                                            {!changeUnit ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                                        </Popover.Button>
+                                        <Popover.Panel
+                                            className="flex flex-col text-txtPrimary absolute  top-[35px] right-[-5px] bg-white z-[100] rounded"
+                                            style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                                        >
+                                            {({ close }) => (
+                                                <div className="flex flex-col justify-center h-full font-normal text-sm">
+                                                    {['USDT', state.symbol].map((e, key) => {
+                                                        return (
+                                                            <div
+                                                                key={key}
+                                                                className={` py-2 px-4 hover:bg-hover font-normal`}
+                                                                onClick={() => {
+                                                                    setState({ ...state, symbol: e })
+                                                                    setChangeUnit(false)
+                                                                    close()
+                                                                }}
+                                                            >
+                                                                <span>{e}</span>
+                                                            </div>
+                                                        )
+                                                    })}
+                                                </div>
+                                            )}
+                                        </Popover.Panel>
+                                    </Popover>
                                 </div>
                             </div>
-                            <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
-                                <div className={'text-[#808890] flex flex-row items-center'}>
+                            <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
+                                <div className={'text-txtSecondary flex flex-row items-center'}>
                                     <span className={'mr-[8px]'}>Margin</span>
                                     <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
                                         <InfoCircle size={14} color={colors.txtSecondary} />
@@ -363,11 +418,12 @@ const AcceptBuyInsurance = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                    <span className={'pr-[8px]'}>{formatNumber(state?.margin, 4)}</span> <span className={'text-[#EB2B3E]'}>{state?.unit}</span>
+                                    <span className={'pr-[8px]'}>{formatNumber(state?.margin, 4)}</span>{' '}
+                                    <span className={'text-txtPrimary'}>{state?.unit}</span>
                                 </div>
                             </div>
                             <div className="flex flex-row justify-between py-[8px] px-[8px]">
-                                <div className={'text-[#808890] flex flex-row items-center'}>
+                                <div className={'text-txtSecondary flex flex-row items-center'}>
                                     <span className={'mr-[8px]'}>Period</span>
                                     <div data-tip={t('insurance:terminology:period')} data-for={`period`}>
                                         <InfoCircle size={14} color={colors.txtSecondary} />
@@ -376,7 +432,7 @@ const AcceptBuyInsurance = () => {
                                 </div>
                                 <div className={'font-semibold'}>
                                     <span>
-                                        <span className={`${checkUpgrade ? 'line-through text-[#808890] text-xs' : 'pr-[2px]'}`}>
+                                        <span className={`${checkUpgrade ? 'line-through text-txtSecondary text-xs' : 'pr-[2px]'}`}>
                                             {state?.period} {t('insurance:buy:day')}
                                         </span>{' '}
                                         <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>
@@ -386,10 +442,10 @@ const AcceptBuyInsurance = () => {
                                 </div>
                             </div>
                             <div className="text-[#B2B7BC] text-xs py-[16px]">
-                                *{t('insurance:buy:notified')} 10,000$ - 12,000$ {t('insurance:buy:notified_sub')}
+                                *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')}
                             </div>
                             {!isUpdated && (
-                                <div className="text-[#EB2B3E] bg-[#F7F8FA] rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
+                                <div className="text-redPrimary bg-hover rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
                                     <div className={'flex flex-row py-[14px]'}>
                                         <span className="mr-[6px]">
                                             <ErrorCircleIcon size={24} />
@@ -414,7 +470,8 @@ const AcceptBuyInsurance = () => {
                             )}
 
                             <div
-                                className="rounded-[12px] p-[24px] flex flex-row items-center border-[#F7F8FA] border-1 relative"
+                                //flex
+                                className=" hidden rounded-[12px] p-[24px]  flex-row items-center border-hover border-1 relative"
                                 style={{ boxShadow: '0px 6px 18px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
                             >
                                 <div className={'rounded-[99999px] mr-[24px]'} style={{ background: 'linear-gradient(180deg, #FFFFFF -56.68%, #E6E6E6 100%)' }}>
@@ -448,12 +505,12 @@ const AcceptBuyInsurance = () => {
                                                     console.log(e)
                                                 }}
                                             />
-                                            <label htmlFor="test1" className="select-none font-semibold text-base text-[#22313F]">
+                                            <label htmlFor="test1" className="select-none font-semibold text-base text-txtPrimary">
                                                 {t('insurance:buy:upgrade')}
                                             </label>
                                         </div>
                                     </div>
-                                    <span className="select-none text-[#22313F]">{t('insurance:buy:upgrade_info')}</span>
+                                    <span className="select-none text-txtPrimary">{t('insurance:buy:upgrade_info')}</span>
                                     <div
                                         style={{
                                             background: 'linear-gradient(88.09deg, #CE0014 0.48%, #E92828 52.94%, #FF5F6D 114.93%)',
@@ -465,6 +522,18 @@ const AcceptBuyInsurance = () => {
                                     </div>
                                 </div>
                             </div>
+                            <div className="dashedLine"></div>
+                            <div className="mt-[2rem] flex flex-col ">
+                                <span className="text-txtSecondary text-sm font-normal mb-[0.5rem]">{language === 'vi' ? 'Mã giới thiệu' : 'Referral ID'}</span>
+                                <Input
+                                    value={referral}
+                                    onChange={(e: any) => {
+                                        setReferral(e.target.value.toUpperCase())
+                                    }}
+                                    type="text"
+                                    className="text-txtPrimary text-base font-normal bg-hover"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -473,7 +542,7 @@ const AcceptBuyInsurance = () => {
                     <Button
                         variants={'primary'}
                         className={`${
-                            !isCanBuy ? 'bg-[#E5E7E8]' : 'bg-[#EB2B3E]'
+                            !isCanBuy ? 'bg-[#E5E7E8]' : 'bg-redPrimary'
                         }  h-[48px] w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                         onClick={() => {
                             setNoti('loading')
@@ -528,10 +597,10 @@ const AcceptBuyInsurance = () => {
                                 <span>{t('insurance:buy:info_covered')}</span>
                             </div>
                             <div className="flex flex-row">
-                                <span className={'text-sm text-[#22313F]'}>
+                                <span className={'text-sm text-txtPrimary'}>
                                     {`${t('insurance:buy:saved')} `}
-                                    <span className={'text-[#EB2B3E] px-[4px]'}>
-                                        {saved.toFixed(4)} {state?.unit}
+                                    <span className={'text-redPrimary px-[4px]'}>
+                                        ${saved.toFixed(4)} {state?.unit}
                                     </span>{' '}
                                     {t('insurance:buy:sub_saved')}
                                 </span>
@@ -541,8 +610,8 @@ const AcceptBuyInsurance = () => {
 
                     <div className="bg-[white] my-[24px]">
                         <div className="mx-[24px]">
-                            <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
-                                <div className={'text-[#808890] flex flex-row items-center'}>
+                            <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
+                                <div className={'text-txtSecondary flex flex-row items-center'}>
                                     <span className={'mr-[8px]'}>R-Claim</span>
                                     <div data-tip={t('insurance:terminology:r_claim')} data-for={`r-claim1`}>
                                         <InfoCircle size={14} color={colors.txtSecondary} />
@@ -550,7 +619,7 @@ const AcceptBuyInsurance = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold'}>
-                                    <span className={`${checkUpgrade ? 'line-through text-[#808890]' : 'pr-[8px]'}`}>{formatNumber(state?.r_claim, 2)}</span>{' '}
+                                    <span className={`${checkUpgrade ? 'line-through text-txtSecondary' : 'pr-[8px]'}`}>{formatNumber(state?.r_claim, 2)}</span>{' '}
                                     <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>
                                         {formatNumber((state?.q_claim + (state?.q_claim * 5) / 100) / state?.margin, 2)}
                                     </span>{' '}
@@ -558,7 +627,7 @@ const AcceptBuyInsurance = () => {
                                 </div>
                             </div>
                             <div className="flex flex-row justify-between py-[8px] px-[8px]">
-                                <div className={'text-[#808890] flex flex-row items-center'}>
+                                <div className={'text-txtSecondary flex flex-row items-center'}>
                                     <span className={'mr-[8px]'}>Q-Claim</span>
                                     <div data-tip={t('insurance:terminology:q_claim')} data-for={`q-claim`}>
                                         <InfoCircle size={14} color={colors.txtSecondary} />
@@ -566,17 +635,17 @@ const AcceptBuyInsurance = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                    <span className={`${checkUpgrade ? 'line-through text-[#808890] pr-[8px]' : 'pr-[8px]'}`}>
+                                    <span className={`${checkUpgrade ? 'line-through text-txtSecondary pr-[8px]' : 'pr-[8px]'}`}>
                                         {formatNumber(state?.q_claim, 4)}
                                     </span>{' '}
                                     <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
                                         {formatNumber(state?.q_claim + (state?.q_claim * 5) / 100, 4)}
                                     </span>{' '}
-                                    <span className={'text-[#EB2B3E] pl-[8px]'}>{state?.unit}</span>
+                                    <span className={'text-redPrimary pl-[8px]'}>{state?.unit}</span>
                                 </div>
                             </div>
-                            <div className="flex flex-row justify-between py-[8px] px-[8px] bg-[#F7F8FA]">
-                                <div className={'text-[#808890] flex flex-row items-center'}>
+                            <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
+                                <div className={'text-txtSecondary flex flex-row items-center'}>
                                     <span className={'mr-[8px]'}>Margin</span>
                                     <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
                                         <InfoCircle size={14} color={colors.txtSecondary} />
@@ -585,11 +654,11 @@ const AcceptBuyInsurance = () => {
                                 </div>
                                 <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                                     <span className={'pr-[2px]'}>{formatNumber(state?.margin, 4)}</span>{' '}
-                                    <span className={'text-[#EB2B3E] pl-[14px]'}>{state?.unit}</span>
+                                    <span className={'text-txtPrimary pl-[14px]'}>{state?.unit}</span>
                                 </div>
                             </div>
                             <div className="flex flex-row justify-between py-[8px] px-[8px]">
-                                <div className={'text-[#808890] flex flex-row items-center'}>
+                                <div className={'text-txtSecondary flex flex-row items-center'}>
                                     <span className={'mr-[8px]'}>Period</span>
                                     <div data-tip={t('insurance:terminology:period')} data-for={`period`}>
                                         <InfoCircle size={14} color={colors.txtSecondary} />
@@ -598,7 +667,7 @@ const AcceptBuyInsurance = () => {
                                 </div>
                                 <div className={'font-semibold'}>
                                     <span>
-                                        <span className={`${checkUpgrade ? 'line-through text-[#808890]' : 'pr-[2px]'}`}>{state?.period}</span>{' '}
+                                        <span className={`${checkUpgrade ? 'line-through text-txtSecondary' : 'pr-[2px]'}`}>{state?.period}</span>{' '}
                                         <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>{state?.period + 2}</span>{' '}
                                         {t('insurance:buy:day')}
                                     </span>
@@ -608,7 +677,7 @@ const AcceptBuyInsurance = () => {
                                 *{t('insurance:buy:notified')} 10,000$ - 12,000$ {t('insurance:buy:notified_sub')}
                             </div>
                             {!isUpdated ? (
-                                <div className="text-[#EB2B3E] bg-[#F7F8FA] rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
+                                <div className="text-redPrimary bg-hover rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
                                     <div className={'flex flex-row items-center py-[14px]'}>
                                         <span className="pr-[8px]">
                                             <ErrorCircleIcon size={16} />
@@ -631,7 +700,7 @@ const AcceptBuyInsurance = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="text-[#52CC74] bg-[#F7F8FA] rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
+                                <div className="text-[#52CC74] bg-hover rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
                                     <div className={'flex flex-row items-center py-[14px]'}>
                                         <span className="pr-[8px]">
                                             <CheckCircle />
@@ -642,7 +711,8 @@ const AcceptBuyInsurance = () => {
                             )}
 
                             <div
-                                className="rounded-[12px] p-[24px] flex flex-row items-center border-[#F7F8FA] border-1 relative"
+                                //flex
+                                className="rounded-[12px] p-[24px] hidden flex-row items-center border-hover border-1 relative"
                                 style={{ boxShadow: '0px 6px 18px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
                             >
                                 <div
@@ -675,12 +745,12 @@ const AcceptBuyInsurance = () => {
                                                 onClick={() => setCheckUpgrade(!checkUpgrade)}
                                                 onChange={(e: any) => {}}
                                             />
-                                            <label htmlFor="test1" className="select-none text-sm text-[#22313F] font-semibold">
+                                            <label htmlFor="test1" className="select-none text-sm text-txtPrimary font-semibold">
                                                 {t('insurance:buy:upgrade')}
                                             </label>
                                         </div>
                                     </div>
-                                    <span className="select-none text-[#22313F] text-xs font-medium">{t('insurance:buy:upgrade_info')}</span>
+                                    <span className="select-none text-txtPrimary text-xs font-medium">{t('insurance:buy:upgrade_info')}</span>
                                     <div
                                         style={{
                                             background: 'linear-gradient(88.09deg, #CE0014 0.48%, #E92828 52.94%, #FF5F6D 114.93%)',
@@ -724,14 +794,14 @@ const AcceptBuyInsurance = () => {
                     <Button
                         variants={'primary'}
                         className={`${
-                            !isCanBuy ? 'bg-[#E5E7E8]' : 'bg-[#EB2B3E]'
-                        }  h-[48px] w-[95%] tiny:w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
+                            !isCanBuy ? 'bg-[#E5E7E8]' : 'bg-redPrimary'
+                        }  h-[48px] w-full flex flex-row justify-center items-center text-white rounded-[8px] py-[12px]`}
                         onClick={() => {
                             createContract()
                         }}
                         disable={!isCanBuy}
                     >
-                        {t('insurance:buy:accept')}
+                        <span className="min-w-[5rem] ">{t('insurance:buy:accept')}</span>
                     </Button>
                 </div>
             </div>

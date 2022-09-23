@@ -12,13 +12,14 @@
         "quality_and_type": "Số lượng tài sản cần bảo hiểm",
         "continue": "Tiếp tục",
         "saved": "Tiết kiệm",
+        "save": "Lưu",
         "sub_saved": "so với không mua bảo hiểm",
         "info_covered": "Thông tin ký quỹ bảo hiểm",
         "day": "Ngày",
         "accept_buy": "Tôi đồng ý với",
         "accept_buy_sub": "điều khoản địch vụ",
         "notified": "Nhận 100% Margin khi P-Market đạt từ",
-        "notified_sub": "vào ngày cuối kỳ hạn.",
+        "notified_sub": "tại T-Expired",
         "price_had_update": "Giá đã được cập nhật",
         "accept": "Xác nhận",
         "period": "Period",
@@ -38,9 +39,15 @@
         "help1": "Cách mua bảo hiểm",
         "asset": "Loại tài sản"
     },
+    "buy_mobile": {
+        "q_covered": "Bạn muốn nhận tiền bảo hiểm cho",
+        "at": "tại",
+        "and": "và",
+        "margin": "Margin là"
+    },
     "final": {
         "succes": "Mua bảo hiểm thành công",
-        "completa": "Hoàn tất",
+        "complete": "Hoàn tất",
         "contract": "Hợp đồng bảo hiểm",
         "contract_sub": "đã kết thúc",
         "reasons": "Lý do: Chạm P-Claim",
@@ -67,7 +74,7 @@
         "margin": "Giá trị ký quỹ hợp đồng bảo hiểm"
     },
     "error": {
-        "p_claim": "Error messenge"
+        "p_claim": "Invalid number"
     },
     "unit": {
         "margin": "Đơn vị Margin",

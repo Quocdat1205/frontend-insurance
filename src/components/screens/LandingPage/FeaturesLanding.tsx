@@ -10,7 +10,7 @@ const FeaturesLanding = () => {
     const { t } = useTranslation()
     const features = [
         {
-            img: '/images/screens/landing-page/ic_features_1.png',
+            img: '/images/screens/landing-page/icÏ_features_1.png',
             title: t('home:landing:asset_value'),
             content: t('home:landing:asset_value_content'),
         },
