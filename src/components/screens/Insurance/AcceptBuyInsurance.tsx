@@ -75,11 +75,11 @@ const AcceptBuyInsurance = () => {
             setState({ ...res })
 
             if (res.p_claim < res.p_market) {
-                setSaved(res.q_claim + res.q_covered * (res.q_claim - res.p_market) - res.margin + res.q_covered * Math.abs(res.q_claim - res.p_market))
+                setSaved(res.q_claim + res.q_covered * (res.p_claim - res.p_market) - res.margin + res.q_covered * Math.abs(res.p_claim - res.p_market))
             }
 
             if (res.p_claim > res.p_market) {
-                setSaved(res.q_claim + res.q_covered * (res.q_claim - res.p_market) - res.margin)
+                setSaved(res.q_claim + res.q_covered * (res.p_claim - res.p_market) - res.margin)
             }
         }
         setLoading(false)
@@ -126,6 +126,7 @@ const AcceptBuyInsurance = () => {
         try {
             if (wallet && state != undefined) {
                 const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${state.symbol}${state.unit}`)
+                console.log(data)
 
                 if (data.data.length > 0) {
                     const min = data.data[0].p - data.data[0].p * 0.05
@@ -215,7 +216,7 @@ const AcceptBuyInsurance = () => {
         if (props) {
             try {
                 const data = {
-                    owner: props.from,
+                    owner: props.from.toLowerCase(),
                     transaction_hash: props.hash,
                     id_sc: _id,
                     asset_covered: dataPost.unit || 'USDT',
@@ -304,7 +305,7 @@ const AcceptBuyInsurance = () => {
                             <span className={'font-semibold text-[#22313F] px-[4px]'}>
                                 {`${t('insurance:buy:saved')} `}
                                 <span className={'text-[#EB2B3E]'}>
-                                    {saved.toFixed(4)} {state && state.unit}
+                                    ${saved.toFixed(4)} {state && state.unit}
                                 </span>{' '}
                                 {t('insurance:buy:sub_saved')}
                             </span>
@@ -529,7 +530,7 @@ const AcceptBuyInsurance = () => {
                                 <span className={'text-sm text-[#22313F]'}>
                                     {`${t('insurance:buy:saved')} `}
                                     <span className={'text-[#EB2B3E] px-[4px]'}>
-                                        {saved.toFixed(4)} {state?.unit}
+                                        ${saved.toFixed(4)} {state?.unit}
                                     </span>{' '}
                                     {t('insurance:buy:sub_saved')}
                                 </span>

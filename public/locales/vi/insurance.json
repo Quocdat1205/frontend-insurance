@@ -12,6 +12,7 @@
         "quality_and_type": "Số lượng tài sản cần bảo hiểm",
         "continue": "Tiếp tục",
         "saved": "Tiết kiệm",
+        "save": "Lưu",
         "sub_saved": "so với không mua bảo hiểm",
         "info_covered": "Thông tin ký quỹ bảo hiểm",
         "day": "Ngày",
@@ -37,6 +38,12 @@
         "detailed_terminology": "Thuật ngữ chi tiết",
         "help1": "Cách mua bảo hiểm",
         "asset": "Loại tài sản"
+    },
+    "buy_mobile": {
+        "q_covered": "Bạn muốn nhận tiền bảo hiểm cho",
+        "at": "tại",
+        "and": "và",
+        "margin": "Margin là"
     },
     "final": {
         "succes": "Mua bảo hiểm thành công",

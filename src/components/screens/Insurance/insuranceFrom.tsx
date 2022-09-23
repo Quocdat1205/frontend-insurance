@@ -22,9 +22,8 @@ import Tooltip from 'components/common/Tooltip/Tooltip'
 import { formatNumber } from 'utils/utils'
 import { ethers } from 'ethers'
 import colors from 'styles/colors'
-import classnames from 'classnames'
+import cx from 'classnames'
 import GlossaryModal from 'components/screens/Glossary/GlossaryModal'
-import { InsuranceFormLoading } from './insuranceFormLoading'
 import InputNumber from 'components/common/Input/InputNumber'
 
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
@@ -70,6 +69,8 @@ const InsuranceFrom = () => {
     const [thisFisrt, setThisFisrt] = useState(true)
     const [saved, setSaved] = useState<number>(0)
     const [minQ_covered, setMinQ_covered] = useState(0)
+    const [showInput, setShowInput] = useState<{ isShow: boolean; name: string }>({ isShow: false, name: '' })
+
     const [showChangeUnit, setShowChangeUnit] = useState({
         isShow: false,
         name: '',
@@ -166,6 +167,60 @@ const InsuranceFrom = () => {
             }
         }
     }
+    useEffect(() => {
+        if (!loadings) {
+            if ('virtualKeyboard' in navigator) {
+                // The VirtualKeyboard API is supported!
+            }
+        }
+    }, [])
+
+    const componentsInputMobile = () => {
+        return (
+            <div className="mx-[1rem] relative">
+                <div>
+                    {t('insurance:buy_mobile:q_covered')}{' '}
+                    <label>
+                        <span id="label_q_coverd" className="z-1 !w-max text-redPrimary">
+                            {state.q_covered}
+                        </span>
+                    </label>{' '}
+                    <span
+                        className="text-redPrimary z-1"
+                        onClick={() => {
+                            setOpenChangeToken(true)
+                        }}
+                    >
+                        {selectCoin.type}
+                    </span>{' '}
+                    {state.p_claim > 0 && (
+                        <>
+                            {t('insurance:buy_mobile:at')} <span className="text-redPrimary">${state.p_claim}</span>
+                            {tab != 6 && '?'}
+                        </>
+                    )}
+                    {tab == 6 && (
+                        <>
+                            {t('insurance:buy_mobile:and')} <br /> {t('insurance:buy_mobile:margin')}{' '}
+                            <label>
+                                <span className="text-redPrimary">
+                                    <span onClick={() => setShowInput({ isShow: true, name: 'margin' })}>{state.margin}</span>{' '}
+                                    <span
+                                        onClick={() => {
+                                            setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:margin')}` })
+                                        }}
+                                    >
+                                        {unitMoney}
+                                    </span>
+                                </span>
+                            </label>
+                            ?
+                        </>
+                    )}
+                </div>
+            </div>
+        )
+    }
 
     // useEffect(() => {
     //     if (loadings) {
@@ -227,7 +282,7 @@ const InsuranceFrom = () => {
             setState({
                 ...state,
                 percent_margin: value,
-                margin: Number((value * state.q_covered) / 100),
+                margin: Number((value / 100) * state.q_covered * state.p_market),
             })
         }
     }
@@ -270,25 +325,8 @@ const InsuranceFrom = () => {
                     },
                 })
             } else {
-                setSelectedCoin({
-                    icon: listCoin[0].icon,
-                    id: listCoin[0].id,
-                    name: listCoin[0].name,
-                    symbol: listCoin[0].symbol,
-                    type: listCoin[0].type,
-                    disable: listCoin[0].disable,
-                })
-                setState({
-                    ...state,
-                    symbol: {
-                        icon: listCoin[0].icon,
-                        id: listCoin[0].id,
-                        name: listCoin[0].name,
-                        symbol: listCoin[0].symbol,
-                        type: listCoin[0].type,
-                        disable: listCoin[0].disable,
-                    },
-                })
+                if (listCoin.length > 0) {
+                }
             }
 
             setTab(res.tab)
@@ -363,6 +401,25 @@ const InsuranceFrom = () => {
             await list.push(tmp)
         })
         if (list.length > 0) {
+            setSelectedCoin({
+                icon: list[0].icon,
+                id: list[0].id,
+                name: list[0].name,
+                symbol: list[0].symbol,
+                type: list[0].type,
+                disable: list[0].disable,
+            })
+            setState({
+                ...state,
+                symbol: {
+                    icon: list[0].icon,
+                    id: list[0].id,
+                    name: list[0].name,
+                    symbol: list[0].symbol,
+                    type: list[0].type,
+                    disable: list[0].disable,
+                },
+            })
             return setListCoin(list)
         }
     }, [assetsToken])
@@ -424,17 +481,12 @@ const InsuranceFrom = () => {
                 const res = JSON.parse(data)
                 const newData = {
                     ...res,
-                    timeframe: state.timeframe,
-                    margin: state.margin * 1.0,
-                    percent_margin: state.percent_margin * 1.0,
-                    period: state.period * 1.0,
-                    p_claim: state.p_claim * 1.0,
-                    q_claim: state.q_claim * 1.0,
-                    r_claim: state.r_claim * 1.0,
-                    q_covered: state.q_covered * 1.0,
-                    p_market: state.p_market * 1.0,
-                    t_market: state.t_market,
-                    p_expired: state.p_expired * 1.0,
+                    disable: state.symbol.disable,
+                    icon: state.symbol.icon,
+                    id: state.symbol.id,
+                    name: state.symbol.name,
+                    symbol: state.symbol.symbol,
+                    type: state.symbol.type,
                 }
                 setStorage(newData)
             }
@@ -450,6 +502,9 @@ const InsuranceFrom = () => {
             const res = JSON.parse(data)
             const newData = { ...res, tab: tab }
             return localStorage.setItem('buy_covered_state', JSON.stringify(newData))
+        }
+        if (tab == 6) {
+            setShowInput({ isShow: true, name: 'margin' })
         }
     }, [tab])
 
@@ -488,7 +543,7 @@ const InsuranceFrom = () => {
         const x = state.q_claim + state.q_covered * (state.p_claim - state.p_market)
 
         if (state.p_claim < state.p_market) {
-            setSaved(x - state.margin + state.q_covered * Math.abs(state.q_claim - state.p_market))
+            setSaved(x - state.margin + state.q_covered * Math.abs(state.p_claim - state.p_market))
         }
 
         if (state.p_claim > state.p_market) {
@@ -532,8 +587,8 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         if (percentInsurance) {
-            const defaultMargin = 8
-            const min = (defaultMargin * 100) / (10 * state.p_market)
+            const defaultMargin = 10
+            const min = defaultMargin / ((10 / 100) * state.p_market)
             setMinQ_covered(min)
         }
     }, [percentInsurance, state.margin, state.q_covered])
@@ -557,7 +612,7 @@ const InsuranceFrom = () => {
         switch (key) {
             case 'q_covered':
                 rs.isValid = !(state.q_covered > userBalance || state.q_covered < Number(minQ_covered.toFixed(2)))
-                rs.message = `<div class="flex items-center">
+                rs.message = `<div class="flex items-center ">
                 ${
                     state.q_covered > userBalance
                         ? t('common:available', { value: `${formatNumber(userBalance)}` })
@@ -566,17 +621,19 @@ const InsuranceFrom = () => {
             </div>`
                 break
             case 'p_claim':
-                const min = state.p_claim > state.p_market ? state.p_market * 1 + 2 * state.p_market : state.p_market * 1 + (70 * state.p_market) / 100
-                const max = state.p_claim > state.p_market ? state.p_market * 1 - (70 * state.p_market) / 100 : state.p_market * 1 - (2 * state.p_market) / 100
+                const min = state.p_claim > state.p_market ? state.p_market * 1 + (2 * state.p_market) / 100 : state.p_market * 1 - (70 * state.p_market) / 100
+                const max = state.p_claim > state.p_market ? state.p_market * 1 + (70 * state.p_market) / 100 : state.p_market * 1 - (2 * state.p_market) / 100
                 rs.isValid = errorPCalim || state.p_claim <= 0
                 rs.message = `<div class="flex items-center">
                 ${t('insurance:error:p_claim')}: ${min.toFixed(2)} < P Claim < ${max.toFixed(2)}
                 </div>`
                 break
             case 'margin':
-                rs.isValid = state.margin < (2 / 100) * state.q_covered * state.p_market || state.margin > (10 / 100) * state.q_covered * state.p_market
+                const MIN = formatNumber((state.q_covered * state.p_market * 2) / 100, 4)
+                const MAX = formatNumber((state.q_covered * state.p_market * 10) / 100, 4)
+                rs.isValid = !(state.margin < Number(MIN) || state.margin > Number(MAX))
                 rs.message = `<div class="flex items-center">
-                ${t('insurance:error:p_claim')}: ${(state.q_covered * 2) / 100} < P Claim < ${(state.q_covered * 10) / 100}
+                ${t('insurance:error:p_claim')}: ${MIN} < P Claim < ${MAX}
                 </div>`
                 break
             default:
@@ -745,7 +802,7 @@ const InsuranceFrom = () => {
 
                                     <Popover className="relative" data-tut="tour_custom" id="tour_custom">
                                         <Popover.Button
-                                            className={classnames('rounded-md h-10 w-auto py-2 px-3 flex items-center space-x-2 bg-hover', {
+                                            className={cx('rounded-md h-10 w-auto py-2 px-3 flex items-center space-x-2 bg-hover', {
                                                 'bg-[#EDEEF0]': isDrop,
                                             })}
                                             onClick={() => setDrop(!isDrop)}
@@ -888,18 +945,42 @@ const InsuranceFrom = () => {
                                         </div>
                                         <div className="flex flex-row w-full space-x-6 text-xs font-semibold">
                                             <div className={`flex flex-row justify-between space-x-4 ${tab == 6 ? 'w-1/2' : 'w-full'}`}>
-                                                {[25, 50, 75, 100].map((item, key) => {
-                                                    return (
-                                                        <div
-                                                            key={key}
-                                                            className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
-                                                            onClick={() => setState({ ...state, q_covered: (item / 100) * userBalance })}
-                                                        >
-                                                            <div className={`${percentInsurance == item ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                            <span className={percentInsurance === item ? 'text-red' : 'text-gray'}>{item}%</span>
-                                                        </div>
-                                                    )
-                                                })}
+                                                <div
+                                                    className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
+                                                    onClick={() => {
+                                                        setState({ ...state, q_covered: (25 / 100) * userBalance })
+                                                    }}
+                                                >
+                                                    <div className={`${percentInsurance == 25 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
+                                                    <div className={percentInsurance === 25 ? 'text-red' : 'text-gray'}>{25}%</div>
+                                                </div>
+                                                <div
+                                                    className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
+                                                    onClick={() => {
+                                                        setState({ ...state, q_covered: (50 / 100) * userBalance })
+                                                    }}
+                                                >
+                                                    <div className={`${percentInsurance == 50 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
+                                                    <div className={percentInsurance === 50 ? 'text-red' : 'text-gray'}>{50}%</div>
+                                                </div>
+                                                <div
+                                                    className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
+                                                    onClick={() => {
+                                                        setState({ ...state, q_covered: (75 / 100) * userBalance })
+                                                    }}
+                                                >
+                                                    <div className={`${percentInsurance == 75 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
+                                                    <div className={percentInsurance === 75 ? 'text-red' : 'text-gray'}>{75}%</div>
+                                                </div>
+                                                <div
+                                                    className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
+                                                    onClick={() => {
+                                                        setState({ ...state, q_covered: (100 / 100) * userBalance })
+                                                    }}
+                                                >
+                                                    <div className={`${percentInsurance == 100 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
+                                                    <div className={percentInsurance === 100 ? 'text-red' : 'text-gray'}>{100}%</div>
+                                                </div>
                                             </div>
 
                                             <div className={`flex flex-row justify-between space-x-4 ${tab == 6 ? 'w-1/2' : 'hidden'}`}>
@@ -1190,7 +1271,7 @@ const InsuranceFrom = () => {
                                         <span className={'font-medium text-txtPrimary px-[4px]'}>
                                             {`${t('insurance:buy:saved')} `}
                                             <span className={'text-red'}>
-                                                {saved.toFixed(4)} {unitMoney}
+                                                ${saved.toFixed(4)} {unitMoney}
                                             </span>{' '}
                                             {t('insurance:buy:sub_saved')}
                                         </span>
@@ -1331,7 +1412,7 @@ const InsuranceFrom = () => {
                                     <Modal
                                         portalId="modal"
                                         isVisible={true}
-                                        className=" bg-white absolute bottom-0 translate-y-0 h-max"
+                                        className=" bg-white !sticky !bottom-0 !left-0 !rounded-none !translate-x-0 !translate-y-0 h-max"
                                         onBackdropCb={() => setShowChangeUnit({ ...showChangeUnit, isShow: false, name: '' })}
                                     >
                                         <div className={` bg-white text-sm  mx-auto `}>
@@ -1357,14 +1438,95 @@ const InsuranceFrom = () => {
                                         </div>
                                     </Modal>
                                 )}
+                                {showInput.isShow && (
+                                    <Modal
+                                        portalId="modal"
+                                        isVisible={true}
+                                        className=" bg-white !sticky !bottom-0 !left-0 !rounded-none !translate-x-0 !translate-y-0 h-max"
+                                        onBackdropCb={() => setShowInput({ ...showInput, isShow: false, name: '' })}
+                                    >
+                                        <div className={``}>
+                                            <div className="text-txtPrimary text-xl font-semibold mb-[1.5rem]">
+                                                {t(`insurance:terminology:${showInput.name}`)}
+                                            </div>
+                                            {showInput.name === 'q_covered' ? (
+                                                <div className="text-txtSecondary text-base mb-[0.5rem]">{t('insurance:buy:quality_and_type')}</div>
+                                            ) : (
+                                                <>
+                                                    <div className={'text-txtSecondary text-base mb-[0.5rem] flex flex-row items-center'}>
+                                                        <span className={'mr-2'}>Margin</span>
+                                                        <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
+                                                            <InfoCircle size={14} color={colors.txtSecondary} />
+                                                            <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
+                                            <div className={`flex justify-between border-collapse rounded-[3px] shadow-none w-full mb-[0.5rem]`}>
+                                                <InputNumber
+                                                    validator={validator(`${showInput.name}`)}
+                                                    value={showInput.name === 'q_covered' ? state.q_covered : state.margin}
+                                                    onChange={(e: any) => onHandleChange(`${showInput.name}`, e)}
+                                                    decimal={8}
+                                                />
+                                            </div>
+                                            <div className={`flex flex-row justify-between space-x-4 w-full text-xs mb-[1.5rem]`}>
+                                                {showInput.name === 'q_covered' &&
+                                                    [25, 50, 75, 100].map((data) => {
+                                                        return (
+                                                            <div
+                                                                key={data}
+                                                                className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
+                                                                onClick={() => {
+                                                                    setState({ ...state, q_covered: (data / 100) * userBalance })
+                                                                }}
+                                                            >
+                                                                <div
+                                                                    className={`${percentInsurance == data ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}
+                                                                ></div>
+                                                                <div className={percentInsurance === data ? 'text-red' : 'text-gray'}>{data}%</div>
+                                                            </div>
+                                                        )
+                                                    })}
+                                                {showInput.name === 'margin' &&
+                                                    [2, 5, 7, 10].map((data) => {
+                                                        return (
+                                                            <div
+                                                                key={data}
+                                                                className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
+                                                                onClick={() => {
+                                                                    updateFormPercentMargin(data)
+                                                                }}
+                                                            >
+                                                                <div
+                                                                    className={`${percentInsurance == data ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}
+                                                                ></div>
+                                                                <div className={percentInsurance === data ? 'text-red' : 'text-gray'}>{data}%</div>
+                                                            </div>
+                                                        )
+                                                    })}
+                                            </div>
+                                            <Button
+                                                variants={'primary'}
+                                                className={`bg-red h-[48px] w-full flex justify-center items-center text-white rounded-[8px] py-[12px]`}
+                                                onClick={() => {}}
+                                            >
+                                                {t('insurance:buy:save')}
+                                            </Button>
+                                        </div>
+                                    </Modal>
+                                )}
                                 {openChangeToken && (
                                     <Modal
                                         portalId="modal"
                                         isVisible={true}
-                                        className=" bg-white absolute bottom-0 !translate-y-1"
-                                        onBackdropCb={() => setOpenChangeToken(false)}
+                                        className=" bg-white !sticky !bottom-0 !left-0 !rounded-none !translate-x-0 !translate-y-0 h-max"
+                                        onBackdropCb={() => {
+                                            setShowInput({ isShow: true, name: 'q_covered' })
+                                            setOpenChangeToken(false)
+                                        }}
                                     >
-                                        <div className="bg-white h-[50%] w-full flex flex-col z-50 text-sm">
+                                        <div className="bg-white text-sm  mx-auto">
                                             <div className="font-semibold text-xl my-[24px]">{t('insurance:buy:asset')}</div>
                                             <div>
                                                 {listCoin &&
@@ -1382,6 +1544,7 @@ const InsuranceFrom = () => {
                                                                     setSelectedCoin(coin)
                                                                     setState({ ...state, symbol: { ...coin } })
                                                                     setOpenChangeToken(false)
+                                                                    setShowInput({ isShow: true, name: 'q_covered' })
                                                                 }}
                                                                 className={`${
                                                                     isPress ? 'bg-gray-1' : 'hover:bg-hover'
@@ -1454,7 +1617,12 @@ const InsuranceFrom = () => {
                                                 <Switch
                                                     checked={tab == 6 ? true : false}
                                                     onChange={() => {
-                                                        tab == 6 ? setTab(3) : setTab(6)
+                                                        if (tab == 6) {
+                                                            return setTab(3)
+                                                        } else {
+                                                            setShowInput({ isShow: true, name: 'margin' })
+                                                            return setTab(6)
+                                                        }
                                                     }}
                                                     className={`${
                                                         tab == 6 ? 'bg-red' : 'bg-[#F2F3F4]'
@@ -1480,93 +1648,7 @@ const InsuranceFrom = () => {
                                         id="tour_statistics"
                                         className=" my-[24px] w-full mx-auto flex flex-wrap flex-col justify-center content-center font-bold text-2xl relative "
                                     >
-                                        <div>
-                                            <span>{t('insurance:buy:buy_covered')} </span>{' '}
-                                            <span
-                                                className="text-red"
-                                                onClick={() => {
-                                                    setOpenChangeToken(true)
-                                                }}
-                                            >
-                                                {selectCoin.name}
-                                            </span>
-                                        </div>
-                                        <div className="flex flex-row overflow-clip">
-                                            <span className="pr-[4px]">{t('insurance:buy:quality')} </span>{' '}
-                                            <label
-                                                className={`${
-                                                    state.q_covered && state.q_covered > 0 ? 'text-red' : 'text-[#B2B7BC]'
-                                                } max-w-[245] relative ml-[6xp] `}
-                                            >
-                                                {state.q_covered > 0 ? Number(state.q_covered) : 'Số tiền?'}
-                                                <input
-                                                    type="number"
-                                                    className={` text-white pl-[4px] focus-visible:outline-none w-0 border border-1 border-black ${
-                                                        openChangeToken && 'opacity-0'
-                                                    } `}
-                                                    placeholder="Số tiền?"
-                                                    value={state.q_covered != undefined ? Number(state.q_covered) : 'Số tiền?'}
-                                                    name="name"
-                                                    id="name"
-                                                    onChange={(a: any) => {
-                                                        if (Number(a.target.value) >= 1) {
-                                                            setState({ ...state, q_covered: a.target.value.replace(/^0+/, '') })
-                                                        } else {
-                                                            setState({ ...state, q_covered: Number(a.target.value) })
-                                                        }
-                                                        setPercentInsurance(0)
-                                                    }}
-                                                ></input>
-                                            </label>{' '}
-                                            <span className="text-red">{selectCoin.type}</span>
-                                        </div>
-                                        {tab == 6 && (
-                                            <div data-tut="tour_custom" id="tour_custom">
-                                                <span>{t('insurance:buy:title_change_margin')}</span>{' '}
-                                                <label className={`${state.margin == 0 ? 'text-[#B2B7BC]' : 'text-red'} max-w-[245] relative ml-[6xp]`}>
-                                                    {state.margin > 0 ? Number(state.margin) : 'Số tiền?'}
-                                                    <input
-                                                        type="number"
-                                                        className={` text-white pl-[4px] focus-visible:outline-none w-0 border border-1 border-black`}
-                                                        placeholder="Số tiền?"
-                                                        value={state.margin > 0 ? Number(state.margin) : 0}
-                                                        name="name"
-                                                        id="name"
-                                                        onChange={(a: any) => {
-                                                            if (Number(a.target.value) >= 1) {
-                                                                return setState({
-                                                                    ...state,
-                                                                    margin: a.target.value.replace(/^0+/, ''),
-                                                                    percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
-                                                                })
-                                                            } else {
-                                                                return setState({
-                                                                    ...state,
-                                                                    margin: Number(a.target.value) * 1,
-                                                                    percent_margin: Number(a.target.value / (state.q_covered * state.p_market)),
-                                                                })
-                                                            }
-                                                        }}
-                                                    ></input>
-                                                </label>{' '}
-                                                <span
-                                                    className="text-red"
-                                                    onClick={() =>
-                                                        setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:margin')}` })
-                                                    }
-                                                >
-                                                    {unitMoney}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {state.q_covered > userBalance && (
-                                            <div className="text-[#E5544B] text-xs flex items-center">
-                                                <div className="mr-[8px]">
-                                                    <ErrorTriggersIcon />
-                                                </div>
-                                                <div>Số dư không đủ</div>
-                                            </div>
-                                        )}
+                                        {componentsInputMobile()}
                                     </div>
                                 )}
                                 {index == 1 && (
@@ -1752,7 +1834,7 @@ const InsuranceFrom = () => {
                                                 <span className={'text-sm text-txtPrimary w-[230px] xs:w-full px-[4px] font-semibold'}>
                                                     {t('insurance:buy:saved')}
                                                     <span className={'text-red'}>
-                                                        {saved.toFixed(4)} {unitMoney}
+                                                        ${saved.toFixed(4)} {unitMoney}
                                                     </span>
                                                     {t('insurance:buy:sub_saved')}
                                                 </span>
@@ -1847,7 +1929,7 @@ const InsuranceFrom = () => {
                     </>
                 )
             ) : (
-                <InsuranceFormLoading isMobile={!isMobile} />
+                <></>
             )}
         </>
     )
