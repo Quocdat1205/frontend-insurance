@@ -19,8 +19,14 @@
     },
     "header": {
         "home": "Home",
-        "buy_covered": "Buy Insurance",
-        "insurance_history": "Insurance History"
+        "buy_covered": "Buy Cover",
+        "insurance_history": "Insurance History",
+        "commission_policy": "Commission Policy",
+        "recent_transactions": "Recent Transactions",
+        "my_covered_contract": "My Insurance Contract",
+        "update_my_email": "Update Email for Notifications",
+        "disconnect": "Disconnect",
+        "account_info_title": "My Wallet"
     },
     "days": "Days",
     "asset_type": "Asset Type",

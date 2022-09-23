@@ -192,3 +192,7 @@ export const formatPercentage = (value: number, digits: number = 2, acceptNegati
     if (!acceptNegative && +value < 0) return '0'
     return numeral(+value).format(`0,0.[${'0'.repeat(digits)}]`, Math.floor)
 }
+
+export function isFunction(functionToCheck: any) {
+    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+}

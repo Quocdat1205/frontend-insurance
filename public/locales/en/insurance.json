@@ -1,7 +1,7 @@
 {
     "buy": {
         "home": "Home",
-        "buy_covered": "Buy Insurance",
+        "buy_covered": "Buy Cover",
         "back_to_home": "Back to Home",
         "default": "Default",
         "change": "Customize",
@@ -35,7 +35,7 @@
         "quality": "Quantity",
         "title_change_margin": "and Margin is",
         "detailed_terminology": "Detailed terminology",
-        "help1": "How to buy Insurance",
+        "help1": "How to buy Cover",
         "asset": "Asset"
     },
     "final": {

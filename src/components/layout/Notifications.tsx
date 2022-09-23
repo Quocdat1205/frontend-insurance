@@ -234,8 +234,9 @@ const Notifications = () => {
                 >
                     <div
                         className={`absolute z-10 mt-3 ${
-                            width && width > screens.drawer ? 'left-0' : 'right-0'
-                        }  shadow-subMenu rounded-xl min-w-[360px] py-1 bg-white`}
+                            // width && width > screens.drawer ? 'left-0' : 'right-0'
+                            width && width > screens.drawer ? '-left-[20rem]' : 'right-0'
+                        }  shadow-subMenu rounded-b-xl min-w-[360px] py-1 bg-white`}
                     >
                         <div className="font-normal sm:h-[28rem] overflow-auto px-4 sm:px-0">
                             {renderNoti()}
