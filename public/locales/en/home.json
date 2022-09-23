@@ -32,28 +32,25 @@
         "register_content": "The lasted information will be sent to you. Please check email regularly",
         "email_invalid": "Confirmation email invalid. Please try again.",
 
-        "faq_type_asset_q": "Các tài sản được Nami Insurance bảo chứng hiện tại bao gồm những loại nào? ",
-        "faq_type_asset_a": "Tính đến hiện hiện, bao gồm: Bitcoin (BTC); Binance coin (BNB); Ethereum (ETH)",
-        "faq_type_asset_link": "Hướng dẫn Ký quỹ bảo hiểm",
+        "faq_type_asset_q": "What types of assets does Nami Insurance now cover?",
+        "faq_type_asset_a": "Included thus far are Bitcoin (BTC), Binance coin (BNB), and Ethereum (ETH)\nRead more tutorial: ",
+        "faq_type_asset_link": "How to Margin Insurance contract",
 
-        "faq_title": "Những câu hỏi thường gặp",
-        "faq_type_asset_q": "Các tài sản được Nami Insurance bảo chứng hiện tại bao gồm những loại nào?",
-        "faq_type_asset_a": "Tính đến hiện hiện, bao gồm: Bitcoin (BTC); Binance coin (BNB); Ethereum (ETH) \nXem thêm: ",
-        "faq_type_asset_link": "Hướng dẫn Ký quỹ bảo hiểm",
+        "faq_title": "FAQ",
 
-        "faq_claim_q": "Tôi có thể Ký quỹ và Nhận chi trả bằng những Coin/Token nào?",
-        "faq_claim_a": "Đơn vị Ký quỹ: USDT \n Đơn vị Nhận chi trả: USDT và Tài sản được bảo hiểm",
+        "faq_claim_q": "Which Coins/Tokens am I allowed to margin and receive cover payout?",
+        "faq_claim_a": "Margin unit: USDT\nCover payout (Q-Claim) unit: USDT or Covered Asset",
 
-        "faq_period_q": "Tôi có thể ký quỹ hợp đồng bảo hiểm với kỳ hạn tối thiểu bao nhiêu ngày?",
-        "faq_period_a": "Tối thiểu là 2 ngày và tối đa là 15 ngày \nThời hạn hợp đồng bảo hiểm ảnh hưởng đến chi trả bảo hiểm (Q-Claim) ",
+        "faq_period_q": "Minimum number of days to margin an insurance contract?",
+        "faq_period_a": "Minimum 2 days and maximum 15 days\nThe period of the insurance contract has an effect on Q-Claim",
 
-        "faq_claim_when_q": "Tôi được nhận chi trả bảo hiểm ngay khi chạm giá không?",
-        "faq_claim_when_a": "Khi chạm mức giá bảo hiểm (P-Claim), trạng thái HĐBH chuyển sang \"Đợi chi trả\". Hệ thống chuyển On-chain tự động khoản nhận chi trả (Q-Claim) đến ví người dùng vào ngày kết thúc hợp đồng\nXem thêm: ",
-        "faq_claim_when_link": "Hệ thống thuật ngữ Nami Insurance",
+        "faq_claim_when_q": "Will I get cover payout as soon as the price reaches?",
+        "faq_claim_when_a": "When reaching P-Claim, the status of the insurance contract switches to \"Claim waiting\". The system automatically sends cover payout (Q-Claim) to the user's wallet address on the end date of insurance contract\nRead more: ",
+        "faq_claim_when_link": "Nami Insurance's Glossary System",
 
-        "faq_claim_how_q": "Tôi có thể ký quỹ 2 HĐBH cùng loại tài sản tại 1 thời điểm không?",
-        "faq_claim_how_a": "Được, người dùng nhận được 2 HĐBH độc lập và có thể kiểm tra trên Explorer\nXem thêm:",
-        "faq_claim_how_link": "Hướng dẫn kiểm trả HĐBH của bạn"
+        "faq_claim_how_q": "Can I separately margin two insurance contracts of the same asset type at the same time?",
+        "faq_claim_how_a": "Sure, users can get two separate insurance contracts and can use Explorer to check on them.\nRead more tutorial: ",
+        "faq_claim_how_link": "How to check the details of your insurance contract"
     },
     "home": {
         "connect_wallet": "Connect Wallet",
