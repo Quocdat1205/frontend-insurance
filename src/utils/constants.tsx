@@ -107,3 +107,7 @@ export const days: any = [
 ]
 
 export const DURATION_AOS = 400
+
+export const errorsWallet = {
+    Cancel: 4001,
+}

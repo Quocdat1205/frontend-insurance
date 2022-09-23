@@ -59,12 +59,12 @@ function MyApp({ Component, pageProps }: AppProps) {
 
     return (
         <Provider store={store}>
-            <Container>
-                <Head />
-                <MetaMaskProvider>
+            <MetaMaskProvider>
+                <Container>
+                    <Head />
                     <Component {...pageProps} />
-                </MetaMaskProvider>
-            </Container>
+                </Container>
+            </MetaMaskProvider>
         </Provider>
     )
 }

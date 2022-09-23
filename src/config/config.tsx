@@ -1,6 +1,6 @@
 import { BasicChainInformation, ExtendedChainInformation, wallets } from 'components/web3/Web3Types'
 import env from 'config/env'
-import { Toast } from 'types/types'
+import { ConnectWalletType, Toast } from 'types/types'
 
 class Config {
     static env = env
@@ -9,11 +9,10 @@ class Config {
     static toast: Toast
     static alert: Toast
     static web3: any
+    static refConnectWallet: ConnectWalletType
 
     static connectWallet = (wallet: string = wallets.metaMask) => {
-        if (Config) {
-            Config.web3.activate(wallet)
-        }
+        Config.refConnectWallet.show()
     }
 
     static chains = String(Config.env.CHAINS)

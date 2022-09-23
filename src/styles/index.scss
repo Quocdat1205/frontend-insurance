@@ -2,10 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-@import 'fonts';
-@import 'fonts';
-@import 'datepicker';
-@import 'pagination';
+@import "fonts";
+@import "fonts";
+@import "datepicker";
+@import "pagination";
+@import "keyframes";
 
 html,
 body {
@@ -55,6 +56,9 @@ body {
 }
 .no-border {
     outline: none;
+}
+.gradient-spin {
+    background: conic-gradient(from 180deg at 50% 50%, #eb2b3e 0deg, rgba(235, 43, 62, 0) 360deg);
 }
 
 @layer utilities {
@@ -182,13 +186,13 @@ input::-webkit-inner-spin-button {
     margin: 0;
 }
 
-input[type='number'] {
+input[type="number"] {
     -moz-appearance: textfield;
 }
 
 /* Tooltip container */
 .tooltip::after {
-    content: ' ';
+    content: " ";
     position: absolute;
     top: 100%; /* At the bottom of the tooltip */
     left: 80%;
@@ -229,7 +233,7 @@ input[type='number'] {
     margin-left: 12px !important;
 
     &::before {
-        content: '';
+        content: "";
         position: absolute;
         display: block;
         width: 0px;

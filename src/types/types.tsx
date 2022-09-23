@@ -15,6 +15,10 @@ export interface Toast {
     show: (type: string, messages: string, option?: OptionNotify) => void
 }
 
+export interface ConnectWalletType {
+    show: (onConfirm?: () => void, onCancel?: () => void) => void
+}
+
 export interface IconSvg {
     size?: number
     color?: string
