@@ -13,7 +13,7 @@ export const getS3Url = (url: string) => Config.env.CDN + url
 
 export const countDecimals = (value: number) => {
     if (Math.floor(value) === value) return 0
-    const str = value?.toString()
+    const str = Number(value)?.toString()
     if (str?.indexOf('.') !== -1 && str?.indexOf('-') !== -1) {
         return str?.split('-')[1] || 0
     }
