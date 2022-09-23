@@ -18,6 +18,7 @@ export interface Toast {
 export interface IconSvg {
     size?: number
     color?: string
+    className?: string
 }
 
 export interface StateInsurance {
