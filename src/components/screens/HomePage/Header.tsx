@@ -66,7 +66,7 @@ const Header = () => {
     }
 
     const menuConfig = [
-        { menuId: 'account-info', router: '/', name: NameComponent, parentId: 0, isNameComponent: true, hideArrowIcon: true, nameComponentProps: { ...props } },
+        { menuId: 'account-info', router: '/', name: NameComponent, parentId: 0, hideArrowIcon: true, nameComponentProps: { ...props } },
         ...Config.subMenu,
     ]
 
