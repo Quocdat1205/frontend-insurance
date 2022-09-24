@@ -4,6 +4,7 @@ import useLanguage, { LANGUAGE_TAG } from 'hooks/useLanguage'
 import { useTranslation } from 'next-i18next'
 import colors from 'styles/colors'
 import classnames from 'classnames'
+import { isFunction } from 'utils/utils'
 
 interface Language {
     active?: boolean
@@ -19,13 +20,18 @@ const ButtonLanguage = ({ mobile = false, className }: Language) => {
         t,
         i18n: { language },
     } = useTranslation()
+
+    const _onChangeLang = () => {
+        if (isFunction(onChangeLang)) onChangeLang()
+    }
+
     return (
         <div className={`${className} border border-red rounded-[3px] w-max`}>
             <div className="flex items-center space-x-1 bg-white-3 px-1 py-[3px] rounded-[3px]">
-                <Language mobile={mobile} active={language === LANGUAGE_TAG.VI} onClick={() => language !== LANGUAGE_TAG.VI && onChangeLang()}>
+                <Language mobile={mobile} active={language === LANGUAGE_TAG.VI} onClick={() => language !== LANGUAGE_TAG.VI && _onChangeLang()}>
                     VI
                 </Language>
-                <Language mobile={mobile} active={language === LANGUAGE_TAG.EN} onClick={() => language !== LANGUAGE_TAG.EN && onChangeLang()}>
+                <Language mobile={mobile} active={language === LANGUAGE_TAG.EN} onClick={() => language !== LANGUAGE_TAG.EN && _onChangeLang()}>
                     EN
                 </Language>
             </div>

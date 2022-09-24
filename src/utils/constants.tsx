@@ -110,4 +110,6 @@ export const DURATION_AOS = 400
 
 export const errorsWallet = {
     Cancel: 4001,
+    Not_found: 4902,
+    Success: 1013,
 }

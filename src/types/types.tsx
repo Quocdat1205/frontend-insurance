@@ -16,7 +16,7 @@ export interface Toast {
 }
 
 export interface ConnectWalletType {
-    show: (onConfirm?: () => void, onCancel?: () => void) => void
+    show: () => void
 }
 
 export interface IconSvg {

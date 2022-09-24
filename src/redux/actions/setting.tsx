@@ -14,9 +14,35 @@ export const onLoading = (data: boolean) => async (dispatch: Dispatch) => {
     }
 }
 
+export const setting = () => async (dispatch: Dispatch) => {
+    try {
+        const address = localStorage.getItem('PUBLIC_ADDRESS')
+        const wallet = localStorage.getItem('PUBLIC_WALLET')
+        if (address && wallet) {
+            dispatch({
+                type: types.SET_ACCOUNT,
+                payload: { address, wallet },
+            })
+        }
+    } catch (error) {
+        console.log('setAccount', error)
+    }
+}
+
+export const setAccount = (data: { address: string | null | undefined; wallet: string | null | undefined }) => async (dispatch: Dispatch) => {
+    try {
+        dispatch({
+            type: types.SET_ACCOUNT,
+            payload: data,
+        })
+    } catch (error) {
+        console.log('setAccount', error)
+    }
+}
+
 export const getListAssetToken = () => async (dispatch: Dispatch) => {
     try {
-        const data = await fetchApi({ url: API_GET_LIST_TOKEN })
+        const { data } = await fetchApi({ url: API_GET_LIST_TOKEN })
         if (data) {
             dispatch({
                 type: types.SET_ASSETS_TOKEN,
