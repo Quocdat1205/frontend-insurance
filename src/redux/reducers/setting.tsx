@@ -16,7 +16,10 @@ const setting = (state = initialState, action: Action) => {
         case types.SET_ACCOUNT:
             return {
                 ...state,
-                account: action.payload,
+                account: {
+                    ...state.account,
+                    ...action.payload,
+                },
             }
         case types.LOADING_ACCOUNT:
             return {

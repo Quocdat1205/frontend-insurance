@@ -17,6 +17,7 @@ export const API_UPDATE_GUIDE_LINE: string = 'v1/update-guide-line'
 export const API_SUBSCRIBE = 'v1/subscribe'
 export const API_GET_NONCE: string = 'v1/get-nonce'
 export const API_LOGIN: string = 'v1/log-in'
+export const API_GET_TOKEN_COOKIES: string = 'v1/get-token-cookies'
 
 //futures
 export const API_GET_UNIT_CONFIG: string = Config.env.NAMI_API_URL + '/api/v3/asset/config'

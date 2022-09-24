@@ -36,7 +36,9 @@ const Header = () => {
 
     const onChangeMenu = (e: any) => {
         if (isMobile && e?.children.length > 0) return
-        if (e.router) router.push(e.router)
+        if (e?.menuId && e.router) router.push(e.router)
+        onClickMenuAddress(e)
+        if (isMobile) setVisible(false)
     }
 
     const onClickMenuAddress = async (e: any) => {

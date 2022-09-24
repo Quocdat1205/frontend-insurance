@@ -15,7 +15,8 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
     const connected = useAppSelector((state: RootStore) => state.setting.account)
 
     const activate = async (connectorId: ConnectorId, _chainId?: number) => {
-        const { connector: _connector } = connectorsData[connectorId ?? connected?.wallet]
+        const wallet = localStorage.getItem('PUBLIC_WALLET')
+        const { connector: _connector } = connectorsData[connectorId ?? connected?.wallet ?? wallet]
         _connector.deactivate()
         _connector instanceof WalletConnect
             ? await _connector.activate(_chainId)
@@ -30,11 +31,11 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
         connector.connectEagerly && connector.connectEagerly()
     }, [connector])
 
-    useEffect(() => {
-        if (chainId && !Config.chains.includes(chainId) && isActive && connected && isMobile) {
-            switchNetwork(Config.chains[0])
-        }
-    }, [isActive, connected, chainId])
+    // useEffect(() => {
+    //     if (chainId && !Config.chains.includes(chainId) && isActive && connected && isMobile) {
+    //         switchNetwork(Config.chains[0])
+    //     }
+    // }, [isActive, connected, chainId])
 
     const contractCaller = useMemo(() => {
         return provider ? new ContractCaller(provider as providers.Web3Provider) : null
@@ -77,7 +78,7 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
 
 function Web3WalletStateProvider({ children, connectorsData }: { children: ReactNode; connectorsData: ConnectorsData }) {
     const state = useWeb3WalletState(connectorsData)
-    Config.web3 = state?.account && state?.account !== Config.web3?.account ? state : Config.web3
+    Config.web3 = isMobile ? state : state?.account && state?.account !== Config.web3?.account ? state : Config.web3
     return (
         // cloneElement(children, {
         //     web3: state,
