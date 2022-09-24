@@ -68,5 +68,37 @@
     "next": "Next",
     "slogan": "Change risk to payback",
     "available": "Maximum {{value}}",
-    "minimum_balance": "Minimum {{value}}"
+    "minimum_balance": "Minimum {{value}}",
+    "coming_soon": "Coming soon",
+    "connecting": "Connecting",
+    "connect_successful": "Connected Successfully",
+    "disconnect_successful": "Successfully disconnected",
+    "connection_error": "Connection Error",
+    "reason_error": "Reason: {{reason}}",
+    "reconnect": "Reconnect",
+    "installer": {
+        "metamask_title": "Install Metamask Extension",
+        "metamask_content": "Please add Metamask Extension to continue the wallet connection process with Nami Insurance.",
+        "metamask_guide": "Having trouble installing the wallet? Read more <span class='text-blue underline cursor-pointer'>how to Install Metamask Extension</span> now.",
+        "coinbase_title": "Cài đặt Coinbase Wallet Extension",
+        "coinbase_content": "Vui lòng cài đặt Coinbase Wallet Extension để tiếp tục quá trình kết nối ví đến Nami Insurance.",
+        "coinbase_guide": "Chưa biết cách cài đặt ví? Đọc <span class='text-blue underline cursor-pointer'>Hướng dẫn cài đặt Coinbase Wallet Extension</span> ngay.",
+        "install": "Install"
+    },
+    "network_error": "Connection failed! Please switch network to connect wallet.",
+    "switch_network": {
+        "title": "Check your network",
+        "description": "Nami Insurance is currently only supported on BNB Smart Chain. Change the network in your wallet in order to continue using the product.",
+        "switch_network": "Switch Network",
+        "disconnect_wallet": "Disconnect wallet"
+    },
+    "not_found_network": {
+        "title": "Your wallet does not currently have BNB Smart Chain.",
+        "description": "Please click 'Add BNB Smart Chain' and copy the following information",
+        "network_name": "Network Name",
+        "new_url:": "New RPC URL",
+        "chainID": "ChainID",
+        "symbol": "Symbol",
+        "add_bnb": "Add BNB Smart Chain"
+    }
 }
