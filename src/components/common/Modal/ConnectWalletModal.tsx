@@ -66,6 +66,12 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         }
     }, [account])
 
+    useEffect(() => {
+        if (address && account.address && account.address !== address) {
+            dispatch(setAccount({ address: address }))
+        }
+    }, [account, address])
+
     const inValidNetword = useMemo(() => {
         return account.address ? (chainId ? Config.chains.includes(chainId) : false) : true
     }, [chainId, account])
@@ -88,7 +94,11 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     }, [isActive, chainId, account, loading, inValidNetword])
 
     const connectionError = (error: any) => {
-        switch (error?.code) {
+        switch (Math.abs(error?.code)) {
+            case 32600:
+            case 32601:
+            case 32602:
+            case 32603:
             case errorsWallet.Cancel:
                 if (inValidNetword) {
                     reason.current = error?.message
@@ -126,8 +136,11 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         switch (wallet?.wallet) {
             case wallets.metaMask:
                 if (isMobile) {
-                    window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}`)
-                    return
+                    if (!Config.isMetaMaskInstalled) {
+                        window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}`)
+                        return
+                    }
+                    Config.web3?.activate(wallets.metaMask)
                 } else {
                     if (!Config.isMetaMaskInstalled) {
                         setInstaller(true)
@@ -137,18 +150,18 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
             default:
                 break
         }
+        if (!isMobile) Config.web3?.activate(wallet?.wallet)
         if (!oldAddress.current) return
         setErrorConnect(false)
         setLoading(true)
         try {
-            Config.web3.activate(wallet?.wallet)
             const token = await Config.web3.contractCaller?.sign(oldAddress.current)
             if (!token) return
             if (token?.message || token?.code) {
                 connectionError(token)
             } else {
-                if (chainId) {
-                    if (inValidNetword) Config.toast.show('success', t('common:connect_successful'))
+                if (chainId && Config.chains.includes(chainId)) {
+                    Config.toast.show('success', t('common:connect_successful'))
                 }
                 localStorage.setItem('PUBLIC_ADDRESS', oldAddress.current)
                 localStorage.setItem('PUBLIC_TOKEN', token)
@@ -269,7 +282,8 @@ const CartWallet = styled.div.attrs<{ active: boolean }>(({ active }) => ({
 `
 
 const Loading = styled.div.attrs({
-    className: 'gradient-spin w-[5rem] h-[5rem] sm:w-[7rem] sm:h-[7rem] animate-spin-reverse flex items-center justify-center rounded-full relative',
+    className:
+        'gradient-spin after:!w-[15px] after:!h-[15px] sm:after:!w-5 sm:after:!h-5 w-[5rem] h-[5rem] sm:w-[7rem] sm:h-[7rem] animate-spin-reverse flex items-center justify-center rounded-full relative',
 })`
     &:after {
         content: '';

@@ -7,12 +7,13 @@ import styled from 'styled-components'
 import useWindowSize from 'hooks/useWindowSize'
 import { IconSvg } from 'types/types'
 import { screens } from 'utils/constants'
-import { isFunction } from 'utils/utils';
+import { isFunction } from 'utils/utils'
+import { RootStore, useAppSelector } from 'redux/store'
 
 interface MenuItem {
     name?: any
-    router: string
-    icon?: string | React.ReactNode | IconSvg |any
+    router?: string
+    icon?: string | React.ReactNode | IconSvg | any
     // when the icon is a custom react node
     isIconSvg?: boolean
     isMobile?: boolean
@@ -20,7 +21,7 @@ interface MenuItem {
     parentId?: string | number
     // when the name is custom react node
     nameComponentProps?: any
-    parent?: string | number,
+    parent?: string | number
     // show arrow down when the menu has children
     hideArrowIcon?: boolean
 }
@@ -32,12 +33,13 @@ interface Menu {
     cbOnMouseOut?: (state: any) => void
 }
 
-const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
+const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
     const { width } = useWindowSize()
     const { t } = useTranslation()
     const isMobile = (width && width < screens.drawer) || mobile
     const [active, setActive] = useState<any>(null)
     const [isHover, setIsHover] = useState(false)
+    const account = useAppSelector((state: RootStore) => state.setting.account)
 
     const onToggleMenu = (e: any, menu: any) => {
         const _active = !menu.parentId && (active?.parentId === menu.menuId || active?.menuId === menu.menuId) ? null : menu
@@ -69,7 +71,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
         e.stopPropagation()
 
         if (isMobile) {
-            return;
+            return
         }
         setActive(false)
         setIsHover(false)
@@ -95,6 +97,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
     const dataFilter = useMemo(() => recursiveData(data), [data])
 
     const renderMenu = (menu: any, index: number, child = false) => {
+        if (!account?.address && menu.menuId === 'disconnect') return null
         const hasChildren = menu.children.length > 0
         const _active = active?.menuId === menu.menuId || active?.parentId === menu.menuId
         const level = menu.level + 1
@@ -151,12 +154,12 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
                         </div>
                         {isMobile && (!_active ? <ChevronDown size={18} /> : <ChevronUp size={18} />)}
                         {/* {!isHover || ( isMobile && !active  ) ? <ChevronDown size={18} /> : <ChevronUp size={18} />} */}
-                        { !menu?.hideArrowIcon && !isMobile && (!isHover ? <ChevronDown size={18} /> : <ChevronUp size={18} />)}
+                        {!menu?.hideArrowIcon && !isMobile && (!isHover ? <ChevronDown size={18} /> : <ChevronUp size={18} />)}
                     </div>
                 )}
                 {hasChildren && (
                     <ul
-                        className={`menu-${level} w-full sm:w-max bg-hover mb:bg-white sm:-mx-8 mb:absolute relative flex flex-col mb:py-4 mb:space-y-2 mb:rounded-b-xl mb:shadow-subMenu mb:top-full h-max sm:left-12 mb:min-w-[244px]`}
+                        className={`menu-${level} w-full mb:w-max bg-hover mb:bg-white mb:-mx-8 mb:absolute relative flex flex-col mb:py-4 mb:space-y-2 mb:rounded-b-xl mb:shadow-subMenu mb:top-full h-max mb:left-12 mb:min-w-[244px]`}
                     >
                         {menu.children.map((menu: any, idx: number) => renderMenu(menu, idx, true))}
                     </ul>
