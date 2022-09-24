@@ -66,5 +66,39 @@
     "next": "Tiếp theo",
     "slogan": "Biến rủi ro thành lợi nhuận",
     "available": "Số dư khả dụng {{value}}",
-    "minimum_balance": "Số dư tối thiểu {{value}}"
+    "minimum_balance": "Số dư tối thiểu {{value}}",
+    "email": "Email",
+    "update": "Cập nhật",
+    "submitting": "Đang gửi...",
+
+    "modal": {
+        "dont_show_later": "Không hiện lại thông báo này",
+        "email_placeholder": "Nhập Email",
+
+        "error_format_email": "Vui lòng nhập Email đúng định dạng. Ví dụ: xxxx@gmail.com.",
+        "error_duplicate_email": "Email mới trùng với email cũ",
+        "success_update_email": "Cập nhật email thành công",
+
+        "email_subscription": {
+            "subscribe_later": "Bỏ qua, tôi sẽ cập nhật sau!",
+            "update_email": "Cập nhật Email",
+            "input_email": "Nhập email",
+            "current_email": "Email hiện tại",
+            "new_email": "Email mới",
+
+            "ignore_description": "Có thể bỏ qua và cập nhật sau bằng cách chọn \"Cập nhật Email của tôi\" tại Quản lý Ví. ",
+            "description": "Nhập Email để nhận ngay cập nhật trạng thái HĐBH của bạn"
+        },
+        "contact": {
+            "title": "Liên hệ Nami Insurance",
+            "description": "Chúng tôi rất vui khi nhận được những yêu cầu từ bạn.",
+            "request": "Yêu cầu",
+            "request_placeholder": "Bạn cần Nami Insurance hỗ trợ gì?",
+
+            "send_request": "Gửi yêu cầu",
+
+            "send_success_title": "Yêu cầu của bạn đã được tiếp nhận",
+            "send_success_desc": "Chúng tôi sẽ phản hồi sớm nhất trong 2-3 ngày làm việc, vui lòng kiểm tra hộp thư thường xuyên."
+        }
+    }
 }

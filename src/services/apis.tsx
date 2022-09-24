@@ -1,5 +1,7 @@
 import Config from 'config/config'
 
+export const API_VERSION = '/v1'
+
 export const API_REGISTER_NOTIFICATON: string = '/v1/subscribe'
 export const API_GET_INFO_GENERAL: string = '/v1/get-info-general'
 export const API_GET_INDIVIDUAL_CONTRACT: string = '/v1/get-individual-contract'
@@ -15,6 +17,8 @@ export const API_GET_CONFIG_ASSET: string = 'v1/get-config-asset'
 export const API_CHECK_GUIDE_LINE: string = 'v1/check-guide-line'
 export const API_UPDATE_GUIDE_LINE: string = 'v1/update-guide-line'
 export const API_SUBSCRIBE = 'v1/subscribe'
+export const API_GET_INFO_USER = '/v1/get-info-user'
+export const API_UPDATE_USER_INFO = '/v1/update-info-user'
 
 //futures
 export const API_GET_UNIT_CONFIG: string = Config.env.NAMI_API_URL + '/api/v3/asset/config'

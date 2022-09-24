@@ -60,6 +60,7 @@ const commonColors = {
         1: '#F2F3F5',
     },
     bgModal: '#3d4252',
+    disabled: '#E5E7E8',
 }
 
 module.exports = {
@@ -184,6 +185,7 @@ module.exports = {
             success: '#52CC74',
             skeleton: '#F0F0F1',
             bgModal: commonColors.bgModal,
+            disabled: commonColors.disabled,
             red: {
                 DEFAULT: commonColors.red.red,
                 ...commonColors.red,
@@ -248,7 +250,7 @@ module.exports = {
                 banner: '0px -4px 10px rgba(235, 43, 62, 0.1)',
                 card: '0px 6px 18px rgba(9, 30, 66, 0.05)',
                 subMenu: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)',
-                dropdown: '0px 3px 5px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.31)'
+                dropdown: '0px 3px 5px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.31)',
             },
             cursor: {
                 grabbing: 'grabbing',

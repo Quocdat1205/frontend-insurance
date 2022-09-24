@@ -7,12 +7,17 @@ import styled from 'styled-components'
 import useWindowSize from 'hooks/useWindowSize'
 import { IconSvg } from 'types/types'
 import { screens } from 'utils/constants'
-import { isFunction } from 'utils/utils';
+import { isFunction } from 'utils/utils'
+import EmailSubscriptionModal from 'components/screens/HomePage/EmailSubModal';
+import NotificationInsurance from 'components/layout/notifucationInsurance';
+import Modal from 'components/common/Modal/Modal';
+import UpdateEmailSubscriptionModal from 'components/screens/HomePage/EmailSubUpdateModal';
+import ContactModal from 'components/screens/HomePage/ContactModal';
 
 interface MenuItem {
     name?: any
     router: string
-    icon?: string | React.ReactNode | IconSvg |any
+    icon?: string | React.ReactNode | IconSvg | any
     // when the icon is a custom react node
     isIconSvg?: boolean
     isMobile?: boolean
@@ -20,7 +25,7 @@ interface MenuItem {
     parentId?: string | number
     // when the name is custom react node
     nameComponentProps?: any
-    parent?: string | number,
+    parent?: string | number
     // show arrow down when the menu has children
     hideArrowIcon?: boolean
 }
@@ -32,7 +37,7 @@ interface Menu {
     cbOnMouseOut?: (state: any) => void
 }
 
-const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
+const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
     const { width } = useWindowSize()
     const { t } = useTranslation()
     const isMobile = (width && width < screens.drawer) || mobile
@@ -69,15 +74,13 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
         e.stopPropagation()
 
         if (isMobile) {
-            return;
+            return
         }
         setActive(false)
         setIsHover(false)
         if (cbOnMouseOut) {
             if (isFunction(cbOnMouseOut)) cbOnMouseOut(false)
         }
-
-        // setActive(false)
     }
 
     const handleOnMouseOver = (e: any) => {
@@ -89,10 +92,20 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
         if (cbOnMouseOver) {
             if (isFunction(cbOnMouseOver)) cbOnMouseOver(true)
         }
-        // setActive(true)
     }
 
     const dataFilter = useMemo(() => recursiveData(data), [data])
+
+    // const [isShowEmailModal, setIsShowEmailModal] = useState(false)
+
+    const handleOpenModal = () => {
+        // console.log("handleOpenModal")
+        // setIsShowEmailModal(true);
+    }
+
+    const handleCloseModal = () => {
+        // setIsShowEmailModal(false);
+    }
 
     const renderMenu = (menu: any, index: number, child = false) => {
         const hasChildren = menu.children.length > 0
@@ -122,6 +135,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
                 </>
             )
         }
+
         return (
             <ItemMenu
                 key={index}
@@ -134,7 +148,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
                 isChild={child}
             >
                 {!hasChildren ? (
-                    <div className="flex items-center space-x-4 px-4">
+                    <div className="flex items-center space-x-4 px-4" onClick={menu?.modalName ? menu.handleOpenModal : () => {console.log("no modal")}}>
                         {menu?.icon && <Icon isIconSvg={menu?.isIconSvg} icon={menu.icon} />}
                         {/* custom parent component: component passed from config as [name] props */}
                         <Name name={menu.name} {...menu?.nameComponentProps} />
@@ -144,6 +158,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
                         className={classnames('flex items-center justify-between sm:justify-start space-x-2 cursor-pointer text-sm px-4', {
                             'pb-3': _active && isMobile,
                         })}
+                        onClick={menu?.modalName ? menu.handleOpenModal : () => {console.log("no modal")}}
                     >
                         <div className="space-x-4 flex items-center">
                             {menu?.icon && <Icon isIconSvg={menu?.isIconSvg} icon={menu.icon} />}
@@ -151,7 +166,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
                         </div>
                         {isMobile && (!_active ? <ChevronDown size={18} /> : <ChevronUp size={18} />)}
                         {/* {!isHover || ( isMobile && !active  ) ? <ChevronDown size={18} /> : <ChevronUp size={18} />} */}
-                        { !menu?.hideArrowIcon && !isMobile && (!isHover ? <ChevronDown size={18} /> : <ChevronUp size={18} />)}
+                        {!menu?.hideArrowIcon && !isMobile && (!isHover ? <ChevronDown size={18} /> : <ChevronUp size={18} />)}
                     </div>
                 )}
                 {hasChildren && (
@@ -166,9 +181,14 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver, }: Menu) => {
     }
 
     return (
-        <ul onMouseOver={handleOnMouseOver} onMouseOut={handleOnMouseOut} className="sidebar-menu flex flex-col mb:items-center mb:flex-row">
-            {dataFilter.map((menu: any, index: number) => renderMenu(menu, index))}
-        </ul>
+        <>
+            {/* <EmailSubscriptionModal visible={isShowEmailModal} onClose={handleCloseModal} /> */}
+            {/* <UpdateEmailSubscriptionModal visible={isShowEmailModal} onClose={handleCloseModal}/> */}
+            {/* <ContactModal visible={isShowEmailModal} onClose={handleCloseModal}/> */}
+            <ul onMouseOver={handleOnMouseOver} onMouseOut={handleOnMouseOut} className="sidebar-menu flex flex-col mb:items-center mb:flex-row">
+                {dataFilter.map((menu: any, index: number) => renderMenu(menu, index))}
+            </ul>
+        </>
     )
 }
 

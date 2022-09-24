@@ -18,6 +18,7 @@ const Button = ({ variants = 'gradient', children, className, onClick, disable }
                     'bg-gradient text-white': variants === 'gradient',
                     'border border-red text-red bg-pink': variants === 'outlined',
                     'bg-red text-white': variants === 'primary',
+                    'bg-[#E5E7E8]': disable,
                 },
                 className,
             )}

@@ -483,10 +483,17 @@ const DisconnectIcon = ({ size = 12, color = '#B2B7BC' }: IconSvg) => <svg width
     <path d="M16.6667 3.41406H9.16667C8.2475 3.41406 7.5 4.16156 7.5 5.08073V8.41406H9.16667V5.08073H16.6667V16.7474H9.16667V13.4141H7.5V16.7474C7.5 17.6666 8.2475 18.4141 9.16667 18.4141H16.6667C17.5858 18.4141 18.3333 17.6666 18.3333 16.7474V5.08073C18.3333 4.16156 17.5858 3.41406 16.6667 3.41406Z" fill="#EB2B3E"/>
 </svg>
 
+const TriggerErrorIconCircle = ({ size = 12, color = '#B2B7BC' }: IconSvg) => {
+    return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11.953 2C6.465 2 2 6.486 2 12C2 17.514 6.486 22 12 22C17.514 22 22 17.514 22 12C22 6.486 17.493 2 11.953 2ZM12 20C7.589 20 4 16.411 4 12C4 7.589 7.567 4 11.953 4C16.391 4 20 7.589 20 12C20 16.411 16.411 20 12 20Z" fill="#EB2B3E"/>
+        <path d="M11 7H13V14H11V7ZM11 15H13V17H11V15Z" fill="#EB2B3E"/>
+    </svg>
+}
 
 export {
     HistoryIcon,
     UserIcon,
     EmailIcon,
     DisconnectIcon,
+    TriggerErrorIconCircle
 }
