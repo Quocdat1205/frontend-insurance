@@ -156,7 +156,7 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                             return router.push('/buy-covered/insurance-history')
                                                         }
                                                     }}
-                                                    disable={!clear && index == 3}
+                                                    disabled={!clear && index == 3}
                                                 >
                                                     {index == 0
                                                         ? `${t('insurance:final:complete')}`
@@ -248,7 +248,7 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                             return router.push('/buy-covered/insurance-history')
                                                         }
                                                     }}
-                                                    disable={!clear && index == 3}
+                                                    disabled={!clear && index == 3}
                                                 >
                                                     {index == 0
                                                         ? `${t('insurance:final:complete')}`
