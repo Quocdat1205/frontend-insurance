@@ -1,4 +1,3 @@
-import axios from 'axios'
 import Config from 'config/config'
 import { Dispatch } from 'redux'
 import * as types from 'redux/actions/types'
@@ -20,6 +19,10 @@ export const setting = () => async (dispatch: Dispatch) => {
     try {
         const address = localStorage.getItem('PUBLIC_ADDRESS')
         const wallet = localStorage.getItem('PUBLIC_WALLET')
+        const token_cookie = localStorage.getItem('PUBLIC_TOKEN_COOKIE')
+        if (token_cookie) {
+            Config.token.token = token_cookie
+        }
         if (address && wallet) {
             dispatch({
                 type: types.SET_ACCOUNT,
@@ -31,7 +34,7 @@ export const setting = () => async (dispatch: Dispatch) => {
     }
 }
 
-export const setAccount = (data: { address: string | null | undefined; wallet: string | null | undefined }) => async (dispatch: Dispatch) => {
+export const setAccount = (data?: { address: string | null | undefined; wallet?: string | null | undefined }) => async (dispatch: Dispatch) => {
     try {
         dispatch({
             type: types.SET_ACCOUNT,

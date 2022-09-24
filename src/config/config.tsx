@@ -12,6 +12,11 @@ class Config {
 
     static alert: Toast
 
+    static token: {
+        token: string | null
+        expire: number | null
+    } = { token: null, expire: null }
+
     static web3: any
     static refConnectWallet: ConnectWalletType
 
@@ -136,7 +141,6 @@ class Config {
         },
         {
             menuId: 'disconnect',
-            router: '/buy-covered',
             name: 'common:header:disconnect',
             parentId: 'account-info',
             // icon: '/images/icons/ic_bx-log-out.png',
@@ -176,7 +180,6 @@ class Config {
         },
         {
             menuId: 'disconnect',
-            router: '/buy-covered',
             name: 'common:header:disconnect',
             parentId: 'account-info',
             // icon: '/images/icons/ic_bx-log-out.png',
