@@ -2,6 +2,10 @@ import * as types from 'redux/actions/types'
 import { Action } from 'types/types'
 
 const initialState = {
+    account: {
+        address: null,
+        wallet: null,
+    },
     loading_account: true,
     assetsToken: [],
     pairConfigs: [],
@@ -9,6 +13,11 @@ const initialState = {
 }
 const setting = (state = initialState, action: Action) => {
     switch (action.type) {
+        case types.SET_ACCOUNT:
+            return {
+                ...state,
+                account: action.payload,
+            }
         case types.LOADING_ACCOUNT:
             return {
                 ...state,
@@ -17,17 +26,17 @@ const setting = (state = initialState, action: Action) => {
         case types.SET_ASSETS_TOKEN:
             return {
                 ...state,
-                assetsToken: action.payload,
+                assetsToken: action.payload ?? [],
             }
         case types.SET_CONFIG_ASSET:
             return {
                 ...state,
-                pairConfigs: action.payload,
+                pairConfigs: action.payload ?? [],
             }
         case types.SET_CONFIG_UNIT:
             return {
                 ...state,
-                unitConfig: action.payload,
+                unitConfig: action.payload ?? [],
             }
         default:
             return state

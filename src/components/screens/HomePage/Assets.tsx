@@ -141,7 +141,9 @@ const Assets = () => {
                         <CardShadow className="p-6 flex flex-col space-y-6 w-full">
                             <div className="flex flex-col space-y-2 sm:space-y-4">
                                 <div className="flex items-center space-x-2">
-                                    <img width="32" height="32" src={asset?.attachment} className="rounded-full" />
+                                    <div className="max-w-[2rem] max-h-[2rem]">
+                                        <img width="32" height="32" src={asset?.attachment} className="rounded-full h-8 w-8 object-cover" />
+                                    </div>
                                     <div className="font-semibold sm:font-medium sm:text-xl">
                                         <span>{asset?.symbol}</span>/<span className="text-txtSecondary">USDT</span>
                                     </div>

@@ -3,7 +3,6 @@ import Modal from 'components/common/Modal/Modal'
 import Skeleton from 'components/common/Skeleton/Skeleton'
 import { NotificationsIcon } from 'components/common/Svg/SvgIcon'
 import useOutsideAlerter from 'hooks/useOutsideAlerter'
-import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import { useTranslation } from 'next-i18next'
 import React, { Fragment, useEffect, useRef, useState, useMemo } from 'react'
 import { API_CHECK_NOTICE, API_GET_NOTICE, API_UPDATE_NOTICE } from 'services/apis'
@@ -19,7 +18,7 @@ import { RootStore, useAppSelector } from 'redux/store'
 import { UnitConfig } from 'types/types'
 
 const Notifications = () => {
-    const { account } = useWeb3Wallet()
+    const account = useAppSelector((state: RootStore) => state.setting.account)
     const unitConfig: UnitConfig = useAppSelector((state: RootStore) => getUnit(state, 'USDT'))
     const { t } = useTranslation()
     const { width } = useWindowSize()
@@ -55,8 +54,8 @@ const Notifications = () => {
     }, [visible])
 
     useEffect(() => {
-        checkNotice()
-    }, [])
+        if (account?.address) checkNotice()
+    }, [account])
 
     const checkNotice = async () => {
         try {
@@ -64,7 +63,7 @@ const Notifications = () => {
                 url: API_CHECK_NOTICE,
                 options: { method: 'GET' },
                 params: {
-                    owner: account,
+                    owner: account?.address,
                 },
             })
             if (data) {

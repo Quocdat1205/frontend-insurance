@@ -8,6 +8,8 @@ import { createSelector } from 'reselect'
 import { RootStore } from 'redux/store'
 import { stateInsurance } from './constants'
 import get from 'lodash/get'
+import fetchApi from 'services/fetch-api'
+import { API_GET_NONCE } from 'services/apis'
 
 export const getS3Url = (url: string) => Config.env.CDN + url
 
@@ -194,5 +196,9 @@ export const formatPercentage = (value: number, digits: number = 2, acceptNegati
 }
 
 export function isFunction(functionToCheck: any) {
-    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]'
+}
+
+export const getMessageSign = (nonce: number) => {
+    return `Sign message with nonce: ${nonce}`
 }

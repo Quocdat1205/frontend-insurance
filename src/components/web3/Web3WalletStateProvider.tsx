@@ -7,16 +7,15 @@ import { getConnectorInfo, getAddChainParameters, ConnectorId, ConnectorsData } 
 import { ContractCaller } from 'components/web3/contract/index'
 import { Web3WalletContext } from 'hooks/useWeb3Wallet'
 import Config from 'config/config'
-import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
-import { onLoading } from 'redux/actions/setting'
+import { RootStore, useAppSelector } from 'redux/store'
+import { isMobile } from 'react-device-detect'
 
 const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorId; name: string; connector: Connector }>) => {
     const { connector, account, chainId, isActive, error, provider } = useWeb3React()
-    const loading_account = useAppSelector((state: RootStore) => state.setting.loading_account)
-    const dispatch = useAppDispatch()
+    const connected = useAppSelector((state: RootStore) => state.setting.account)
 
     const activate = async (connectorId: ConnectorId, _chainId?: number) => {
-        const { connector: _connector } = connectorsData[connectorId]
+        const { connector: _connector } = connectorsData[connectorId ?? connected?.wallet]
         _connector.deactivate()
         _connector instanceof WalletConnect
             ? await _connector.activate(_chainId)
@@ -31,21 +30,15 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
         connector.connectEagerly && connector.connectEagerly()
     }, [connector])
 
-    const timer = useRef<any>(null)
     useEffect(() => {
-        if (loading_account) {
-            clearTimeout(timer.current)
-            timer.current = setTimeout(() => {
-                dispatch(onLoading(false))
-            }, 1000)
-        } else {
-            if (Config.chains.find((rs: number) => rs !== chainId) && chainId && isActive) {
-                switchNetwork(Config.chains[0])
-            }
+        if (chainId && !Config.chains.includes(chainId) && isActive && connected && isMobile) {
+            switchNetwork(Config.chains[0])
         }
-    }, [isActive, loading_account, chainId])
+    }, [isActive, connected, chainId])
 
-    const contractCaller = useMemo(() => (provider ? new ContractCaller(provider as providers.Web3Provider) : null), [provider])
+    const contractCaller = useMemo(() => {
+        return provider ? new ContractCaller(provider as providers.Web3Provider) : null
+    }, [provider])
 
     const switchNetwork = async (_chainId: number) => {
         activate(getConnectorInfo(connector).id, _chainId)
@@ -84,7 +77,7 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
 
 function Web3WalletStateProvider({ children, connectorsData }: { children: ReactNode; connectorsData: ConnectorsData }) {
     const state = useWeb3WalletState(connectorsData)
-    Config.web3 = state
+    Config.web3 = state?.account && state?.account !== Config.web3?.account ? state : Config.web3
     return (
         // cloneElement(children, {
         //     web3: state,

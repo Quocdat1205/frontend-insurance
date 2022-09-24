@@ -67,4 +67,36 @@
     "slogan": "Biến rủi ro thành lợi nhuận",
     "available": "Số lượng tối đa {{value}}",
     "minimum_balance": "Số lượng tối thiểu {{value}}"
+    "coming_soon": "Sắp ra mắt",
+    "connecting": "Đang kết nối",
+    "connect_successful": "Kết nối ví thành công",
+    "disconnect_successful": "Ngắt kết nối ví thành công",
+    "connection_error": "Lỗi kết nối",
+    "reason_error": "Lý do: {{reason}}",
+    "reconnect": "Kết nối lại",
+    "installer": {
+        "metamask_title": "Cài đặt Metamask Extension",
+        "metamask_content": "Vui lòng cài đặt Metamask Extension để tiếp tục quá trình kết nối ví đến Nami Insurance.",
+        "metamask_guide": "Chưa biết cách cài đặt ví? Đọc <span class='text-blue underline cursor-pointer'>Hướng dẫn cài đặt Metamask Extension</span> ngay.",
+        "coinbase_title": "Cài đặt Coinbase Wallet Extension",
+        "coinbase_content": "Vui lòng cài đặt Coinbase Wallet Extension để tiếp tục quá trình kết nối ví đến Nami Insurance.",
+        "coinbase_guide": "Chưa biết cách cài đặt ví? Đọc <span class='text-blue underline cursor-pointer'>Hướng dẫn cài đặt Coinbase Wallet Extension</span> ngay.",
+        "install": "Cài đặt"
+    },
+    "network_error": "Kết nối thất bại! Vui lòng chuyển mạng lưới lại để kết nối ví.",
+    "switch_network": {
+        "title": "Kiểm tra mạng lưới của bạn",
+        "description": "Hiện tại Nami Insurance chỉ được hỗ trợ trên BNB Smart Chain. Vui lòng chuyển mạng lưới trong ví để tiếp tục sử dụng sản phẩm.",
+        "switch_network": "Chuyển mạng lưới",
+        "disconnect_wallet": "Ngắt kết nối ví"
+    },
+    "not_found_network": {
+        "title": "Ví bạn chưa có BNB Smart Chain",
+        "description": "Vui lòng ấn nút “Thêm BNB Smart Chain” và sao chép thông tin dưới đây",
+        "network_name": "Tên mạng",
+        "new_url:": "RPC URL mới",
+        "chainID": "Mã chuỗi",
+        "symbol": "Ký hiệu tiền tệ",
+        "add_bnb": "Thêm BNB Smart Chain"
+    }
 }
