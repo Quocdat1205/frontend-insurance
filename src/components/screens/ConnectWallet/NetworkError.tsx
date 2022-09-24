@@ -16,7 +16,7 @@ const NetworkError = () => {
 
     return (
         <div className="flex flex-col justitfy-center items-center text-center w-full">
-            <div className="w-[7.75rem] h-[7.75rem]">
+            <div className="w-20 h-20 sm:w-[7.75rem] sm:h-[7.75rem]">
                 <img src="/images/icons/ic_failed.png" />
             </div>
             <div className="text-xl mt-6 font-medium">{t('common:not_found_network:title')}</div>
