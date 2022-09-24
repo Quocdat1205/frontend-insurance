@@ -13,6 +13,7 @@ import { ChevronDown, Check, ChevronUp } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
+import { getDecimalPrice } from 'utils/utils'
 import { Suspense } from 'react'
 import { RootStore, useAppSelector } from 'redux/store'
 import Config from 'config/config'
@@ -65,13 +66,15 @@ const InsuranceFrom = () => {
     const [changeUnit1, setChangeUnit1] = useState<boolean>(false)
     const [changeUnit2, setChangeUnit2] = useState<boolean>(false)
     const [showCroll, setShowCroll] = useState(false)
-    const [errorPCalim, setErrorPCalim] = useState(false)
     const [showGuide, setShowGuide] = useState<boolean>(false)
     const [chosing, setChosing] = useState(false)
     const [showGuideModal, setShowGuideModal] = useState<boolean>(false)
     const [thisFisrt, setThisFisrt] = useState(true)
     const [saved, setSaved] = useState<number>(0)
-    const [minQ_covered, setMinQ_covered] = useState(0)
+    const [rangeQ_covered, setRangeQ_covered] = useState({
+        min: 0,
+        max: 100,
+    })
     const [showInput, setShowInput] = useState<{ isShow: boolean; name: string }>({ isShow: false, name: '' })
 
     const [showChangeUnit, setShowChangeUnit] = useState({
@@ -81,6 +84,11 @@ const InsuranceFrom = () => {
     const [userBalance, setUserBalance] = useState<number>(0)
     const [listCoin, setListCoin] = useState<ICoin[]>([])
     const [pair_configs, setPairConfigs] = useState<any>({})
+    const [decimalList, setDecimalList] = useState({
+        decimal_q_covered: 4,
+        decimal_margin: 4,
+        decimal_p_claim: 4,
+    })
     const [selectCoin, setSelectedCoin] = useState<ICoin>({
         icon: '',
         id: '',
@@ -148,36 +156,6 @@ const InsuranceFrom = () => {
             return Math.abs(Number(p_stop)) / 100
         }
     }
-
-    const validatePclaim = (value: number) => {
-        if (value > state.p_market * 1 + (2 * state.p_market) / 100 && value < state.p_market * 1 + (70 * state.p_market) / 100) {
-            setErrorPCalim(true)
-            return validateMargin(state.margin)
-        } else if (value > state.p_market * 1 - (70 * state.p_market) / 100 && value < state.p_market * 1 - (2 * state.p_market) / 100) {
-            setErrorPCalim(true)
-            return validateMargin(state.margin)
-        } else {
-            setErrorPCalim(false)
-            return setClear(false)
-        }
-    }
-
-    const validateMargin = (value: number) => {
-        if (wallet.account) {
-            if (value > 0) {
-                return validateQCovered(state.q_covered)
-            } else {
-                return setClear(false)
-            }
-        }
-    }
-    useEffect(() => {
-        if (!loadings) {
-            if ('virtualKeyboard' in navigator) {
-                // The VirtualKeyboard API is supported!
-            }
-        }
-    }, [])
 
     const componentsInputMobile = () => {
         return (
@@ -257,16 +235,6 @@ const InsuranceFrom = () => {
         return router.push('/buy-covered/info-covered')
     }
 
-    const validateQCovered = (value: number) => {
-        if (wallet.account) {
-            if (value > 0) {
-                return setClear(true)
-            } else {
-                return setClear(false)
-            }
-        }
-    }
-
     const getUSDT = async () => {
         const result = wallet.getBalance()
         result.then((balance: number) => {
@@ -292,7 +260,7 @@ const InsuranceFrom = () => {
             setState({
                 ...state,
                 percent_margin: value,
-                margin: Number((value / 100) * state.q_covered * state.p_market),
+                margin: Number(((value / 100) * state.q_covered * state.p_market).toFixed(decimalList.decimal_margin)),
             })
         }
     }
@@ -302,6 +270,7 @@ const InsuranceFrom = () => {
             const item = pairConfigs.find((i: any) => {
                 return i.baseAsset === symbol
             })
+
             return setPairConfigs({ ...item })
         }
     }
@@ -351,7 +320,6 @@ const InsuranceFrom = () => {
             setTab(res.tab)
             setUnitMoney(res.unitMoney)
             setIndex(res.index)
-            validatePclaim(res.p_claim)
             setThisFisrt(true)
             refreshApi(selectTime, selectCoin)
         } else {
@@ -407,7 +375,8 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         let list: ICoin[] = []
-        assetsToken.map(async (token: any) => {
+
+        assetsToken.data.map(async (token: any) => {
             const tmp = {
                 id: token._id,
                 name: token.name,
@@ -522,9 +491,6 @@ const InsuranceFrom = () => {
             const newData = { ...res, tab: tab }
             return localStorage.setItem('buy_covered_state', JSON.stringify(newData))
         }
-        if (tab == 6) {
-            // setShowInput({ isShow: true, name: 'margin' })
-        }
     }, [tab])
 
     useEffect(() => {
@@ -587,7 +553,13 @@ const InsuranceFrom = () => {
             const laverage = Leverage(state.p_market, p_stop)
             const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
             const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
-            setState({ ...state, q_claim: q_claim, r_claim: Number(q_claim / margin) * 100, p_expired: Math.floor(p_stop), margin: margin })
+            setState({
+                ...state,
+                q_claim: Number(q_claim.toFixed(2)),
+                r_claim: Number((Number(q_claim / margin) * 100).toFixed(decimalList.decimal_q_covered)),
+                p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
+                margin: Number(margin.toFixed(decimalList.decimal_margin)),
+            })
 
             console.log(laverage * 2 * (margin / state.p_market))
         }
@@ -601,21 +573,27 @@ const InsuranceFrom = () => {
             const laverage = Leverage(state.p_market, p_stop)
             const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
             const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + state.margin
-            setState({ ...state, q_claim: q_claim, r_claim: Number(q_claim / state.margin) * 100, p_expired: Math.floor(p_stop) })
+            setState({
+                ...state,
+                q_claim: Number(q_claim.toFixed(2)),
+                r_claim: Number((Number(q_claim / state.margin) * 100).toFixed(decimalList.decimal_q_covered)),
+                p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
+            })
         }
         createSaved()
-        validatePclaim(state.p_claim)
     }, [state.q_covered, state.margin, state.p_claim])
 
     useEffect(() => {
-        console.log(pair_configs.filters)
-        const min = 8 / ((10 / 100) * state.p_market)
-        setMinQ_covered(min)
+        const defaultQ_covered = pair_configs?.filters?.find((e: any) => {
+            return e.filterType === 'LOT_SIZE'
+        })
+        const min = Number(defaultQ_covered?.minQty)
+        const max = Math.min(Number(defaultQ_covered?.maxQty), userBalance)
+        setRangeQ_covered({ min: min, max: max })
     }, [percentInsurance, state.margin, state.q_covered])
 
     useEffect(() => {
         if (state.p_claim > 0) {
-            validatePclaim(state.p_claim)
         }
     }, [state.p_claim])
 
@@ -627,34 +605,85 @@ const InsuranceFrom = () => {
         }
     }, [showGuide])
 
+    const [rangeP_claim, setRangeP_claim] = useState({
+        min: 0,
+        max: 100,
+    })
+    const [rangeMargin, setRangeMargin] = useState({
+        min: 0,
+        max: 100,
+    })
+
+    const [percentPrice, setPercentPrice] = useState<any>()
+
+    useEffect(() => {
+        pair_configs?.filters?.map((item: any) => {
+            if (item?.filterType === 'LOT_SIZE') {
+                const decimal: number = (1 / item.stepSize).toString().replace('1', '').length
+                setDecimalList({ ...decimalList, decimal_q_covered: decimal })
+            }
+            if (item?.filterType === 'PERCENT_PRICE') {
+                setPercentPrice({ ...item })
+            }
+            if (item?.filterType === 'PRICE_FILTER') {
+                const decimalP_Claim: number = (1 / Number(item.tickSize)).toString().replace('1', '').length
+                setDecimalList({ ...decimalList, decimal_p_claim: decimalP_Claim })
+                const min = Math.max(
+                    state.p_market * Number(percentPrice?.multiplierDown),
+                    state.p_market - state.p_market * Number(percentPrice?.minDifferenceRatio),
+                )
+                const max = Math.min(
+                    state.p_market * Number(percentPrice?.multiplierUp),
+                    state.p_market - state.p_market * Number(percentPrice?.minDifferenceRatio),
+                )
+                setRangeP_claim({ ...rangeP_claim, min: min, max: max })
+            }
+            if (item?.filterType === 'MARGIN') {
+                const decimalMargin: number = (1 / item.stepSize).toString().replace('1', '').length
+                setDecimalList({ ...decimalList, decimal_margin: decimalMargin })
+                const MIN = Number((state.q_covered * state.p_market * item.minQtyRatio).toFixed(decimalMargin))
+                const MAX = Number((state.q_covered * state.p_market * item.maxQtyRatio).toFixed(decimalMargin))
+                setRangeMargin({ ...rangeP_claim, min: MIN, max: MAX })
+            }
+        })
+    }, [pair_configs, state.q_covered])
+
     const validator = (key: string) => {
         const rs = { isValid: true, message: '' }
 
         switch (key) {
             case 'q_covered':
-                rs.isValid = !(state.q_covered > userBalance || state.q_covered < Number(minQ_covered.toFixed(2)))
+                rs.isValid = !(state.q_covered > Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered)) || state.q_covered < rangeQ_covered.min)
                 rs.message = `<div class="flex items-center ">
                 ${
-                    state.q_covered > userBalance
-                        ? t('common:available', { value: `${formatNumber(userBalance)}` })
-                        : t('common:minimum_balance', { value: formatNumber(Number(minQ_covered.toFixed(8))) })
+                    state.q_covered > Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered))
+                        ? t('common:available', {
+                              value: `${Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered))}`,
+                          })
+                        : t('common:minimum_balance', { value: rangeQ_covered.min })
                 }
             </div>`
                 break
             case 'p_claim':
-                const min = state.p_claim > state.p_market ? state.p_market * 1 + (2 * state.p_market) / 100 : state.p_market * 1 - (70 * state.p_market) / 100
-                const max = state.p_claim > state.p_market ? state.p_market * 1 + (70 * state.p_market) / 100 : state.p_market * 1 - (2 * state.p_market) / 100
-                rs.isValid = errorPCalim || state.p_claim <= 0
+                rs.isValid =
+                    state.p_claim > Number(rangeP_claim.max.toFixed(decimalList.decimal_p_claim)) ||
+                    state.p_claim < Number(rangeP_claim.min.toFixed(decimalList.decimal_p_claim))
                 rs.message = `<div class="flex items-center">
-                ${t('insurance:error:p_claim')}: ${min.toFixed(8)} < P Claim < ${max.toFixed(8)}
+                ${
+                    state.p_claim > Number(rangeP_claim.max)
+                        ? t('common:available', { value: `${Number(rangeP_claim.max)}` })
+                        : t('common:minimum_balance', { value: `${Number(rangeP_claim.min)}` })
+                }
                 </div>`
                 break
             case 'margin':
-                const MIN = formatNumber((state.q_covered * state.p_market * 2) / 100, 4)
-                const MAX = formatNumber((state.q_covered * state.p_market * 10) / 100, 4)
-                rs.isValid = !(state.margin < Number(MIN) || state.margin > Number(MAX))
+                rs.isValid = !(state.margin < Number(rangeMargin.min) || state.margin > Number(rangeMargin.max))
                 rs.message = `<div class="flex items-center">
-                ${t('insurance:error:p_claim')}: ${MIN} < Margin < ${MAX}
+                ${
+                    state.margin > Number(rangeMargin.max)
+                        ? t('common:available', { value: `${Number(rangeMargin.max)}` })
+                        : t('common:minimum_balance', { value: `${Number(rangeMargin.min)}` })
+                }
                 </div>`
                 break
             default:
@@ -764,11 +793,19 @@ const InsuranceFrom = () => {
 
     const onHandleChange = (key: string, e: any) => {
         const value = +e.value
+        const res = validator(key)
+        if (state.q_covered > 0 && state.margin && state.p_claim && wallet.account) {
+            setClear(res.isValid)
+        }
+
         switch (key) {
             case 'q_covered':
+                setState({ ...state, [key]: value })
+                break
             case 'p_claim':
                 setState({ ...state, [key]: value })
                 setPercentInsurance(8)
+
                 break
             case 'margin':
                 setState({ ...state, margin: value, percent_margin: 0 })
@@ -867,7 +904,10 @@ const InsuranceFrom = () => {
                                                         <div
                                                             className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                             onClick={() => {
-                                                                setState({ ...state, q_covered: (25 / 100) * userBalance })
+                                                                setState({
+                                                                    ...state,
+                                                                    q_covered: Number(((25 / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered)),
+                                                                })
                                                             }}
                                                         >
                                                             <div className={`${percentInsurance == 25 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
@@ -876,7 +916,10 @@ const InsuranceFrom = () => {
                                                         <div
                                                             className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                             onClick={() => {
-                                                                setState({ ...state, q_covered: (50 / 100) * userBalance })
+                                                                setState({
+                                                                    ...state,
+                                                                    q_covered: Number(((50 / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered)),
+                                                                })
                                                             }}
                                                         >
                                                             <div className={`${percentInsurance == 50 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
@@ -885,7 +928,10 @@ const InsuranceFrom = () => {
                                                         <div
                                                             className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                             onClick={() => {
-                                                                setState({ ...state, q_covered: (75 / 100) * userBalance })
+                                                                setState({
+                                                                    ...state,
+                                                                    q_covered: Number(((75 / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered)),
+                                                                })
                                                             }}
                                                         >
                                                             <div className={`${percentInsurance == 75 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
@@ -894,7 +940,12 @@ const InsuranceFrom = () => {
                                                         <div
                                                             className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                             onClick={() => {
-                                                                setState({ ...state, q_covered: (100 / 100) * userBalance })
+                                                                setState({
+                                                                    ...state,
+                                                                    q_covered: Number(
+                                                                        ((100 / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
+                                                                    ),
+                                                                })
                                                             }}
                                                         >
                                                             <div className={`${percentInsurance == 100 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
@@ -1424,7 +1475,11 @@ const InsuranceFrom = () => {
                                                                 key={data}
                                                                 className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                                 onClick={() => {
-                                                                    setState({ ...state, q_covered: (data / 100) * userBalance })
+                                                                    setState({
+                                                                        ...state,
+                                                                        q_covered:
+                                                                            (data / 100) * Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered)),
+                                                                    })
                                                                 }}
                                                             >
                                                                 <div
@@ -1756,7 +1811,9 @@ const InsuranceFrom = () => {
                                                                 setState({
                                                                     ...state,
                                                                     percent_margin: item,
-                                                                    margin: Number((item * state.q_covered * state.p_market) / 100),
+                                                                    margin: Number(
+                                                                        ((item * state.q_covered * state.p_market) / 100).toFixed(decimalList.decimal_margin),
+                                                                    ),
                                                                 })
                                                             }
                                                         >
