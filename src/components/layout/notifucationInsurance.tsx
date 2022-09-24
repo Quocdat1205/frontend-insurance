@@ -80,6 +80,18 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
         }
     }, [email])
 
+    const handleClick = (index: number) => {
+        if (index == 0) {
+            return router.push('/buy-covered/insurance-history')
+        }
+        if (index == 3) {
+            return handleAPISubscribe(email)
+        }
+        if (index != 0 && index != 3) {
+            return router.push('/buy-covered/insurance-history')
+        }
+    }
+
     return active ? (
         isMobile ? (
             <>
@@ -146,15 +158,7 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                         !clear && index == 3 ? 'bg-[#E5E7E8]' : 'bg-[#EB2B3E]'
                                                     } h-[48px] !w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                                                     onClick={() => {
-                                                        if (index == 0) {
-                                                            return router.push('/buy-covered/insurance-history')
-                                                        }
-                                                        if (index == 3) {
-                                                            return handleAPISubscribe(email)
-                                                        }
-                                                        if (index != 0 && index != 3) {
-                                                            return router.push('/buy-covered/insurance-history')
-                                                        }
+                                                        handleClick(index)
                                                     }}
                                                     disabled={!clear && index == 3}
                                                 >
@@ -238,15 +242,7 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
                                                         !clear && index == 3 ? 'bg-[#E5E7E8]' : 'bg-[#EB2B3E]'
                                                     }  h-[48px] !w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                                                     onClick={() => {
-                                                        if (index == 0) {
-                                                            return router.push('/buy-covered/insurance-history')
-                                                        }
-                                                        if (index == 3) {
-                                                            return handleAPISubscribe(email)
-                                                        }
-                                                        if (index != 0 && index != 3) {
-                                                            return router.push('/buy-covered/insurance-history')
-                                                        }
+                                                        handleClick(index)
                                                     }}
                                                     disabled={!clear && index == 3}
                                                 >
