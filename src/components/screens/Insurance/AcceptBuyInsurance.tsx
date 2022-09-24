@@ -546,7 +546,7 @@ const AcceptBuyInsurance = () => {
                                 Config.toast.show('success', `${t('insurance:buy:price_had_update')}`)
                             }
                         }}
-                        disable={!isCanBuy}
+                        disabled={!isCanBuy}
                     >
                         {isUpdated ? `${t('insurance:buy:accept')} (${count}s)` : language === 'vi' ? 'Cập nhật lại giá' : 'Update price'}
                     </Button>
@@ -789,7 +789,7 @@ const AcceptBuyInsurance = () => {
                                 Config.toast.show('success', `${t('insurance:buy:price_had_update')}`)
                             }
                         }}
-                        disable={!isCanBuy}
+                        disabled={!isCanBuy}
                     >
                         {isUpdated ? `${t('insurance:buy:accept')} (${count}s)` : language === 'vi' ? 'Cập nhật lại giá' : 'Update price'}
                     </Button>
