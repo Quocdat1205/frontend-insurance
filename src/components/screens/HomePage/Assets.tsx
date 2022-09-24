@@ -14,7 +14,7 @@ import { createSelector } from 'reselect'
 import { useRouter } from 'next/router'
 import { TendencyIcon } from 'components/common/Svg/SvgIcon'
 import colors from 'styles/colors'
-import { formatNumber, sparkLineBuilder } from 'utils/utils'
+import { formatNumber } from 'utils/utils'
 import fetchApi from 'services/fetch-api'
 import { API_GET_FUTURES_MARKET_WATCH } from 'services/apis'
 import FuturesMarketWatch from 'models/FuturesMarketWatch'
@@ -25,7 +25,7 @@ const LineChart = dynamic(() => import('components/common/Chart/LineChart'), {
 })
 
 const getNewAssets = createSelector([(state: RootStore) => state.setting.assetsToken], (assetsToken) => {
-    return assetsToken.filter((asset: any) => asset.isNew)
+    return assetsToken.filter((asset: any) => asset.isNewToken)
 })
 
 const Assets = () => {
