@@ -32,10 +32,9 @@ const Insurance = ({ slug }: any) => {
         case 'info-covered':
             return (
                 <LayoutWeb3 sponsor={false}>
-                    <Breadcrumbs>
-                        <div>{t('common:header:home')}</div>
-                        <div>{t('common:header:buy_covered')}</div>
-                    </Breadcrumbs>
+                    <div className="w-full bg-[#E5E7E8] h-[0.25rem] sticky top-0 z-[50]">
+                        <div className="bg-red h-[0.25rem] w-full"></div>
+                    </div>
                     <AcceptBuyInsurance />
                 </LayoutWeb3>
             )
