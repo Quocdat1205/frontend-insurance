@@ -67,6 +67,6 @@
     },
     "next": "Next",
     "slogan": "Change risk to payback",
-    "available": "Available Balances {{value}}",
-    "minimum_balance": "Minimum Balance {{value}}"
+    "available": "Maximum {{value}}",
+    "minimum_balance": "Minimum {{value}}"
 }
