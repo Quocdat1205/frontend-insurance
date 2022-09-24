@@ -140,7 +140,7 @@ const AcceptBuyInsurance = () => {
                     if (price > max || price < min) {
                         setUpdated(false)
                         Config.toast.show('error', t('insurance:buy:price_had_update'))
-                        return setCanBuy(false)
+                        return setActive(false)
                     }
                 }
 
@@ -227,7 +227,7 @@ const AcceptBuyInsurance = () => {
                 console.log(state)
 
                 const data = {
-                    owner: props.from.toLowerCase(),
+                    owner: props.from,
                     transaction_hash: props.hash,
                     id_sc: _id,
                     asset_covered: dataPost.asset,
