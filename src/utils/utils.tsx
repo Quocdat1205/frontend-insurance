@@ -111,7 +111,7 @@ export const timeMessage = (previous: any) => {
 }
 
 export const getDecimalPrice = (config: PairConfig) => {
-    const decimalScalePrice = config?.filters.find((rs: any) => rs.filterType === 'PRICE_FILTER') ?? 1
+    const decimalScalePrice = config?.filters?.find((rs: any) => rs.filterType === 'PRICE_FILTER') ?? 1
     return +countDecimals(decimalScalePrice?.tickSize)
 }
 
@@ -194,5 +194,5 @@ export const formatPercentage = (value: number, digits: number = 2, acceptNegati
 }
 
 export function isFunction(functionToCheck: any) {
-    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]'
 }
