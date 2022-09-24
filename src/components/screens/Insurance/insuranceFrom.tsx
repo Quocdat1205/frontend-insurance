@@ -376,7 +376,7 @@ const InsuranceFrom = () => {
     useEffect(() => {
         let list: ICoin[] = []
 
-        assetsToken.data.map(async (token: any) => {
+        assetsToken?.map(async (token: any) => {
             const tmp = {
                 id: token._id,
                 name: token.name,
@@ -1957,7 +1957,7 @@ export const fetchApiNami = async (symbol: string, from: string, to: string, res
 
         let list = await response.json()
         let data: { date: number; value: any }[] = []
-        list.map((item: any) => {
+        list?.map((item: any) => {
             data.push({
                 date: item[0] * 1000,
                 value: item[1],
