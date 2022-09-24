@@ -837,7 +837,7 @@ const InsuranceFrom = () => {
                             </div>
                             {
                                 // head Insurance
-                                <HeaderContent state={tab} setState={setTab} wallet={wallet} />
+                                <HeaderContent state={tab} setState={setTab} wallet={wallet} auth={wallet.account} />
                             }
 
                             {
