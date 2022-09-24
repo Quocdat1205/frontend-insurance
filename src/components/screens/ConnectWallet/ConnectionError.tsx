@@ -11,12 +11,12 @@ const ConnectionError = ({ message, onReconnect }: ConnectionError) => {
 
     return (
         <div className="flex flex-col justitfy-center items-center text-center w-full">
-            <div className="w-[7.75rem] h-[7.75rem]">
+            <div className="w-20 h-20 sm:w-[7.75rem] sm:h-[7.75rem]">
                 <img src="/images/icons/ic_failed.png" />
             </div>
             <div className="text-xl mt-6 font-medium">{t('common:connection_error')}</div>
-            <div className="text-txtSecondary mt-2 text-center">{t('common:reason_error', { reason: message })}</div>
-            <div onClick={onReconnect} className="mt-8 font-semibold text-red flex items-center space-x-2 cursor-pointer">
+            <div className="text-txtSecondary mt-2 text-center text-sm sm:text-base">{t('common:reason_error', { reason: message })}</div>
+            <div onClick={onReconnect} className="mt-8 text-sm sm:text-base font-semibold text-red flex items-center space-x-2 cursor-pointer">
                 <ReplayIcon />
                 <span>{t('common:reconnect')}</span>
             </div>

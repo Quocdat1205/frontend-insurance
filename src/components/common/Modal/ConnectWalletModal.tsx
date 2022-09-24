@@ -67,7 +67,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     }, [account])
 
     const inValidNetword = useMemo(() => {
-        return chainId && account.adddress ? Config.chains.includes(chainId) : true
+        return account.address ? (chainId ? Config.chains.includes(chainId) : false) : true
     }, [chainId, account])
 
     useEffect(() => {
@@ -197,16 +197,16 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 {networkError && <NetworkError />}
                 {!errorConnect && !installer && !switchNetwork && !networkError && (
                     <>
-                        {!loading && <div className="text-xl font-medium"> {t('home:home:connect_wallet')}</div>}
+                        {!loading && <div className="text-xl font-medium text-left sm:text-center w-full"> {t('home:home:connect_wallet')}</div>}
                         {loading ? (
-                            <div className="flex flex-col space-y-6">
+                            <div className="flex flex-col space-y-6 justify-center items-center">
                                 <Loading>
-                                    <div className="bg-white w-[calc(7rem-40px)] h-[calc(7rem-40px)] flex items-center justify-center rounded-full" />
+                                    <div className="bg-white w-[calc(5rem-30px)] h-[calc(5rem-30px)] sm:w-[calc(7rem-40px)] sm:h-[calc(7rem-40px)] flex items-center justify-center rounded-full" />
                                 </Loading>
                                 <div className="text-xl font-medium">{t('common:connecting')}</div>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-4 w-full">
                                 {walletsFilter.map((item: Wallet, index: number) => (
                                     <CartWallet key={index} onClick={() => setWallet(item)} active={wallet?.wallet === item?.wallet}>
                                         <div className="w-10 h-10 flex justify-center items-center relative">
@@ -225,15 +225,20 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                                                 </div>
                                             )}
                                         </div>
-                                        <div>{item.name}</div>
+                                        <div className="text-sm sm:text-base">{item.name}</div>
                                     </CartWallet>
                                 ))}
                             </div>
                         )}
-                        <Button onClick={onConfirm} disabled={!wallet?.active ? true : false || loading} variants="primary" className="w-full py-3 !mt-8">
+                        <Button
+                            onClick={onConfirm}
+                            disabled={!wallet?.active ? true : false || loading}
+                            variants="primary"
+                            className="w-full py-3 !mt-8 text-sm sm:text-base"
+                        >
                             {t('home:home:connect_wallet')}
                         </Button>
-                        <div className="text-txtSecondary">
+                        <div className="text-txtSecondary text-sm sm:text-base">
                             Chưa sở hữu ví? Đọc <span className="text-blue cursor-pointer underline">Hướng dẫn tạo ví</span> ngay.
                         </div>
                     </>
@@ -244,9 +249,12 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
 })
 
 const CartWallet = styled.div.attrs<{ active: boolean }>(({ active }) => ({
-    className: classNames('p-3 flex flex-col items-center space-y-[2px] min-w-[5.5rem] sm:min-w-[11.25rem] bg-hover rounded-md cursor-pointer relative', {
-        'after:!block': active,
-    }),
+    className: classNames(
+        'p-3 flex flex-col items-center space-y-[2px] min-w-[5.5rem] w-full sm:min-w-[11.25rem] bg-hover rounded-md cursor-pointer relative',
+        {
+            'after:!block': active,
+        },
+    ),
 }))<any>`
     &:after {
         display: none;
@@ -261,7 +269,7 @@ const CartWallet = styled.div.attrs<{ active: boolean }>(({ active }) => ({
 `
 
 const Loading = styled.div.attrs({
-    className: 'gradient-spin w-[7rem] h-[7rem] animate-spin-reverse flex items-center justify-center rounded-full relative',
+    className: 'gradient-spin w-[5rem] h-[5rem] sm:w-[7rem] sm:h-[7rem] animate-spin-reverse flex items-center justify-center rounded-full relative',
 })`
     &:after {
         content: '';

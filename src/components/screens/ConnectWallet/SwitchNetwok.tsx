@@ -23,13 +23,13 @@ const SwitchNetwok = ({ onClose, onSwitch }: SwitchNetwok) => {
 
     return (
         <div className="flex flex-col justitfy-center items-center text-center w-full">
-            <div className="w-[7.75rem] h-[7.75rem]">
+            <div className="w-20 h-20 sm:w-[7.75rem] sm:h-[7.75rem]">
                 <img src="/images/icons/ic_failed.png" />
             </div>
             <div className="text-xl mt-6 font-medium">{t('common:switch_network:title')}</div>
-            <div className="text-txtSecondary mt-2 text-center">{t('common:switch_network:description')}</div>
+            <div className="text-txtSecondary mt-2 text-center text-sm sm:text-base">{t('common:switch_network:description')}</div>
 
-            <div className="mt-8 flex items-center space-x-4 w-full">
+            <div className="mt-8 flex items-center space-x-4 w-full text-sm sm:text-base">
                 <Button onClick={onSwitch} variants="primary" className="w-full py-2">
                     {t('common:switch_network:switch_network')}
                 </Button>
