@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'react-feather'
 import cx from 'classnames'
 
-const HeaderContent = ({ state, setState, wallet }: any) => {
+const HeaderContent = ({ state, setState, wallet, auth }: any) => {
     const [isDrop, setDrop] = useState<boolean>(false)
     const router = useRouter()
     const {
@@ -16,7 +16,9 @@ const HeaderContent = ({ state, setState, wallet }: any) => {
 
     return (
         <div
-            className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto mt-[4rem] mb-[3rem] grid grid-cols-12 content-center items-center justify-between"
+            className={`max-w-screen-layout 4xl:max-w-screen-3xl m-auto mt-[4rem] ${
+                auth ? 'mb-[3rem] ' : 'mb-[1rem] '
+            } grid grid-cols-12 content-center items-center justify-between`}
             onClick={() => {
                 setDrop(false)
             }}

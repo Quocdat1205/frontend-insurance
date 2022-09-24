@@ -304,8 +304,8 @@ const AcceptBuyInsurance = () => {
                 </Modal>
                 {
                     // head Insurance
-                    <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto px-[80px] mt-[48px] mb-[20px] flex items-center justify-between">
-                        <div className="flex items-center font-semibold text-base">
+                    <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto mt-[4rem] mb-[3rem] grid grid-cols-12 content-center items-center justify-between">
+                        <div className="flex items-center font-semibold text-base col-span-4">
                             <LeftArrow></LeftArrow>
                             <span
                                 className={' text-txtPrimary hover:cursor-pointer ml-[8px]'}
@@ -317,7 +317,11 @@ const AcceptBuyInsurance = () => {
                             </span>
                         </div>
 
-                        <Popover className="relative" data-tut="tour_custom" id="tour_custom">
+                        <div className={'flex flex-col justify-center items-center col-span-4'}>
+                            <div className={'font-semibold text-[32px] leading-[44px]'}>{t('insurance:buy:info_covered')}</div>
+                        </div>
+
+                        <Popover className="relative col-span-4 flex justify-end" data-tut="tour_custom" id="tour_custom">
                             <Popover.Button
                                 className={
                                     'border border-[0.5] text-base border-hover rounded-[6px] h-[40px] w-auto py-[8px] px-[12px] flex flex-row bg-hover shadow focus-visible:outline-none'
@@ -453,18 +457,21 @@ const AcceptBuyInsurance = () => {
                                 </div>
                             </div>
                             <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
-                                <div className={'text-txtSecondary flex flex-row items-center'}>
+                                <div className={'text-txtSecondary  flex flex-row items-center'}>
                                     <span className={'mr-[8px]'}>{language === 'vi' ? 'Mã giới thiệu' : 'Referral ID'}</span>
                                 </div>
                                 <div className={'font-semibold flex flex-row hover:cursor-pointer w-auto'}>
                                     <Input
+                                        idInput="input_referral"
                                         value={referral}
                                         onChange={(e: any) => {
                                             setReferral(e.target.value.toUpperCase())
                                         }}
                                         type="text"
                                         placeholder={language === 'vi' ? 'Nhập mã giới thiệu tại đây' : 'Text referral ID here'}
-                                        className={`text-txtPrimary !p-0 !m-0 !shadow-none !border-none text-base font-normal bg-hover text-right min-w-[13.5rem]`}
+                                        className={`${
+                                            referral.length > 0 ? 'text-redPrimary' : 'text-txtPrimary'
+                                        } !p-0 !m-0 !shadow-none !border-none text-base font-semibold bg-hover text-right min-w-[13.5rem]`}
                                     />
                                 </div>
                             </div>
@@ -550,7 +557,7 @@ const AcceptBuyInsurance = () => {
                     >
                         {isUpdated ? `${t('insurance:buy:accept')} (${count}s)` : language === 'vi' ? 'Cập nhật lại giá' : 'Update price'}
                     </Button>
-                    <span className="my-[16px] flex flex-col justify-center items-center">
+                    <span className="my-[1rem] text-sm flex flex-col justify-center items-center">
                         {t('insurance:buy:Term_of_Service')}
                         <div>
                             <span className={`${language == 'en' ? '' : 'hidden'}`}>{t('insurance:buy:Term_of_Service_of')}</span>
