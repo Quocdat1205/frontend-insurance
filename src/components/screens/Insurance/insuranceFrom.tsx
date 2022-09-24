@@ -630,11 +630,11 @@ const InsuranceFrom = () => {
                 setDecimalList({ ...decimalList, decimal_p_claim: decimalP_Claim })
                 const min = Math.max(
                     state.p_market * Number(percentPrice?.multiplierDown),
-                    state.p_market - state.p_market * Number(percentPrice?.minDifferenceRatio),
+                    state.p_market - state.p_market * Number(percentPrice?.minDifferenceRatio || 0),
                 )
                 const max = Math.min(
                     state.p_market * Number(percentPrice?.multiplierUp),
-                    state.p_market - state.p_market * Number(percentPrice?.minDifferenceRatio),
+                    state.p_market - state.p_market * Number(percentPrice?.minDifferenceRatio || 0),
                 )
                 setRangeP_claim({ ...rangeP_claim, min: min, max: max })
             }
@@ -832,7 +832,7 @@ const InsuranceFrom = () => {
                                 setChangeUnit1(false)
                             }}
                         >
-                            <div className="w-full bg-[#E5E7E8] h-[0.25rem] sticky top-0 z-[50]">
+                            <div className="w-full bg-[#E5E7E8] h-[0.25rem] sticky top-[4.1875rem] z-[50]">
                                 <div className="bg-red h-[0.25rem] w-1/2"></div>
                             </div>
                             {
@@ -845,7 +845,7 @@ const InsuranceFrom = () => {
                                 !wallet.account
                                     ? !isMobile && (
                                           <div
-                                              className="w-full flex flex-col justify-center items-center max-w-screen-layout 4xl:max-w-screen-3xl m-auto"
+                                              className="w-full flex flex-col justify-center items-center max-w-screen-layout 4xl:max-w-screen-3xl m-auto mb-[1rem]"
                                               onClick={() => {
                                                   setDrop(false)
                                                   setChosing(false)
@@ -864,7 +864,7 @@ const InsuranceFrom = () => {
                                       )
                                     : ''
                             }
-                            <div className="max-w-/screen-layout 4xl:max-w-screen-3xl m-auto flex flex-row">
+                            <div className="max-w-/screen-layout 4xl:max-w-screen-3xl m-auto flex flex-row mb-[8rem]">
                                 <div className="w-8/12">
                                     {
                                         //chart
@@ -880,7 +880,7 @@ const InsuranceFrom = () => {
                                                 <div id="tour_statistics" data-tut="tour_statistics">
                                                     <div className={'pb-2 text-sm leading-5 text-txtSecondary flex items-center space-x-6'}>
                                                         <div className={'w-full flex flex-row items-center'}>
-                                                            <span>{menu[7].name}</span>
+                                                            <span className="mr-2">{menu[7].name}</span>
                                                             <div data-tip={t('insurance:terminology:q_covered')} data-for={`q_covered`}>
                                                                 <InfoCircle size={14} color={colors.txtSecondary} />
                                                                 <Tooltip className="max-w-[200px]" id={'q_covered'} placement="right" />
@@ -1094,7 +1094,7 @@ const InsuranceFrom = () => {
                                                     }}
                                                 >
                                                     <CheckCircle size={68}></CheckCircle>
-                                                    <span className={'font-medium text-txtPrimary mt-[1rem]'}>
+                                                    <span className={'font-medium text-base text-txtPrimary mt-[1rem]'}>
                                                         {`${t('insurance:buy:saved')} `}
                                                         <span className={'text-red'}>
                                                             ${saved.toFixed(4)} {unitMoney}
