@@ -233,7 +233,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
 
             // //Label bullet main
             let latitudeLabel = subSeries.bullets.push(new am4charts.LabelBullet())
-            latitudeLabel.label.text = `P-Market: $${chart.data[chart.data.length - 1]?.value}`
+            latitudeLabel.label.html = `<div class="text-xs">P-Market: $${chart.data[chart.data.length - 1]?.value}</div>`
             latitudeLabel.label.horizontalCenter = 'right'
             latitudeLabel.label.dx = 100
             latitudeLabel.label.dy = -5
@@ -264,7 +264,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
 
                 //label expired
                 let expiredLabel = latitudeExpired.bullets.push(new am4charts.LabelBullet())
-                expiredLabel.label.text = `P-Expired: $${latitudeExpired.data[0].value}`
+                expiredLabel.label.html = `<div class="text-xs">P-Expired: $${latitudeExpired.data[0].value}</div>`
                 expiredLabel.label.horizontalCenter = 'middle'
                 expiredLabel.label.dy = latitudeExpired.data[0].value > state.p_market ? 23 : -23
                 expiredLabel.label.verticalCenter = 'bottom'

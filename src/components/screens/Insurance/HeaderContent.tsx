@@ -16,12 +16,12 @@ const HeaderContent = ({ state, setState, wallet }: any) => {
 
     return (
         <div
-            className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto px-[5rem] mt-[4rem] mb-[3rem] flex flex-row content-center items-center justify-between"
+            className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto mt-[4rem] mb-[3rem] grid grid-cols-12 content-center items-center justify-between"
             onClick={() => {
                 setDrop(false)
             }}
         >
-            <div className="flex items-center font-semibold">
+            <div className="flex items-center font-semibold col-span-4">
                 <LeftArrow />
                 <span
                     className={'hover:cursor-pointer ml-2'}
@@ -34,7 +34,7 @@ const HeaderContent = ({ state, setState, wallet }: any) => {
             </div>
 
             <div
-                className={'flex flex-col justify-center items-center '}
+                className={'flex flex-col justify-center items-center col-span-4'}
                 onClick={() => {
                     setDrop(false)
                 }}
@@ -43,9 +43,9 @@ const HeaderContent = ({ state, setState, wallet }: any) => {
                 {!wallet.account && <div className={'mt-[12px]'}>{t('insurance:buy:connect_wallet_error')}</div>}
             </div>
 
-            <Popover className="relative" data-tut="tour_custom" id="tour_custom">
+            <Popover className="relative col-span-4 flex justify-end" data-tut="tour_custom" id="tour_custom">
                 <Popover.Button
-                    className={cx('rounded-md h-10  py-2 px-3 flex items-center space-x-2 bg-hover', {
+                    className={cx('rounded-md h-10 py-2 px-3 flex items-center space-x-2 bg-hover', {
                         'bg-[#EDEEF0]': isDrop,
                     })}
                     onClick={() => setDrop(!isDrop)}
