@@ -62,8 +62,8 @@ const AcceptBuyInsurance = () => {
     const [active, setActive] = useState<boolean>(false)
     const [res, setRes] = useState(null)
     const [saved, setSaved] = useState(0)
-    const [changeUnit, setChangeUnit] = useState(false)
     const [referral, setReferral] = useState('')
+    const [count, setCount] = useState(10)
 
     useEffect(() => {
         fetch()
@@ -104,18 +104,18 @@ const AcceptBuyInsurance = () => {
             console.log(err)
         }
     }
-    useEffect(() => {
-        setInterval(() => {
-            if (Noti === 'loading') {
-                return
-            }
-            if (isUpdated) {
-                setUpdated(false)
-                setCanBuy(false)
-                return
-            }
-        }, 10000)
-    })
+    // useEffect(() => {
+    //     setInterval(() => {
+    //         if (Noti === 'loading') {
+    //             return
+    //         }
+    //         if (isUpdated) {
+    //             setUpdated(false)
+    //             setCanBuy(false)
+    //             return
+    //         }
+    //     }, 10000)
+    // })
 
     const createContract = async () => {
         if (!wallet.account) {
@@ -266,6 +266,17 @@ const AcceptBuyInsurance = () => {
         }
     }
 
+    useEffect(() => {
+        setTimeout(() => {
+            if (count > 0) {
+                setCount(count - 1)
+            }
+            if (count == 0) {
+                return setUpdated(false)
+            }
+        }, 1000)
+    }, [count])
+
     return !loading && state != undefined ? (
         !isMobile ? (
             <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
@@ -312,7 +323,7 @@ const AcceptBuyInsurance = () => {
                                     'border border-[0.5] text-base border-hover rounded-[6px] h-[40px] w-auto py-[8px] px-[12px] flex flex-row bg-hover shadow focus-visible:outline-none'
                                 }
                             >
-                                {state.tab}
+                                {`${state.tab == '0' ? t('insurance:buy:default') : t('insurance:buy:change_margin')}`}
                                 <ChevronDown></ChevronDown>
                             </Popover.Button>
                             <Popover.Panel className="absolute z-50 bg-white w-[260px] right-0 top-[48px] rounded shadow"></Popover.Panel>
@@ -374,8 +385,8 @@ const AcceptBuyInsurance = () => {
                                     <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
                                         {formatNumber(state?.q_claim + (state?.q_claim * 5) / 100, 4)}
                                     </span>{' '}
-                                    <span className={'text-redPrimary'}>{state?.unit}</span>
-                                    <Popover className="relative">
+                                    <span className={''}>{state?.unit}</span>
+                                    {/* <Popover className="relative">
                                         <Popover.Button
                                             className={'my-4 text-txtPrimary underline hover:cursor-pointer '}
                                             onClick={() => setChangeUnit(!changeUnit)}
@@ -406,7 +417,7 @@ const AcceptBuyInsurance = () => {
                                                 </div>
                                             )}
                                         </Popover.Panel>
-                                    </Popover>
+                                    </Popover> */}
                                 </div>
                             </div>
                             <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
@@ -441,33 +452,25 @@ const AcceptBuyInsurance = () => {
                                     </span>
                                 </div>
                             </div>
+                            <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
+                                <div className={'text-txtSecondary flex flex-row items-center'}>
+                                    <span className={'mr-[8px]'}>{language === 'vi' ? 'Mã giới thiệu' : 'Referral ID'}</span>
+                                </div>
+                                <div className={'font-semibold flex flex-row hover:cursor-pointer w-auto'}>
+                                    <Input
+                                        value={referral}
+                                        onChange={(e: any) => {
+                                            setReferral(e.target.value.toUpperCase())
+                                        }}
+                                        type="text"
+                                        placeholder={language === 'vi' ? 'Nhập mã giới thiệu tại đây' : 'Text referral ID here'}
+                                        className={`text-txtPrimary !p-0 !m-0 !shadow-none !border-none text-base font-normal bg-hover text-right min-w-[13.5rem]`}
+                                    />
+                                </div>
+                            </div>
                             <div className="text-[#B2B7BC] text-xs py-[16px]">
                                 *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')}
                             </div>
-                            {!isUpdated && (
-                                <div className="text-redPrimary bg-hover rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
-                                    <div className={'flex flex-row py-[14px]'}>
-                                        <span className="mr-[6px]">
-                                            <ErrorCircleIcon size={24} />
-                                        </span>
-                                        <span className=""> {t('insurance:buy:price_had_update')}</span>
-                                    </div>
-                                    <div>
-                                        <Button
-                                            variants="outlined"
-                                            className="py-[8px] px-[24px] rounded-[8px]"
-                                            onClick={() => {
-                                                getPrice(`${state.symbol}${state?.unit}`, setPrice)
-                                                setUpdated(true)
-                                                setCanBuy(true)
-                                                Config.toast.show('success', `${t('insurance:buy:price_had_update')}`)
-                                            }}
-                                        >
-                                            {t('insurance:buy:accept')}
-                                        </Button>
-                                    </div>
-                                </div>
-                            )}
 
                             <div
                                 //flex
@@ -522,18 +525,6 @@ const AcceptBuyInsurance = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="dashedLine"></div>
-                            <div className="mt-[2rem] flex flex-col ">
-                                <span className="text-txtSecondary text-sm font-normal mb-[0.5rem]">{language === 'vi' ? 'Mã giới thiệu' : 'Referral ID'}</span>
-                                <Input
-                                    value={referral}
-                                    onChange={(e: any) => {
-                                        setReferral(e.target.value.toUpperCase())
-                                    }}
-                                    type="text"
-                                    className="text-txtPrimary text-base font-normal bg-hover"
-                                />
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -541,16 +532,23 @@ const AcceptBuyInsurance = () => {
                 <div className={'flex flex-col justify-center items-center my-[48px]'}>
                     <Button
                         variants={'primary'}
-                        className={`${
-                            !isCanBuy ? 'bg-[#E5E7E8]' : 'bg-redPrimary'
-                        }  h-[48px] w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
+                        className={`bg-redPrimaryh-[48px] w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                         onClick={() => {
-                            setNoti('loading')
-                            createContract()
+                            if (isUpdated) {
+                                setNoti('loading')
+                                createContract()
+                            }
+                            if (!isUpdated) {
+                                getPrice(`${state.symbol}${state?.unit}`, setPrice)
+                                setUpdated(true)
+                                setCanBuy(true)
+                                setCount(10)
+                                Config.toast.show('success', `${t('insurance:buy:price_had_update')}`)
+                            }
                         }}
                         disable={!isCanBuy}
                     >
-                        {t('insurance:buy:accept')}
+                        {isUpdated ? `${t('insurance:buy:accept')} (${count}s)` : language === 'vi' ? 'Cập nhật lại giá' : 'Update price'}
                     </Button>
                     <span className="my-[16px] flex flex-col justify-center items-center">
                         {t('insurance:buy:Term_of_Service')}
@@ -641,7 +639,7 @@ const AcceptBuyInsurance = () => {
                                     <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
                                         {formatNumber(state?.q_claim + (state?.q_claim * 5) / 100, 4)}
                                     </span>{' '}
-                                    <span className={'text-redPrimary pl-[8px]'}>{state?.unit}</span>
+                                    <span className={'pl-[8px]'}>{state?.unit}</span>
                                 </div>
                             </div>
                             <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
@@ -673,43 +671,25 @@ const AcceptBuyInsurance = () => {
                                     </span>
                                 </div>
                             </div>
-                            <div className="text-[#B2B7BC] text-xs py-[16px]">
-                                *{t('insurance:buy:notified')} 10,000$ - 12,000$ {t('insurance:buy:notified_sub')}
+                            <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
+                                <div className={'text-txtSecondary flex flex-row items-center'}>
+                                    <span className={'mr-[8px]'}>{language === 'vi' ? 'Mã giới thiệu' : 'Referral ID'}</span>
+                                </div>
+                                <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
+                                    <Input
+                                        value={referral}
+                                        onChange={(e: any) => {
+                                            setReferral(e.target.value.toUpperCase())
+                                        }}
+                                        type="text"
+                                        placeholder={language === 'vi' ? 'Nhập mã giới thiệu tại đây' : 'Text referral ID here'}
+                                        className={`text-txtPrimary h-auto !p-0 !m-0 !shadow-none !border-none text-base font-normal bg-hover text-right min-w-[13.5rem]`}
+                                    />
+                                </div>
                             </div>
-                            {!isUpdated ? (
-                                <div className="text-redPrimary bg-hover rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
-                                    <div className={'flex flex-row items-center py-[14px]'}>
-                                        <span className="pr-[8px]">
-                                            <ErrorCircleIcon size={16} />
-                                        </span>
-                                        <span className="text-sm"> {t('insurance:buy:price_had_update')}</span>
-                                    </div>
-                                    <div>
-                                        <Button
-                                            variants="outlined"
-                                            className={`py-[8px] rounded-[8px] px-[6px] text-xs tiny:px-[24px]`}
-                                            onClick={() => {
-                                                getPrice(`${state.symbol}${state?.unit}`, setPrice)
-                                                setUpdated(true)
-                                                setCanBuy(true)
-                                                Config.toast.show('success', `${t('insurance:buy:price_had_update')}`)
-                                            }}
-                                        >
-                                            {t('insurance:buy:accept')}
-                                        </Button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="text-[#52CC74] bg-hover rounded-[12px] mb-[24px] w-full flex flex-row justify-between items-center px-[18px]">
-                                    <div className={'flex flex-row items-center py-[14px]'}>
-                                        <span className="pr-[8px]">
-                                            <CheckCircle />
-                                        </span>
-                                        <span className="text-sm"> {t('insurance:buy:price_had_update')}</span>
-                                    </div>
-                                </div>
-                            )}
-
+                            <div className="text-[#B2B7BC] text-xs py-[16px]">
+                                *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')}
+                            </div>
                             <div
                                 //flex
                                 className="rounded-[12px] p-[24px] hidden flex-row items-center border-hover border-1 relative"
@@ -768,7 +748,7 @@ const AcceptBuyInsurance = () => {
                     </div>
                 </div>
 
-                <div className={'flex flex-col justify-center items-center mt-[89px] mx-[24px]'}>
+                <div className={'flex flex-col justify-center items-center mt-[4rem] mx-[24px]'}>
                     <span className="text-center pb-[16px] text-xs">
                         {t('insurance:buy:Term_of_Service')}
                         <div>
@@ -797,11 +777,21 @@ const AcceptBuyInsurance = () => {
                             !isCanBuy ? 'bg-[#E5E7E8]' : 'bg-redPrimary'
                         }  h-[48px] w-full flex flex-row justify-center items-center text-white rounded-[8px] py-[12px]`}
                         onClick={() => {
-                            createContract()
+                            if (isUpdated) {
+                                setNoti('loading')
+                                createContract()
+                            }
+                            if (!isUpdated) {
+                                getPrice(`${state.symbol}${state?.unit}`, setPrice)
+                                setUpdated(true)
+                                setCanBuy(true)
+                                setCount(10)
+                                Config.toast.show('success', `${t('insurance:buy:price_had_update')}`)
+                            }
                         }}
                         disable={!isCanBuy}
                     >
-                        <span className="min-w-[5rem] ">{t('insurance:buy:accept')}</span>
+                        {isUpdated ? `${t('insurance:buy:accept')} (${count}s)` : language === 'vi' ? 'Cập nhật lại giá' : 'Update price'}
                     </Button>
                 </div>
             </div>

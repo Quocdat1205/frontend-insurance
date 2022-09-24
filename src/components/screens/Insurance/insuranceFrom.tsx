@@ -249,7 +249,7 @@ const InsuranceFrom = () => {
             symbol: selectCoin?.type,
             unit: unitMoney,
             p_claim: Number(state.p_claim),
-            tab: menu[tab]?.name,
+            tab: tab,
             q_covered: Number(state.q_covered),
             p_market: Number(state.p_market),
         }

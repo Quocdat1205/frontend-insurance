@@ -1,6 +1,8 @@
+import axios from 'axios'
+import Config from 'config/config'
 import { Dispatch } from 'redux'
 import * as types from 'redux/actions/types'
-import { API_GET_LIST_TOKEN, API_GET_CONFIG_ASSET, API_GET_UNIT_CONFIG } from 'services/apis'
+import { API_GET_LIST_TOKEN, API_GET_CONFIG_ASSET, API_GET_UNIT_CONFIG, API_GET_GET_TOKEN } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 
 export const onLoading = (data: boolean) => async (dispatch: Dispatch) => {
