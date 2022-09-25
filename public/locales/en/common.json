@@ -67,6 +67,8 @@
     },
     "next": "Next",
     "slogan": "Change risk to payback",
+    "slogan_first": "Change risk",
+    "slogan_second": "To payback",
     "available": "Available Balances {{value}}",
     "minimum_balance": "Minimum Balance {{value}}"
 }

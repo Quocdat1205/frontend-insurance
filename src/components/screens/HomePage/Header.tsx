@@ -1,10 +1,8 @@
 import { createNullLogger } from '@algolia/logger-common'
 import detectEthereumProvider from '@metamask/detect-provider'
-import acorn from 'acorn'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import React, { useMemo, useState } from 'react'
-import { isMobile } from 'react-device-detect'
 import { ChevronDown, ChevronUp, X } from 'react-feather';
 import Button from 'components/common/Button/Button'
 import ButtonLanguage from 'components/common/Button/ButtonLanguage'
@@ -97,7 +95,7 @@ const Header = () => {
                                 // </div>
                             )}
                             {account && network && isMobile && (
-                                // <Menu data={menuConfig} network={network} acount={account} isMobile={isMobile}/>
+                                // <Menu data={menuConfig} network={network} account={account} isMobile={isMobile}/>
                                 <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
                                     <img src={network.icon} width={24} height={24} />
                                     <div>{network.chain}</div>

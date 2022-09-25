@@ -65,6 +65,8 @@
     },
     "next": "Tiếp theo",
     "slogan": "Biến rủi ro thành lợi nhuận",
+    "slogan_first": "Biến rủi ro",
+    "slogan_second": "Thành lợi nhuận",
     "available": "Số dư khả dụng {{value}}",
     "minimum_balance": "Số dư tối thiểu {{value}}"
 }

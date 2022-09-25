@@ -9,7 +9,8 @@ interface Footer {
 const Footer = ({ sponsor = true }) => {
     const { t } = useTranslation()
     return (
-        <footer className="footer pt-20 sm:pt-[11.75rem]">
+        // <footer className="footer pt-8 sm:pt-[4.125rem] mb-[4rem]">
+        <footer className="footer pt-8 sm:pt-[4.125rem]">
             {sponsor && (
                 <BgSponsor>
                     <div className="text-txtPrimary font-bold text-sm sm:text-xl">{t('home:landing:products_sponsored_by')}</div>
@@ -42,7 +43,7 @@ const Footer = ({ sponsor = true }) => {
                             </div>
                         </div>
                     </div>
-                    <div className="my-6 h-[1px] bg-divider" />
+                    <div className="my-6 h-[1px] bg-divider " />
                     <div className="text-xs text-txtSecondary">Copyright © 2021 UI8 LLC. All rights reserved</div>
                 </div>
             </div>
@@ -51,9 +52,9 @@ const Footer = ({ sponsor = true }) => {
 }
 
 const BgSponsor = styled.div.attrs({
-    className: 'flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 space-x-8 justify-center bg-opacity-[0.4] py-8 sm:py-6',
+    className: 'flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 space-x-8 justify-center bg-opacity-[0.4] sm:pb-16 pb-6',
 })`
-    background-color: #ffe4e9;
+    //background-color: #ffe4e9;
     /* opacity: 0.4; */
     /* background: linear-gradient(
         88.49deg,
