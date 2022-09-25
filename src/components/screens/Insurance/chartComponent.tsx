@@ -326,13 +326,16 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
 
                 if (p_claim > 0) {
                     if (isMobile) {
-                        claimLabel.label.html = `<div id="claimLabel" class="hover:cursor-pointer items-center flex text-xs h-[24px] text-[${
-                            latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : '#52CC74'
-                        }] "><span>P-Claim: $${
-                            latitudeClaim.data[0].value
-                        }</span><span class="ml-[8px] h-[24px] py-[2px] px-[8px] items-center border rounded-full bg-[${
-                            latitudeClaim.data[0].value < state.p_market ? '#FFF1F2' : '#F1FFF5'
-                        }]">${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%</span></div>`
+                        const label_mobile = document.getElementById('label_mobile')
+                        if (label_mobile) {
+                            label_mobile.innerHTML = `<div id="claimLabel" class="justify-end mt-[0.25rem] hover:cursor-pointer items-center flex text-xs h-[24px] text-[${
+                                latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : '#52CC74'
+                            }] "><span>P-Claim: $${
+                                latitudeClaim.data[0].value
+                            }</span><span class="ml-[8px] h-[24px] py-[2px] px-[8px] items-center border rounded-full bg-[${
+                                latitudeClaim.data[0].value < state.p_market ? '#FFF1F2' : '#F1FFF5'
+                            }]">${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%</span></div>`
+                        }
                     } else {
                         claimLabel.label.html = `<div id="claimLabel" class="hover:cursor-pointer text-sm z-[1000]" style="color: ${
                             latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : '#52CC74'
@@ -358,12 +361,12 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                     const claimLabel = document.getElementById('claimLabel')
                     if (claimLabel) {
                         if (value < state.p_market) {
-                            claimLabel.style.color = '#EB2B3E'
-                            claimLabel.style.backgroundColor = '#FFF1F2'
+                            // claimLabel.style.color = '#EB2B3E'
+                            // claimLabel.style.backgroundColor = '#FFF1F2'
                             claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
                         } else {
-                            claimLabel.style.color = '#52CC74'
-                            claimLabel.style.backgroundColor = '#F1FFF5'
+                            // claimLabel.style.color = '#52CC74'
+                            // claimLabel.style.backgroundColor = '#F1FFF5'
                             claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
                         }
                     }
