@@ -582,7 +582,7 @@ const AcceptBuyInsurance = () => {
                     onBackdropCb={() => {
                         setActive(false)
                     }}
-                    className="rounded-xl p-6 bg-white  absolute left-1/2 top-1/2 -translate-x-1/2 !translate-y-1"
+                    className="bg-white !sticky !bottom-0 !left-0 !rounded-none !translate-x-0 !translate-y-0 h-3/4"
                 >
                     <NotificationInsurance id={res ? res : ''} name={`${Noti}`} state={state} active={active} setActive={() => {}} isMobile={false} />
                 </Modal>
