@@ -16,7 +16,7 @@ const HeaderContent = ({ state, setState, wallet, auth }: any) => {
 
     return (
         <div
-            className={`max-w-screen-layout 4xl:max-w-screen-3xl m-auto mt-[4rem] ${
+            className={`max-w-screen-layout 4xl:max-w-screen-3xl m-auto mt-[2rem] ${
                 auth ? 'mb-[3rem] ' : 'mb-[1rem] '
             } grid grid-cols-12 content-center items-center justify-between`}
             onClick={() => {
@@ -42,7 +42,7 @@ const HeaderContent = ({ state, setState, wallet, auth }: any) => {
                 }}
             >
                 <div className={'font-semibold text-[32px] leading-[44px]'}>{t('insurance:buy:buy_covered')}</div>
-                {!wallet.account && <div className={'mt-[12px]'}>{t('insurance:buy:connect_wallet_error')}</div>}
+                {auth == null && <div className={'mt-[12px]'}>{t('insurance:buy:connect_wallet_error')}</div>}
             </div>
 
             <Popover className="relative col-span-4 flex justify-end" data-tut="tour_custom" id="tour_custom">
