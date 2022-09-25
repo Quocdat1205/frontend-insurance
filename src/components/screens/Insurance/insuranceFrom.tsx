@@ -1196,7 +1196,7 @@ const InsuranceFrom = () => {
                                                         </div>
                                                     </div>
                                                     <div className={'flex flex-row justify-center items-center hover:cursor-pointer relative max-h-[24px]'}>
-                                                        {state.q_claim > 0 ? Number(state?.q_claim.toFixed(2)) : 0}
+                                                        {state.q_claim > 0 ? Number(state?.q_claim.toFixed(decimalList.decimal_q_covered)) : 0}
                                                         <span className={'pl-2 mr-1'}>{unitMoney}</span>
                                                         <div className="relative">
                                                             {/* <Popover className="relative">
@@ -1875,7 +1875,7 @@ const InsuranceFrom = () => {
                                                     </div>
                                                 </div>
                                                 <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
-                                                    {state.q_claim > 0 ? Number(state.q_claim.toFixed(2)) : 0}
+                                                    {state.q_claim > 0 ? Number(state.q_claim.toFixed(decimalList.decimal_q_covered)) : 0}
                                                     <span
                                                         className={'text-red pl-[8px]'}
                                                         onClick={() =>
