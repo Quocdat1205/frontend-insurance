@@ -19,6 +19,8 @@ import { ChevronDown, ChevronUp } from 'react-feather'
 import Modal from 'components/common/Modal/Modal'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
 import { Input } from 'components/common/Input/input'
+import { API_GET_BUY_INSURANCE } from 'services/apis'
+import fetchApi from 'services/fetch-api'
 
 export type IBuyInsurance = {
     createInsurance: number
@@ -224,8 +226,6 @@ const AcceptBuyInsurance = () => {
     const handlePostInsurance = async (props: any, dataPost: any, state: any, _id: any) => {
         if (props) {
             try {
-                console.log(state)
-
                 const data = {
                     owner: props.from,
                     transaction_hash: props.hash,
@@ -238,6 +238,7 @@ const AcceptBuyInsurance = () => {
                     period: Number(state.period),
                     isUseNain: dataPost.isUseNain,
                 }
+
                 await buyInsurance(data).then((res) => {
                     if (res === 201) {
                         setRes(_id)
