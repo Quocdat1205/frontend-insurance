@@ -1,7 +1,7 @@
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import React, { useMemo, useState } from 'react'
-import { ChevronDown, ChevronUp, X } from 'react-feather'
+import { ChevronDown, ChevronUp, X } from 'react-feather';
 import Button from 'components/common/Button/Button'
 import ButtonLanguage from 'components/common/Button/ButtonLanguage'
 import Menu from 'components/common/Menu/Menu'
