@@ -102,5 +102,7 @@
     "slogan_first": "Change risk",
     "slogan_second": "To payback",
     "available": "Available Balances {{value}}",
-    "minimum_balance": "Minimum Balance {{value}}"
+    "minimum_balance": "Minimum Balance {{value}}",
+    "max": "Maximum {{value}}",
+    "min": "Minimum {{value}}"
 }
