@@ -65,8 +65,6 @@
     },
     "next": "Tiếp theo",
     "slogan": "Biến rủi ro thành lợi nhuận",
-    "available": "Số lượng tối đa {{value}}",
-    "minimum_balance": "Số lượng tối thiểu {{value}}",
     "coming_soon": "Sắp ra mắt",
     "connecting": "Đang kết nối",
     "connect_successful": "Kết nối ví thành công",
@@ -98,5 +96,9 @@
         "chainID": "Mã chuỗi",
         "symbol": "Ký hiệu tiền tệ",
         "add_bnb": "Thêm BNB Smart Chain"
-    }
+    },
+    "slogan_first": "Biến rủi ro",
+    "slogan_second": "Thành lợi nhuận",
+    "available": "Số dư khả dụng {{value}}",
+    "minimum_balance": "Số dư tối thiểu {{value}}"
 }

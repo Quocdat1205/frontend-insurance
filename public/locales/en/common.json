@@ -67,8 +67,6 @@
     },
     "next": "Next",
     "slogan": "Change risk to payback",
-    "available": "Maximum {{value}}",
-    "minimum_balance": "Minimum {{value}}",
     "coming_soon": "Coming soon",
     "connecting": "Connecting",
     "connect_successful": "Connected Successfully",
@@ -100,5 +98,9 @@
         "chainID": "ChainID",
         "symbol": "Symbol",
         "add_bnb": "Add BNB Smart Chain"
-    }
+    },
+    "slogan_first": "Change risk",
+    "slogan_second": "To payback",
+    "available": "Available Balances {{value}}",
+    "minimum_balance": "Minimum Balance {{value}}"
 }
