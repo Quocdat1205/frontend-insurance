@@ -18,7 +18,6 @@ const LayoutInsurance = ({ children, handleClick, hiddenHeader }: layoutInsuranc
     return !isMobile ? (
         <div className="relative" onClick={handleClick}>
             {!hiddenHeader && <Header />}
-            <Breadcrumbs>{[`${t('insurance:buy:home')}`, `${t('insurance:buy:buy_covered')}`]}</Breadcrumbs>
             {children}
         </div>
     ) : (

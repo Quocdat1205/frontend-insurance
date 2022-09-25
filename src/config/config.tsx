@@ -1,7 +1,7 @@
 import { BasicChainInformation, ExtendedChainInformation, wallets } from 'components/web3/Web3Types'
 import env from 'config/env'
-import { Toast } from 'types/types'
-import { DisconnectIcon, EmailIcon, HistoryIcon, UserIcon } from 'components/common/Svg/SvgIcon';
+import { ConnectWalletType, Toast } from 'types/types'
+import { DisconnectIcon, EmailIcon, HistoryIcon, UserIcon } from 'components/common/Svg/SvgIcon'
 
 class Config {
     static env = env
@@ -12,13 +12,19 @@ class Config {
 
     static alert: Toast
 
-    static web3: any
+    static token: {
+        token: string | null
+        expire: number | null
+    } = { token: null, expire: null }
 
-    static connectWallet = (wallet: string = wallets.metaMask) => {
-        if (Config) {
-            Config.web3.activate(wallet)
-        }
+    static web3: any
+    static refConnectWallet: ConnectWalletType
+
+    static connectWallet = () => {
+        Config.refConnectWallet.show()
     }
+
+    static isMetaMaskInstalled = Config.client && Boolean(window.ethereum && window.ethereum.isMetaMask)
 
     static chains = String(Config.env.CHAINS)
         .split(',')
@@ -54,6 +60,12 @@ class Config {
     static blogUrl: { nami_exchange: string; nami_today: string } = {
         nami_exchange: 'https://nami.exchange',
         nami_today: 'https://nami.today',
+    }
+
+    static logout = () => {
+        localStorage.removeItem('PUBLIC_ADDRESS')
+        localStorage.removeItem('PUBLIC_TOKEN')
+        localStorage.removeItem('PUBLIC_WALLET')
     }
 
     static pattern = (key: string) => {
@@ -96,7 +108,7 @@ class Config {
         // },
     ]
 
-    static subMenuMobile  = [
+    static subMenuMobile = [
         {
             menuId: 'recent-transaction',
             router: '/buy-covered',
@@ -130,7 +142,6 @@ class Config {
         },
         {
             menuId: 'disconnect',
-            router: '/buy-covered',
             name: 'common:header:disconnect',
             parentId: 'account-info',
             // icon: '/images/icons/ic_bx-log-out.png',
@@ -140,7 +151,7 @@ class Config {
         },
     ]
 
-    static subMenu  = [
+    static subMenu = [
         {
             menuId: 'recent-transaction',
             router: '/home',
@@ -171,7 +182,6 @@ class Config {
         },
         {
             menuId: 'disconnect',
-            router: '/buy-covered',
             name: 'common:header:disconnect',
             parentId: 'account-info',
             // icon: '/images/icons/ic_bx-log-out.png',
@@ -183,7 +193,7 @@ class Config {
     static homeMenuMobile = [
         { menuId: 'account-info', router: '/home', name: 'common:header:account_info_title', parentId: 0 },
         ...Config.subMenuMobile,
-        ...Config.homeMenu
+        ...Config.homeMenu,
     ]
 }
 

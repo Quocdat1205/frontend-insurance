@@ -4,11 +4,12 @@ import { isMobile } from 'react-device-detect'
 import Button from 'components/common/Button/Button'
 import InputField from 'components/common/Input/InputField'
 import Modal from 'components/common/Modal/Modal'
+import Toast from 'components/layout/Toast'
+import Config from 'config/config'
 import * as types from 'redux/actions/types'
-import { API_GET_INFO_USER, API_GET_UNIT_CONFIG } from 'services/apis'
+import { RootStore, useAppSelector } from 'redux/store'
+import { API_GET_INFO_USER, API_GET_UNIT_CONFIG, API_UPDATE_USER_INFO } from 'services/apis';
 import fetchApi from 'services/fetch-api'
-import Toast from 'components/layout/Toast';
-import Config from 'config/config';
 
 interface UpdateEmailSubscriptionModal {
     visible: boolean
@@ -31,12 +32,15 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
     const [email, setEmail] = useState('')
     const [currentEmail, setCurrentEmail] = useState('a@mail.com')
     const [ableSubmit, setAbleSubmit] = useState(false)
+    const account = useAppSelector((state: RootStore) => state.setting.account)
+
+    console.log({ account })
 
     const getInfo = async () => {
         const { data } = await fetchApi({
             url: API_GET_INFO_USER,
             params: {
-                owner: '0xFA39a930C7A3D1fEde4E1348FF74c0c5ba93D2B4',
+                owner: account.address,
             },
         })
         console.log('fetch---', data)
@@ -49,25 +53,30 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
     }
 
     const updateEmail = async () => {
-        Config.toast.show('error', t('home:landing:email_invalid'), {
-            position:"top-right"
-        })
-        return
-        const { data } = await fetchApi({
-            url: API_GET_INFO_USER,
-            baseURL: '',
-            method: 'PUT',
+        // Config.toast.show('error', t('home:landing:email_invalid'), {
+        //     position: 'top-right',
+        // })
+        // return
+        const { data, message, statusCode } = await fetchApi({
+            url: API_UPDATE_USER_INFO,
+            options :{
+                method: 'PUT',
+            },
             params: {
-                owner: '0xFA39a930C7A3D1fEde4E1348FF74c0c5ba93D2B4',
-                email: '',
+                owner: account.address,
+                email: 'i@mail.com',
             },
         })
         console.log('update---', data)
-        if (data) {
+        if (message === 'SUCCESS' && statusCode === 200) {
+            onClose()
+            Config.toast.show('success', t('common:modal:success_update_email'))
             // dispatch({
             //     type: types.SET_CONFIG_UNIT,
             //     payload: data,
             // })
+        } else {
+            Config.toast.show('error', t('home:landing:email_invalid'))
         }
     }
 
@@ -156,7 +165,7 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
                         //     return router.push('/buy-covered/insurance-history')
                         // }
                     }}
-                    disable={!email || !ableSubmit}
+                    disabled={!email || !ableSubmit}
                 >
                     {t('common:update')}
                 </Button>

@@ -17,9 +17,13 @@ const fetchApi = async ({ url, options, params, cancelToken, timeout, baseURL }:
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Headers': '*',
+                Authorization: '',
             },
             cancelToken,
             timeout,
+        }
+        if (Config.token.token) {
+            defaultOptions.headers['Authorization'] = `Bearer ${Config.token.token}`
         }
 
         const opts = merge(defaultOptions, options)

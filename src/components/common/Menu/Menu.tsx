@@ -4,30 +4,32 @@ import React, { MouseEventHandler, useMemo, useState } from 'react'
 import { isMobile as mobile } from 'react-device-detect'
 import { ChevronDown, ChevronUp } from 'react-feather'
 import styled from 'styled-components'
+import Modal from 'components/common/Modal/Modal'
+import NotificationInsurance from 'components/layout/notifucationInsurance'
+import ContactModal from 'components/screens/HomePage/ContactModal'
+import EmailSubscriptionModal from 'components/screens/HomePage/EmailSubModal'
+import UpdateEmailSubscriptionModal from 'components/screens/HomePage/EmailSubUpdateModal'
 import useWindowSize from 'hooks/useWindowSize'
+import { RootStore, useAppSelector } from 'redux/store'
 import { IconSvg } from 'types/types'
 import { screens } from 'utils/constants'
 import { isFunction } from 'utils/utils'
-import EmailSubscriptionModal from 'components/screens/HomePage/EmailSubModal';
-import NotificationInsurance from 'components/layout/notifucationInsurance';
-import Modal from 'components/common/Modal/Modal';
-import UpdateEmailSubscriptionModal from 'components/screens/HomePage/EmailSubUpdateModal';
-import ContactModal from 'components/screens/HomePage/ContactModal';
 
 interface MenuItem {
     name?: any
-    router: string
+    router?: string
     icon?: string | React.ReactNode | IconSvg | any
     // when the icon is a custom react node
-    isIconSvg?: boolean
+    isIconSvg?: undefined | boolean
     isMobile?: boolean
-    menuId: string
+    menuId: undefined | string
     parentId?: string | number
     // when the name is custom react node
     nameComponentProps?: any
     parent?: string | number
     // show arrow down when the menu has children
     hideArrowIcon?: boolean
+    modalName?: undefined | string
 }
 
 interface Menu {
@@ -43,6 +45,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
     const isMobile = (width && width < screens.drawer) || mobile
     const [active, setActive] = useState<any>(null)
     const [isHover, setIsHover] = useState(false)
+    const account = useAppSelector((state: RootStore) => state.setting.account)
 
     const onToggleMenu = (e: any, menu: any) => {
         const _active = !menu.parentId && (active?.parentId === menu.menuId || active?.menuId === menu.menuId) ? null : menu
@@ -108,6 +111,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
     }
 
     const renderMenu = (menu: any, index: number, child = false) => {
+        if (!account?.address && menu.menuId === 'disconnect') return null
         const hasChildren = menu.children.length > 0
         const _active = active?.menuId === menu.menuId || active?.parentId === menu.menuId
         const level = menu.level + 1
@@ -148,7 +152,16 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                 isChild={child}
             >
                 {!hasChildren ? (
-                    <div className="flex items-center space-x-4 px-4" onClick={menu?.modalName ? menu.handleOpenModal : () => {console.log("no modal")}}>
+                    <div
+                        className="flex items-center space-x-4 px-4"
+                        onClick={
+                            menu?.modalName
+                                ? menu.handleOpenModal
+                                : () => {
+                                      console.log('no modal')
+                                  }
+                        }
+                    >
                         {menu?.icon && <Icon isIconSvg={menu?.isIconSvg} icon={menu.icon} />}
                         {/* custom parent component: component passed from config as [name] props */}
                         <Name name={menu.name} {...menu?.nameComponentProps} />
@@ -158,7 +171,13 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                         className={classnames('flex items-center justify-between sm:justify-start space-x-2 cursor-pointer text-sm px-4', {
                             'pb-3': _active && isMobile,
                         })}
-                        onClick={menu?.modalName ? menu.handleOpenModal : () => {console.log("no modal")}}
+                        onClick={
+                            menu?.modalName
+                                ? menu.handleOpenModal
+                                : () => {
+                                      console.log('no modal')
+                                  }
+                        }
                     >
                         <div className="space-x-4 flex items-center">
                             {menu?.icon && <Icon isIconSvg={menu?.isIconSvg} icon={menu.icon} />}
@@ -171,7 +190,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                 )}
                 {hasChildren && (
                     <ul
-                        className={`menu-${level} w-full sm:w-max bg-hover mb:bg-white sm:-mx-8 mb:absolute relative flex flex-col mb:py-4 mb:space-y-2 mb:rounded-b-xl mb:shadow-subMenu mb:top-full h-max sm:left-12 mb:min-w-[244px]`}
+                        className={`menu-${level} w-full mb:w-max bg-hover mb:bg-white mb:-mx-8 mb:absolute relative flex flex-col mb:py-4 mb:space-y-2 mb:rounded-b-xl mb:shadow-subMenu mb:top-full h-max mb:left-12 mb:min-w-[244px]`}
                     >
                         {menu.children.map((menu: any, idx: number) => renderMenu(menu, idx, true))}
                     </ul>

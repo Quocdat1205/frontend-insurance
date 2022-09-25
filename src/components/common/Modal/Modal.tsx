@@ -15,6 +15,7 @@ interface Modal {
     isMobile?: boolean
     customHeader?: () => void
     wrapClassName?: string
+    closeButton?: boolean
 }
 
 const Modal = ({
@@ -27,6 +28,7 @@ const Modal = ({
     isMobile,
     customHeader,
     wrapClassName = '',
+    closeButton = true,
 }: Modal) => {
     const wrapperRef = useRef<any>(null)
     const container = useRef<any>(null)
@@ -87,19 +89,19 @@ const Modal = ({
                         ref={wrapperRef}
                         className={classnames(
                             'w-full absolute bg-white overflow-auto max-h-full',
-                            { 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl': !isMobile},
+                            { 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl': !isMobile },
                             className,
                         )}
                     >
                         <div className={`py-8 px-6 h-full ${wrapClassName}`}>
                             <>
-                                {customHeader ? (
-                                    customHeader()
-                                ) : (
-                                    <div className="flex items-center justify-end pb-6 sm:pb-2">
-                                        <X onClick={handleOutside} size={20} className="cursor-pointer" />
-                                    </div>
-                                )}
+                                {customHeader
+                                    ? customHeader()
+                                    : closeButton && (
+                                          <div className="flex items-center justify-end pb-6 sm:pb-2">
+                                              <X onClick={handleOutside} size={20} className="cursor-pointer" />
+                                          </div>
+                                      )}
                                 {children}
                             </>
                         </div>

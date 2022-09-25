@@ -111,7 +111,7 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
                             //     return router.push('/buy-covered/insurance-history')
                             // }
                         }}
-                        disable={!reqDetail?.request || !reqDetail?.email || !!(validator && Object.keys(validator)?.length && !validator('email')?.isValid)}
+                        disabled={!reqDetail?.request || !reqDetail?.email || !!(validator && Object.keys(validator)?.length && !validator('email')?.isValid)}
                     >
                         {t('common:update')}
                     </Button>

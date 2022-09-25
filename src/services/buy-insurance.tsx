@@ -1,6 +1,6 @@
 import axios from 'axios'
 import Config from 'config/config'
-import { API_GET_BUY_INSURANCE, API_GET_GET_TOKEN } from './apis'
+import { API_GET_BUY_INSURANCE, API_GET_GET_TOKEN_COOKIES } from './apis'
 
 export const buyInsurance = async (props: {
     owner: string
@@ -17,9 +17,12 @@ export const buyInsurance = async (props: {
     try {
         const { owner, transaction_hash, id_sc, asset_covered, asset_refund, margin, q_covered, p_claim, period, isUseNain } = props
 
-        const AuthToken = await axios.get(`${Config.env.API_URL}${API_GET_GET_TOKEN}`, { params: { owner: owner.toLowerCase() } })
+        const CookieToken = await axios.get(`${Config.env.API_URL}${API_GET_GET_TOKEN_COOKIES}`, {
+            params: { owner: owner },
+            withCredentials: true,
+        })
 
-        const { status } = await axios.post(
+        const data = await axios.post(
             `${Config.env.API_URL}${API_GET_BUY_INSURANCE}`,
             {
                 owner,
@@ -33,10 +36,18 @@ export const buyInsurance = async (props: {
                 period,
                 isUseNain,
             },
-            { headers: { Authorization: `Bearer ${AuthToken.data}` } },
+            {
+                headers: {
+                    accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Credentials': true,
+                    Authorization: `Bearer ${CookieToken.data.data}`,
+                    withCredentials: true,
+                },
+            },
         )
 
-        return status
+        return data.data.status
     } catch (error) {
         console.error(error)
         return false

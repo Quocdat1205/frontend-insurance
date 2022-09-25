@@ -56,7 +56,7 @@ const Toast = forwardRef((props, ref) => {
                     appear
                     show={visible}
                     style={style}
-                    className={`${className} transform flex items-center rounded-[3px] space-x-9 px-6 py-4 leading-6`}
+                    className={`${className} transform flex items-center rounded-[3px] space-x-9 px-6 py-4 leading-6 shadow-toast`}
                     enter="transition-all duration-150"
                     enterFrom="opacity-0 scale-50"
                     enterTo="opacity-100 scale-100"

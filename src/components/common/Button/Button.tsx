@@ -6,10 +6,10 @@ interface Props {
     children: ReactNode
     className?: string
     onClick?: () => void
-    disable?: boolean
+    disabled?: boolean
 }
 
-const Button = ({ variants = 'gradient', children, className, onClick, disable }: Props) => {
+const Button = ({ variants = 'gradient', children, className, onClick, disabled }: Props) => {
     return (
         <button
             className={classNames(
@@ -18,12 +18,12 @@ const Button = ({ variants = 'gradient', children, className, onClick, disable }
                     'bg-gradient text-white': variants === 'gradient',
                     'border border-red text-red bg-pink': variants === 'outlined',
                     'bg-red text-white': variants === 'primary',
-                    'bg-[#E5E7E8]': disable,
+                    'bg-divider text-white': disabled,
                 },
                 className,
             )}
             onClick={onClick}
-            disabled={disable}
+            disabled={disabled}
         >
             {children}
         </button>

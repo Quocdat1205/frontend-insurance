@@ -1,5 +1,6 @@
 import Skeleton from 'components/common/Skeleton/Skeleton'
 import CardShadow from 'components/common/Card/CardShadow'
+import React from 'react'
 
 export const InsuranceFormLoading = ({ isMobile }: any) => {
     return !isMobile ? (
@@ -57,7 +58,7 @@ export const InsuranceFormLoading = ({ isMobile }: any) => {
                         </div>
 
                         <div className={'flex flex-row justify-between items-center w-full mt-5'}>
-                            {[1, 2, 3, 4, 5, 6, 7].map((time, key) => {
+                            {[1, 2, 3, 4, 5, 6, 7].map((key) => {
                                 return <Skeleton key={key} className="h-6 w-[10%]" />
                             })}
                         </div>
@@ -76,7 +77,7 @@ export const InsuranceFormLoading = ({ isMobile }: any) => {
                         </span>
 
                         <div className={`flex flex-row mt-4 space-x-3  w-full `}>
-                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((time, key) => {
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((key) => {
                                 return <Skeleton key={key} className="h-6 w-[12.5rem]" />
                             })}
                         </div>
@@ -133,7 +134,7 @@ export const InsuranceFormLoading = ({ isMobile }: any) => {
             </div>
 
             <div className={'pt-[1rem] max-w-screen-layout 4xl:max-w-screen-3xl m-auto flex flex-row justify-between'}>
-                {[1, 2, 3, 4, 5, 6, 7].map((time, key) => {
+                {[1, 2, 3, 4, 5, 6, 7].map((key) => {
                     return <Skeleton key={key} className="h-6 w-[10%]" />
                 })}
             </div>
@@ -153,10 +154,12 @@ export const InsuranceFormLoading = ({ isMobile }: any) => {
                 </div>
             </div>
             <div className={'pt-[1rem] max-w-screen-layout 4xl:max-w-screen-3xl m-auto flex flex-row justify-between'}>
-                {[1, 2, 3, 4, 5, 6, 7].map((time, key) => {
+                {[1, 2, 3, 4, 5, 6, 7].map((key) => {
                     return <Skeleton key={key} className="h-6 w-[10%]" />
                 })}
             </div>
         </div>
     )
 }
+
+export default InsuranceFormLoading

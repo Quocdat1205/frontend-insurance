@@ -7,6 +7,8 @@ import numeral from 'numeral'
 import { createSelector } from 'reselect'
 import Config from 'config/config'
 import { RootStore } from 'redux/store'
+import { API_GET_NONCE } from 'services/apis'
+import fetchApi from 'services/fetch-api'
 import { PairConfig, UnitConfig } from 'types/types'
 import { stateInsurance } from './constants'
 
@@ -14,7 +16,7 @@ export const getS3Url = (url: string) => Config.env.CDN + url
 
 export const countDecimals = (value: number) => {
     if (Math.floor(value) === value) return 0
-    const str = value?.toString()
+    const str = Number(value)?.toString()
     if (str?.indexOf('.') !== -1 && str?.indexOf('-') !== -1) {
         return str?.split('-')[1] || 0
     }
@@ -112,7 +114,7 @@ export const timeMessage = (previous: any) => {
 }
 
 export const getDecimalPrice = (config: PairConfig) => {
-    const decimalScalePrice = config?.filters.find((rs: any) => rs.filterType === 'PRICE_FILTER') ?? 1
+    const decimalScalePrice = config?.filters?.find((rs: any) => rs.filterType === 'PRICE_FILTER') ?? 1
     return +countDecimals(decimalScalePrice?.tickSize)
 }
 
@@ -208,3 +210,5 @@ export const getModalSubscribeStorage = () => {
     }
     return false
 }
+
+export const getMessageSign = (nonce: number) => `Sign message with nonce: ${nonce}`

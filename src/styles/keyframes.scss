@@ -1,0 +1,9 @@
+@keyframes -spin-360 {
+    to {
+        transform: rotate(-360deg);
+    }
+}
+
+.animate-spin-reverse {
+    animation: -spin-360 1s linear infinite;
+}

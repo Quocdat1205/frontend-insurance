@@ -119,7 +119,7 @@ const EmailSubscriptionModal = ({ visible, onClose }: EmailSubModal) => {
                         onClick={() => {
                             updateEmail()
                         }}
-                        disable={!email || !ableSubmit}
+                        disabled={!email || !ableSubmit}
                     >
                         {t('common:update')}
                     </Button>

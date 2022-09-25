@@ -6,7 +6,7 @@ import { isMobile } from 'react-device-detect'
 import { InsuranceFormLoading } from 'components/screens/Insurance/insuranceFormLoading'
 const InsuranceFrom = dynamic(() => import('components/screens/Insurance/insuranceFrom'), {
     ssr: false,
-    loading: () => <InsuranceFormLoading isMobile={!isMobile} />,
+    // loading: () => <InsuranceFormLoading isMobile={!isMobile} />,
 })
 
 const BuyCovered = () => {

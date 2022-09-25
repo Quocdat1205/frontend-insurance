@@ -1,6 +1,3 @@
-import { createNullLogger } from '@algolia/logger-common'
-import detectEthereumProvider from '@metamask/detect-provider'
-import acorn from 'acorn'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -19,7 +16,8 @@ import { ChainDataList } from 'components/web3/constants/chains'
 import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import useWindowSize from 'hooks/useWindowSize'
-import { RootStore, useAppSelector } from 'redux/store'
+import { setAccount } from 'redux/actions/setting'
+import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
 import { API_GET_INFO_USER } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { screens } from 'utils/constants'
@@ -27,12 +25,14 @@ import { getModalSubscribeStorage, setModalSubscribeStorage } from 'utils/utils'
 
 const Header = () => {
     const { t } = useTranslation()
-    const { account, chain } = useWeb3Wallet()
+    const { chain } = useWeb3Wallet()
     const { width } = useWindowSize()
     const router = useRouter()
     const isMobile = width && width < screens.drawer
     const [visible, setVisible] = useState<boolean>(false)
     const [isHover, setIsHover] = useState<boolean>(false)
+    const dispatch = useAppDispatch()
+    const account = useAppSelector((state: RootStore) => state.setting.account)
     const loading_account = useAppSelector((state: RootStore) => state.setting.loading_account)
     const [userInfo, setUserInfo] = useState<any>(null)
 
@@ -40,19 +40,28 @@ const Header = () => {
     const [isShowModal, setIsShowModal] = useState(false)
 
     const onConnect = async () => {
-        const provider = await detectEthereumProvider({ timeout: 0 })
-        if (isMobile) {
-            window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}`)
-        } else {
-            provider ? Config.connectWallet() : Config.toast.show('error', 'Cài đặt metamask')
-        }
+        Config.connectWallet()
     }
 
     const network = useMemo(() => ChainDataList[chain?.id], [account, chain])
 
     const onChangeMenu = (e: any) => {
         if (isMobile && e?.children.length > 0) return
-        if (e.router) router.push(e.router)
+        if (e?.menuId && e.router) router.push(e.router)
+        onClickMenuAddress(e)
+        if (isMobile) setVisible(false)
+    }
+
+    const onClickMenuAddress = async (e: any) => {
+        switch (e?.menuId) {
+            case 'disconnect':
+                dispatch(setAccount({ address: null, wallet: null }))
+                Config.logout()
+                Config.toast.show('success', t('common:disconnect_successful'))
+                break
+            default:
+                break
+        }
     }
 
     const handleMouseHover = (show: boolean) => {
@@ -61,9 +70,12 @@ const Header = () => {
 
     const NameComponent = ({ network, accounnt, isMobile }: any) => (
         <div className="p-2 bg-hover rounded-[5px] flex items-center space-x-2">
-            <img src={network?.icon} width={24} height={24} />
-            <div>{network?.chain}</div>
-            <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-2">{`${account?.substr(0, isMobile ? 2 : 4)}...${account?.substr(-4)}`}</div>
+            {network && <img src={network?.icon} width={24} height={24} />}
+            {network && <div>{network?.chain}</div>}
+            <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-2">{`${account?.address?.substr(
+                0,
+                isMobile ? 2 : 4,
+            )}...${account?.address?.substr(-4)}`}</div>
             {/* <ChevronDown size={18} /> */}
             {isHover ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
         </div>
@@ -79,9 +91,10 @@ const Header = () => {
         const { data } = await fetchApi({
             url: API_GET_INFO_USER,
             params: {
-                owner: '0xFA39a930C7A3D1fEde4E1348FF74c0c5ba93D2B4',
+                owner: account?.address,
             },
         })
+        console.log({ data });
         const isShownModal = getModalSubscribeStorage()
         setUserInfo(data)
         if (!data && !isShownModal) {
@@ -113,7 +126,12 @@ const Header = () => {
         return item
     })
 
-    const menuConfig = [
+    // const menuConfig = [
+    //     { menuId: 'account-info', router: '/', name: NameComponent, parentId: 0, hideArrowIcon: true, nameComponentProps: { ...props } },
+    //     ...TransformSubMenu,
+    // ]
+
+    const menuAddress = [
         { menuId: 'account-info', router: '/', name: NameComponent, parentId: 0, hideArrowIcon: true, nameComponentProps: { ...props } },
         ...TransformSubMenu,
     ]
@@ -141,13 +159,35 @@ const Header = () => {
                     )}
                     {!loading_account && (
                         <div className="flex items-center space-x-5 sm:space-x-6 cursor-pointer">
-                            {network && <Notifications />}
+                            {/* {network && <Notifications />} */}
 
-                            {account && network && !userInfo && isShowModal && (
-                                <EmailSubscriptionModal visible={!userInfo && isShowModal} onClose={handleCloseModal} />
-                            )}
-                            {account && network && !isMobile && (
-                                <Menu data={menuConfig} cbOnMouseOut={handleMouseHover} cbOnMouseOver={handleMouseHover} />
+                            {/* {account && network && !userInfo && isShowModal && ( */}
+                            {/*     <EmailSubscriptionModal visible={!userInfo && isShowModal} onClose={handleCloseModal} /> */}
+                            {/* )} */}
+                            {/* {account && network && !isMobile && ( */}
+                            {/*     <Menu data={menuAddress} cbOnMouseOut={handleMouseHover} cbOnMouseOver={handleMouseHover} onChange={onClickMenuAddress} /> */}
+                            {/*     // <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2"> */}
+                            {/*     //     <img src={network.icon} width={24} height={24} /> */}
+                            {/*     //     <div>{network.chain}</div> */}
+                            {/*     //     <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1"> */}
+                            {/*     //         {`${account.substr(0, isMobile ? 2 : 4)}...${account.substr(-4)}`} */}
+                            {/*     //     </div> */}
+                            {/*     // </div> */}
+                            {/* )} */}
+                            {/* {account && network && isMobile && ( */}
+                            {/*     // <Menu data={menuConfig} network={network} acount={account} isMobile={isMobile}/> */}
+                            {/*     <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2"> */}
+                            {/*         <img src={network.icon} width={24} height={24} /> */}
+                            {/*         <div>{network.chain}</div> */}
+                            {/*         <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1"> */}
+                            {/*             {`${account?.substr(0, isMobile ? 2 : 4)}...${account?.substr(-4)}`} */}
+                            {/*         </div> */}
+                            {/*     </div> */}
+                            {/* )} */}
+
+                            {account?.address && <Notifications />}
+                            {account?.address && !isMobile && (
+                                <Menu data={menuAddress} cbOnMouseOut={handleMouseHover} cbOnMouseOver={handleMouseHover} onChange={onClickMenuAddress} />
                                 // <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
                                 //     <img src={network.icon} width={24} height={24} />
                                 //     <div>{network.chain}</div>
@@ -156,20 +196,19 @@ const Header = () => {
                                 //     </div>
                                 // </div>
                             )}
-                            {account && network && isMobile && (
-                                // <Menu data={menuConfig} network={network} acount={account} isMobile={isMobile}/>
+                            {account?.address && network && isMobile && (
                                 <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
                                     <img src={network.icon} width={24} height={24} />
                                     <div>{network.chain}</div>
                                     <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1">
-                                        {`${account.substr(0, isMobile ? 2 : 4)}...${account.substr(-4)}`}
+                                        {`${account?.address.substr(0, isMobile ? 2 : 4)}...${account?.address.substr(-4)}`}
                                     </div>
                                 </div>
                             )}
 
                             {/* {network && isMobile && <Notifications />} */}
                             {!isMobile && <ButtonLanguage />}
-                            {!account && (
+                            {!account?.address && (
                                 <Button onClick={onConnect} className="font-semibold px-4 py-2 space-x-2">
                                     {t('home:home:connect_wallet')}
                                 </Button>

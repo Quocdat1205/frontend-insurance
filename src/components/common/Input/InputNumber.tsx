@@ -20,6 +20,8 @@ export type InputProps = {
     customSuffix?: any
     decimal?: number
     validator?: { message: string; isValid: boolean }
+    ref?: any
+    id?: string
 }
 const InputNumber = ({
     className,
@@ -35,6 +37,7 @@ const InputNumber = ({
     validator,
     onChange,
     value,
+    id,
     ...inputProps
 }: Partial<InputProps>) => {
     const [focus, setFocus] = useState<boolean>(false)
@@ -54,7 +57,7 @@ const InputNumber = ({
     return (
         <div className={cx('h-11 sm:h-12 rounded-[3px] px-3 py-3 bg-hover w-full relative flex', { 'border border-error': isError }, className)}>
             {isError && focus && validator?.message && (
-                <div className="absolute right-0 -top-11 sm:-top-12 text-xs z-[100] border border-red p-2 rounded-md">
+                <div className="absolute right-0 -top-11 sm:-top-12 text-xs z-[100] bg-white border border-red p-2 rounded-md">
                     <div className="flex items-center space-x-2">
                         <ErrorTriggersIcon />
                         <div dangerouslySetInnerHTML={{ __html: validator?.message }} />
@@ -64,6 +67,7 @@ const InputNumber = ({
             <div className="flex items-center space-x-2 w-full">
                 {customPrefix && <div className={cx('outline-none', prefixClassName)}>{customPrefix && customPrefix()}</div>}
                 <NumberFormat
+                    id={id}
                     thousandSeparator
                     getInputRef={(ref: HTMLInputElement) => (reference = ref)}
                     type="text"
