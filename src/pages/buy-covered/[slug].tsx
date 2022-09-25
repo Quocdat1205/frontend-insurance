@@ -1,4 +1,5 @@
 import Breadcrumbs from 'components/layout/Breadcrumbs'
+import LayoutInsurance from 'components/layout/layoutInsurance'
 import LayoutWeb3 from 'components/layout/LayoutWeb3'
 import { InsuranceFormLoading } from 'components/screens/Insurance/insuranceFormLoading'
 import InsuranceContractLoading from 'components/screens/InsuranceHistory/InsuranceContractLoading'
@@ -35,12 +36,12 @@ const Insurance = ({ slug }: any) => {
             )
         case 'info-covered':
             return !isMobile ? (
-                <LayoutWeb3 sponsor={false}>
+                <LayoutInsurance>
                     <div className="w-full bg-[#E5E7E8] h-[0.25rem] sticky top-0 z-[50]">
                         <div className="bg-red h-[0.25rem] w-full"></div>
                     </div>
                     <AcceptBuyInsurance />
-                </LayoutWeb3>
+                </LayoutInsurance>
             ) : (
                 <>
                     <AcceptBuyInsurance />

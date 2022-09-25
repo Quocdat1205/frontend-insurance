@@ -120,9 +120,6 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             setP_Market(chart.data[chart.data.length - 1]?.value)
             setPClaim(PClaim)
         }
-        return () => {
-            if (chart) chart.dispose()
-        }
     }, [dataChart, p_claim, p_expired, state.period])
 
     // useEffect(() => {
@@ -132,6 +129,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
     const InitChart = async (test_data: Idata[]) => {
         am4core.unuseTheme(am4themes_animated)
         chart = am4core.create('chartdiv', am4charts.XYChart)
+        chart.updateCurrentData = true
 
         if (chart) {
             chart.responsive.enabled = true
@@ -264,7 +262,13 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
 
                 //label expired
                 let expiredLabel = latitudeExpired.bullets.push(new am4charts.LabelBullet())
-                expiredLabel.label.html = `<div class="text-xs">P-Expired: $${latitudeExpired.data[0].value}</div>`
+                console.log(latitudeExpired.data[0].value, 'thuc')
+                if (state.p_claim && state.q_covered) {
+                    expiredLabel.label.html = `<div class="text-xs">P-Expired: $${latitudeExpired.data[0].value}</div>`
+                } else {
+                    bulletExpired.disabled = true
+                }
+
                 expiredLabel.label.horizontalCenter = 'middle'
                 expiredLabel.label.dy = latitudeExpired.data[0].value > state.p_market ? 23 : -23
                 expiredLabel.label.verticalCenter = 'bottom'
