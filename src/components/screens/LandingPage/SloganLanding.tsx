@@ -27,7 +27,7 @@ const SloganLanding = () => {
                     </div>
                 </div>
                 <div className="max-w-[848px] 3xl:max-w-[75rem] pb-0 lg:pb-[180px] w-full flex lg:pt-[50px] justify-end lg:h-full h-[calc(100vh-468px)]">
-                    <img src="/images/screens/landing-page/bg_home.png" className=" max-h-[663px] lg:h-[calc(100vh-168px)] h-full " />
+                    <img src="/images/screens/landing-page/bg_home.png" className=" lg:max-w-[841px] lg:max-h-[663px] lg:h-[calc(100vh-168px)] h-full " />
                 </div>
             </div>
         </Background>
