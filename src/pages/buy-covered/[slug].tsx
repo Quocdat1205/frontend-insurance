@@ -1,4 +1,5 @@
 import LayoutInsurance from 'components/layout/layoutInsurance'
+
 import Config from 'config/config'
 import useWindowSize from 'hooks/useWindowSize'
 import { useTranslation } from 'next-i18next'
