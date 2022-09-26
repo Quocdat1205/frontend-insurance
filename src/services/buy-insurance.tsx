@@ -42,7 +42,7 @@ export const buyInsurance = async (props: {
             },
         )
 
-        return data.data.status
+        return data.data.statusCode
     } catch (error) {
         console.error(error)
         return false

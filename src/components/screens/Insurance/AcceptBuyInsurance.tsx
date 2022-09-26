@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 import Button from 'components/common/Button/Button'
 import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
