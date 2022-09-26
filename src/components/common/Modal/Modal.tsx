@@ -1,8 +1,9 @@
 import classnames from 'classnames'
 import useOutsideAlerter, { useOutside } from 'hooks/useOutsideAlerter'
+import useWindowSize from 'hooks/useWindowSize'
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { X } from 'react-feather'
-import { PORTAL_MODAL_ID } from 'utils/constants'
+import { PORTAL_MODAL_ID, screens } from 'utils/constants'
 import Portal from './Portal'
 
 interface Modal {
@@ -34,6 +35,7 @@ const Modal = ({
     const container = useRef<any>(null)
     const timer = useRef<any>(null)
     const [mount, setMount] = useState<boolean>(false)
+    const { width } = useWindowSize()
 
     const handleOutside = () => {
         if (isVisible && onBackdropCb) onBackdropCb()
@@ -82,14 +84,14 @@ const Modal = ({
                     className={classnames('h-full relative ease-in transition-all flex', {
                         'translate-y-full duration-200': !isVisible || !mount,
                         'translate-y-0 duration-200': mount,
-                        'flex flex-col justify-end': isMobile,
+                        'flex-col justify-end': isMobile && width && width < screens.drawer,
                     })}
                 >
                     <div
                         ref={wrapperRef}
                         className={classnames(
                             'w-full absolute bg-white overflow-auto max-h-full',
-                            { 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl': !isMobile },
+                            { 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl': !isMobile || (width && width >= screens.drawer) },
                             className,
                         )}
                     >

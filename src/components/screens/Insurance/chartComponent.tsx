@@ -120,9 +120,6 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             setP_Market(chart.data[chart.data.length - 1]?.value)
             setPClaim(PClaim)
         }
-        return () => {
-            if (chart) chart.dispose()
-        }
     }, [dataChart, p_claim, p_expired, state.period])
 
     // useEffect(() => {
@@ -132,6 +129,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
     const InitChart = async (test_data: Idata[]) => {
         am4core.unuseTheme(am4themes_animated)
         chart = am4core.create('chartdiv', am4charts.XYChart)
+        chart.updateCurrentData = true
 
         if (chart) {
             chart.responsive.enabled = true
@@ -179,7 +177,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             valueAxis.renderer.maxLabelPosition = 0.95
             valueAxis.renderer.axisFills.template.disabled = true
             valueAxis.renderer.ticks.template.disabled = true
-            valueAxis.hidden = false
+            valueAxis.hidden = true
             valueAxis.tooltip.disabled = true
 
             let gradient = new am4core.LinearGradient()
@@ -264,7 +262,13 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
 
                 //label expired
                 let expiredLabel = latitudeExpired.bullets.push(new am4charts.LabelBullet())
-                expiredLabel.label.html = `<div class="text-xs">P-Expired: $${latitudeExpired.data[0].value}</div>`
+                console.log(latitudeExpired.data[0].value, 'thuc')
+                if (state.p_claim && state.q_covered) {
+                    expiredLabel.label.html = `<div class="text-xs">P-Expired: $${latitudeExpired.data[0].value}</div>`
+                } else {
+                    bulletExpired.disabled = true
+                }
+
                 expiredLabel.label.horizontalCenter = 'middle'
                 expiredLabel.label.dy = latitudeExpired.data[0].value > state.p_market ? 23 : -23
                 expiredLabel.label.verticalCenter = 'bottom'
@@ -315,27 +319,25 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 bulletClaim.properties.alwaysShowTooltip = true
 
                 let claimLabel = latitudeClaim.bullets.push(new am4charts.LabelBullet())
-                claimLabel.label.dy = latitudeClaim.data[0].value > state.p_market ? 20 : -20
                 claimLabel.label.horizontalCenter = 1
                 claimLabel.label.fill = am4core.color('#EB2B3E')
                 claimLabel.label.html = ''
                 claimLabel.label.draggable = false
+                claimLabel.label.position = [0, 0]
+                claimLabel.label.dy = latitudeClaim.data[0].value > state.p_market ? 20 : -20
                 if (isMobile) {
-                    claimLabel.label.dx = -58
+                    claimLabel.label.dx = -90
                 }
 
                 if (p_claim > 0) {
                     if (isMobile) {
-                        const label_mobile = document.getElementById('label_mobile')
-                        if (label_mobile) {
-                            label_mobile.innerHTML = `<div id="claimLabel" class="justify-end mt-[0.25rem] hover:cursor-pointer items-center flex text-xs h-[24px] text-[${
-                                latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : '#52CC74'
-                            }] "><span>P-Claim: $${
-                                latitudeClaim.data[0].value
-                            }</span><span class="ml-[8px] h-[24px] py-[2px] px-[8px] items-center border rounded-full bg-[${
-                                latitudeClaim.data[0].value < state.p_market ? '#FFF1F2' : '#F1FFF5'
-                            }]">${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%</span></div>`
-                        }
+                        claimLabel.label.html = `<div id="claimLabel" class="justify-end mt-[0.25rem] hover:cursor-pointer items-center flex text-xs h-[24px] text-[${
+                            latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : '#52CC74'
+                        }] "><span>P-Claim: $${
+                            latitudeClaim.data[0].value
+                        }</span><span class="ml-[8px] h-[24px] py-[2px] px-[8px] items-center border rounded-full bg-[${
+                            latitudeClaim.data[0].value < state.p_market ? '#FFF1F2' : '#F1FFF5'
+                        }]">${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%</span></div>`
                     } else {
                         claimLabel.label.html = `<div id="claimLabel" class="hover:cursor-pointer text-sm z-[1000]" style="color: ${
                             latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : '#52CC74'
@@ -377,32 +379,32 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                     setP_Claim(value)
                 })
 
-                if (isMobile) {
-                    chart.events.once('down', (e: any) => {
-                        chart.cursor.events.on('cursorpositionchanged', function (ev: any) {
-                            let yAxis = ev.target.chart.yAxes.getIndex(0)
-                            const value = yAxis.positionToValue(yAxis.toAxisPosition(ev.target.yPosition)).toFixed(2)
-                            const claimLabel = document.getElementById('claimLabel')
+                // if (isMobile) {
+                //     chart.events.once('down', (e: any) => {
+                //         chart.cursor.events.on('cursorpositionchanged', function (ev: any) {
+                //             let yAxis = ev.target.chart.yAxes.getIndex(0)
+                //             const value = yAxis.positionToValue(yAxis.toAxisPosition(ev.target.yPosition)).toFixed(2)
+                //             const claimLabel = document.getElementById('claimLabel')
 
-                            if (claimLabel) {
-                                if (value < state.p_market) {
-                                    claimLabel.style.color = '#EB2B3E'
-                                    claimLabel.style.backgroundColor = '#FFF1F2'
-                                    claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
-                                } else {
-                                    claimLabel.style.color = '#52CC74'
-                                    claimLabel.style.backgroundColor = '#F1FFF5'
-                                    claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
-                                }
-                            }
-                            if (ev) {
-                                chart.events.once('up', (e: any) => {
-                                    setP_Claim(value)
-                                })
-                            }
-                        })
-                    })
-                }
+                //             if (claimLabel) {
+                //                 if (value < state.p_market) {
+                //                     claimLabel.style.color = '#EB2B3E'
+                //                     claimLabel.style.backgroundColor = '#FFF1F2'
+                //                     claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                //                 } else {
+                //                     claimLabel.style.color = '#52CC74'
+                //                     claimLabel.style.backgroundColor = '#F1FFF5'
+                //                     claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                //                 }
+                //             }
+                //             if (ev) {
+                //                 chart.events.once('up', (e: any) => {
+                //                     setP_Claim(value)
+                //                 })
+                //             }
+                //         })
+                //     })
+                // }
 
                 handleTrendLineStatus(chart, p_claim, state)
             }

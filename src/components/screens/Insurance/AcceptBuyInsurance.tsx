@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 import Button from 'components/common/Button/Button'
 import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
@@ -12,7 +12,6 @@ import { useRouter } from 'next/router'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatPriceToWeiValue, formatWeiValueToPrice } from 'utils/format'
-import { formatNumber } from 'utils/utils'
 import { contractAddress } from 'components/web3/constants/contractAddress'
 import { Popover } from '@headlessui/react'
 import { ChevronDown, ChevronUp } from 'react-feather'
@@ -41,6 +40,11 @@ export type IState = {
     tab: string
     q_covered: number
     p_market: number
+    decimalList: {
+        decimal_margin: number
+        decimal_p_claim: number
+        decimal_q_covered: number
+    }
 }
 
 const AcceptBuyInsurance = () => {
@@ -148,8 +152,8 @@ const AcceptBuyInsurance = () => {
                     const dataPost = {
                         buyer: wallet.account as string,
                         asset: state.symbol,
-                        margin: formatPriceToWeiValue(Number(formatNumber(state.margin, 4))),
-                        q_covered: formatPriceToWeiValue(Number(formatNumber(state.q_covered, 4))),
+                        margin: formatPriceToWeiValue(Number(state.margin.toFixed(state.decimalList.decimal_margin))),
+                        q_covered: formatPriceToWeiValue(Number(state.q_covered.toFixed(state.decimalList.decimal_q_covered))),
                         p_market: formatPriceToWeiValue(data.data[0].p),
                         p_claim: formatPriceToWeiValue(Number(state.p_claim)),
                         period: Number(state.period),
@@ -182,8 +186,8 @@ const AcceptBuyInsurance = () => {
                     const dataPost = {
                         buyer: wallet.account as string,
                         asset: state.symbol,
-                        margin: formatPriceToWeiValue(Number(formatNumber(state.margin, 4))),
-                        q_covered: formatPriceToWeiValue(Number(formatNumber(state.q_covered, 4))),
+                        margin: formatPriceToWeiValue(Number(state.margin.toFixed(state.decimalList.decimal_margin))),
+                        q_covered: formatPriceToWeiValue(Number(state.q_covered.toFixed(state.decimalList.decimal_q_covered))),
                         p_market: formatPriceToWeiValue(data.data[0].p),
                         p_claim: formatPriceToWeiValue(Number(state.p_claim)),
                         period: Number(state.period) + 2,
@@ -224,8 +228,6 @@ const AcceptBuyInsurance = () => {
     const handlePostInsurance = async (props: any, dataPost: any, state: any, _id: any) => {
         if (props) {
             try {
-                console.log(state)
-
                 const data = {
                     owner: props.from,
                     transaction_hash: props.hash,
@@ -238,6 +240,7 @@ const AcceptBuyInsurance = () => {
                     period: Number(state.period),
                     isUseNain: dataPost.isUseNain,
                 }
+
                 await buyInsurance(data).then((res) => {
                     if (res === 201) {
                         setRes(_id)
@@ -367,10 +370,10 @@ const AcceptBuyInsurance = () => {
                                 </div>
                                 <div className={'font-semibold'}>
                                     <span className={`${checkUpgrade ? 'line-through text-txtSecondary text-xs pr-[8px]' : 'pr-[8px]'}`}>
-                                        {formatNumber(state?.r_claim, 2)} %
+                                        {state?.r_claim.toFixed(state?.decimalList?.decimal_q_covered)} %
                                     </span>
                                     <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>
-                                        {formatNumber((state?.q_claim + (state?.q_claim * 5) / 100) / state?.margin, 2)} %
+                                        {((state?.q_claim + (state?.q_claim * 5) / 100) / state?.margin).toFixed(state?.decimalList?.decimal_q_covered)} %
                                     </span>
                                 </div>
                             </div>
@@ -384,10 +387,10 @@ const AcceptBuyInsurance = () => {
                                 </div>
                                 <div className={'font-semibold flex flex-row items-center'}>
                                     <span className={`${checkUpgrade ? 'line-through text-txtSecondary pr-[8px] text-xs' : 'pr-[8px]'}`}>
-                                        {formatNumber(state?.q_claim, 4)}
+                                        {(state?.q_claim).toFixed(state?.decimalList?.decimal_q_covered)}
                                     </span>{' '}
                                     <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
-                                        {formatNumber(state?.q_claim + (state?.q_claim * 5) / 100, 4)}
+                                        {(state?.q_claim + (state?.q_claim * 5) / 100).toFixed(state?.decimalList?.decimal_q_covered)}
                                     </span>{' '}
                                     <span className={''}>{state?.unit}</span>
                                     {/* <Popover className="relative">
@@ -433,7 +436,7 @@ const AcceptBuyInsurance = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                    <span className={'pr-[8px]'}>{formatNumber(state?.margin, 4)}</span>{' '}
+                                    <span className={'pr-[8px]'}>{(state?.margin).toFixed(state?.decimalList?.decimal_margin)}</span>{' '}
                                     <span className={'text-txtPrimary'}>{state?.unit}</span>
                                 </div>
                             </div>
@@ -624,9 +627,11 @@ const AcceptBuyInsurance = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold'}>
-                                    <span className={`${checkUpgrade ? 'line-through text-txtSecondary' : 'pr-[8px]'}`}>{formatNumber(state?.r_claim, 2)}</span>{' '}
+                                    <span className={`${checkUpgrade ? 'line-through text-txtSecondary' : 'pr-[8px]'}`}>
+                                        {(state?.r_claim).toFixed(state.decimalList.decimal_q_covered)}
+                                    </span>{' '}
                                     <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>
-                                        {formatNumber((state?.q_claim + (state?.q_claim * 5) / 100) / state?.margin, 2)}
+                                        {((state?.q_claim + (state?.q_claim * 5) / 100) / state?.margin).toFixed(state?.decimalList?.decimal_q_covered)}
                                     </span>{' '}
                                     %
                                 </div>
@@ -641,10 +646,10 @@ const AcceptBuyInsurance = () => {
                                 </div>
                                 <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
                                     <span className={`${checkUpgrade ? 'line-through text-txtSecondary pr-[8px]' : 'pr-[8px]'}`}>
-                                        {formatNumber(state?.q_claim, 4)}
+                                        {(state?.q_claim).toFixed(state?.decimalList?.decimal_q_covered)}
                                     </span>{' '}
                                     <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
-                                        {formatNumber(state?.q_claim + (state?.q_claim * 5) / 100, 4)}
+                                        {(state?.q_claim + (state?.q_claim * 5) / 100).toFixed(state?.decimalList?.decimal_q_covered)}
                                     </span>{' '}
                                     <span className={'pl-[8px]'}>{state?.unit}</span>
                                 </div>
@@ -658,7 +663,7 @@ const AcceptBuyInsurance = () => {
                                     </div>
                                 </div>
                                 <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                    <span className={'pr-[2px]'}>{formatNumber(state?.margin, 4)}</span>{' '}
+                                    <span className={'pr-[2px]'}>{(state?.margin).toFixed(state?.decimalList?.decimal_margin)}</span>{' '}
                                     <span className={'text-txtPrimary pl-[14px]'}>{state?.unit}</span>
                                 </div>
                             </div>

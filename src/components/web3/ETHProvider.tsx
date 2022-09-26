@@ -6,28 +6,20 @@ import { ReactNode, useMemo } from 'react'
 
 import { getConnectorInfo } from 'components/web3/Web3Types'
 import Web3WalletStateProvider from 'components/web3/Web3WalletStateProvider'
-import { CoinbaseWallet } from '@web3-react/coinbase-wallet'
 
 export interface Web3WalletProviderProps {
     children: ReactNode
-    config: {
-        walletConnect?: ConstructorParameters<typeof WalletConnect>['1']
-        coinbaseWallet: ConstructorParameters<typeof CoinbaseWallet>['1']
+    config?: {
+        walletConnect: ConstructorParameters<typeof WalletConnect>['1']
     }
 }
 
-function MetaMaskProvider({ children, config }: Web3WalletProviderProps) {
+function ETHProvider({ children, config }: Web3WalletProviderProps) {
     const [metaMask, metaMaskHooks] = useMemo(() => initializeConnector<MetaMask>((actions) => new MetaMask(actions)), [])
 
-    const [coinbaseWallet, coinbaseHooks] = useMemo(
-        () => initializeConnector<CoinbaseWallet>((actions) => new CoinbaseWallet(actions, config.coinbaseWallet)),
-        [config.coinbaseWallet],
-    )
-
-    const connectors: [Connector, Web3ReactHooks][] = useMemo(() => [[metaMask, metaMaskHooks]], [metaMask, metaMaskHooks, coinbaseWallet, coinbaseHooks])
+    const connectors: [Connector, Web3ReactHooks][] = useMemo(() => [[metaMask, metaMaskHooks]], [metaMask, metaMaskHooks])
     const connectorsData: any = {
         metaMask: getConnectorInfo(metaMask),
-        coinbaseWallet: getConnectorInfo(coinbaseWallet),
     }
 
     return (
@@ -37,4 +29,4 @@ function MetaMaskProvider({ children, config }: Web3WalletProviderProps) {
     )
 }
 
-export default MetaMaskProvider
+export default ETHProvider

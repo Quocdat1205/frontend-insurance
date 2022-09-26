@@ -57,9 +57,16 @@ function MyApp({ Component, pageProps }: AppProps) {
         }
     }, [router.events])
 
+    const config = {
+        coinbaseWallet: {
+            url: 'https://mainet.infura.io/v3/f87b967bc65a41c0a1a25635493fa482',
+            appName: 'Nami Insurance',
+        },
+    }
+
     return (
         <Provider store={store}>
-            <MetaMaskProvider>
+            <MetaMaskProvider config={config}>
                 <Container>
                     <Head />
                     <Component {...pageProps} />

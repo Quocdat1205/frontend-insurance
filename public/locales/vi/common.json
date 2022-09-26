@@ -72,6 +72,7 @@
     "connection_error": "Lỗi kết nối",
     "reason_error": "Lý do: {{reason}}",
     "reconnect": "Kết nối lại",
+    "network_error": "Lỗi kết nối mạng",
     "installer": {
         "metamask_title": "Cài đặt Metamask Extension",
         "metamask_content": "Vui lòng cài đặt Metamask Extension để tiếp tục quá trình kết nối ví đến Nami Insurance.",
@@ -81,7 +82,7 @@
         "coinbase_guide": "Chưa biết cách cài đặt ví? Đọc <span class='text-blue underline cursor-pointer'>Hướng dẫn cài đặt Coinbase Wallet Extension</span> ngay.",
         "install": "Cài đặt"
     },
-    "network_error": "Kết nối thất bại! Vui lòng chuyển mạng lưới lại để kết nối ví.",
+    "error_switch_network": "Kết nối thất bại! Vui lòng chuyển mạng lưới lại để kết nối ví.",
     "switch_network": {
         "title": "Kiểm tra mạng lưới của bạn",
         "description": "Hiện tại Nami Insurance chỉ được hỗ trợ trên BNB Smart Chain. Vui lòng chuyển mạng lưới trong ví để tiếp tục sử dụng sản phẩm.",
@@ -100,5 +101,7 @@
     "slogan_first": "Biến rủi ro",
     "slogan_second": "Thành lợi nhuận",
     "available": "Số dư khả dụng {{value}}",
-    "minimum_balance": "Số dư tối thiểu {{value}}"
+    "minimum_balance": "Số dư tối thiểu {{value}}",
+    "max": "Tối da {{value}}",
+    "min": "Tối thiểu {{value}}"
 }

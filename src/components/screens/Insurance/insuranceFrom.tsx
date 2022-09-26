@@ -4,26 +4,22 @@ import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import Button from 'components/common/Button/Button'
 import axios from 'axios'
 import { Menu, Popover, Switch, Tab } from '@headlessui/react'
-import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { CheckCircle, LeftArrow, InfoCircle, XMark, ErrorTriggersIcon, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
-import { ChevronDown, Check, ChevronUp } from 'react-feather'
+import { CheckCircle, InfoCircle, XMark, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
+import { ChevronDown, Check, ChevronUp, ArrowLeft } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'
-import { getDecimalPrice } from 'utils/utils'
 import { Suspense } from 'react'
 import { RootStore, useAppSelector } from 'redux/store'
 import Config from 'config/config'
 // import NotificationInsurance from 'components/layout/notifucationInsurance'
 import Modal from 'components/common/Modal/Modal'
 import Tooltip from 'components/common/Tooltip/Tooltip'
-import { formatNumber } from 'utils/utils'
 import { ethers } from 'ethers'
 import colors from 'styles/colors'
-import cx from 'classnames'
 import GlossaryModal from 'components/screens/Glossary/GlossaryModal'
 import InputNumber from 'components/common/Input/InputNumber'
 import HeaderContent from './HeaderContent'
@@ -40,13 +36,17 @@ const InsuranceFrom = () => {
         i18n: { language },
     } = useTranslation()
     const wallet = useWeb3Wallet()
-    const { account } = useWeb3Wallet()
+
+    if (wallet) {
+        console.log(wallet)
+    }
+
     const router = useRouter()
     const { width, height } = useWindowSize()
     const isMobile = width && width <= screens.drawer
-    const { assetsToken, pairConfigs } = useAppSelector((state: RootStore) => {
-        return state.setting
-    })
+    const assetsToken = useAppSelector((state: RootStore) => state.setting.assetsToken)
+    const pairConfigs = useAppSelector((state: RootStore) => state.setting.pairConfigs)
+    const account = useAppSelector((state: RootStore) => state.setting.account)
 
     const [percentInsurance, setPercentInsurance] = useState<number>(0)
     const [selectTime, setSelectTime] = useState<string>('ALL')
@@ -139,7 +139,7 @@ const InsuranceFrom = () => {
     ]
 
     const Leverage = (p_market: number, p_stop: number) => {
-        const leverage = Number(formatNumber(p_market / Math.abs(p_market - p_stop), 2))
+        const leverage = Number(p_market / Math.abs(p_market - p_stop))
         return leverage < 1 ? 1 : leverage
     }
 
@@ -183,6 +183,7 @@ const InsuranceFrom = () => {
                     )}
                     {tab == 6 && (
                         <>
+                            {' '}
                             {t('insurance:buy_mobile:and')} <br /> {t('insurance:buy_mobile:margin')}{' '}
                             <label>
                                 <span className="text-redPrimary">
@@ -220,9 +221,9 @@ const InsuranceFrom = () => {
 
     const handleNext = () => {
         const query = {
-            r_claim: Number(formatNumber(state.r_claim, 2)),
-            q_claim: Number(formatNumber(state.q_claim, 4)),
-            margin: Number(formatNumber(state.margin, 4)),
+            r_claim: Number(state.r_claim),
+            q_claim: Number(state.q_claim),
+            margin: Number(state.margin),
             period: Number(state.period),
             symbol: selectCoin?.type,
             unit: unitMoney,
@@ -230,25 +231,51 @@ const InsuranceFrom = () => {
             tab: tab,
             q_covered: Number(state.q_covered),
             p_market: Number(state.p_market),
+            decimalList: { ...decimalList },
         }
         localStorage.setItem('info_covered_state', JSON.stringify(query))
         return router.push('/buy-covered/info-covered')
     }
 
-    const getUSDT = async () => {
-        const result = wallet.getBalance()
-        result.then((balance: number) => {
-            setUserBalance(balance)
-        })
+    const getBalaneToken = async (symbol: string) => {
+        if (symbol === 'BNB') {
+            const result = wallet.getBalance()
+            return result.then((balance: number) => {
+                setUserBalance(balance)
+                return balance
+            })
+        }
 
-        // const balanceUsdt = await wallet.contractCaller.usdtContract.contract.balanceOf(account)
-        // if (balanceUsdt) {
-        //     console.log(balanceUsdt)
+        if (symbol === 'USDT') {
+            const balanceUsdt = await wallet.contractCaller?.usdtContract.contract.balanceOf(account.address)
 
-        //     return setUserBalance(Number(formatNumber(Number(ethers.utils.formatEther(balanceUsdt)) / Number(state.p_market), 4)))
-        // } else {
-        //     return false
-        // }
+            if (balanceUsdt) {
+                if (Number(ethers.utils.formatEther(balanceUsdt)) > 0) {
+                    setUserBalance(Number((Number(ethers.utils.formatEther(balanceUsdt)) / Number(state.p_market)).toFixed(decimalList.decimal_q_covered)))
+                    return Number(ethers.utils.formatEther(balanceUsdt))
+                } else {
+                    setUserBalance(0)
+                    return 0
+                }
+            } else {
+                return false
+            }
+        }
+
+        if (symbol === 'ETH') {
+            const balanceETH = await wallet.contractCaller?.ethContract.contract.balanceOf(account.address)
+            if (balanceETH) {
+                if (Number(ethers.utils.formatEther(balanceETH)) > 0) {
+                    setUserBalance(Number((Number(ethers.utils.formatEther(balanceETH)) / Number(state.p_market)).toFixed(decimalList.decimal_q_covered)))
+                    return Number(ethers.utils.formatEther(balanceETH))
+                } else {
+                    setUserBalance(0)
+                    return 0
+                }
+            } else {
+                return false
+            }
+        }
     }
     const setStorage = (value: any) => {
         localStorage.setItem('buy_covered_state', JSON.stringify(value))
@@ -334,92 +361,102 @@ const InsuranceFrom = () => {
     ) => {
         const timeEnd = new Date()
         const timeBegin = new Date()
-        // setLoadings(true)
-        if (selectCoin) {
-            if (selectTime == '1H' || selectTime == '1D') {
-                timeBegin.setDate(timeEnd.getDate() - 10)
-                fetchApiNami(
-                    `${selectCoin.type && selectCoin.type}${unitMoney}`,
-                    `${Math.floor(timeBegin.getTime() / 1000)}`,
-                    `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                    '1m',
-                    setDataChart,
-                ).then(() => {
-                    return setLoadings(false)
-                })
-            } else if (selectTime == '1W') {
-                timeBegin.setDate(timeEnd.getDate() - 10)
-                fetchApiNami(
-                    `${selectCoin.type && selectCoin.type}${unitMoney}`,
-                    `${Math.floor(timeBegin.getTime() / 1000)}`,
-                    `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                    '1h',
-                    setDataChart,
-                ).then(() => {
-                    return setLoadings(false)
-                })
-            } else {
-                timeBegin.setDate(timeEnd.getDate() - 10)
-                fetchApiNami(
-                    `${selectCoin.type && selectCoin.type}${unitMoney}`,
-                    `${Math.floor(timeBegin.getTime() / 1000)}`,
-                    `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                    '1h',
-                    setDataChart,
-                ).then(() => {
-                    return setLoadings(false)
-                })
+        setLoadings(true)
+        try {
+            if (selectCoin.symbol !== '') {
+                if (selectTime == '1H' || selectTime == '1D') {
+                    timeBegin.setDate(timeEnd.getDate() - 10)
+                    fetchApiNami(
+                        `${selectCoin.type && selectCoin.type}${unitMoney}`,
+                        `${Math.floor(timeBegin.getTime() / 1000)}`,
+                        `${Math.ceil(timeEnd.getTime() / 1000)}`,
+                        '1m',
+                        setDataChart,
+                    ).then(() => {
+                        return setLoadings(false)
+                    })
+                } else if (selectTime == '1W') {
+                    timeBegin.setDate(timeEnd.getDate() - 10)
+                    fetchApiNami(
+                        `${selectCoin.type && selectCoin.type}${unitMoney}`,
+                        `${Math.floor(timeBegin.getTime() / 1000)}`,
+                        `${Math.ceil(timeEnd.getTime() / 1000)}`,
+                        '1h',
+                        setDataChart,
+                    ).then(() => {
+                        return setLoadings(false)
+                    })
+                } else {
+                    timeBegin.setDate(timeEnd.getDate() - 10)
+                    fetchApiNami(
+                        `${selectCoin.type && selectCoin.type}${unitMoney}`,
+                        `${Math.floor(timeBegin.getTime() / 1000)}`,
+                        `${Math.ceil(timeEnd.getTime() / 1000)}`,
+                        '1h',
+                        setDataChart,
+                    ).then(() => {
+                        return setLoadings(false)
+                    })
+                }
             }
+        } catch (err) {
+            console.log(err)
         }
     }
 
     useEffect(() => {
-        let list: ICoin[] = []
-
+        let list = listCoin
         assetsToken?.map(async (token: any) => {
+            const balance = await getBalaneToken(token.symbol)
             const tmp = {
                 id: token._id,
                 name: token.name,
                 icon: token.attachment,
                 symbol: `${token.symbol}USDT`,
                 type: token.symbol,
-                disable: !token.isActive,
+                disable: balance > 0 ? false : true,
             }
 
-            await list.push(tmp)
+            if (balance > 0) {
+                setSelectedCoin({
+                    icon: tmp.icon,
+                    id: tmp.id,
+                    name: tmp.name,
+                    symbol: tmp.symbol,
+                    type: tmp.type,
+                    disable: tmp.disable,
+                })
+                setState({
+                    ...state,
+                    symbol: {
+                        icon: tmp.icon,
+                        id: tmp.id,
+                        name: tmp.name,
+                        symbol: tmp.symbol,
+                        type: tmp.type,
+                        disable: tmp.disable,
+                    },
+                })
+            }
+
+            list.push(tmp)
         })
+
         if (list.length > 0) {
-            setSelectedCoin({
-                icon: list[0].icon,
-                id: list[0].id,
-                name: list[0].name,
-                symbol: list[0].symbol,
-                type: list[0].type,
-                disable: list[0].disable,
-            })
-            setState({
-                ...state,
-                symbol: {
-                    icon: list[0].icon,
-                    id: list[0].id,
-                    name: list[0].name,
-                    symbol: list[0].symbol,
-                    type: list[0].type,
-                    disable: list[0].disable,
-                },
-            })
-            return setListCoin(list)
+            setListCoin(list)
         }
     }, [assetsToken])
 
     useEffect(() => {
+        if (userBalance > 0) {
+            return
+        }
+    }, [userBalance])
+
+    useEffect(() => {
         try {
-            if (typeof window.ethereum !== undefined) {
-                console.log('MetaMask is installed!')
-            }
-            if (account) {
+            if (account.address != null) {
                 getStorage()
-                getUSDT()
             }
         } catch (error) {
             console.log('error get USDT balance')
@@ -464,20 +501,22 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         if (state) {
-            const data = localStorage.getItem('buy_covered_state')
-            if (data) {
-                const res = JSON.parse(data)
-                const newData = {
-                    ...res,
-                    disable: state.symbol.disable,
-                    icon: state.symbol.icon,
-                    id: state.symbol.id,
-                    name: state.symbol.name,
-                    symbol: state.symbol.symbol,
-                    type: state.symbol.type,
+            setTimeout(() => {
+                const data = localStorage.getItem('buy_covered_state')
+                if (data) {
+                    const res = JSON.parse(data)
+                    const newData = {
+                        ...res,
+                        disable: state.symbol.disable,
+                        icon: state.symbol.icon,
+                        id: state.symbol.id,
+                        name: state.symbol.name,
+                        symbol: state.symbol.symbol,
+                        type: state.symbol.type,
+                    }
+                    setStorage(newData)
                 }
-                setStorage(newData)
-            }
+            }, 5000)
         }
         if (thisFisrt) {
             return setThisFisrt(false)
@@ -494,7 +533,11 @@ const InsuranceFrom = () => {
     }, [tab])
 
     useEffect(() => {
+        console.log(listCoin)
+
         if (listCoin.length > 0) {
+            console.log(listCoin)
+
             const timeEnd = new Date()
             const timeBegin = new Date()
             timeBegin.setDate(timeEnd.getDate() - 10)
@@ -504,6 +547,7 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         refreshApi(selectTime, selectCoin)
+        getBalaneToken(selectCoin.type)
         const data = localStorage.getItem('buy_covered_state')
         if (data) {
             let res = JSON.parse(data)
@@ -543,8 +587,11 @@ const InsuranceFrom = () => {
             setPercentInsurance(percent)
         }
 
+        validator('q_covered')
+        validator('margin')
+
         if (state.q_covered && state.p_claim) {
-            const margin = Number((10 * state.q_covered * state.p_market) / 100)
+            const margin = Number((9 * state.q_covered * state.p_market) / 100)
             const userCapital = margin
             const systemCapital = userCapital
             const hedge_capital = userCapital + systemCapital
@@ -560,8 +607,6 @@ const InsuranceFrom = () => {
                 p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
                 margin: Number(margin.toFixed(decimalList.decimal_margin)),
             })
-
-            // console.log(laverage * 2 * (margin / state.p_market))
         }
 
         if (state.q_covered && state.p_claim && state.margin) {
@@ -593,8 +638,7 @@ const InsuranceFrom = () => {
     }, [percentInsurance, state.margin, state.q_covered])
 
     useEffect(() => {
-        if (state.p_claim > 0) {
-        }
+        validator('p_claim')
     }, [state.p_claim])
 
     useEffect(() => {
@@ -615,6 +659,7 @@ const InsuranceFrom = () => {
     })
 
     const [percentPrice, setPercentPrice] = useState<any>()
+    const [priceFilter, setPriceFilter] = useState<any>()
 
     useEffect(() => {
         pair_configs?.filters?.map((item: any) => {
@@ -623,20 +668,38 @@ const InsuranceFrom = () => {
                 setDecimalList({ ...decimalList, decimal_q_covered: decimal })
             }
             if (item?.filterType === 'PERCENT_PRICE') {
+                console.log(item)
+
                 setPercentPrice({ ...item })
             }
             if (item?.filterType === 'PRICE_FILTER') {
+                setPriceFilter({ ...item })
                 const decimalP_Claim: number = (1 / Number(item.tickSize)).toString().replace('1', '').length
                 setDecimalList({ ...decimalList, decimal_p_claim: decimalP_Claim })
-                const min = Math.max(
-                    state.p_market * Number(percentPrice?.multiplierDown),
-                    state.p_market - state.p_market * Number(percentPrice?.minDifferenceRatio || 0),
-                )
-                const max = Math.min(
-                    state.p_market * Number(percentPrice?.multiplierUp),
-                    state.p_market - state.p_market * Number(percentPrice?.minDifferenceRatio || 0),
-                )
-                setRangeP_claim({ ...rangeP_claim, min: min, max: max })
+
+                const a = state.p_market * Number(percentPrice?.multiplierDown)
+                const b = state.p_market - state.p_market * Number(percentPrice?.minDifferenceRatio)
+                const c = state.p_market * Number(1 + percentPrice?.minDifferenceRatio)
+
+                const min1 = state.p_market + (2 / 100) * state.p_market
+                const max1 = state.p_market + (70 / 100) * state.p_market
+
+                const min2 = state.p_market - (70 / 100) * state.p_market
+                const max2 = state.p_market - (2 / 100) * state.p_market
+
+                if (state.p_claim > state.p_market) {
+                    setRangeP_claim({
+                        ...rangeP_claim,
+                        min: Number(min1.toFixed(decimalList.decimal_p_claim)),
+                        max: Number(max1.toFixed(decimalList.decimal_p_claim)),
+                    })
+                } else {
+                    setRangeP_claim({
+                        ...rangeP_claim,
+                        min: Number(min2.toFixed(decimalList.decimal_p_claim)),
+                        max: Number(max2.toFixed(decimalList.decimal_p_claim)),
+                    })
+                }
             }
             if (item?.filterType === 'MARGIN') {
                 const decimalMargin: number = (1 / item.stepSize).toString().replace('1', '').length
@@ -646,10 +709,10 @@ const InsuranceFrom = () => {
                 setRangeMargin({ ...rangeP_claim, min: MIN, max: MAX })
             }
         })
-    }, [pair_configs, state.q_covered])
+    }, [pair_configs, state.q_covered, selectCoin, state.p_claim])
 
     const validator = (key: string) => {
-        const rs = { isValid: true, message: '' }
+        let rs = { isValid: true, message: '' }
 
         switch (key) {
             case 'q_covered':
@@ -666,23 +729,48 @@ const InsuranceFrom = () => {
                 break
             case 'p_claim':
                 rs.isValid =
-                    state.p_claim > Number(rangeP_claim.max.toFixed(decimalList.decimal_p_claim)) ||
-                    state.p_claim < Number(rangeP_claim.min.toFixed(decimalList.decimal_p_claim))
-                rs.message = `<div class="flex items-center">
-                ${
-                    state.p_claim > Number(rangeP_claim.max)
-                        ? t('common:available', { value: `${Number(rangeP_claim.max)}` })
-                        : t('common:minimum_balance', { value: `${Number(rangeP_claim.min)}` })
+                    !(state.p_claim > Number(rangeP_claim.max) || state.p_claim < Number(rangeP_claim.min)) &&
+                    !(Number(priceFilter?.minPrice) > state.p_claim || state.p_claim > Number(priceFilter?.maxPrice)) &&
+                    !(
+                        state.p_claim > Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered)) ||
+                        state.p_claim < Number((state.p_market * Number(percentPrice?.multiplierDown)).toFixed(decimalList.decimal_q_covered))
+                    )
+                if (state.p_claim > Number(rangeP_claim.max) || state.p_claim < Number(rangeP_claim.min)) {
+                    rs.message = `<div class="flex items-center">
+                  ${
+                      state.p_claim > Number(rangeP_claim.max)
+                          ? t('common:max', { value: `${Number(rangeP_claim.max)}` })
+                          : t('common:min', { value: `${Number(rangeP_claim.min)}` })
+                  }
+                  </div>`
+                } else if (Number(priceFilter?.minPrice) > state.p_claim || state.p_claim > Number(priceFilter?.maxPrice)) {
+                    rs.message = `<div class="flex items-center">
+              ${
+                  state.p_claim > +priceFilter.maxPrice
+                      ? t('common:max', { value: `${Number(priceFilter.maxPrice)}` })
+                      : t('common:min', { value: `${Number(priceFilter.minPrice)}` })
+              }
+              </div>`
+                } else if (
+                    state.p_claim > Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered)) ||
+                    state.p_claim < Number((state.p_market * Number(percentPrice?.multiplierDown)).toFixed(decimalList.decimal_q_covered))
+                ) {
+                    rs.message = `<div class="flex items-center">
+              ${
+                  state.p_claim > Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered))
+                      ? t('common:max', { value: `${Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered))}` })
+                      : t('common:min', { value: `${Number((state.p_market * Number(percentPrice?.multiplierDown)).toFixed(decimalList.decimal_q_covered))}` })
+              }
+              </div>`
                 }
-                </div>`
                 break
             case 'margin':
                 rs.isValid = !(state.margin < Number(rangeMargin.min) || state.margin > Number(rangeMargin.max))
                 rs.message = `<div class="flex items-center">
                 ${
                     state.margin > Number(rangeMargin.max)
-                        ? t('common:available', { value: `${Number(rangeMargin.max)}` })
-                        : t('common:minimum_balance', { value: `${Number(rangeMargin.min)}` })
+                        ? t('common:max', { value: `${Number(rangeMargin.max)}` })
+                        : t('common:min', { value: `${Number(rangeMargin.min)}` })
                 }
                 </div>`
                 break
@@ -743,10 +831,11 @@ const InsuranceFrom = () => {
                                         key={key}
                                         className={`hover:bg-hover flex flex-row justify-start w-full items-center p-3 text-divider font-medium`}
                                     >
-                                        <img alt={''} src={`${coin.icon}`} width="36" height="36" className={'mr-[5px] grayscale hover:cursor-default'}></img>
+                                        <div className="max-w-[20px] mr-[8px] max-h-[20px] ">
+                                            <img alt={''} src={`${coin.icon}`} width="20" height="20" className={'mr-[5px] rounded-[50%]'}></img>
+                                        </div>
                                         <div className={'flex flex-row justify-between w-full'}>
                                             <span>{coin.name}</span>
-                                            {coin.id === selectCoin.id ? <Check size={16} className={'text-red'}></Check> : ''}
                                         </div>
                                     </a>
                                 )
@@ -794,7 +883,8 @@ const InsuranceFrom = () => {
     const onHandleChange = (key: string, e: any) => {
         const value = +e.value
         const res = validator(key)
-        if (state.q_covered > 0 && state.margin && state.p_claim && wallet.account) {
+
+        if (res?.isValid && state.p_claim && state.q_covered && state.margin && account.address != null) {
             setClear(res.isValid)
         }
 
@@ -837,12 +927,12 @@ const InsuranceFrom = () => {
                             </div>
                             {
                                 // head Insurance
-                                <HeaderContent state={tab} setState={setTab} wallet={wallet} auth={wallet.account} />
+                                <HeaderContent state={tab} setState={setTab} wallet={wallet} auth={account.address} />
                             }
 
                             {
                                 //checkAuth
-                                !wallet.account
+                                account.address == null
                                     ? !isMobile && (
                                           <div
                                               className="w-full flex flex-col justify-center items-center max-w-screen-layout 4xl:max-w-screen-3xl m-auto mb-[1rem]"
@@ -864,7 +954,7 @@ const InsuranceFrom = () => {
                                       )
                                     : ''
                             }
-                            <div className="max-w-/screen-layout 4xl:max-w-screen-3xl m-auto flex flex-row mb-[8rem]">
+                            <div className="max-w-/screen-layout 4xl:max-w-screen-3xl m-auto flex flex-row mb-[8rem] overflow-hidden">
                                 <div className="w-8/12">
                                     {
                                         //chart
@@ -894,13 +984,13 @@ const InsuranceFrom = () => {
                                                                 value={state.q_covered}
                                                                 onChange={(e: any) => onHandleChange('q_covered', e)}
                                                                 customSuffix={renderPopoverQCover}
-                                                                decimal={8}
+                                                                decimal={decimalList.decimal_q_covered}
                                                             />
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row w-full space-x-6 text-xs font-semibold">
-                                                    <div className={`flex flex-row justify-between space-x-4 ${tab == 6 ? 'w-1/2' : 'w-full'}`}>
+                                                    <div className={`flex flex-row justify-between space-x-4 w-full `}>
                                                         <div
                                                             className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                             onClick={() => {
@@ -1027,7 +1117,7 @@ const InsuranceFrom = () => {
                                                             customSuffix={() => unitMoney}
                                                             suffixClassName="text-txtSecondary"
                                                             placeholder={`${menu[9].name}`}
-                                                            decimal={8}
+                                                            decimal={decimalList.decimal_q_covered}
                                                         />
                                                         {/* {!errorPCalim && state.p_claim != 0 && (
                                                     <span className="flex flex-row text-[#E5544B] mt-[8px]">
@@ -1048,7 +1138,7 @@ const InsuranceFrom = () => {
                                                     </span>
                                                     <Tab.Group>
                                                         <Tab.List
-                                                            className={`flex flex-row mt-4 space-x-3  w-full ${isMobile && showCroll ? 'overflow-scroll' : ''}`}
+                                                            className={`flex flex-row mt-4 justify-between`}
                                                             onTouchStart={() => {
                                                                 setShowCroll(true)
                                                             }}
@@ -1126,7 +1216,7 @@ const InsuranceFrom = () => {
                                                         </div>
                                                     </div>
                                                     <div className={''}>
-                                                        <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span>
+                                                        <span>{state?.r_claim > 0 ? Number(state?.r_claim.toFixed(decimalList.decimal_q_covered)) : 0}%</span>
                                                     </div>
                                                 </div>
                                                 <div
@@ -1142,7 +1232,7 @@ const InsuranceFrom = () => {
                                                         </div>
                                                     </div>
                                                     <div className={'flex flex-row justify-center items-center hover:cursor-pointer relative max-h-[24px]'}>
-                                                        {state.q_claim > 0 ? Number(formatNumber(state?.q_claim, 2)) : 0}
+                                                        {state.q_claim > 0 ? Number(state?.q_claim.toFixed(decimalList.decimal_q_covered)) : 0}
                                                         <span className={'pl-2 mr-1'}>{unitMoney}</span>
                                                         <div className="relative">
                                                             {/* <Popover className="relative">
@@ -1193,7 +1283,7 @@ const InsuranceFrom = () => {
                                                         </div>
                                                     </div>
                                                     <div className={'flex flex-row items-center justify-center hover:cursor-pointer relative max-h-[24px]'}>
-                                                        {state.margin > 0 ? Number(formatNumber(state?.margin, 2)) : 0}
+                                                        {state.margin > 0 ? Number(state?.margin.toFixed(decimalList.decimal_margin)) : 0}
                                                         <span className={'pl-2 mr-1'}>{unitMoney}</span>
                                                         <div className="relative">
                                                             {/* <Popover className="relative">
@@ -1248,7 +1338,7 @@ const InsuranceFrom = () => {
                                                                 value={state.q_covered > 0 ? state.margin : 0}
                                                                 onChange={(e: any) => onHandleChange('margin', e)}
                                                                 customSuffix={renderPopoverMargin}
-                                                                decimal={8}
+                                                                decimal={decimalList.decimal_margin}
                                                             />
                                                         </div>
                                                         <div className={`flex flex-row justify-between space-x-4 !w-full mt-[0.5rem]`}>
@@ -1345,7 +1435,7 @@ const InsuranceFrom = () => {
                     </>
                 ) : (
                     <>
-                        {!wallet.account ? (
+                        {account.address == null ? (
                             <>
                                 <div style={{ background: 'linear-gradient(180deg, rgba(244, 63, 94, 0.15) 0%, rgba(254, 205, 211, 0) 100%)' }}>
                                     <div className="px-[16px] pt-[8px]" onClick={() => router.push('/home')}>
@@ -1464,7 +1554,7 @@ const InsuranceFrom = () => {
                                                     validator={validator(`${showInput.name}`)}
                                                     value={showInput.name === 'q_covered' ? state.q_covered : state.margin}
                                                     onChange={(e: any) => onHandleChange(`${showInput.name}`, e)}
-                                                    decimal={8}
+                                                    decimal={showInput.name === 'q_covered' ? decimalList.decimal_q_covered : decimalList.decimal_margin}
                                                 />
                                             </div>
                                             <div className={`flex flex-row justify-between space-x-4 w-full text-xs mb-[1.5rem]`}>
@@ -1597,7 +1687,7 @@ const InsuranceFrom = () => {
                                                 router.push('/home')
                                             }}
                                         >
-                                            <XMark></XMark>
+                                            <ArrowLeft />
                                         </div>
                                         <div data-tut="tour_custom" id="tour_custom" className={`h-[32px] flex flex-row mx-[16px]`}>
                                             <span
@@ -1689,9 +1779,6 @@ const InsuranceFrom = () => {
                                                 ></line>
                                             </svg>
                                         </div>
-                                        <div className="flex justify-end">
-                                            <div id="label_mobile"></div>
-                                        </div>
 
                                         <div className={'flex flex-row justify-between items-center w-full mt-5 pl-[32px] pr-[32px]'}>
                                             {listTime.map((time, key) => {
@@ -1726,7 +1813,7 @@ const InsuranceFrom = () => {
                                                 customSuffix={() => unitMoney}
                                                 suffixClassName="text-txtSecondary"
                                                 placeholder={`${menu[9].name}`}
-                                                decimal={8}
+                                                decimal={decimalList.decimal_q_covered}
                                             />
                                         </div>
                                     </div>
@@ -1808,7 +1895,7 @@ const InsuranceFrom = () => {
                                                     </div>
                                                 </div>
                                                 <div className={'font-semibold'}>
-                                                    <span>{state?.r_claim > 0 ? Number(formatNumber(state?.r_claim, 2)) : 0}%</span>
+                                                    <span>{state?.r_claim > 0 ? Number(state?.r_claim.toFixed(decimalList.decimal_q_covered)) : 0}%</span>
                                                 </div>
                                             </div>
                                             <div
@@ -1824,7 +1911,7 @@ const InsuranceFrom = () => {
                                                     </div>
                                                 </div>
                                                 <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
-                                                    {state.q_claim > 0 ? Number(formatNumber(state.q_claim, 2)) : 0}
+                                                    {state.q_claim > 0 ? Number(state.q_claim.toFixed(decimalList.decimal_q_covered)) : 0}
                                                     <span
                                                         className={'text-red pl-[8px]'}
                                                         onClick={() =>
@@ -1848,7 +1935,7 @@ const InsuranceFrom = () => {
                                                     </div>
                                                 </div>
                                                 <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                                    {state.margin > 0 ? Number(formatNumber(state.margin, 2)) : 0}
+                                                    {state.margin > 0 ? Number(state.margin.toFixed(decimalList.decimal_margin)) : 0}
 
                                                     <span
                                                         className={'text-red pl-[8px]'}

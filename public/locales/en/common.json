@@ -74,6 +74,7 @@
     "connection_error": "Connection Error",
     "reason_error": "Reason: {{reason}}",
     "reconnect": "Reconnect",
+    "network_error": "Issue with the wireless router",
     "installer": {
         "metamask_title": "Install Metamask Extension",
         "metamask_content": "Please add Metamask Extension to continue the wallet connection process with Nami Insurance.",
@@ -83,7 +84,7 @@
         "coinbase_guide": "Chưa biết cách cài đặt ví? Đọc <span class='text-blue underline cursor-pointer'>Hướng dẫn cài đặt Coinbase Wallet Extension</span> ngay.",
         "install": "Install"
     },
-    "network_error": "Connection failed! Please switch network to connect wallet.",
+    "error_switch_network": "Connection failed! Please switch network to connect wallet.",
     "switch_network": {
         "title": "Check your network",
         "description": "Nami Insurance is currently only supported on BNB Smart Chain. Change the network in your wallet in order to continue using the product.",
@@ -102,5 +103,7 @@
     "slogan_first": "Change risk",
     "slogan_second": "To payback",
     "available": "Available Balances {{value}}",
-    "minimum_balance": "Minimum Balance {{value}}"
+    "minimum_balance": "Minimum Balance {{value}}",
+    "max": "Maximum {{value}}",
+    "min": "Minimum {{value}}"
 }
