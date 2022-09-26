@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'react-feather'
 import cx from 'classnames'
 
-const HeaderContent = ({ state, setState, wallet, auth }: any) => {
+const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) => {
     const [isDrop, setDrop] = useState<boolean>(false)
     const router = useRouter()
     const {
@@ -66,6 +66,9 @@ const HeaderContent = ({ state, setState, wallet, auth }: any) => {
                                             setDrop(false)
                                             setState(key)
                                             close()
+                                            if (key == 0) {
+                                                setProps({ ...props, percent_margin: 8 })
+                                            }
                                         }}
                                         key={key}
                                         onMouseDown={() => (Press = true)}
