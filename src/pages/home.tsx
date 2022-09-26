@@ -23,7 +23,7 @@ const Home = ({ news }: any) => {
             </div>
             <Banner />
             <News news={news} />
-            <RegisterLanding />
+            {/* <RegisterLanding /> */}
         </LayoutWeb3>
     )
 }

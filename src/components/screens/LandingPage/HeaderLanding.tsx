@@ -14,7 +14,7 @@ import useWindowSize from 'hooks/useWindowSize'
 const HeaderLanding = () => {
     const router = useRouter()
     const { width } = useWindowSize()
-    const isMobile = width && width < 820
+    const isMobile = width && width < 1024
     const [visible, setVisible] = useState(false)
     const {
         t,
@@ -32,21 +32,13 @@ const HeaderLanding = () => {
         console.log(`href_${language}`)
         if (e?.[`href_${language}`]) {
             window.open(e[`href_${language}`])
-            // router.push(e[`href_${language}`])
             return
         }
 
         if (isMobile && e?.children.length > 0) return
         if (e?.menuId && e.router) router.push(e.router)
-        // onClickMenuAddress(e)
         if (isMobile) setVisible(false)
     }
-
-    const menu = [
-        // { menuId: 'white-paper', router: 'white-paper', name: 'home:landing:white_paper', parentId: 0 },
-        // { menuId: 'faq', router: 'faq', name: 'home:landing:faq', parentId: 0 },
-        // { menuId: 'contact', router: 'contact', name: 'home:landing:contact', parentId: 0 },
-    ]
 
     return (
         <header className="header-landing h-[4rem] mb:h-[4.25rem] flex items-center px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[10]">
@@ -90,7 +82,10 @@ const HeaderLanding = () => {
                             <Menu data={Config.landingPageMenu} onChange={onChangeMenu} />
                         </div>
                         <div className="mx-4">
-                            <Button onClick={() => router.push('/home')} className="py-[0.875rem] leading-5 flex items-center justify-center space-x-2 w-full min-w-[12.75rem]">
+                            <Button
+                                onClick={() => router.push('/home')}
+                                className="py-[0.875rem] leading-5 flex items-center justify-center space-x-2 w-full min-w-[12.75rem]"
+                            >
                                 <span className="">{t('home:landing:access')}</span>
                                 <RightArrow />
                             </Button>

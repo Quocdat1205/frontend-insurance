@@ -61,7 +61,7 @@ const Header = () => {
         <div className="p-2 bg-hover rounded-[5px] flex items-center space-x-2">
             {network && <img src={network?.icon} width={24} height={24} />}
             {network && <div>{network?.chain}</div>}
-            <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-2">{`${account?.address?.substr(
+            <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-4 lg:py-0">{`${account?.address?.substr(
                 0,
                 isMobile ? 2 : 4,
             )}...${account?.address?.substr(-4)}`}</div>
@@ -79,13 +79,24 @@ const Header = () => {
     const menuAddress = [
         isMobile
             ? { menuId: 'account-info', router: '/home', name: 'common:header:account_info_title', parentId: 0 }
-            : { menuId: 'account-info', router: '/', name: NameComponent, parentId: 0, hideArrowIcon: true, nameComponentProps: { ...props } },
+            : {
+                  menuId: 'account-info',
+                  router: '/',
+                  name: NameComponent,
+                  parentId: 0,
+                  hideArrowIcon: true,
+                  isDropdown: true,
+                  nameComponentProps: { ...props },
+              },
         ...Config.subMenu,
     ]
 
     const MenuFilter = useMemo(() => {
-        return [...menuAddress, ...Config.homeMenu]
-    }, [isMobile])
+        // base menu
+        const baseMenu = [...Config.homeMenu]
+        // check wallet connected
+        return account?.address ? [...menuAddress, ...baseMenu] : baseMenu
+    }, [isMobile, account])
 
     return (
         <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 lg:px-10 border-b border-divider sticky top-0 bg-white z-[50]">

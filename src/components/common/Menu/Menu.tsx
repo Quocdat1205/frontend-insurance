@@ -5,10 +5,10 @@ import { isMobile as mobile } from 'react-device-detect'
 import { ChevronDown, ChevronUp } from 'react-feather'
 import styled from 'styled-components'
 import useWindowSize from 'hooks/useWindowSize'
+import { RootStore, useAppSelector } from 'redux/store'
 import { IconSvg } from 'types/types'
 import { screens } from 'utils/constants'
 import { isFunction } from 'utils/utils'
-import { RootStore, useAppSelector } from 'redux/store'
 
 interface MenuItem {
     name?: any
@@ -24,6 +24,7 @@ interface MenuItem {
     parent?: string | number
     // show arrow down when the menu has children
     hideArrowIcon?: boolean
+    isDropdown?: boolean
 }
 
 interface Menu {
@@ -125,6 +126,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                 </>
             )
         }
+
         return (
             <ItemMenu
                 key={index}
@@ -135,6 +137,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                     'active-menu': _active,
                 })}
                 isChild={child}
+                isDropdown={menu?.isDropdown}
             >
                 {!hasChildren ? (
                     <div className="flex items-center space-x-4 px-4">
@@ -176,12 +179,13 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
 }
 
 interface Item {
-    isChild?: boolean
+    isChild?: boolean,
+    isDropdown?: boolean,
 }
 
-const ItemMenu = styled.li.attrs<Item>(({ isChild }) => ({
+const ItemMenu = styled.li.attrs<Item>(({ isChild, isDropdown }) => ({
     className: classnames('cursor-pointer text-sm py-3 relative lg:hover:active-menu', {
-        // 'mb:hover:text-red mb:py-6': !isChild,
+        'mb:hover:text-red': !isChild && !isDropdown,
         'lg:py-2': !isChild,
         'lg:!py-[10px] pl-4 font-normal lg:text-txtPrimary lg:hover:bg-hover lg:hover:rounded-[3px]': isChild,
     }),
