@@ -113,7 +113,7 @@ export const timeMessage = (previous: any) => {
 }
 
 export const getDecimalPrice = (config: PairConfig) => {
-    const decimalScalePrice = config?.filters.find((rs: any) => rs.filterType === 'PRICE_FILTER') ?? 1
+    const decimalScalePrice = config?.filters?.find((rs: any) => rs.filterType === 'PRICE_FILTER') ?? 1
     return +countDecimals(decimalScalePrice?.tickSize)
 }
 

@@ -1,14 +1,14 @@
-import ButtonLanguage from 'components/common/Button/ButtonLanguage'
-import { MenuIcon, RightArrow } from 'components/common/Svg/SvgIcon'
-import React, { useState } from 'react'
-import useWindowSize from 'hooks/useWindowSize'
 import { useTranslation } from 'next-i18next'
-import Drawer from 'components/layout/Drawer'
 import { useRouter } from 'next/router'
-import Button from 'components/common/Button/Button'
-import Menu from 'components/common/Menu/Menu'
+import React, { useState } from 'react'
 import { X } from 'react-feather'
-import Config from 'config/config';
+import Button from 'components/common/Button/Button'
+import ButtonLanguage from 'components/common/Button/ButtonLanguage'
+import Menu from 'components/common/Menu/Menu'
+import { MenuIcon, RightArrow } from 'components/common/Svg/SvgIcon'
+import Drawer from 'components/layout/Drawer'
+import Config from 'config/config'
+import useWindowSize from 'hooks/useWindowSize'
 
 const HeaderLanding = () => {
     const router = useRouter()
@@ -28,31 +28,29 @@ const HeaderLanding = () => {
 
     return (
         <header className="header-landing h-[4rem] mb:h-[4.25rem] flex items-center px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[10]">
-           <div className="max-w-screen-layout 4xl:max-w-screen-4xl m-auto w-full flex items-center justify-between space-x-4 sm:space-x-12">
-              <div className={"flex items-center"}>
-                  <div className="w-[75px]">
-                      <img src="/images/ic_logo.png" />
-                  </div>
-                  {
-                      !isMobile && (
-                          <div className="w-full flex items-center justify-end mb:justify-between  py-3 mb:py-0 text-sm font-semibold">
-                              <Menu data={Config.homeMenu} />
-                          </div>
-                      )
-                  }
-              </div>
+            <div className="max-w-screen-layout 4xl:max-w-screen-4xl m-auto w-full flex items-center justify-between space-x-4 sm:space-x-12">
+                <div className={'flex items-center w-full'}>
+                    <div className="w-[75px]">
+                        <img src="/images/ic_logo.png" />
+                    </div>
+                    {!isMobile && (
+                        <div className="w-full flex items-center justify-end py-3 mb:py-0 text-sm font-semibold">
+                            <Menu data={Config.homeMenu} />
+                        </div>
+                    )}
+                </div>
                 <div className="flex items-center space-x-6 py-3 mb:py-0 text-sm font-semibold">
                     {!isMobile ? (
                         <>
                             <ButtonLanguage />
-                            <Button onClick={() => router.push('/home')} className="px-6 py-2 flex items-center space-x-2">
+                            <Button onClick={() => router.push('/home')} className="min-w-[9.5rem] px-6 py-2 flex items-center space-x-2">
                                 <span>{t('home:landing:access')}</span>
                                 <RightArrow />
                             </Button>
                         </>
                     ) : (
                         <>
-                            <Button onClick={() => router.push('/home')} className="px-4 py-2 leading-[1rem] flex items-center space-x-2">
+                            <Button onClick={() => router.push('/home')} className="min-w-[7.5rem] px-4 py-2 leading-[1rem] flex items-center space-x-2">
                                 <span className="font-semibold">{t('home:landing:access')}</span>
                                 <RightArrow />
                             </Button>

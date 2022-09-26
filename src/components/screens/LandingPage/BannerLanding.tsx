@@ -1,14 +1,14 @@
 import AOS from 'aos'
 import classnames from 'classnames'
-import useWindowSize from 'hooks/useWindowSize'
 import { useTranslation } from 'next-i18next'
 import React, { useEffect, useMemo, useState } from 'react'
-import fetchApi from 'services/fetch-api'
 import styled from 'styled-components'
+import useWindowSize from 'hooks/useWindowSize'
 import { API_GET_INFO_GENERAL } from 'services/apis'
-import { formatNumber } from 'utils/utils'
+import fetchApi from 'services/fetch-api'
 import 'aos/dist/aos.css'
 import { DURATION_AOS } from 'utils/constants'
+import { formatCurrency, formatNumber } from 'utils/utils'
 
 const BannerLanding = () => {
     const { t } = useTranslation()
@@ -17,7 +17,9 @@ const BannerLanding = () => {
     const [general, setGeneral] = useState<any>(null)
 
     useEffect(() => {
-        getInfoGeneral()
+        getInfoGeneral().catch((r) => {
+            console.log('error')
+        })
     }, [])
 
     const getInfoGeneral = async () => {
@@ -29,18 +31,19 @@ const BannerLanding = () => {
             if (data) setGeneral(data)
         } catch (e) {
             console.log(e)
-        } finally {
         }
     }
 
-    const list = useMemo(() => {
-        return [
-            { title: t('home:landing:total_q_covered'), value: general?.q_coverd ?? 0, decimal: 4 },
-            { title: t('home:landing:total_margin'), value: general?.q_margin ?? 0, decimal: 4 },
-            { title: t('home:landing:users'), value: general?.total_user ?? 0, decimal: 4 },
-            { title: t('home:landing:avg_r_claim'), value: general?.r_claim ?? 0, suffix: '%', decimal: 2 },
-        ]
-    }, [general])
+    const list = useMemo(
+        () => [
+            // { title: t('home:landing:total_q_claim'), value: general?.q_claim ?? 0, decimal: 4 },
+            { title: t('home:landing:total_q_covered'), value: formatCurrency(+formatNumber(general?.q_coverd ?? 0), 2), decimal: 2 },
+            { title: t('home:landing:users'), value: general?.total_user ?? 0, decimal: 2, prefix: '', suffix: '' },
+            { title: t('home:landing:total_margin'), value: formatCurrency(general?.q_margin || 0, 2), decimal: 2, prefix: '$', suffix: '' },
+            { title: t('home:landing:avg_r_claim'), value: general?.r_claim ?? 0, suffix: '%', decimal: 2, prefix: '' },
+        ],
+        [general],
+    )
 
     useEffect(() => {
         AOS.init({
@@ -50,30 +53,35 @@ const BannerLanding = () => {
         AOS.refresh()
     }, [])
 
+    const QClaimValue: string | number = formatCurrency(general?.q_claim, 4)
+
     return (
         <Background isMobile={isMobile}>
-            <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto mb-0 w-full text-center flex flex-col space-y-12 sm:space-y-6">
-                <div className="flex flex-col space-y-2">
-                    <div className="leading-5 sm:leading-6">{t('home:landing:total_q_claim')}</div>
-                    <div
-                        className="text-red text-[2.25rem] leading-[3.25rem] sm:leading-10 font-bold sm:font-semibold"
-                        data-aos="fade-up"
-                        data-aos-delay={DURATION_AOS}
-                    >
-                        {formatNumber(general?.q_claim, 4)}
-                    </div>
-                </div>
-                <div className="grid grid-rows-4 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-4 grid-flow-col sm:gap-x-6 lg:gap-6">
-                    {list.map((item: any, index: number) => (
-                        <Item key={index} className="border-gradient-red">
-                            <div className="text-txtSecondary text-sm sm:text-base">{item.title}</div>
-                            <div className="font-semibold text-2xl" data-aos="fade-up" data-aos-delay={DURATION_AOS * index}>
-                                {formatNumber(item.value, item.decimal)}
-                                {item.suffix}
+            <div className="max-w-screen-insurance rounded-2xl 4xl:max-w-screen-3xl mx-auto mb-0 w-full text-center flex flex-col">
+                <Grid>
+                    <Item key={'index'} className="bg-white col-span-4 lg:col-span-1">
+                        <div className="flex flex-col space-y-2 ">
+                            <div
+                                className="text-red text-[2rem] lg:text-4xl leading-[3.25rem] font-medium lg:leading-10 lg:font-semibold"
+                                data-aos="fade-up"
+                                data-aos-delay={0}
+                            >
+                                ${formatNumber(+QClaimValue, 2)}
                             </div>
+                            <div className="text-txtSecondary leading-5 text-sm lg:text-base lg:leading-6">{t('home:landing:total_q_claim')}</div>
+                        </div>
+                    </Item>
+                    {list.map((item: any, index: number) => (
+                        <Item key={index} className="bg-white">
+                            <div className="font-semibold md:text-4xl text-red text-2xl" data-aos="fade-up" data-aos-delay={DURATION_AOS * index}>
+                                {item?.prefix}
+                                {formatNumber(item.value, item.decimal)}
+                                {item?.suffix}
+                            </div>
+                            <div className="text-txtSecondary text-sm lg:text-base">{item.title}</div>
                         </Item>
                     ))}
-                </div>
+                </Grid>
             </div>
         </Background>
     )
@@ -81,21 +89,34 @@ const BannerLanding = () => {
 
 const Item = styled.div.attrs<any>({
     className: classnames(
-        'shadow-banner pt-6 pb-9 last:pb-6 -mb-3 lg:m-0 first:mt-0 sm:!p-x4 sm:py-12 w-full ',
+        'pt-6 pb-9 last:pb-6 -mb-3 lg:m-0 first:mt-0 sm:!p-x4 sm:py-12 w-full ',
         'text-center flex flex-col items-center space-y-[2px] sm:even:mb-0 last:m-0',
     ),
 })`
     backdrop-filter: blur(5px);
-    border-radius: 12px 12px 0px 0px;
     border-bottom: 0;
 `
 const Background = styled.section.attrs({
-    className: 'pt-12 banner-landing px-4 lg:px-20 min-h-[350px] flex flex-col justify-end',
+    className: ' banner-landing lg:px-6 min-h-[180px] flex flex-col justify-end mt-0 -mt-[206px] lg:-mt-[180px]',
+    // className: '-pt-12 banner-landing px-4 lg:px-20 min-h-[350px] flex flex-col justify-end',
 })<any>`
-    background-image: ${({ isMobile }) => `url(${`/images/screens/landing-page/bg_banner${isMobile ? '_mobile' : ''}.png`})`};
-    background-position: top;
-    background-repeat: no-repeat;
-    background-size: cover;
+        // background-image: ${({ isMobile }) => `url(${`/images/screens/landing-page/bg_banner${isMobile ? '_mobile' : ''}.png`})`};
+    //background-position: top;
+    //background-repeat: no-repeat;
+    //background-size: cover;
+    //box-shadow: 0px -3px 5px rgba(235, 43, 62, 0.15);
+    //border-radius: 1rem;
+    border-bottom: 0;
+`
+
+const Grid = styled.div.attrs({
+    className: 'grid bg-red grid-rows-3 lg:grid-rows-1 grid-cols-2 lg:grid-rows-1 lg:grid-cols-5 grid-flow-col ',
+})<any>`
+    box-shadow: 0px -3px 5px rgba(235, 43, 62, 0.15);
+    border-radius: 16px 16px 0px 0px;
+
+    background: #ffffff;
+    overflow: hidden;
 `
 
 export default BannerLanding

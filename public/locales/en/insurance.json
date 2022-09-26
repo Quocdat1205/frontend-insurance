@@ -9,7 +9,8 @@
         "covered_history": "Cover History",
         "help": "How to get covered",
         "help_short": "Guide",
-        "quality_and_type": "Quantity of the covered asset",
+        "q_covered": "Q-Covered",
+        "margin": "Margin",
         "continue": "Continue",
         "saved": "Savings",
         "save": "Save",
@@ -32,11 +33,11 @@
         "Term_of_Service_sub": "Term of Service.",
         "Term_of_Service_of": "the Nami Insurance's ",
         "connect_wallet": "Connect wallet",
-        "connect_wallet_error": "Please connect your wallet to utilize this feature",
+        "connect_wallet_error": "Please connect wallet",
         "quality": "Quantity",
         "title_change_margin": "and Margin is",
         "detailed_terminology": "Detailed terminology",
-        "help1": "How to buy Cover",
+        "help1": "How to buy cover",
         "asset": "Asset"
     },
     "buy_mobile": {

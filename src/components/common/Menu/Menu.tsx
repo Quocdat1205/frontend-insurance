@@ -182,7 +182,7 @@ interface Item {
 const ItemMenu = styled.li.attrs<Item>(({ isChild }) => ({
     className: classnames('cursor-pointer text-sm py-3 relative mb:hover:active-menu', {
         // 'mb:hover:text-red mb:py-6': !isChild,
-        'mb:hover:text-red mb:py-2': !isChild,
+        'mb:py-2': !isChild,
         'mb:!py-[10px] pl-4 font-normal mb:text-txtPrimary mb:hover:bg-hover mb:hover:rounded-[3px]': isChild,
     }),
 }))<Item>``
