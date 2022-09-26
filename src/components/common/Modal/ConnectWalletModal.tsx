@@ -16,7 +16,6 @@ import InstallerWallet from 'components/screens/ConnectWallet/InstallerWallet'
 import NetworkError from 'components/screens/ConnectWallet/NetworkError'
 import SwitchNetwok from 'components/screens/ConnectWallet/SwitchNetwok'
 import { useWeb3React } from '@web3-react/core'
-import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import { isString } from 'lodash'
 
 interface ConnectWalletModal {}
@@ -159,6 +158,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
             default:
                 break
         }
+        console.log(Config.web3)
         if (!isMobile) Config.web3?.activate(wallet?.wallet)
         if (!oldAddress.current) return
         setErrorConnect(false)
