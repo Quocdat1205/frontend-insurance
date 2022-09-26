@@ -23,6 +23,8 @@ import colors from 'styles/colors'
 import GlossaryModal from 'components/screens/Glossary/GlossaryModal'
 import InputNumber from 'components/common/Input/InputNumber'
 import HeaderContent from './HeaderContent'
+import fetchApi from 'services/fetch-api'
+import { API_GET_PRICE_CHART } from 'services/apis'
 
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
@@ -2013,6 +2015,18 @@ const InsuranceFrom = () => {
 
 export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any) => {
     try {
+        const ts = Math.round(new Date().getTime() / 1000)
+        const tsYesterday = ts - 7 * (24 * 3600)
+        const params = {
+            broker: 'NAMI_SPOT',
+            symbol: symbol,
+            from: tsYesterday,
+            to: ts,
+            resolution: resolution,
+        }
+        const test = await fetchApi({ url: API_GET_PRICE_CHART, baseURL: '', params: params })
+        console.log(test)
+
         const response = await fetch(
             'https://datav2.nami.exchange/api/v1/chart/history?' +
                 'broker=NAMI_SPOT' +
@@ -2026,9 +2040,11 @@ export const fetchApiNami = async (symbol: string, from: string, to: string, res
                 resolution,
         )
 
-        let list = await response.json()
+        // let list = await test.json()
+        // console.log(list)
+
         let data: { date: number; value: any }[] = []
-        list?.map((item: any) => {
+        test?.map((item: any) => {
             data.push({
                 date: item[0] * 1000,
                 value: item[1],
