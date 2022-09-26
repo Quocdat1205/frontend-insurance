@@ -155,6 +155,8 @@ const InsuranceFrom = () => {
     }
 
     const componentsInputMobile = () => {
+        console.log(state.margin)
+
         return (
             <div className="mx-[1rem] relative">
                 <div>
