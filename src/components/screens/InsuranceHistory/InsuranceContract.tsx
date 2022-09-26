@@ -340,8 +340,11 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
                 minWidth: 120,
                 Cell: (e: any) => (
                     <div className="underline text-red font-light cursor-pointer">
-                        <Link href={Config.env.BSC + '/' + e.value}>
+                        {/* <Link href={Config.env.BSC + '/' + e.value}>
                             <a target="_blank">{e.value}</a>
+                        </Link> */}
+                        <Link href={Config.env.BSC + '/' + e.value}>
+                            <a target="_blank">{e.value?.length > 10 ? String(e.value).substr(0, 5) + '...' + String(e.value).substr(-3) : e.value}</a>
                         </Link>
                     </div>
                 ),
