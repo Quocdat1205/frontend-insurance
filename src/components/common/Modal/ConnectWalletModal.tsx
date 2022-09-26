@@ -28,7 +28,10 @@ interface Wallet {
 }
 
 const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
-    const { t } = useTranslation()
+    const {
+        t,
+        i18n: { language },
+    } = useTranslation()
     const dispatch = useAppDispatch()
 
     const { account: address, error, chainId, isActive } = useWeb3React()
@@ -42,6 +45,9 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     const [networkError, setNetworkError] = useState<boolean>(false)
     const firstTime = useRef<boolean>(true)
     const oldAddress = useRef<string | null>()
+    const isReload = useRef<boolean>(false)
+    const textErrorButton = useRef<string>(t(`common:reconnect`))
+    const showIconReload = useRef<boolean>(true)
 
     const loading_account = useAppSelector((state: RootStore) => state.setting.loading_account)
     const account = useAppSelector((state: RootStore) => state.setting.account)
@@ -102,7 +108,9 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
             case 32603:
             case errorsWallet.Cancel:
                 if (inValidNetword) {
-                    reason.current = error?.message
+                    reason.current = t('errors:40001')
+                    textErrorButton.current = t(`common:reconnect`)
+                    showIconReload.current = true
                     setErrorConnect(true)
                 }
                 break
@@ -114,7 +122,20 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 setVisible(false)
                 break
             case errorsWallet.NetWork_error:
+                showIconReload.current = true
                 reason.current = t('common:network_error')
+                setErrorConnect(true)
+                break
+            case errorsWallet.Connect_failed:
+                reason.current = t('errors:CONNECT_FAILED')
+                textErrorButton.current = t(`common:refresh`)
+                isReload.current = true
+                setErrorConnect(true)
+                break
+            case errorsWallet.Already_opened:
+                reason.current = t('common:user_not_login')
+                showIconReload.current = false
+                textErrorButton.current = t('common:got_it')
                 setErrorConnect(true)
                 break
             default:
@@ -133,6 +154,10 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         Config.web3.switchNetwork(Config.chains[0])
         setLoading(true)
         setSwitchNetwork(false)
+    }
+
+    const lostConnection = () => {
+        connectionError({ code: errorsWallet.Connect_failed, message: t('errors:CONNECT_FAILED') })
     }
 
     const onConfirm = async () => {
@@ -158,14 +183,17 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
             default:
                 break
         }
-        console.log(Config.web3)
+
         if (!isMobile) Config.web3?.activate(wallet?.wallet)
         if (!oldAddress.current) return
         setErrorConnect(false)
         setLoading(true)
         try {
             const token = await Config.web3.contractCaller?.sign(oldAddress.current)
-            if (!token) return
+            if (!token) {
+                lostConnection()
+                return
+            }
             if (token?.message || token?.code) {
                 connectionError(token)
             } else {
@@ -194,6 +222,20 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         setSwitchNetwork(false)
     }
 
+    const onRead = (e: any) => {
+        let el = e?.target
+        while (el && el !== e.currentTarget && el.tagName !== 'SPAN') {
+            el = el.parentNode
+        }
+        if (el && el.tagName === 'SPAN') {
+            if (language === 'vi') {
+                window.open('https://quocdat.gitbook.io/whitepaper-insurance/bo-huong-dan/huong-dan-su-dung-vi')
+            } else {
+                window.open('https://quocdat.gitbook.io/whitepaper-insurance-en/tutorial/connect-wallet-to-nami-insurance')
+            }
+        }
+    }
+
     const walletsFilter: Wallet[] = [
         { name: 'Metamask', icon: '/images/icons/ic_metamask.png', active: true, wallet: wallets.metaMask },
         { name: 'Coinbase Wallet', icon: '/images/icons/ic_coinbase.png', active: false, wallet: wallets.coinbaseWallet },
@@ -208,12 +250,20 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
             isVisible={isVisible}
             isMobile={isMobile}
             onBackdropCb={() => !switchNetwork && inValidNetword && onCancel()}
-            wrapClassName={`!p-6 ${networkError ? 'sm:w-[524px]' : 'sm:w-[424px]'} `}
-            className={'sm:w-max'}
+            wrapClassName={`!p-6 ${networkError ? 'mb:w-[524px]' : 'mb:w-[424px]'} `}
+            className={'mb:w-max'}
             containerClassName={`${switchNetwork || !inValidNetword ? '!z-[99]' : ''}`}
         >
             <div className="flex flex-col space-y-4 justify-center items-center">
-                {errorConnect && <ConnectionError message={reason.current} onReconnect={onConfirm} />}
+                {errorConnect && (
+                    <ConnectionError
+                        message={reason.current}
+                        isReload={isReload.current}
+                        onReconnect={onConfirm}
+                        textErrorButton={textErrorButton.current}
+                        showIcon={showIconReload.current}
+                    />
+                )}
                 {installer && <InstallerWallet wallet={wallet?.wallet} />}
                 {switchNetwork && <SwitchNetwok onClose={onCancel} onSwitch={onSwitch} />}
                 {networkError && <NetworkError />}
@@ -260,9 +310,11 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                         >
                             {t('home:home:connect_wallet')}
                         </Button>
-                        <div className="text-txtSecondary text-sm sm:text-base">
-                            Chưa sở hữu ví? Đọc <span className="text-blue cursor-pointer underline">Hướng dẫn tạo ví</span> ngay.
-                        </div>
+                        <div
+                            onClick={onRead}
+                            className="text-txtSecondary text-sm sm:text-base text-center"
+                            dangerouslySetInnerHTML={{ __html: t('common:dont_have_wallet') }}
+                        />
                     </>
                 )}
             </div>

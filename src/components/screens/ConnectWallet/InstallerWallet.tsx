@@ -20,7 +20,9 @@ const InstallerWallet = ({ wallet }: InstallerWallet) => {
             el = el.parentNode
         }
         if (el && el.tagName === 'SPAN') {
-            if (isMetamask) console.log('metamask already')
+            if (isMetamask) {
+                window.open('https://quocdat.gitbook.io/whitepaper-insurance/bo-huong-dan/huong-dan-su-dung-vi')
+            }
         }
     }
 
@@ -32,7 +34,9 @@ const InstallerWallet = ({ wallet }: InstallerWallet) => {
                 <img src="/images/icons/ic_metamask.png" />
             </div>
             <div className="text-xl mt-6 font-medium">{t(`common:installer:${isMetamask ? 'metamask' : 'coinbase'}_title`)}</div>
-            <div className="text-txtSecondary mt-2 text-center text-sm sm:text-base">{t(`common:installer:${isMetamask ? 'metamask' : 'coinbase'}_content`)}</div>
+            <div className="text-txtSecondary mt-2 text-center text-sm sm:text-base">
+                {t(`common:installer:${isMetamask ? 'metamask' : 'coinbase'}_content`)}
+            </div>
             <Button onClick={onInstall} variants="primary" className="w-full py-2 mt-8 text-sm sm:text-base">
                 {t('common:installer:install')}
             </Button>

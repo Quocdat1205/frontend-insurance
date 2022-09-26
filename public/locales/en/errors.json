@@ -1,3 +1,5 @@
 {
-    "EMAIL_EXITED": "email is already existed"
+    "EMAIL_EXITED": "email is already existed",
+    "40001": "User refused to authorize the wallet connection",
+    "CONNECT_FAILED": "Connection failed, please try again"
 }

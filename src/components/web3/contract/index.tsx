@@ -46,6 +46,7 @@ export class ContractCaller {
             const signature = await signer.signMessage(getMessageSign(nonce))
             return await fetchApi({ url: API_LOGIN, options: { method: 'POST' }, params: { owner: address, signature: signature } })
         } catch (error) {
+            console.log('sign', error)
             return error
         }
     }
