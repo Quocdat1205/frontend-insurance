@@ -4,7 +4,7 @@ export const PORTAL_MODAL_ID: string = 'PORTAL_MODAL'
 
 export const screens = {
     drawer: 820,
-    drawerHome: 992,
+    drawerHome: 1024,
 }
 
 const SUPPORT = {
