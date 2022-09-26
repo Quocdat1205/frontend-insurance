@@ -98,7 +98,6 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
     const dataFilter = useMemo(() => recursiveData(data), [data])
 
     const renderMenu = (menu: any, index: number, child = false) => {
-        if (!account?.address && menu.menuId === 'disconnect') return null
         const hasChildren = menu.children.length > 0
         const _active = active?.menuId === menu.menuId || active?.parentId === menu.menuId
         const level = menu.level + 1
