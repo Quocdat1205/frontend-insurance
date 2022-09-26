@@ -1,18 +1,10 @@
-import Breadcrumbs from 'components/layout/Breadcrumbs'
 import LayoutInsurance from 'components/layout/layoutInsurance'
-import LayoutWeb3 from 'components/layout/LayoutWeb3'
-import { InsuranceFormLoading } from 'components/screens/Insurance/insuranceFormLoading'
-import InsuranceContractLoading from 'components/screens/InsuranceHistory/InsuranceContractLoading'
 import Config from 'config/config'
 import useWindowSize from 'hooks/useWindowSize'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import dynamic from 'next/dynamic'
 import { screens } from 'utils/constants'
-const InsuranceHistory = dynamic(() => import('components/screens/InsuranceHistory/InsuranceHistory'), {
-    ssr: false,
-    loading: () => <InsuranceContractLoading />,
-})
 
 const AcceptBuyInsurance = dynamic(() => import('components/screens/Insurance/AcceptBuyInsurance'), {
     ssr: false,
@@ -23,17 +15,6 @@ const Insurance = ({ slug }: any) => {
     const isMobile = width && width <= screens.drawer
 
     switch (slug) {
-        case 'insurance-history':
-            return (
-                <LayoutWeb3 sponsor={false}>
-                    <Breadcrumbs>
-                        <div>{t('common:header:home')}</div>
-                        <div>{t('common:header:buy_covered')}</div>
-                        <div>{t('common:header:insurance_history')}</div>
-                    </Breadcrumbs>
-                    <InsuranceHistory />
-                </LayoutWeb3>
-            )
         case 'info-covered':
             return !isMobile ? (
                 <LayoutInsurance>

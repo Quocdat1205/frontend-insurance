@@ -4,11 +4,10 @@ import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import Button from 'components/common/Button/Button'
 import axios from 'axios'
 import { Menu, Popover, Switch, Tab } from '@headlessui/react'
-import { Input } from 'components/common/Input/input'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { CheckCircle, LeftArrow, InfoCircle, XMark, ErrorTriggersIcon, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
+import { CheckCircle, InfoCircle, XMark, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp, ArrowLeft } from 'react-feather'
 import { useTranslation } from 'next-i18next'
 import useWindowSize from 'hooks/useWindowSize'
@@ -37,6 +36,11 @@ const InsuranceFrom = () => {
         i18n: { language },
     } = useTranslation()
     const wallet = useWeb3Wallet()
+
+    if (wallet) {
+        console.log(wallet)
+    }
+
     const router = useRouter()
     const { width, height } = useWindowSize()
     const isMobile = width && width <= screens.drawer
@@ -243,7 +247,7 @@ const InsuranceFrom = () => {
         }
 
         if (symbol === 'USDT') {
-            const balanceUsdt = await wallet.contractCaller.usdtContract.contract.balanceOf(account.address)
+            const balanceUsdt = await wallet.contractCaller?.usdtContract.contract.balanceOf(account.address)
 
             if (balanceUsdt) {
                 if (Number(ethers.utils.formatEther(balanceUsdt)) > 0) {
@@ -259,7 +263,7 @@ const InsuranceFrom = () => {
         }
 
         if (symbol === 'ETH') {
-            const balanceETH = await wallet.contractCaller.ethContract.contract.balanceOf(account.address)
+            const balanceETH = await wallet.contractCaller?.ethContract.contract.balanceOf(account.address)
             if (balanceETH) {
                 if (Number(ethers.utils.formatEther(balanceETH)) > 0) {
                     setUserBalance(Number((Number(ethers.utils.formatEther(balanceETH)) / Number(state.p_market)).toFixed(decimalList.decimal_q_covered)))
@@ -655,6 +659,7 @@ const InsuranceFrom = () => {
     })
 
     const [percentPrice, setPercentPrice] = useState<any>()
+    const [priceFilter, setPriceFilter] = useState<any>()
 
     useEffect(() => {
         pair_configs?.filters?.map((item: any) => {
@@ -663,9 +668,12 @@ const InsuranceFrom = () => {
                 setDecimalList({ ...decimalList, decimal_q_covered: decimal })
             }
             if (item?.filterType === 'PERCENT_PRICE') {
+                console.log(item)
+
                 setPercentPrice({ ...item })
             }
             if (item?.filterType === 'PRICE_FILTER') {
+                setPriceFilter({ ...item })
                 const decimalP_Claim: number = (1 / Number(item.tickSize)).toString().replace('1', '').length
                 setDecimalList({ ...decimalList, decimal_p_claim: decimalP_Claim })
 
@@ -704,7 +712,7 @@ const InsuranceFrom = () => {
     }, [pair_configs, state.q_covered, selectCoin, state.p_claim])
 
     const validator = (key: string) => {
-        const rs = { isValid: true, message: '' }
+        let rs = { isValid: true, message: '' }
 
         switch (key) {
             case 'q_covered':
@@ -720,14 +728,41 @@ const InsuranceFrom = () => {
             </div>`
                 break
             case 'p_claim':
-                rs.isValid = !(state.p_claim > Number(rangeP_claim.max) || state.p_claim < Number(rangeP_claim.min))
-                rs.message = `<div class="flex items-center">
-                ${
-                    state.p_claim > Number(rangeP_claim.max)
-                        ? t('common:max', { value: `${Number(rangeP_claim.max)}` })
-                        : t('common:min', { value: `${Number(rangeP_claim.min)}` })
+                rs.isValid =
+                    !(state.p_claim > Number(rangeP_claim.max) || state.p_claim < Number(rangeP_claim.min)) &&
+                    !(Number(priceFilter?.minPrice) > state.p_claim || state.p_claim > Number(priceFilter?.maxPrice)) &&
+                    !(
+                        state.p_claim > Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered)) ||
+                        state.p_claim < Number((state.p_market * Number(percentPrice?.multiplierDown)).toFixed(decimalList.decimal_q_covered))
+                    )
+                if (state.p_claim > Number(rangeP_claim.max) || state.p_claim < Number(rangeP_claim.min)) {
+                    rs.message = `<div class="flex items-center">
+                  ${
+                      state.p_claim > Number(rangeP_claim.max)
+                          ? t('common:max', { value: `${Number(rangeP_claim.max)}` })
+                          : t('common:min', { value: `${Number(rangeP_claim.min)}` })
+                  }
+                  </div>`
+                } else if (Number(priceFilter?.minPrice) > state.p_claim || state.p_claim > Number(priceFilter?.maxPrice)) {
+                    rs.message = `<div class="flex items-center">
+              ${
+                  state.p_claim > +priceFilter.maxPrice
+                      ? t('common:max', { value: `${Number(priceFilter.maxPrice)}` })
+                      : t('common:min', { value: `${Number(priceFilter.minPrice)}` })
+              }
+              </div>`
+                } else if (
+                    state.p_claim > Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered)) ||
+                    state.p_claim < Number((state.p_market * Number(percentPrice?.multiplierDown)).toFixed(decimalList.decimal_q_covered))
+                ) {
+                    rs.message = `<div class="flex items-center">
+              ${
+                  state.p_claim > Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered))
+                      ? t('common:max', { value: `${Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered))}` })
+                      : t('common:min', { value: `${Number((state.p_market * Number(percentPrice?.multiplierDown)).toFixed(decimalList.decimal_q_covered))}` })
+              }
+              </div>`
                 }
-                </div>`
                 break
             case 'margin':
                 rs.isValid = !(state.margin < Number(rangeMargin.min) || state.margin > Number(rangeMargin.max))
@@ -848,8 +883,9 @@ const InsuranceFrom = () => {
     const onHandleChange = (key: string, e: any) => {
         const value = +e.value
         const res = validator(key)
-        if (state.q_covered > 0 && state.margin && state.p_claim && account.address != null) {
-            setClear(!res.isValid)
+
+        if (res?.isValid && state.p_claim && state.q_covered && state.margin && account.address != null) {
+            setClear(res.isValid)
         }
 
         switch (key) {
