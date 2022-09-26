@@ -1,7 +1,7 @@
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import React, { useMemo, useState } from 'react'
-import { ChevronDown, ChevronUp, X } from 'react-feather';
+import { ChevronDown, ChevronUp, X } from 'react-feather'
 import Button from 'components/common/Button/Button'
 import ButtonLanguage from 'components/common/Button/ButtonLanguage'
 import Menu from 'components/common/Menu/Menu'
@@ -77,14 +77,20 @@ const Header = () => {
     }
 
     const menuAddress = [
-        { menuId: 'account-info', router: '/', name: NameComponent, parentId: 0, hideArrowIcon: true, nameComponentProps: { ...props } },
+        isMobile
+            ? { menuId: 'account-info', router: '/home', name: 'common:header:account_info_title', parentId: 0 }
+            : { menuId: 'account-info', router: '/', name: NameComponent, parentId: 0, hideArrowIcon: true, nameComponentProps: { ...props } },
         ...Config.subMenu,
     ]
 
+    const MenuFilter = useMemo(() => {
+        return [...menuAddress, ...Config.homeMenu]
+    }, [isMobile])
+
     return (
-        <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[50]">
+        <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 lg:px-10 border-b border-divider sticky top-0 bg-white z-[50]">
             <div className="max-w-screen-layout 4xl:max-w-screen-4xl m-auto w-full flex items-center justify-between space-x-4 sm:space-x-12">
-                <div className="min-w-[67px] w-[75px]">
+                <div className="min-w-[67px] w-[75px]" onClick={() => router.push('/')}>
                     <img src="/images/ic_logo.png" />
                 </div>
                 <div className="w-full flex items-center justify-end homeNav:justify-between  py-3 mb:py-0 text-sm font-semibold">
@@ -139,7 +145,7 @@ const Header = () => {
                 <Drawer visible={visible} onClose={() => setVisible(false)}>
                     <div>
                         <div className="mb-8">
-                            <Menu data={Config.homeMenuMobile} onChange={onChangeMenu} />
+                            <Menu data={MenuFilter} onChange={onChangeMenu} />
                         </div>
                         {!network && (
                             <div className="mx-4">
