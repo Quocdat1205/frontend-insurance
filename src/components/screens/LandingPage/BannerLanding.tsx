@@ -37,9 +37,9 @@ const BannerLanding = () => {
     const list = useMemo(
         () => [
             // { title: t('home:landing:total_q_claim'), value: general?.q_claim ?? 0, decimal: 4 },
-            { title: t('home:landing:total_q_covered'), value: formatCurrency(+formatNumber(general?.q_coverd ?? 0), 4), decimal: 4 },
-            { title: t('home:landing:users'), value: general?.total_user ?? 0, decimal: 4, prefix: '', suffix: '' },
-            { title: t('home:landing:total_margin'), value: formatCurrency(general?.q_margin || 0, 4), decimal: 4, prefix: '$', suffix: '' },
+            { title: t('home:landing:total_q_covered'), value: formatCurrency(+formatNumber(general?.q_coverd ?? 0), 2), decimal: 2 },
+            { title: t('home:landing:users'), value: general?.total_user ?? 0, decimal: 2, prefix: '', suffix: '' },
+            { title: t('home:landing:total_margin'), value: formatCurrency(general?.q_margin || 0, 2), decimal: 2, prefix: '$', suffix: '' },
             { title: t('home:landing:avg_r_claim'), value: general?.r_claim ?? 0, suffix: '%', decimal: 2, prefix: '' },
         ],
         [general],
@@ -66,7 +66,7 @@ const BannerLanding = () => {
                                 data-aos="fade-up"
                                 data-aos-delay={0}
                             >
-                                ${formatNumber(+QClaimValue, 4)}
+                                ${formatNumber(+QClaimValue, 2)}
                             </div>
                             <div className="text-txtSecondary leading-5 text-sm lg:text-base lg:leading-6">{t('home:landing:total_q_claim')}</div>
                         </div>
@@ -97,7 +97,7 @@ const Item = styled.div.attrs<any>({
     border-bottom: 0;
 `
 const Background = styled.section.attrs({
-    className: ' banner-landing min-h-[168px] flex flex-col justify-end mt-0 md:-mt-[168px]',
+    className: ' banner-landing lg:px-6 min-h-[180px] flex flex-col justify-end mt-0 -mt-[206px] lg:-mt-[180px]',
     // className: '-pt-12 banner-landing px-4 lg:px-20 min-h-[350px] flex flex-col justify-end',
 })<any>`
         // background-image: ${({ isMobile }) => `url(${`/images/screens/landing-page/bg_banner${isMobile ? '_mobile' : ''}.png`})`};

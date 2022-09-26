@@ -47,7 +47,7 @@ export const setAccount = (data?: { address: string | null | undefined; wallet?:
 
 export const getListAssetToken = () => async (dispatch: Dispatch) => {
     try {
-        const {data} = await fetchApi({ url: API_GET_LIST_TOKEN })
+        const { data } = await fetchApi({ url: API_GET_LIST_TOKEN })
         if (data) {
             dispatch({
                 type: types.SET_ASSETS_TOKEN,

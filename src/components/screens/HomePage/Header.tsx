@@ -21,7 +21,7 @@ const Header = () => {
     const { chain } = useWeb3Wallet()
     const { width } = useWindowSize()
     const router = useRouter()
-    const isMobile = width && width < screens.drawer
+    const isMobile = width && width <= screens.drawerHome
     const [visible, setVisible] = useState<boolean>(false)
     const [isHover, setIsHover] = useState<boolean>(false)
     const dispatch = useAppDispatch()
@@ -87,7 +87,7 @@ const Header = () => {
                 <div className="min-w-[67px] w-[75px]">
                     <img src="/images/ic_logo.png" />
                 </div>
-                <div className="w-full flex items-center justify-end mb:justify-between  py-3 mb:py-0 text-sm font-semibold">
+                <div className="w-full flex items-center justify-end homeNav:justify-between  py-3 mb:py-0 text-sm font-semibold">
                     {!isMobile && (
                         <div className="hidden mb:block">
                             <Menu data={Config.homeMenu} onChange={onChangeMenu} />
@@ -95,7 +95,7 @@ const Header = () => {
                         </div>
                     )}
                     {!loading_account && (
-                        <div className="flex items-center space-x-5 sm:space-x-6 cursor-pointer">
+                        <div className="flex items-center space-x-5 sm:space-x-2 cursor-pointer">
                             <>
                                 {account?.address && <Notifications />}
                                 {account?.address && !isMobile && (
