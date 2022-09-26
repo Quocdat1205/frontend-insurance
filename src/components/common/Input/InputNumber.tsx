@@ -42,8 +42,6 @@ const InputNumber = ({
 }: Partial<InputProps>) => {
     const [focus, setFocus] = useState<boolean>(false)
 
-    console.log(value)
-
     const isError = value > 0 && validator && Object.keys(validator)?.length && !validator?.isValid
 
     const _onFocus = (e: any) => {
