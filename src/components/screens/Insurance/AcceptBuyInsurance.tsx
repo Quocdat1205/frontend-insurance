@@ -280,10 +280,10 @@ const AcceptBuyInsurance = () => {
             console.log(state.p_claim.toFixed(state?.decimalList?.decimal_p_claim))
 
             if (p_refund > state.p_claim) {
-                return ` ${state.p_claim.toFixed(state?.decimalList?.decimal_p_claim)} - ${p_refund.toFixed(state?.decimalList?.decimal_p_claim)} `
+                return ` $${state.p_claim.toFixed(state?.decimalList?.decimal_p_claim)} - $${p_refund.toFixed(state?.decimalList?.decimal_p_claim)} `
             }
             if (p_refund < state.p_claim) {
-                return ` ${p_refund.toFixed(state?.decimalList?.decimal_p_claim)} - ${state.p_claim.toFixed(state?.decimalList?.decimal_p_claim)} `
+                return ` $${p_refund.toFixed(state?.decimalList?.decimal_p_claim)} - $${state.p_claim.toFixed(state?.decimalList?.decimal_p_claim)} `
             }
         }
     }
@@ -299,11 +299,15 @@ const AcceptBuyInsurance = () => {
         }, 1000)
     }, [count])
 
-    const timeEnd = () => {
-        let time = new Date()
-        let b = time.getDate()
-        console.log(b)
-    }
+    // const timeEnd = () => {
+    //     if (state) {
+    //         let time = new Date()
+    //         time.setDate(time.getDate() + state.period)
+
+    //         return `${time.getDate()}/${time.getMonth()}/${time.getFullYear()} - ${time.getHours()}:0${time.getMinutes()}`
+    //     }
+    //     return ''
+    // }
 
     return !loading && state != undefined ? (
         !isMobile ? (
@@ -504,7 +508,7 @@ const AcceptBuyInsurance = () => {
                                 </div>
                             </div>
                             <div className="text-[#B2B7BC] text-xs py-[16px]">
-                                *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')} {timeEnd()}
+                                *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')} {/*timeEnd()*/}
                             </div>
 
                             <div

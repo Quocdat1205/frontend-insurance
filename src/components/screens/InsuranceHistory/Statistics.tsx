@@ -15,11 +15,11 @@ import { UnitConfig } from 'types/types'
 interface Statistics {
     unitConfig: UnitConfig
     hasInsurance: boolean
+    account: any
 }
-const Statistics = ({ unitConfig, hasInsurance }: Statistics) => {
+const Statistics = ({ unitConfig, hasInsurance, account }: Statistics) => {
     const [day, setDay] = useState(30)
     const [loading, setLoading] = useState<boolean>(hasInsurance)
-    const { account } = useWeb3Wallet()
     const [dataSource, setDataSource] = useState<any>(null)
     const { t } = useTranslation()
 
