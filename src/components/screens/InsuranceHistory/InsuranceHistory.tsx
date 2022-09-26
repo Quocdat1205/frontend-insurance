@@ -47,7 +47,7 @@ const InsuranceHistory = () => {
                 url: API_CHECK_GUIDE_LINE,
                 options: { method: 'GET' },
                 params: {
-                    owner: account,
+                    owner: account?.address,
                 },
             })
             seen.current = data
@@ -69,7 +69,7 @@ const InsuranceHistory = () => {
                 url: API_UPDATE_GUIDE_LINE,
                 options: { method: 'GET' },
                 params: {
-                    owner: account,
+                    owner: account?.address,
                 },
             })
         } catch (e) {
@@ -124,14 +124,16 @@ const InsuranceHistory = () => {
                             </div>
                         </Popover>
                     </div>
-                    {((account?.address && hasInsurance) || showGuide) && <Statistics hasInsurance={hasInsurance} unitConfig={unitConfig} />}
+                    {((account?.address && hasInsurance) || showGuide) && (
+                        <Statistics account={account?.address} hasInsurance={hasInsurance} unitConfig={unitConfig} />
+                    )}
                     <CardShadow mobileNoShadow className="sm:mt-12 sm:p-8">
                         <InsuranceContract
                             hasInsurance={hasInsurance}
                             setHasInsurance={setHasInsurance}
                             unitConfig={unitConfig}
                             showGuide={showGuide}
-                            account={account}
+                            account={account?.address}
                         />
                     </CardShadow>
                     <div className="pt-[30px] sm:pt-12">

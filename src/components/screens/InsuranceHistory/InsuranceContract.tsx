@@ -173,7 +173,7 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
     useEffect(() => {
         clearTimeout(timer.current)
         if (!allPairConfigs || allPairConfigs.length <= 0) return
-        if (account?.address) {
+        if (account) {
             getInsurance()
         } else {
             timer.current = setTimeout(() => {
@@ -380,7 +380,7 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
     }
 
     const onBuyInsurance = () => {
-        if (!account?.address) {
+        if (!account) {
             Config.connectWallet()
             return
         }
@@ -408,7 +408,7 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
         )
     }
 
-    if (isMobile && account?.address)
+    if (isMobile && account)
         return !hasInsurance && !showGuide ? (
             <NoData account={account} t={t} onBuyInsurance={onBuyInsurance} hasInsurance={hasInsurance} />
         ) : (
@@ -441,7 +441,7 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
 
     return (
         <>
-            {account?.address && hasInsurance && (
+            {account && hasInsurance && (
                 <div className="mb-6 grid grid-rows-3 grid-cols-1 md:grid-rows-2 md:grid-cols-2 lg:grid-rows-1 lg:grid-cols-3 gap-4">
                     <Selectbox
                         value={asset}
@@ -503,12 +503,12 @@ const NoData = ({ hasInsurance, onBuyInsurance, t, account }: any) => {
                 <img className="max-w-[230px] sm:max-w-[310px]" src="/images/icons/bg_noData.png" />
             </div>
             <div className="mt-4 pb-6">
-                {account?.address
+                {account
                     ? t(`insurance_history:you_have_no_insurance${hasInsurance ? '_filter' : ''}`)
                     : t('insurance_history:connecting_wallet_to_buy')}
             </div>
             <Button onClick={onBuyInsurance} className="py-3 px-6 sm:px-20 sm:font-semibold rounded-xl text-sm sm:text-base">
-                {account?.address ? t('common:header:buy_covered') : t('home:home:connect_wallet')}
+                {account ? t('common:header:buy_covered') : t('home:home:connect_wallet')}
             </Button>
         </div>
     )
