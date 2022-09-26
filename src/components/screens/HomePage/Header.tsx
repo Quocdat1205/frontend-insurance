@@ -116,7 +116,7 @@ const Header = () => {
                             <>
                                 {account?.address && <Notifications />}
                                 {account?.address && !isMobile && (
-                                    <Menu data={menuAddress} cbOnMouseOut={handleMouseHover} cbOnMouseOver={handleMouseHover} onChange={onClickMenuAddress} />
+                                    <Menu data={menuAddress} cbOnMouseOut={handleMouseHover} cbOnMouseOver={handleMouseHover} onChange={onChangeMenu} />
                                     // <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
                                     //     <img src={network.icon} width={24} height={24} />
                                     //     <div>{network.chain}</div>

@@ -11,7 +11,7 @@ interface Container {
 }
 
 const Container = ({ children }: Container) => {
-    const dispath = useAppDispatch()
+    const dispatch = useAppDispatch()
 
     useEffect(() => {
         let vh = window.innerHeight * 0.01
@@ -20,10 +20,10 @@ const Container = ({ children }: Container) => {
         if (vw <= 360) {
             document.documentElement.style.setProperty('font-size', '14px')
         }
-        dispath(setting())
-        dispath(getListAssetToken())
-        dispath(getConfigAsset())
-        dispath(getConfigUnit())
+        dispatch(setting())
+        dispatch(getListAssetToken())
+        dispatch(getConfigAsset())
+        dispatch(getConfigUnit())
     }, [])
 
     return (
