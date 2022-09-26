@@ -237,6 +237,7 @@ module.exports = {
                 tiny: '355px',
                 xs: '320px',
                 '1xs': '391px',
+                homeNav: '993px',
             },
             spacing: {
                 128: '32rem',
@@ -249,7 +250,7 @@ module.exports = {
                 card: '0px 6px 18px rgba(9, 30, 66, 0.05)',
                 subMenu: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)',
                 dropdown: '0px 3px 5px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.31)',
-                toast: '0px 8px 5px rgba(23, 43, 77, 0.04), 0px 15px 12px rgba(23, 43, 77, 0.08)'
+                toast: '0px 8px 5px rgba(23, 43, 77, 0.04), 0px 15px 12px rgba(23, 43, 77, 0.08)',
             },
             cursor: {
                 grabbing: 'grabbing',
