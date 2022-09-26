@@ -239,6 +239,11 @@ const AcceptBuyInsurance = () => {
     const handlePostInsurance = async (props: any, dataPost: any, state: any, _id: any) => {
         if (props) {
             try {
+                if (props.hash) {
+                    setRes(_id)
+                    setNoti('success')
+                }
+
                 const data = {
                     owner: props.from,
                     transaction_hash: props.hash,
@@ -253,11 +258,7 @@ const AcceptBuyInsurance = () => {
                 }
 
                 await buyInsurance(data).then((res) => {
-                    if (res === 201) {
-                        setRes(_id)
-                        setNoti('success')
-                        // setActive(true)
-                    }
+                    console.log(res)
                 })
             } catch (error) {
                 console.log(error)
