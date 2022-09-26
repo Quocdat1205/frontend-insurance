@@ -82,13 +82,13 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
 
     const handleClick = (index: number) => {
         if (index == 0) {
-            return router.push('/buy-covered/insurance-history')
+            return router.push('/insurance-history')
         }
         if (index == 3) {
             return handleAPISubscribe(email)
         }
         if (index != 0 && index != 3) {
-            return router.push('/buy-covered/insurance-history')
+            return router.push('/insurance-history')
         }
     }
 
