@@ -20,13 +20,15 @@ const SloganLanding = () => {
             >
                 <div className="flex flex-col space-y-6 lg:space-y-9 w-full">
                     <div className="flex flex-col space-y-2 pt-[4.25rem] lg:pt-0 text-center lg:text-left font-semibold">
-                        <span className="text-[2rem] lg:text-[4.25rem] lg:leading-[5rem]">{t('common:slogan_first')}</span>
-                        <span className="text-4xl text-gradient text-[2rem] lg:text-[4.25rem] lg:leading-[5rem]">{t('common:slogan_second')}</span>
+                        <span className="text-[2rem] leading-[2.75rem] lg:text-[4.25rem] lg:leading-[5rem]">{t('common:slogan_first')}</span>
+                        <span className="text-[3rem] leading-[3.75rem] text-gradient text-[2rem] lg:text-[5.5rem] lg:leading-[6rem]">
+                            {t('common:slogan_second')}
+                        </span>
                     </div>
                     <div className="flex items-center justify-center lg:justify-between lg:justify-start space-x-4 text-sm font-semibold">
                         <Button
                             onClick={handleClickBuyCover}
-                            className="  w-[342px] lg:w-max h-12 text-sm lg:text-xl lg:h-full whitespace-nowrap !rounded-xl px-6 py-4 leading-6"
+                            className=" w-[342px] lg:w-max h-12 text-sm lg:text-xl lg:h-full whitespace-nowrap !rounded-xl px-6 py-4 leading-6"
                         >
                             {t('home:landing:buy_covered')}
                         </Button>
