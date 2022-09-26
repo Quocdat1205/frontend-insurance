@@ -117,7 +117,7 @@ const InsuranceFrom = () => {
     })
 
     const [dataChart, setDataChart] = useState()
-    const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', 'ALL']
+    const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', `${language === 'vi' ? 'Tất cả' : 'All'}`]
     const listTabPeriod: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     const menu = [
         { menuId: 'home', router: 'home', name: t('insurance:buy:home'), parentId: 0 },
@@ -558,6 +558,7 @@ const InsuranceFrom = () => {
             getPrice(selectCoin.symbol, state, setState)
             setState({ ...state, symbol: { ...selectCoin } })
             getConfig(selectCoin.type)
+            getBalaneToken(selectCoin.type)
         }
     }, [selectCoin])
 
@@ -578,7 +579,6 @@ const InsuranceFrom = () => {
         validator('q_covered')
         validator('margin')
 
-        console.log()
         if (res_q_covered.isValid) {
             if (state.q_covered && state.p_claim) {
                 const margin = Number((8 * state.q_covered * state.p_market) / 100)
@@ -655,9 +655,6 @@ const InsuranceFrom = () => {
         const defaultQ_covered = pair_configs?.filters?.find((e: any) => {
             return e.filterType === 'LOT_SIZE'
         })
-        const min = Number(defaultQ_covered?.minQty)
-        const max = Math.min(Number(defaultQ_covered?.maxQty), userBalance)
-        setRangeQ_covered({ min: min, max: max })
     }, [percentInsurance, state.margin, state.q_covered])
 
     useEffect(() => {
@@ -689,6 +686,10 @@ const InsuranceFrom = () => {
             if (item?.filterType === 'LOT_SIZE') {
                 const decimal: number = (1 / item.stepSize).toString().replace('1', '').length
                 setDecimalList({ ...decimalList, decimal_q_covered: decimal })
+
+                const min = Number(item?.minQty)
+                const max = Number(item?.maxQty) < userBalance ? Number(item?.maxQty) : userBalance
+                setRangeQ_covered({ min: min, max: max })
             }
             if (item?.filterType === 'PERCENT_PRICE') {
                 setPercentPrice({ ...item })
@@ -728,8 +729,6 @@ const InsuranceFrom = () => {
         })
     }, [pair_configs, state.q_covered, selectCoin, state.p_claim])
 
-    console.log(decimalList)
-
     const validator = (key: string) => {
         let rs = { isValid: true, message: '' }
 
@@ -741,14 +740,14 @@ const InsuranceFrom = () => {
                     state.q_covered <= 0
                 )
                 rs.message = `<div class="flex items-center ">
-                ${
-                    state.q_covered > Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered))
-                        ? t('common:available', {
-                              value: `${Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered))}`,
-                          })
-                        : t('common:minimum_balance', { value: rangeQ_covered.min })
-                }
-            </div>`
+                    ${
+                        state.q_covered > Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered))
+                            ? t('common:available', {
+                                  value: `${Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered))}`,
+                              })
+                            : t('common:minimum_balance', { value: rangeQ_covered.min })
+                    }
+                </div>`
                 break
             case 'p_claim':
                 rs.isValid =
@@ -857,7 +856,7 @@ const InsuranceFrom = () => {
                                         <div className="max-w-[20px] mr-[8px] max-h-[20px] ">
                                             <img alt={''} src={`${coin.icon}`} width="20" height="20" className={'mr-[5px] rounded-[50%]'}></img>
                                         </div>
-                                        <div className={'flex flex-row justify-between w-full'}>
+                                        <div className={'flex flex-row justify-between w-full text-sm'}>
                                             <span>{coin.name}</span>
                                         </div>
                                     </a>
