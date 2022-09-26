@@ -81,7 +81,6 @@ const Header = () => {
             ? { menuId: 'account-info', router: '/home', name: 'common:header:account_info_title', parentId: 0 }
             : {
                   menuId: 'account-info',
-                  router: '/',
                   name: NameComponent,
                   parentId: 0,
                   hideArrowIcon: true,
