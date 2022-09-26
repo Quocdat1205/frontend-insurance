@@ -239,9 +239,15 @@ const AcceptBuyInsurance = () => {
     const handlePostInsurance = async (props: any, dataPost: any, state: any, _id: any) => {
         if (props) {
             try {
-                if (props.hash) {
+                console.log(props)
+
+                if (_id) {
                     setRes(_id)
                     setNoti('success')
+                }
+                if (!_id) {
+                    setActive(false)
+                    Config.toast.show('error', 'Purchased Fail')
                 }
 
                 const data = {
