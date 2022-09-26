@@ -1,7 +1,7 @@
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import React, { useMemo, useState } from 'react'
-import { ChevronDown, ChevronUp, X } from 'react-feather';
+import { ChevronDown, ChevronUp, X } from 'react-feather'
 import Button from 'components/common/Button/Button'
 import ButtonLanguage from 'components/common/Button/ButtonLanguage'
 import Menu from 'components/common/Menu/Menu'
@@ -12,9 +12,9 @@ import { ChainDataList } from 'components/web3/constants/chains'
 import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import useWindowSize from 'hooks/useWindowSize'
+import { setAccount } from 'redux/actions/setting'
 import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
 import { screens } from 'utils/constants'
-import { setAccount } from 'redux/actions/setting'
 
 const Header = () => {
     const { t } = useTranslation()
@@ -61,7 +61,7 @@ const Header = () => {
         <div className="p-2 bg-hover rounded-[5px] flex items-center space-x-2">
             {network && <img src={network?.icon} width={24} height={24} />}
             {network && <div>{network?.chain}</div>}
-            <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-2">{`${account?.address?.substr(
+            <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-4 lg:py-0">{`${account?.address?.substr(
                 0,
                 isMobile ? 2 : 4,
             )}...${account?.address?.substr(-4)}`}</div>
@@ -77,14 +77,31 @@ const Header = () => {
     }
 
     const menuAddress = [
-        { menuId: 'account-info', router: '/', name: NameComponent, parentId: 0, hideArrowIcon: true, nameComponentProps: { ...props } },
+        isMobile
+            ? { menuId: 'account-info', router: '/home', name: 'common:header:account_info_title', parentId: 0 }
+            : {
+                  menuId: 'account-info',
+                  router: '/',
+                  name: NameComponent,
+                  parentId: 0,
+                  hideArrowIcon: true,
+                  isDropdown: true,
+                  nameComponentProps: { ...props },
+              },
         ...Config.subMenu,
     ]
 
+    const MenuFilter = useMemo(() => {
+        // base menu
+        const baseMenu = [...Config.homeMenu]
+        // check wallet connected
+        return account?.address ? [...menuAddress, ...baseMenu] : baseMenu
+    }, [isMobile, account])
+
     return (
-        <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[50]">
+        <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 lg:px-10 border-b border-divider sticky top-0 bg-white z-[50]">
             <div className="max-w-screen-layout 4xl:max-w-screen-4xl m-auto w-full flex items-center justify-between space-x-4 sm:space-x-12">
-                <div className="min-w-[67px] w-[75px]">
+                <div className="min-w-[67px] w-[75px]" onClick={() => router.push('/')}>
                     <img src="/images/ic_logo.png" />
                 </div>
                 <div className="w-full flex items-center justify-end homeNav:justify-between  py-3 mb:py-0 text-sm font-semibold">
@@ -110,10 +127,10 @@ const Header = () => {
                                 )}
                                 {account?.address && network && isMobile && (
                                     // <Menu data={menuConfig} network={network} acount={account} isMobile={isMobile}/>
-                                    <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
+                                    <div className=" bg-hover rounded-[5px] flex items-center space-x-2">
                                         <img src={network.icon} width={24} height={24} />
                                         <div>{network.chain}</div>
-                                        <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1">
+                                        <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 my-1">
                                             {`${account?.address.substr(0, isMobile ? 2 : 4)}...${account?.address.substr(-4)}`}
                                         </div>
                                     </div>
@@ -139,7 +156,7 @@ const Header = () => {
                 <Drawer visible={visible} onClose={() => setVisible(false)}>
                     <div>
                         <div className="mb-8">
-                            <Menu data={Config.homeMenuMobile} onChange={onChangeMenu} />
+                            <Menu data={MenuFilter} onChange={onChangeMenu} />
                         </div>
                         {!network && (
                             <div className="mx-4">

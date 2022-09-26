@@ -23,6 +23,8 @@ import colors from 'styles/colors'
 import GlossaryModal from 'components/screens/Glossary/GlossaryModal'
 import InputNumber from 'components/common/Input/InputNumber'
 import HeaderContent from './HeaderContent'
+import fetchApi from 'services/fetch-api'
+import { API_GET_PRICE_CHART } from 'services/apis'
 
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
@@ -36,11 +38,6 @@ const InsuranceFrom = () => {
         i18n: { language },
     } = useTranslation()
     const wallet = useWeb3Wallet()
-
-    if (wallet) {
-        console.log(wallet)
-    }
-
     const router = useRouter()
     const { width, height } = useWindowSize()
     const isMobile = width && width <= screens.drawer
@@ -85,9 +82,9 @@ const InsuranceFrom = () => {
     const [listCoin, setListCoin] = useState<ICoin[]>([])
     const [pair_configs, setPairConfigs] = useState<any>({})
     const [decimalList, setDecimalList] = useState({
-        decimal_q_covered: 4,
-        decimal_margin: 4,
-        decimal_p_claim: 4,
+        decimal_q_covered: 2,
+        decimal_margin: 0,
+        decimal_p_claim: 0,
     })
     const [selectCoin, setSelectedCoin] = useState<ICoin>({
         icon: '',
@@ -100,7 +97,7 @@ const InsuranceFrom = () => {
     const [state, setState] = useState({
         timeframe: 'ALL',
         margin: 0,
-        percent_margin: 0,
+        percent_margin: 8,
         symbol: {
             icon: '',
             id: '',
@@ -282,8 +279,11 @@ const InsuranceFrom = () => {
         setThisFisrt(false)
     }
 
+    const [percentMargin, setPercentMargin] = useState(8)
+
     const updateFormPercentMargin = (value: number) => {
         if (state.q_covered > 0) {
+            setPercentMargin(value)
             setState({
                 ...state,
                 percent_margin: value,
@@ -407,17 +407,16 @@ const InsuranceFrom = () => {
     useEffect(() => {
         let list = listCoin
         assetsToken?.map(async (token: any) => {
-            const balance = await getBalaneToken(token.symbol)
             const tmp = {
                 id: token._id,
                 name: token.name,
                 icon: token.attachment,
                 symbol: `${token.symbol}USDT`,
                 type: token.symbol,
-                disable: balance > 0 ? false : true,
+                disable: token.disable,
             }
 
-            if (balance > 0) {
+            if (tmp.type == 'BNB') {
                 setSelectedCoin({
                     icon: tmp.icon,
                     id: tmp.id,
@@ -443,6 +442,9 @@ const InsuranceFrom = () => {
         })
 
         if (list.length > 0) {
+            list.sort((a: any, b: any) => {
+                return b.name - a.name
+            })
             setListCoin(list)
         }
     }, [assetsToken])
@@ -494,12 +496,6 @@ const InsuranceFrom = () => {
     }, [index])
 
     useEffect(() => {
-        if (state.q_covered > 0) {
-            setPercentInsurance((state.q_covered / userBalance) * 100)
-        }
-    }, [state.q_covered])
-
-    useEffect(() => {
         if (state) {
             setTimeout(() => {
                 const data = localStorage.getItem('buy_covered_state')
@@ -533,11 +529,7 @@ const InsuranceFrom = () => {
     }, [tab])
 
     useEffect(() => {
-        console.log(listCoin)
-
         if (listCoin.length > 0) {
-            console.log(listCoin)
-
             const timeEnd = new Date()
             const timeBegin = new Date()
             timeBegin.setDate(timeEnd.getDate() - 10)
@@ -582,51 +574,82 @@ const InsuranceFrom = () => {
     }
 
     useEffect(() => {
-        if (state.q_covered > 0) {
-            const percent: number = Math.floor((state.q_covered / userBalance) * 100)
-            setPercentInsurance(percent)
-        }
-
+        const res_q_covered = validator('p_claim')
         validator('q_covered')
         validator('margin')
 
-        if (state.q_covered && state.p_claim) {
-            const margin = Number((9 * state.q_covered * state.p_market) / 100)
-            const userCapital = margin
-            const systemCapital = userCapital
-            const hedge_capital = userCapital + systemCapital
-            const hedge = Number(margin / (state.q_covered * state.p_market))
-            const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
-            const laverage = Leverage(state.p_market, p_stop)
-            const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-            const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
-            setState({
-                ...state,
-                q_claim: Number(q_claim.toFixed(2)),
-                r_claim: Number((Number(q_claim / margin) * 100).toFixed(decimalList.decimal_q_covered)),
-                p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
-                margin: Number(margin.toFixed(decimalList.decimal_margin)),
-            })
-        }
+        console.log()
+        if (res_q_covered.isValid) {
+            if (state.q_covered && state.p_claim) {
+                const margin = Number((8 * state.q_covered * state.p_market) / 100)
+                const userCapital = margin
+                const systemCapital = userCapital
+                const hedge_capital = userCapital + systemCapital
+                const hedge = Number(margin / (state.q_covered * state.p_market))
+                const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
+                const laverage = Leverage(state.p_market, p_stop)
+                const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
+                const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
+                setState({
+                    ...state,
+                    q_claim: Number(q_claim.toFixed(2)),
+                    r_claim: Number((Number(q_claim / margin) * 100).toFixed(decimalList.decimal_q_covered)),
+                    p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
+                    margin: Number(margin.toFixed(decimalList.decimal_margin)),
+                })
+            }
 
-        if (state.q_covered && state.p_claim && state.margin) {
-            const userCapital = state.margin
-            const systemCapital = userCapital
-            const hedge_capital = userCapital + systemCapital
-            const hedge = Number(state.margin / (state.q_covered * state.p_market))
-            const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
-            const laverage = Leverage(state.p_market, p_stop)
-            const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-            const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + state.margin
+            if (state.q_covered && state.p_claim && state.margin) {
+                const userCapital = state.margin
+                const systemCapital = userCapital
+                const hedge_capital = userCapital + systemCapital
+                const hedge = Number(state.margin / (state.q_covered * state.p_market))
+                const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
+                const laverage = Leverage(state.p_market, p_stop)
+                const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
+                const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + state.margin
+                setState({
+                    ...state,
+                    q_claim: Number(q_claim.toFixed(2)),
+                    r_claim: Number((Number(q_claim / state.margin) * 100).toFixed(decimalList.decimal_q_covered)),
+                    p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
+                })
+            }
+            createSaved()
+        } else {
             setState({
                 ...state,
-                q_claim: Number(q_claim.toFixed(2)),
-                r_claim: Number((Number(q_claim / state.margin) * 100).toFixed(decimalList.decimal_q_covered)),
-                p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
+                q_claim: 0,
+                r_claim: 0,
+                p_expired: 0,
+                margin: 0,
             })
+            setSaved(0)
         }
-        createSaved()
     }, [state.q_covered, state.margin, state.p_claim])
+
+    useEffect(() => {
+        if (tab === 0 || tab === 3) {
+            if (state.q_covered && state.p_claim) {
+                const margin = Number((8 * state.q_covered * state.p_market) / 100)
+                const userCapital = margin
+                const systemCapital = userCapital
+                const hedge_capital = userCapital + systemCapital
+                const hedge = Number(margin / (state.q_covered * state.p_market))
+                const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
+                const laverage = Leverage(state.p_market, p_stop)
+                const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
+                const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
+                setState({
+                    ...state,
+                    q_claim: Number(q_claim.toFixed(2)),
+                    r_claim: Number((Number(q_claim / margin) * 100).toFixed(decimalList.decimal_q_covered)),
+                    p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
+                    margin: Number(margin.toFixed(decimalList.decimal_margin)),
+                })
+            }
+        }
+    }, [tab])
 
     useEffect(() => {
         const defaultQ_covered = pair_configs?.filters?.find((e: any) => {
@@ -668,18 +691,12 @@ const InsuranceFrom = () => {
                 setDecimalList({ ...decimalList, decimal_q_covered: decimal })
             }
             if (item?.filterType === 'PERCENT_PRICE') {
-                console.log(item)
-
                 setPercentPrice({ ...item })
             }
             if (item?.filterType === 'PRICE_FILTER') {
                 setPriceFilter({ ...item })
-                const decimalP_Claim: number = (1 / Number(item.tickSize)).toString().replace('1', '').length
-                setDecimalList({ ...decimalList, decimal_p_claim: decimalP_Claim })
-
-                const a = state.p_market * Number(percentPrice?.multiplierDown)
-                const b = state.p_market - state.p_market * Number(percentPrice?.minDifferenceRatio)
-                const c = state.p_market * Number(1 + percentPrice?.minDifferenceRatio)
+                const tmp = ((1 / item.tickSize) * 1).toString().replace('1', '').length
+                setDecimalList({ ...decimalList, decimal_p_claim: tmp > 0 ? tmp : 3 })
 
                 const min1 = state.p_market + (2 / 100) * state.p_market
                 const max1 = state.p_market + (70 / 100) * state.p_market
@@ -711,12 +728,18 @@ const InsuranceFrom = () => {
         })
     }, [pair_configs, state.q_covered, selectCoin, state.p_claim])
 
+    console.log(decimalList)
+
     const validator = (key: string) => {
         let rs = { isValid: true, message: '' }
 
         switch (key) {
             case 'q_covered':
-                rs.isValid = !(state.q_covered > Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered)) || state.q_covered < rangeQ_covered.min)
+                rs.isValid = !(
+                    state.q_covered > Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered)) ||
+                    state.q_covered < rangeQ_covered.min ||
+                    state.q_covered <= 0
+                )
                 rs.message = `<div class="flex items-center ">
                 ${
                     state.q_covered > Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered))
@@ -729,7 +752,7 @@ const InsuranceFrom = () => {
                 break
             case 'p_claim':
                 rs.isValid =
-                    !(state.p_claim > Number(rangeP_claim.max) || state.p_claim < Number(rangeP_claim.min)) &&
+                    !(state.p_claim > Number(rangeP_claim.max) || state.p_claim < Number(rangeP_claim.min) || state.p_claim <= 0) &&
                     !(Number(priceFilter?.minPrice) > state.p_claim || state.p_claim > Number(priceFilter?.maxPrice)) &&
                     !(
                         state.p_claim > Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered)) ||
@@ -765,7 +788,7 @@ const InsuranceFrom = () => {
                 }
                 break
             case 'margin':
-                rs.isValid = !(state.margin < Number(rangeMargin.min) || state.margin > Number(rangeMargin.max))
+                rs.isValid = !(state.margin < Number(rangeMargin.min) || state.margin > Number(rangeMargin.max) || state.margin <= 0)
                 rs.message = `<div class="flex items-center">
                 ${
                     state.margin > Number(rangeMargin.max)
@@ -882,11 +905,6 @@ const InsuranceFrom = () => {
 
     const onHandleChange = (key: string, e: any) => {
         const value = +e.value
-        const res = validator(key)
-
-        if (res?.isValid && state.p_claim && state.q_covered && state.margin && account.address != null) {
-            setClear(res.isValid)
-        }
 
         switch (key) {
             case 'q_covered':
@@ -904,6 +922,23 @@ const InsuranceFrom = () => {
                 break
         }
     }
+
+    const handleCheckFinal = () => {
+        if (account.address == null) {
+            return setClear(false)
+        } else if (!validator('p_claim') || !validator('margin') || !validator('q_covered')) {
+            return setClear(false)
+        } else if (state.q_covered > 0 && state.margin > 0 && state.p_claim > 0) {
+            return setClear(true)
+        }
+    }
+
+    useEffect(() => {
+        handleCheckFinal()
+        if (state.q_covered <= 0 || state.margin <= 0 || state.p_claim <= 0) {
+            setClear(false)
+        }
+    }, [state.q_covered, state.margin, state.p_claim])
 
     return (
         <>
@@ -927,7 +962,7 @@ const InsuranceFrom = () => {
                             </div>
                             {
                                 // head Insurance
-                                <HeaderContent state={tab} setState={setTab} wallet={wallet} auth={account.address} />
+                                <HeaderContent state={tab} setState={setTab} props={state} setProps={setState} wallet={wallet} auth={account.address} />
                             }
 
                             {
@@ -998,6 +1033,7 @@ const InsuranceFrom = () => {
                                                                     ...state,
                                                                     q_covered: Number(((25 / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered)),
                                                                 })
+                                                                setPercentInsurance(25)
                                                             }}
                                                         >
                                                             <div className={`${percentInsurance == 25 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
@@ -1010,6 +1046,7 @@ const InsuranceFrom = () => {
                                                                     ...state,
                                                                     q_covered: Number(((50 / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered)),
                                                                 })
+                                                                setPercentInsurance(50)
                                                             }}
                                                         >
                                                             <div className={`${percentInsurance == 50 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
@@ -1022,6 +1059,7 @@ const InsuranceFrom = () => {
                                                                     ...state,
                                                                     q_covered: Number(((75 / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered)),
                                                                 })
+                                                                setPercentInsurance(75)
                                                             }}
                                                         >
                                                             <div className={`${percentInsurance == 75 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
@@ -1036,6 +1074,7 @@ const InsuranceFrom = () => {
                                                                         ((100 / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
                                                                     ),
                                                                 })
+                                                                setPercentInsurance(100)
                                                             }}
                                                         >
                                                             <div className={`${percentInsurance == 100 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
@@ -1173,7 +1212,7 @@ const InsuranceFrom = () => {
                                     <div>
                                         {
                                             //description
-                                            index == 1 && state.q_covered > 0 && state.p_claim > 0 && (
+                                            index == 1 && saved > 0 && (
                                                 <div
                                                     className={
                                                         'flex flex-col justify-center items-center mb-[2.5rem] max-w-screen-layout 4xl:max-w-screen-3xl m-auto'
@@ -1355,12 +1394,10 @@ const InsuranceFrom = () => {
                                                                     >
                                                                         <div
                                                                             className={`${
-                                                                                state.percent_margin == item ? 'bg-red' : 'bg-gray-1'
+                                                                                percentMargin == item ? 'bg-red' : 'bg-gray-1'
                                                                             } h-1 w-full rounded-sm`}
                                                                         ></div>
-                                                                        <span className={state.percent_margin === item ? 'text-red' : 'text-gray'}>
-                                                                            {item}%
-                                                                        </span>
+                                                                        <span className={percentMargin == item ? 'text-red' : 'text-gray'}>{item}%</span>
                                                                     </div>
                                                                 )
                                                             })}
@@ -1592,9 +1629,9 @@ const InsuranceFrom = () => {
                                                                 }}
                                                             >
                                                                 <div
-                                                                    className={`${state.percent_margin == data ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}
+                                                                    className={`${percentMargin == data ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}
                                                                 ></div>
-                                                                <div className={state.percent_margin === data ? 'text-red' : 'text-gray'}>{data}%</div>
+                                                                <div className={percentMargin === data ? 'text-red' : 'text-gray'}>{data}%</div>
                                                             </div>
                                                         )
                                                     })}
@@ -1869,7 +1906,7 @@ const InsuranceFrom = () => {
                                         }}
                                         className={`${clear ? 'visible' : 'invisible'} items-center w-[300px] xs:w-full`}
                                     >
-                                        {state.q_covered > 0 && state.p_claim > 0 && (
+                                        {saved > 0 && (
                                             <div className={'flex justify-center items-center mt-[24px] mx-[16px]'}>
                                                 <CheckCircle></CheckCircle>
                                                 <span className={'text-sm text-txtPrimary w-[230px] xs:w-full px-[4px] font-semibold'}>
@@ -1978,6 +2015,18 @@ const InsuranceFrom = () => {
 
 export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any) => {
     try {
+        const ts = Math.round(new Date().getTime() / 1000)
+        const tsYesterday = ts - 7 * (24 * 3600)
+        const params = {
+            broker: 'NAMI_SPOT',
+            symbol: symbol,
+            from: tsYesterday,
+            to: ts,
+            resolution: resolution,
+        }
+        const test = await fetchApi({ url: API_GET_PRICE_CHART, baseURL: '', params: params })
+        console.log(test)
+
         const response = await fetch(
             'https://datav2.nami.exchange/api/v1/chart/history?' +
                 'broker=NAMI_SPOT' +
@@ -1991,9 +2040,11 @@ export const fetchApiNami = async (symbol: string, from: string, to: string, res
                 resolution,
         )
 
-        let list = await response.json()
+        // let list = await test.json()
+        // console.log(list)
+
         let data: { date: number; value: any }[] = []
-        list?.map((item: any) => {
+        test?.map((item: any) => {
             data.push({
                 date: item[0] * 1000,
                 value: item[1],

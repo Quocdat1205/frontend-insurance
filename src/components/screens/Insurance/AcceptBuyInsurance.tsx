@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from 'axios'
 import Button from 'components/common/Button/Button'
 import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
@@ -193,13 +193,24 @@ const AcceptBuyInsurance = () => {
                         period: Number(state.period) + 2,
                         isUseNain: true,
                     }
+
                     const allowance = await wallet.contractCaller.usdtContract.contract.allowance(wallet.account, contractAddress)
                     const parseAllowance = formatWeiValueToPrice(allowance)
                     if (parseAllowance < state.margin) {
-                        await wallet.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(state.margin), {
+                        await wallet.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(100000), {
                             from: wallet.account,
                         })
                     }
+                    // if (state.symbol == 'ETH') {
+                    //     const allowance = await wallet.contractCaller.ethContract.contract.allowance(wallet.account, contractAddress)
+                    //     const parseAllowance = formatWeiValueToPrice(allowance)
+                    //     if (parseAllowance < state.margin) {
+                    //         await wallet.contractCaller.ethContract.contract.approve(contractAddress, formatPriceToWeiValue(state.margin), {
+                    //             from: wallet.account,
+                    //         })
+                    //     }
+                    // }
+
                     const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
                         dataPost.buyer,
                         dataPost.asset,
@@ -228,6 +239,17 @@ const AcceptBuyInsurance = () => {
     const handlePostInsurance = async (props: any, dataPost: any, state: any, _id: any) => {
         if (props) {
             try {
+                console.log(props)
+
+                if (_id) {
+                    setRes(_id)
+                    setNoti('success')
+                }
+                if (!_id) {
+                    setActive(false)
+                    Config.toast.show('error', 'Purchased Fail')
+                }
+
                 const data = {
                     owner: props.from,
                     transaction_hash: props.hash,
@@ -242,11 +264,7 @@ const AcceptBuyInsurance = () => {
                 }
 
                 await buyInsurance(data).then((res) => {
-                    if (res === 201) {
-                        setRes(_id)
-                        setNoti('success')
-                        // setActive(true)
-                    }
+                    console.log(res)
                 })
             } catch (error) {
                 console.log(error)
