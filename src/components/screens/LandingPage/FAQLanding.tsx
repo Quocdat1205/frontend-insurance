@@ -79,40 +79,38 @@ const FaqLanding = () => {
         },
     ]
     return (
-        <section className={'pt-[7.5rem]'}>
-            <Background>
-                <div className=" whitespace-pre-line max-w-screen-insurance 4xl:max-w-screen-3xl m-auto text-center flex flex-col justify-center items-center">
-                    <div className="text-2xl sm:text-5xl leading-8 font-semibold mb-5">{t('home:landing:faq_title')}</div>
-                    {faq_contents.map(({ question, ans, link, href }, index) => (
-                        <div key={question}>
-                            <div className="h-[1px] w-full bg-divider" />
-                            <div key={question} className="mx-auto min-w-[20rem] lg:min-w-[48rem] w-full max-w-md rounded-2xl p-[1.5rem] ">
-                                <Disclosure>
-                                    {({ open }) => (
-                                        <>
-                                            <Disclosure.Button className="text-left bg-opacity-0 flex w-full justify-between items-center rounded-lg bg-purple-100 px-4 text-left font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
-                                                <span className={'font-semibold text-sm lg:text-base'}>{question}</span>
-                                                <div>
-                                                    <DownArrow className={`${!open ? 'rotate-180 transform' : ''}`} color={colors.txtPrimary} size={20} />
-                                                </div>
-                                            </Disclosure.Button>
-                                            <ContentDisclosure content={ans} link={link || ''} href={href} />
-                                        </>
-                                    )}
-                                </Disclosure>
-                            </div>
+        <Background id={'faq-section'}>
+            <div className="whitespace-pre-line max-w-screen-insurance 4xl:max-w-screen-3xl m-auto text-center flex flex-col justify-center items-center">
+                <div className="text-2xl sm:text-5xl leading-8 font-semibold mb-5">{t('home:landing:faq_title')}</div>
+                {faq_contents.map(({ question, ans, link, href }, index) => (
+                    <div key={question}>
+                        <div className="h-[1px] w-full bg-divider" />
+                        <div key={question} className="mx-auto min-w-[20rem] lg:min-w-[48rem] w-full max-w-md rounded-2xl p-[1.5rem] ">
+                            <Disclosure>
+                                {({ open }) => (
+                                    <>
+                                        <Disclosure.Button className="text-left bg-opacity-0 flex w-full justify-between items-center rounded-lg bg-purple-100 px-4 text-left font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                            <span className={'font-semibold text-sm lg:text-base'}>{question}</span>
+                                            <div>
+                                                <DownArrow className={`${!open ? 'rotate-180 transform' : ''}`} color={colors.txtPrimary} size={20} />
+                                            </div>
+                                        </Disclosure.Button>
+                                        <ContentDisclosure content={ans} link={link || ''} href={href} />
+                                    </>
+                                )}
+                            </Disclosure>
                         </div>
-                    ))}
-                </div>
-            </Background>
-        </section>
+                    </div>
+                ))}
+            </div>
+        </Background>
     )
 }
 
 export default FaqLanding
 
 const Background = styled.section.attrs({
-    className: 'pt-12 banner-landing px-4 lg:px-20 min-h-[350px] flex flex-col justify-end',
+    className: 'pt-12 banner-landing px-4 lg:px-20 min-h-[350px] flex flex-col justify-end pt-[7.5rem]',
 })<any>`
     background-image: ${({ isMobile }) => `url(${`/images/screens/landing-page/bg_faq.png`})`};
     background-position: top;

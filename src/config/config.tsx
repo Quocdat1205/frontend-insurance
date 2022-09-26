@@ -1,7 +1,7 @@
+import { DisconnectIcon, EmailIcon, HistoryIcon, UserIcon } from 'components/common/Svg/SvgIcon'
 import { BasicChainInformation, ExtendedChainInformation, wallets } from 'components/web3/Web3Types'
 import env from 'config/env'
 import { ConnectWalletType, Toast } from 'types/types'
-import { DisconnectIcon, EmailIcon, HistoryIcon, UserIcon } from 'components/common/Svg/SvgIcon'
 
 class Config {
     static env = env
@@ -18,6 +18,7 @@ class Config {
     } = { token: null, expire: null }
 
     static web3: any
+
     static refConnectWallet: ConnectWalletType
 
     static connectWallet = () => {
@@ -25,8 +26,6 @@ class Config {
     }
 
     static isMetaMaskInstalled = Config.client && Boolean(window.ethereum && window.ethereum.isMetaMask)
-
-    static online: boolean = Config.client && navigator.onLine
 
     static chains = String(Config.env.CHAINS)
         .split(',')
@@ -92,12 +91,70 @@ class Config {
         { menuId: 'home', router: '/home', name: 'common:header:home', parentId: 0 },
         { menuId: 'buy-covered-parent', router: '/buy-covered', name: 'common:header:buy_covered', parentId: 0 },
         { menuId: 'commission_policy', router: '/buy-covered', name: 'common:header:commission_policy', parentId: 0 },
+        // {
+        //     menuId: 'buy-covered',
+        //     router: '/buy-covered',
+        //     name: 'common:header:buy_covered',
+        //     // parentId: 'buy-covered-parent',
+        //     // icon: '/images/icons/ic_menu_buy_covered.png',
+        //     isMobile: true,
+        // },
+        // {
+        //     menuId: 'insurance-history',
+        //     router: '/buy-covered/insurance-history',
+        //     name: 'common:header:insurance_history',
+        //     // parentId: 'buy-covered-parent',
+        //     // icon: '/images/icons/Ic_menu_users.png',
+        //     isMobile: true,
+        // },
+    ]
+
+    static subMenuMobile = [
+        {
+            menuId: 'recent-transaction',
+            router: '/buy-covered',
+            name: 'common:header:recent_transactions',
+            parentId: 'account-info',
+            // icon: '/images/icons/ic_recent_transaction.png',
+            icon: HistoryIcon,
+            isMobile: true,
+            isIconSvg: true,
+        },
+        {
+            menuId: 'my-covered-contract',
+            router: '/buy-covered',
+            name: 'common:header:my_covered_contract',
+            parentId: 'account-info',
+            // icon: '/images/icons/ic_user.png',
+            isMobile: true,
+            icon: UserIcon,
+            isIconSvg: true,
+        },
+        {
+            menuId: 'update-email',
+            router: '/buy-covered',
+            name: 'common:header:update_my_email',
+            parentId: 'account-info',
+            // icon: '/images/icons/ic_email.png',
+            isMobile: true,
+            icon: EmailIcon,
+            isIconSvg: true,
+        },
+        {
+            menuId: 'disconnect',
+            name: 'common:header:disconnect',
+            parentId: 'account-info',
+            // icon: '/images/icons/ic_bx-log-out.png',
+            isMobile: true,
+            icon: DisconnectIcon,
+            isIconSvg: true,
+        },
     ]
 
     static subMenu = [
         {
             menuId: 'recent-transaction',
-            router: '/buy-covered',
+            router: '/home',
             name: 'common:header:recent_transactions',
             parentId: 'account-info',
             // icon: '/images/icons/ic_recent_transaction.png',
@@ -106,7 +163,7 @@ class Config {
         },
         {
             menuId: 'my-covered-contract',
-            router: '/insurance-history',
+            router: '/home',
             name: 'common:header:my_covered_contract',
             parentId: 'account-info',
             // icon: '/images/icons/ic_user.png',
@@ -129,6 +186,30 @@ class Config {
             // icon: '/images/icons/ic_bx-log-out.png',
             icon: DisconnectIcon,
             isIconSvg: true,
+        },
+    ]
+
+    static homeMenuMobile = [
+        { menuId: 'account-info', router: '/home', name: 'common:header:account_info_title', parentId: 0 },
+        ...Config.subMenuMobile,
+        ...Config.homeMenu,
+    ]
+
+    static landingPageMenu = [
+        {
+            menuId: 'buy_covered',
+            // router: '/buy-covered',
+            name: 'home:landing:white_paper',
+            parentId: 0,
+            href_en: 'https://quocdat.gitbook.io/whitepaper-insurance-en/',
+            href_vi: 'https://quocdat.gitbook.io/whitepaper-insurance/',
+        },
+        {
+            menuId: 'faq_section',
+            router: '#faq-section',
+            name: 'home:landing:faq_title',
+            parentId: 0,
+            section: 'faq_section',
         },
     ]
 }
