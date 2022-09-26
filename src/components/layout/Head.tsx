@@ -58,6 +58,8 @@ function Meta(props: Meta) {
             />
             {/* <link rel="manifest" href="/site.webmanifest" key="site-manifest" /> */}
             <link rel="icon" type="image/x-icon" href={icon} />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
             {keywords && (
                 <meta key="keywords" name="keywords" content={keywords} />
             )}
