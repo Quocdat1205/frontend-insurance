@@ -75,13 +75,13 @@ const FeaturesLanding = () => {
                     })}
 
                     {/* Use FlexBox instead grid to prevent image scale error --- image t0o large */}
-                    <div className="rounded-xl bg-hover flex flex-col w-full lg:flex-row h-full justify-start h-full lg:justify-between items-start">
-                        <div className={'flex-1 w-full h-full flex flex-col items-start justify-between lg:min-h-[360px] lg:max-w-[600px] p-6'}>
-                            <div className={'sm:mt-9 text-left max-w-[370px] mb-6 sm:bm-0'}>
-                                <div className="text-xl lg:text-2xl font-medium text-red mb-2">{features[2].title}</div>
-                                <div className="text-sm lg:text-base">{features[2].content}</div>
+                    <div className="rounded-xl bg-hover flex flex-col w-full md:flex-row h-full justify-start h-full md:justify-between items-start">
+                        <div className={'flex-1 w-full h-full flex flex-col items-start justify-between md:min-h-[360px] md:max-w-[600px] p-6'}>
+                            <div className={'md:mt-9 text-left max-w-[370px] mb-6 md:bm-0'}>
+                                <div className="text-xl md:text-2xl font-medium text-red mb-2">{features[2].title}</div>
+                                <div className="text-sm md:text-base">{features[2].content}</div>
                             </div>
-                            <p onClick={handleOnBuyCover} className={'text-red text-sm lg:text-base font-semibold cursor-pointer'}>
+                            <p onClick={handleOnBuyCover} className={'text-red text-sm md:text-base font-semibold cursor-pointer'}>
                                 {t('common:header:buy_covered')} <RightArrow className={'inline-block'} color={'red'} />{' '}
                             </p>
                         </div>
@@ -95,8 +95,8 @@ const FeaturesLanding = () => {
 
 const DemandImage = styled.div.attrs({
     className:
-        'w-full flex bg-contain lg:pt-0 pt-2 bg-no-repeat lg:bg-cover rounded-b-xl lg:rounded-r-md ' +
-        'min-h-[200px] min-w-screen max-h-[277px] mt-[3.625rem] lg:mt-0 lg:min-h-[360px] lg:max-w-[600px] ',
+        'w-full flex bg-contain md:pt-0 pt-2 bg-no-repeat md:bg-cover rounded-b-xl md:rounded-r-md ' +
+        'min-h-[200px] min-w-screen max-h-[277px] mt-[3.625rem] md:mt-0 md:min-h-[360px] md:max-w-[600px] ',
 })<any>`
     background-image: ${({ img }) => `url(${img})`};
     background-repeat: no-repeat;
