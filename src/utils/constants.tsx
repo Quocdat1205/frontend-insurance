@@ -4,6 +4,7 @@ export const PORTAL_MODAL_ID: string = 'PORTAL_MODAL'
 
 export const screens = {
     drawer: 820,
+    drawerHome: 992
 }
 
 const SUPPORT = {
@@ -112,4 +113,5 @@ export const errorsWallet = {
     Cancel: 4001,
     Not_found: 4902,
     Success: 1013,
+    NetWork_error: 'ERR_NETWORK',
 }

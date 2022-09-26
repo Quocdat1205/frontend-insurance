@@ -1,7 +1,7 @@
+import { DisconnectIcon, EmailIcon, HistoryIcon, UserIcon } from 'components/common/Svg/SvgIcon'
 import { BasicChainInformation, ExtendedChainInformation, wallets } from 'components/web3/Web3Types'
 import env from 'config/env'
 import { ConnectWalletType, Toast } from 'types/types'
-import { DisconnectIcon, EmailIcon, HistoryIcon, UserIcon } from 'components/common/Svg/SvgIcon'
 
 class Config {
     static env = env
@@ -18,6 +18,7 @@ class Config {
     } = { token: null, expire: null }
 
     static web3: any
+
     static refConnectWallet: ConnectWalletType
 
     static connectWallet = () => {
@@ -194,6 +195,24 @@ class Config {
         { menuId: 'account-info', router: '/home', name: 'common:header:account_info_title', parentId: 0 },
         ...Config.subMenuMobile,
         ...Config.homeMenu,
+    ]
+
+    static landingPageMenu = [
+        {
+            menuId: 'buy_covered',
+            // router: '/buy-covered',
+            name: 'home:landing:white_paper',
+            parentId: 0,
+            href_en: 'https://quocdat.gitbook.io/whitepaper-insurance-en/',
+            href_vi: 'https://quocdat.gitbook.io/whitepaper-insurance/',
+        },
+        {
+            menuId: 'faq_section',
+            router: '#faq-section',
+            name: 'home:landing:faq_title',
+            parentId: 0,
+            section: 'faq_section',
+        },
     ]
 }
 

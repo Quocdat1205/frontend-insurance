@@ -1,9 +1,7 @@
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import React, { useEffect, useMemo, useState } from 'react'
-import { isMobile } from 'react-device-detect'
+import React, { useMemo, useState, useEffect } from 'react'
 import { ChevronDown, ChevronUp, X } from 'react-feather'
-import { useFilters } from 'react-table'
 import Button from 'components/common/Button/Button'
 import ButtonLanguage from 'components/common/Button/ButtonLanguage'
 import Menu from 'components/common/Menu/Menu'
@@ -28,7 +26,7 @@ const Header = () => {
     const { chain } = useWeb3Wallet()
     const { width } = useWindowSize()
     const router = useRouter()
-    const isMobile = width && width < screens.drawer
+    const isMobile = width && width <= screens.drawerHome
     const [visible, setVisible] = useState<boolean>(false)
     const [isHover, setIsHover] = useState<boolean>(false)
     const dispatch = useAppDispatch()
@@ -72,7 +70,7 @@ const Header = () => {
         <div className="p-2 bg-hover rounded-[5px] flex items-center space-x-2">
             {network && <img src={network?.icon} width={24} height={24} />}
             {network && <div>{network?.chain}</div>}
-            <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-2">{`${account?.address?.substr(
+            <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-4 lg:py-0">{`${account?.address?.substr(
                 0,
                 isMobile ? 2 : 4,
             )}...${account?.address?.substr(-4)}`}</div>
@@ -94,7 +92,6 @@ const Header = () => {
                 owner: account?.address,
             },
         })
-        console.log({ data });
         const isShownModal = getModalSubscribeStorage()
         setUserInfo(data)
         if (!data && !isShownModal) {
@@ -113,7 +110,6 @@ const Header = () => {
 
     const handleOpenModal = () => {
         setIsOpenModalUpdateEmail(true)
-        console.log('handleOpenModal -', isOpenModalUpdateEmail)
     }
 
     const TransformSubMenu = Config.subMenu.map((item, index) => {
@@ -131,8 +127,24 @@ const Header = () => {
     //     ...TransformSubMenu,
     // ]
 
-    const menuAddress = [
+    const menuA1ddress = [
         { menuId: 'account-info', router: '/', name: NameComponent, parentId: 0, hideArrowIcon: true, nameComponentProps: { ...props } },
+        ...TransformSubMenu,
+    ]
+
+    const menuAddress = [
+        isMobile
+            ? { menuId: 'account-info', router: '/home', name: 'common:header:account_info_title', parentId: 0 }
+            : {
+                  menuId: 'account-info',
+                  router: '/',
+                  name: NameComponent,
+                  parentId: 0,
+                  hideArrowIcon: true,
+                  isDropdown: true,
+                  nameComponentProps: { ...props },
+              },
+        // ...Config.subMenu,
         ...TransformSubMenu,
     ]
 
@@ -141,16 +153,24 @@ const Header = () => {
         setModalSubscribeStorage('true')
     }
 
+    const MenuFilter = useMemo(() => {
+        // base menu
+        const baseMenu = [...Config.homeMenu]
+        // check wallet connected
+        return account?.address ? [...menuAddress, ...baseMenu] : baseMenu
+    }, [isMobile, account])
+
     return (
-        <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[50]">
+        <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 lg:px-10 border-b border-divider sticky top-0 bg-white z-[50]">
             <div className="max-w-screen-layout 4xl:max-w-screen-4xl m-auto w-full flex items-center justify-between space-x-4 sm:space-x-12">
-                <div className="min-w-[67px] w-[75px]">
+                <div className="min-w-[67px] w-[75px]" onClick={() => router.push('/')}>
                     <img src="/images/ic_logo.png" />
                 </div>
 
-                <UpdateEmailSubscriptionModal visible={isOpenModalUpdateEmail} onClose={() => setIsOpenModalUpdateEmail(false)} />
+                <EmailSubscriptionModal visible={isOpenModalUpdateEmail} onClose={() => setIsOpenModalUpdateEmail(false)} />
+                {/* <UpdateEmailSubscriptionModal visible={isOpenModalUpdateEmail} onClose={() => setIsOpenModalUpdateEmail(false)} /> */}
 
-                <div className="w-full flex items-center justify-end mb:justify-between  py-3 mb:py-0 text-sm font-semibold">
+                <div className="w-full flex items-center justify-end homeNav:justify-between  py-3 mb:py-0 text-sm font-semibold">
                     {!isMobile && (
                         <div className="hidden mb:block">
                             <Menu data={Config.homeMenu} onChange={onChangeMenu} />
@@ -158,54 +178,30 @@ const Header = () => {
                         </div>
                     )}
                     {!loading_account && (
-                        <div className="flex items-center space-x-5 sm:space-x-6 cursor-pointer">
-                            {/* {network && <Notifications />} */}
-
-                            {/* {account && network && !userInfo && isShowModal && ( */}
-                            {/*     <EmailSubscriptionModal visible={!userInfo && isShowModal} onClose={handleCloseModal} /> */}
-                            {/* )} */}
-                            {/* {account && network && !isMobile && ( */}
-                            {/*     <Menu data={menuAddress} cbOnMouseOut={handleMouseHover} cbOnMouseOver={handleMouseHover} onChange={onClickMenuAddress} /> */}
-                            {/*     // <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2"> */}
-                            {/*     //     <img src={network.icon} width={24} height={24} /> */}
-                            {/*     //     <div>{network.chain}</div> */}
-                            {/*     //     <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1"> */}
-                            {/*     //         {`${account.substr(0, isMobile ? 2 : 4)}...${account.substr(-4)}`} */}
-                            {/*     //     </div> */}
-                            {/*     // </div> */}
-                            {/* )} */}
-                            {/* {account && network && isMobile && ( */}
-                            {/*     // <Menu data={menuConfig} network={network} acount={account} isMobile={isMobile}/> */}
-                            {/*     <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2"> */}
-                            {/*         <img src={network.icon} width={24} height={24} /> */}
-                            {/*         <div>{network.chain}</div> */}
-                            {/*         <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1"> */}
-                            {/*             {`${account?.substr(0, isMobile ? 2 : 4)}...${account?.substr(-4)}`} */}
-                            {/*         </div> */}
-                            {/*     </div> */}
-                            {/* )} */}
-
-                            {account?.address && <Notifications />}
-                            {account?.address && !isMobile && (
-                                <Menu data={menuAddress} cbOnMouseOut={handleMouseHover} cbOnMouseOver={handleMouseHover} onChange={onClickMenuAddress} />
-                                // <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
-                                //     <img src={network.icon} width={24} height={24} />
-                                //     <div>{network.chain}</div>
-                                //     <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1">
-                                //         {`${account.substr(0, isMobile ? 2 : 4)}...${account.substr(-4)}`}
-                                //     </div>
-                                // </div>
-                            )}
-                            {account?.address && network && isMobile && (
-                                <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
-                                    <img src={network.icon} width={24} height={24} />
-                                    <div>{network.chain}</div>
-                                    <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1">
-                                        {`${account?.address.substr(0, isMobile ? 2 : 4)}...${account?.address.substr(-4)}`}
+                        <div className="flex items-center space-x-5 sm:space-x-2 cursor-pointer">
+                            <>
+                                {account?.address && <Notifications />}
+                                {account?.address && !isMobile && (
+                                    <Menu data={menuAddress} cbOnMouseOut={handleMouseHover} cbOnMouseOver={handleMouseHover} onChange={onClickMenuAddress} />
+                                    // <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
+                                    //     <img src={network.icon} width={24} height={24} />
+                                    //     <div>{network.chain}</div>
+                                    //     <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1">
+                                    //         {`${account.substr(0, isMobile ? 2 : 4)}...${account.substr(-4)}`}
+                                    //     </div>
+                                    // </div>
+                                )}
+                                {account?.address && network && isMobile && (
+                                    // <Menu data={menuConfig} network={network} acount={account} isMobile={isMobile}/>
+                                    <div className=" bg-hover rounded-[5px] flex items-center space-x-2">
+                                        <img src={network.icon} width={24} height={24} />
+                                        <div>{network.chain}</div>
+                                        <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 my-1">
+                                            {`${account?.address.substr(0, isMobile ? 2 : 4)}...${account?.address.substr(-4)}`}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-
+                                )}
+                            </>
                             {/* {network && isMobile && <Notifications />} */}
                             {!isMobile && <ButtonLanguage />}
                             {!account?.address && (
@@ -226,7 +222,7 @@ const Header = () => {
                 <Drawer visible={visible} onClose={() => setVisible(false)}>
                     <div>
                         <div className="mb-8">
-                            <Menu data={Config.homeMenuMobile} onChange={onChangeMenu} />
+                            <Menu data={MenuFilter} onChange={onChangeMenu} />
                         </div>
                         {!network && (
                             <div className="mx-4">

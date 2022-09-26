@@ -5,8 +5,6 @@ import Config from 'config/config'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RootStore, useAppSelector } from 'redux/store'
-import { createSelector } from 'reselect'
 import { API_SUBSCRIBE } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { formatNumber } from 'utils/utils'
@@ -82,13 +80,13 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
 
     const handleClick = (index: number) => {
         if (index == 0) {
-            return router.push('/buy-covered/insurance-history')
+            return router.push('/insurance-history')
         }
         if (index == 3) {
             return handleAPISubscribe(email)
         }
         if (index != 0 && index != 3) {
-            return router.push('/buy-covered/insurance-history')
+            return router.push('/insurance-history')
         }
     }
 

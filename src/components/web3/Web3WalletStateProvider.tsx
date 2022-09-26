@@ -78,7 +78,7 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
 
 function Web3WalletStateProvider({ children, connectorsData }: { children: ReactNode; connectorsData: ConnectorsData }) {
     const state = useWeb3WalletState(connectorsData)
-    Config.web3 = isMobile ? state : state?.account && state?.account !== Config.web3?.account ? state : Config.web3
+    Config.web3 = isMobile ? state : state?.account && state?.account !== Config.web3?.account ? state : Config.web3 ?? state
     return (
         // cloneElement(children, {
         //     web3: state,

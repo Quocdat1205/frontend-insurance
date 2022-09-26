@@ -1,4 +1,5 @@
 import { useTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
 import React from 'react'
 import styled from 'styled-components'
 
@@ -6,8 +7,33 @@ interface Footer {
     sponsor: boolean
 }
 
+const WHITE_PAPER = 'whitepaper'
+const FAQ = 'faq'
+const TERM = 'term'
+
 const Footer = ({ sponsor = true }) => {
-    const { t } = useTranslation()
+    const {
+        t,
+        i18n: { language },
+    } = useTranslation()
+
+    const router = useRouter()
+
+    const LINKS: any = {
+        [WHITE_PAPER]: {
+            vi: 'https://quocdat.gitbook.io/whitepaper-insurance/',
+            en: 'https://quocdat.gitbook.io/whitepaper-insurance-en/',
+        },
+        [TERM]: {
+            en: 'https://quocdat.gitbook.io/whitepaper-insurance-en/terms/terms-of-service/',
+            vi: 'https://quocdat.gitbook.io/whitepaper-insurance/chinh-sach-dich-vu/dieu-khoan-su-dung',
+        },
+    }
+
+    const handleClickItem = (type: string) => window.open(LINKS[type][language])
+    const handleCLickFAQ = () => router.push('#faq-section')
+    const handleClickBuyCover = () => router.push('/buy-covered')
+
     return (
         // <footer className="footer pt-8 sm:pt-[4.125rem] mb-[4rem]">
         <footer className="footer pt-8 sm:pt-[4.125rem]">
@@ -29,16 +55,22 @@ const Footer = ({ sponsor = true }) => {
                             <div className="flex flex-col space-y-4 sm:space-y-2">
                                 <div className="font-semibold">{t('home:landing:features')}</div>
                                 <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 text-txtSecondary">
-                                    <div>{t('home:landing:buy_covered')}</div>
-                                    <div>{t('home:landing:buy_nain')}</div>
+                                    <div className={'cursor-pointer'} onClick={handleClickBuyCover}>{t('home:landing:buy_covered')}</div>
+                                    {/* <div>{t('home:landing:buy_nain')}</div> */}
                                 </div>
                             </div>
                             <div className="flex flex-col space-y-4 sm:space-y-2">
                                 <div className="font-semibold">{t('home:landing:document')}</div>
                                 <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 text-txtSecondary">
-                                    <div>{t('home:landing:white_paper')}</div>
-                                    <div>{t('home:landing:faq')}</div>
-                                    <div>{t('home:landing:terms_of_service')}</div>
+                                    <div className={'cursor-pointer'} onClick={() => handleClickItem(WHITE_PAPER)}>
+                                        {t('home:landing:white_paper')}
+                                    </div>
+                                    <div className={'cursor-pointer'} onClick={handleCLickFAQ}>
+                                        {t('home:landing:faq')}
+                                    </div>
+                                    <div className={'cursor-pointer'} onClick={() => handleClickItem(TERM)}>
+                                        {t('home:landing:terms_of_service')}
+                                    </div>
                                 </div>
                             </div>
                         </div>
