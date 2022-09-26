@@ -1,3 +1,4 @@
+import { lighten } from '@amcharts/amcharts4/.internal/core/utils/Colors'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
@@ -20,6 +21,27 @@ const HeaderLanding = () => {
         i18n: { language },
     } = useTranslation()
 
+    const scrollTo = (id: string) => {
+        const elId = id.split('#')[1]
+        const section = document.querySelector(`${elId}`)
+        section?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+
+    const onChangeMenu = (e: any) => {
+        // Redirect link
+        console.log(`href_${language}`)
+        if (e?.[`href_${language}`]) {
+            window.open(e[`href_${language}`])
+            // router.push(e[`href_${language}`])
+            return
+        }
+
+        if (isMobile && e?.children.length > 0) return
+        if (e?.menuId && e.router) router.push(e.router)
+        // onClickMenuAddress(e)
+        if (isMobile) setVisible(false)
+    }
+
     const menu = [
         // { menuId: 'white-paper', router: 'white-paper', name: 'home:landing:white_paper', parentId: 0 },
         // { menuId: 'faq', router: 'faq', name: 'home:landing:faq', parentId: 0 },
@@ -35,7 +57,7 @@ const HeaderLanding = () => {
                     </div>
                     {!isMobile && (
                         <div className="w-full flex items-center justify-end py-3 mb:py-0 text-sm font-semibold">
-                            <Menu data={Config.homeMenu} />
+                            <Menu data={Config.landingPageMenu} onChange={onChangeMenu} />
                         </div>
                     )}
                 </div>
@@ -43,14 +65,14 @@ const HeaderLanding = () => {
                     {!isMobile ? (
                         <>
                             <ButtonLanguage />
-                            <Button onClick={() => router.push('/home')} className="min-w-[9.5rem] px-6 py-2 flex items-center space-x-2">
+                            <Button onClick={() => router.push('/home')} className="min-w-[9.5rem] px-6 py-2 flex items-center space-x-2 min-w-[12.75rem]">
                                 <span>{t('home:landing:access')}</span>
                                 <RightArrow />
                             </Button>
                         </>
                     ) : (
                         <>
-                            <Button onClick={() => router.push('/home')} className="min-w-[7.5rem] px-4 py-2 leading-[1rem] flex items-center space-x-2">
+                            <Button onClick={() => router.push('/home')} className="px-4 py-2 leading-[1rem] flex items-center space-x-2 min-w-[12.75rem]">
                                 <span className="font-semibold">{t('home:landing:access')}</span>
                                 <RightArrow />
                             </Button>
@@ -65,10 +87,10 @@ const HeaderLanding = () => {
                 <Drawer visible={visible} onClose={() => setVisible(false)}>
                     <div>
                         <div className="mb-8">
-                            <Menu data={Config.homeMenu} />
+                            <Menu data={Config.landingPageMenu} onChange={onChangeMenu} />
                         </div>
                         <div className="mx-4">
-                            <Button onClick={() => router.push('/home')} className="py-[0.875rem] leading-5 flex items-center justify-center space-x-2 w-full">
+                            <Button onClick={() => router.push('/home')} className="py-[0.875rem] leading-5 flex items-center justify-center space-x-2 w-full min-w-[12.75rem]">
                                 <span className="">{t('home:landing:access')}</span>
                                 <RightArrow />
                             </Button>

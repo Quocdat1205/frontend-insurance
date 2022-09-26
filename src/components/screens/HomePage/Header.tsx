@@ -12,9 +12,9 @@ import { ChainDataList } from 'components/web3/constants/chains'
 import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import useWindowSize from 'hooks/useWindowSize'
+import { setAccount } from 'redux/actions/setting'
 import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
 import { screens } from 'utils/constants'
-import { setAccount } from 'redux/actions/setting'
 
 const Header = () => {
     const { t } = useTranslation()
@@ -116,10 +116,10 @@ const Header = () => {
                                 )}
                                 {account?.address && network && isMobile && (
                                     // <Menu data={menuConfig} network={network} acount={account} isMobile={isMobile}/>
-                                    <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
+                                    <div className=" bg-hover rounded-[5px] flex items-center space-x-2">
                                         <img src={network.icon} width={24} height={24} />
                                         <div>{network.chain}</div>
-                                        <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1">
+                                        <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 my-1">
                                             {`${account?.address.substr(0, isMobile ? 2 : 4)}...${account?.address.substr(-4)}`}
                                         </div>
                                     </div>
