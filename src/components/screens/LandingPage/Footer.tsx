@@ -30,7 +30,7 @@ const Footer = ({ sponsor = true }) => {
                                 <div className="font-semibold">{t('home:landing:features')}</div>
                                 <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 text-txtSecondary">
                                     <div>{t('home:landing:buy_covered')}</div>
-                                    <div>{t('home:landing:buy_nain')}</div>
+                                    {/* <div>{t('home:landing:buy_nain')}</div> */}
                                 </div>
                             </div>
                             <div className="flex flex-col space-y-4 sm:space-y-2">

@@ -73,7 +73,7 @@ const BannerLanding = () => {
                     </Item>
                     {list.map((item: any, index: number) => (
                         <Item key={index} className="bg-white">
-                            <div className="font-semibold md:text-4xl text-red text-2xl" data-aos="fade-up" data-aos-delay={DURATION_AOS * index}>
+                            <div className="font-semibold lg:text-4xl text-red text-[2rem]" data-aos="fade-up" data-aos-delay={DURATION_AOS * index}>
                                 {item?.prefix}
                                 {formatNumber(item.value, item.decimal)}
                                 {item?.suffix}
