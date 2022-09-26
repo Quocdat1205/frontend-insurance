@@ -26,6 +26,8 @@ class Config {
 
     static isMetaMaskInstalled = Config.client && Boolean(window.ethereum && window.ethereum.isMetaMask)
 
+    static online: boolean = Config.client && navigator.onLine
+
     static chains = String(Config.env.CHAINS)
         .split(',')
         .map((chain) => Number(chain))

@@ -34,7 +34,7 @@ export class ContractCaller {
     public async sign(address: string) {
         try {
             const nonce = await getNonce(address)
-            if (!nonce) return null
+            if (nonce?.code === 'ERR_NETWORK' || !nonce) return nonce
             const signer = this.provider.getSigner()
             const signature = await signer.signMessage(getMessageSign(nonce))
             return await fetchApi({ url: API_LOGIN, options: { method: 'POST' }, params: { owner: address, signature: signature } })
@@ -49,5 +49,6 @@ export const getNonce = async (address: string) => {
         return await fetchApi({ url: API_GET_NONCE, params: { owner: address } })
     } catch (error) {
         if (Config.env.NODE_ENV === 'dev') console.log('getNonce', error)
+        return error
     }
 }

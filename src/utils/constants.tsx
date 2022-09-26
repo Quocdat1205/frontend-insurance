@@ -112,4 +112,5 @@ export const errorsWallet = {
     Cancel: 4001,
     Not_found: 4902,
     Success: 1013,
+    NetWork_error: 'ERR_NETWORK',
 }

@@ -17,6 +17,7 @@ import NetworkError from 'components/screens/ConnectWallet/NetworkError'
 import SwitchNetwok from 'components/screens/ConnectWallet/SwitchNetwok'
 import { useWeb3React } from '@web3-react/core'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
+import { isString } from 'lodash'
 
 interface ConnectWalletModal {}
 
@@ -80,7 +81,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         if (chainId && account.address) {
             if (!inValidNetword) {
                 setTimeout(() => {
-                    Config.toast.show('error', t('common:network_error'))
+                    Config.toast.show('error', t('common:error_switch_network'))
                     setVisible(true)
                     firstTime.current = false
                     oldAddress.current = account.address
@@ -94,7 +95,8 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     }, [isActive, chainId, account, loading, inValidNetword])
 
     const connectionError = (error: any) => {
-        switch (Math.abs(error?.code)) {
+        const code = isString(error?.code) ? error?.code : Math.abs(error?.code)
+        switch (code) {
             case 32600:
             case 32601:
             case 32602:
@@ -112,11 +114,15 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 Config.toast.show('success', t('common:connect_successful'))
                 setVisible(false)
                 break
+            case errorsWallet.NetWork_error:
+                reason.current = t('common:network_error')
+                setErrorConnect(true)
+                break
             default:
                 break
         }
         setLoading(false)
-        setSwitchNetwork(!inValidNetword)
+        setSwitchNetwork(code !== errorsWallet.Success ? !inValidNetword : false)
     }
 
     const onShow = () => {
@@ -147,6 +153,9 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                         return
                     }
                 }
+                break
+            case wallets.coinbaseWallet:
+                return
             default:
                 break
         }
@@ -169,8 +178,8 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 dispatch(setAccount({ address: oldAddress.current, wallet: wallet?.wallet }))
                 setVisible(false)
             }
-        } catch (error) {
-            console.log('getNonce', error)
+        } catch (error: any) {
+            console.log('confirm', error)
         } finally {
         }
     }
