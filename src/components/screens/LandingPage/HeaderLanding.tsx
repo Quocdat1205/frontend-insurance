@@ -10,12 +10,14 @@ import { MenuIcon, RightArrow } from 'components/common/Svg/SvgIcon'
 import Drawer from 'components/layout/Drawer'
 import Config from 'config/config'
 import useWindowSize from 'hooks/useWindowSize'
+import { RootStore, useAppSelector } from 'redux/store'
 
 const HeaderLanding = () => {
     const router = useRouter()
     const { width } = useWindowSize()
     const isMobile = width && width < 1024
     const [visible, setVisible] = useState(false)
+    const loading_account = useAppSelector((state: RootStore) => state.setting.loading_account)
     const {
         t,
         i18n: { language },
@@ -47,33 +49,35 @@ const HeaderLanding = () => {
                     <div className="w-[75px]">
                         <img src="/images/ic_logo.png" />
                     </div>
-                    {!isMobile && (
+                    {!isMobile && !loading_account && (
                         <div className="w-full flex items-center justify-end py-3 mb:py-0 text-sm font-semibold">
                             <Menu data={Config.landingPageMenu} onChange={onChangeMenu} />
                         </div>
                     )}
                 </div>
-                <div className="flex items-center space-x-6 py-3 mb:py-0 text-sm font-semibold">
-                    {!isMobile ? (
-                        <>
-                            <ButtonLanguage />
-                            <Button onClick={() => router.push('/home')} className="min-w-[9.5rem] px-6 py-2 flex items-center space-x-2 min-w-[12.75rem]">
-                                <span>{t('home:landing:access')}</span>
-                                <RightArrow />
-                            </Button>
-                        </>
-                    ) : (
-                        <>
-                            <Button onClick={() => router.push('/home')} className="px-4 py-2 leading-[1rem] flex items-center space-x-2 min-w-[12.75rem]">
-                                <span className="font-semibold">{t('home:landing:access')}</span>
-                                <RightArrow />
-                            </Button>
-                            <div className="cursor-pointer" onClick={() => setVisible(!visible)}>
-                                {visible ? <X /> : <MenuIcon />}
-                            </div>
-                        </>
-                    )}
-                </div>
+                {!loading_account && (
+                    <div className="flex items-center space-x-6 py-3 mb:py-0 text-sm font-semibold">
+                        {!isMobile ? (
+                            <>
+                                <ButtonLanguage />
+                                <Button onClick={() => router.push('/home')} className="min-w-[9.5rem] px-6 py-2 flex items-center space-x-2 w-max">
+                                    <span>{t('home:landing:access')}</span>
+                                    <RightArrow />
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button onClick={() => router.push('/home')} className="px-4 py-2 leading-[1rem] flex items-center space-x-2 w-max">
+                                    <span className="font-semibold">{t('home:landing:access')}</span>
+                                    <RightArrow />
+                                </Button>
+                                <div className="cursor-pointer" onClick={() => setVisible(!visible)}>
+                                    {visible ? <X /> : <MenuIcon />}
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
             </div>
             {isMobile && (
                 <Drawer visible={visible} onClose={() => setVisible(false)}>
