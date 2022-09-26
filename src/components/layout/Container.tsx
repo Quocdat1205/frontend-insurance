@@ -20,7 +20,7 @@ const Container = ({ children }: Container) => {
         if (vw <= 360) {
             document.documentElement.style.setProperty('font-size', '14px')
         }
-        // dispatch(setting())
+        dispatch(setting())
         dispatch(getListAssetToken())
         dispatch(getConfigAsset())
         dispatch(getConfigUnit())

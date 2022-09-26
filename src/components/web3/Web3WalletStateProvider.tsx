@@ -34,13 +34,13 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
         connector.connectEagerly && connector.connectEagerly()
     }, [connector])
 
-    useEffect(() => {
-        if (!isActive && !loading && connected?.address) {
-            Config.logout()
-        } else if (isActive && !connected?.address) {
-            dispatch(setting())
-        }
-    }, [isActive, loading, connected, isActivating])
+    // useEffect(() => {
+    //     if (!isActive && !loading && connected?.address) {
+    //         Config.logout()
+    //     } else if (isActive && !connected?.address) {
+    //         dispatch(setting())
+    //     }
+    // }, [isActive, loading, connected, isActivating])
 
     const contractCaller = useMemo(() => {
         return provider ? new ContractCaller(provider as providers.Web3Provider) : null
