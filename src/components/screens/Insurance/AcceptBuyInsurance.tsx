@@ -724,7 +724,9 @@ const AcceptBuyInsurance = () => {
                                         }}
                                         type="text"
                                         placeholder={language === 'vi' ? 'Nhập mã giới thiệu tại đây' : 'Text referral ID here'}
-                                        className={`text-txtPrimary h-auto !p-0 !m-0 !shadow-none !border-none text-base font-normal bg-hover text-right min-w-[13.5rem]`}
+                                        className={`${
+                                            referral.length > 0 ? 'text-redPrimary' : 'text-txtPrimary'
+                                        } h-auto !p-0 !m-0 !shadow-none !border-none text-base font-normal bg-hover text-right min-w-[13.5rem]`}
                                     />
                                 </div>
                             </div>
