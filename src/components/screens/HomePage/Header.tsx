@@ -48,6 +48,9 @@ const Header = () => {
                 Config.logout()
                 Config.toast.show('success', t('common:disconnect_successful'))
                 break
+            case 'recent-transaction':
+                window.open(`https://bscscan.com/address/${account?.address}`, '_blank')
+                break
             default:
                 break
         }

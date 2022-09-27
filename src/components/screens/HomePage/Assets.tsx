@@ -150,7 +150,7 @@ const Assets = () => {
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <div className={`text-2xl sm:text-[1.875rem] sm:leading-[2.75rem] font-medium ${negative ? 'text-red' : 'text-success'}`}>
-                                        ${pairPrice?.lastPrice}
+                                        ${formatNumber(pairPrice?.lastPrice)}
                                     </div>
                                     <div className="flex items-center space-x-1">
                                         <TendencyIcon down={negative} color={sparkLineColor} />

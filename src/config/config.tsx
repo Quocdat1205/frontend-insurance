@@ -96,7 +96,7 @@ class Config {
     static subMenu = [
         {
             menuId: 'recent-transaction',
-            router: '/home',
+            // router: '/insurance-history',
             name: 'common:header:recent_transactions',
             parentId: 'account-info',
             // icon: '/images/icons/ic_recent_transaction.png',
@@ -112,14 +112,14 @@ class Config {
             icon: UserIcon,
             isIconSvg: true,
         },
-        {
-            menuId: 'update-email',
-            name: 'common:header:update_my_email',
-            parentId: 'account-info',
-            // icon: '/images/icons/ic_email.png',
-            icon: EmailIcon,
-            isIconSvg: true,
-        },
+        // {
+        //     menuId: 'update-email',
+        //     name: 'common:header:update_my_email',
+        //     parentId: 'account-info',
+        //     // icon: '/images/icons/ic_email.png',
+        //     icon: EmailIcon,
+        //     isIconSvg: true,
+        // },
         {
             menuId: 'disconnect',
             name: 'common:header:disconnect',
