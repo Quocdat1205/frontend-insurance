@@ -112,7 +112,6 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
     }
 
     const renderMenu = (menu: any, index: number, child = false) => {
-        if (!account?.address && menu.menuId === 'disconnect') return null
         const hasChildren = menu.children.length > 0
         const _active = active?.menuId === menu.menuId || active?.parentId === menu.menuId
         const level = menu.level + 1
@@ -127,7 +126,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                 const IconComponent = icon
                 return <IconComponent />
             }
-            return <img className="min-w-6 min-h-6 w-6 h-6" src={menu.icon} />
+            return <img className="w-6 h-6 min-w-6 min-h-6" src={menu.icon} />
         }
 
         const Name = ({ name, ...nameProps }: any) => {
@@ -154,16 +153,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                 isDropdown={menu?.isDropdown}
             >
                 {!hasChildren ? (
-                    <div
-                        className="flex items-center space-x-4 px-4"
-                        onClick={
-                            menu?.modalName
-                                ? menu.handleOpenModal
-                                : () => {
-                                      console.log('no modal')
-                                  }
-                        }
-                    >
+                    <div className="flex items-center px-4 space-x-4">
                         {menu?.icon && <Icon isIconSvg={menu?.isIconSvg} icon={menu.icon} />}
                         {/* custom parent component: component passed from config as [name] props */}
                         <Name name={menu.name} {...menu?.nameComponentProps} />
@@ -173,15 +163,8 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                         className={classnames('flex items-center justify-between sm:justify-start space-x-2 cursor-pointer text-sm px-4', {
                             'pb-3': _active && isMobile,
                         })}
-                        onClick={
-                            menu?.modalName
-                                ? menu.handleOpenModal
-                                : () => {
-                                      console.log('no modal')
-                                  }
-                        }
                     >
-                        <div className="space-x-4 flex items-center">
+                        <div className="flex items-center space-x-4">
                             {menu?.icon && <Icon isIconSvg={menu?.isIconSvg} icon={menu.icon} />}
                             <Name name={menu.name} {...menu?.nameComponentProps} />
                         </div>
@@ -202,7 +185,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
     }
 
     return (
-        <ul onMouseOver={handleOnMouseOver} onMouseOut={handleOnMouseOut} className="sidebar-menu flex flex-col lg:items-center lg:flex-row">
+        <ul onMouseOver={handleOnMouseOver} onMouseOut={handleOnMouseOut} className="flex flex-col sidebar-menu lg:items-center lg:flex-row">
             {dataFilter.map((menu: any, index: number) => renderMenu(menu, index))}
         </ul>
     )
@@ -216,7 +199,7 @@ interface Item {
 const ItemMenu = styled.li.attrs<Item>(({ isChild, isDropdown }) => ({
     className: classnames('cursor-pointer text-sm py-3 relative lg:hover:active-menu', {
         'mb:hover:text-red': !isChild && !isDropdown,
-        'lg:py-2': !isChild,
+        'lg:py-3': !isChild,
         'lg:!py-[10px] pl-4 font-normal lg:text-txtPrimary lg:hover:bg-hover lg:hover:rounded-[3px]': isChild,
     }),
 }))<Item>``

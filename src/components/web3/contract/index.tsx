@@ -41,11 +41,12 @@ export class ContractCaller {
     public async sign(address: string) {
         try {
             const nonce = await getNonce(address)
-            if (nonce?.code === 'ERR_NETWORK' || !nonce) return nonce
+            if (!nonce?.data) return nonce
             const signer = this.provider.getSigner()
-            const signature = await signer.signMessage(getMessageSign(nonce))
+            const signature = await signer.signMessage(getMessageSign(nonce?.data))
             return await fetchApi({ url: API_LOGIN, options: { method: 'POST' }, params: { owner: address, signature: signature } })
         } catch (error) {
+            console.log('sign', error)
             return error
         }
     }

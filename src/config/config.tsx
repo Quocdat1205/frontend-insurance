@@ -91,66 +91,9 @@ class Config {
         { menuId: 'home', router: '/home', name: 'common:header:home', parentId: 0 },
         { menuId: 'buy-covered-parent', router: '/buy-covered', name: 'common:header:buy_covered', parentId: 0 },
         { menuId: 'commission_policy', router: '/buy-covered', name: 'common:header:commission_policy', parentId: 0 },
-        // {
-        //     menuId: 'buy-covered',
-        //     router: '/buy-covered',
-        //     name: 'common:header:buy_covered',
-        //     // parentId: 'buy-covered-parent',
-        //     // icon: '/images/icons/ic_menu_buy_covered.png',
-        //     isMobile: true,
-        // },
-        // {
-        //     menuId: 'insurance-history',
-        //     router: '/buy-covered/insurance-history',
-        //     name: 'common:header:insurance_history',
-        //     // parentId: 'buy-covered-parent',
-        //     // icon: '/images/icons/Ic_menu_users.png',
-        //     isMobile: true,
-        // },
     ]
 
-    static subMenuMobile = [
-        {
-            menuId: 'recent-transaction',
-            router: '/buy-covered',
-            name: 'common:header:recent_transactions',
-            parentId: 'account-info',
-            // icon: '/images/icons/ic_recent_transaction.png',
-            icon: HistoryIcon,
-            isMobile: true,
-            isIconSvg: true,
-        },
-        {
-            menuId: 'my-covered-contract',
-            router: '/buy-covered',
-            name: 'common:header:my_covered_contract',
-            parentId: 'account-info',
-            // icon: '/images/icons/ic_user.png',
-            isMobile: true,
-            icon: UserIcon,
-            isIconSvg: true,
-        },
-        {
-            menuId: 'update-email',
-            router: '/buy-covered',
-            name: 'common:header:update_my_email',
-            parentId: 'account-info',
-            modalName: 'updateEmail',
-            // icon: '/images/icons/ic_email.png',
-            isMobile: true,
-            icon: EmailIcon,
-            isIconSvg: true,
-        },
-        {
-            menuId: 'disconnect',
-            name: 'common:header:disconnect',
-            parentId: 'account-info',
-            // icon: '/images/icons/ic_bx-log-out.png',
-            isMobile: true,
-            icon: DisconnectIcon,
-            isIconSvg: true,
-        },
-    ]
+
 
     static subMenu = [
         {
@@ -164,7 +107,7 @@ class Config {
         },
         {
             menuId: 'my-covered-contract',
-            router: '/home',
+            router: '/insurance-history',
             name: 'common:header:my_covered_contract',
             parentId: 'account-info',
             // icon: '/images/icons/ic_user.png',
@@ -173,7 +116,6 @@ class Config {
         },
         {
             menuId: 'update-email',
-            router: '/buy-covered',
             name: 'common:header:update_my_email',
             parentId: 'account-info',
             modalName: 'updateEmail',
@@ -191,11 +133,6 @@ class Config {
         },
     ]
 
-    static homeMenuMobile = [
-        { menuId: 'account-info', router: '/home', name: 'common:header:account_info_title', parentId: 0 },
-        ...Config.subMenuMobile,
-        ...Config.homeMenu,
-    ]
 
     static landingPageMenu = [
         {

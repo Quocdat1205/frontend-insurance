@@ -10,7 +10,7 @@ import colors from 'styles/colors'
 
 const ContentDisclosure = ({ content, link = '', href = '' }: { content: string; link?: string; href?: string }) => (
     <Transition
-        enter="transition duration-100 ease-out"
+        enter="transition duration-20 ease-out"
         enterFrom="transform scale-95 opacity-0"
         enterTo="transform scale-100 opacity-100"
         leave="transition duration-75 ease-out"
@@ -85,11 +85,14 @@ const FaqLanding = () => {
                 {faq_contents.map(({ question, ans, link, href }, index) => (
                     <div key={question}>
                         <div className="h-[1px] w-full bg-divider" />
-                        <div key={question} className="mx-auto min-w-[20rem] lg:min-w-[48rem] w-full max-w-md rounded-2xl p-[1.5rem] ">
+                        <div key={question} className="mx-auto min-w-[20rem] lg:min-w-[48rem] w-full max-w-md rounded-2xl px-6 py-4 lg:p-[1.5rem] ">
                             <Disclosure>
                                 {({ open }) => (
                                     <>
-                                        <Disclosure.Button className="text-left bg-opacity-0 flex w-full justify-between items-center rounded-lg bg-purple-100 px-4 text-left font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                        <Disclosure.Button
+                                            as={'div'}
+                                            className=" active:outline-transparent active:bg-transparent focus:bg-none touch-none active:outline-none flex w-full justify-between items-center rounded-lg bg-purple-100 px-4 text-left font-medium text-purple-900 focus:outline-none"
+                                        >
                                             <span className={'font-semibold text-sm lg:text-base'}>{question}</span>
                                             <div>
                                                 <DownArrow className={`${!open ? 'rotate-180 transform' : ''}`} color={colors.txtPrimary} size={20} />
@@ -110,7 +113,7 @@ const FaqLanding = () => {
 export default FaqLanding
 
 const Background = styled.section.attrs({
-    className: 'pt-12 banner-landing px-4 lg:px-20 min-h-[350px] flex flex-col justify-end pt-[7.5rem]',
+    className: 'pt-12 banner-landing px-4 lg:px-20 min-h-[350px] flex flex-col justify-end mt-[7.5rem] scroll-mt-[4.25rem]',
 })<any>`
     background-image: ${({ isMobile }) => `url(${`/images/screens/landing-page/bg_faq.png`})`};
     background-position: top;

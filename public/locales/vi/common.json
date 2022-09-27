@@ -70,7 +70,7 @@
     "connect_successful": "Kết nối ví thành công",
     "disconnect_successful": "Ngắt kết nối ví thành công",
     "connection_error": "Lỗi kết nối",
-    "reason_error": "Lý do: {{reason}}",
+    "reason_error": "Nguyên nhân: {{reason}}",
     "reconnect": "Kết nối lại",
     "network_error": "Lỗi kết nối mạng",
     "installer": {
@@ -93,7 +93,7 @@
         "title": "Ví bạn chưa có BNB Smart Chain",
         "description": "Vui lòng ấn nút “Thêm BNB Smart Chain” và sao chép thông tin dưới đây",
         "network_name": "Tên mạng",
-        "new_url:": "RPC URL mới",
+        "new_rpc_url": "RPC URL mới",
         "chainID": "Mã chuỗi",
         "symbol": "Ký hiệu tiền tệ",
         "add_bnb": "Thêm BNB Smart Chain"
@@ -138,5 +138,9 @@
     },
     "minimum_balance": "Số dư tối thiểu {{value}}",
     "max": "Tối da {{value}}",
-    "min": "Tối thiểu {{value}}"
+    "min": "Tối thiểu {{value}}",
+    "refresh": "Thử lại",
+    "dont_have_wallet": "Chưa sở hữu Ví? Xem <span class='text-blue underline cursor-pointer'>Hướng dẫn tạo Ví</span> ngay",
+    "user_not_login": "Người dùng chưa truy cập tài khoản. Vui lòng nhập mật khẩu người dùng tại tiện ích Ví.",
+    "got_it": "Đã hiểu"
 }

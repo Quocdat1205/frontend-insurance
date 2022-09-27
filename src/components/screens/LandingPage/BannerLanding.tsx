@@ -73,7 +73,7 @@ const BannerLanding = () => {
                     </Item>
                     {list.map((item: any, index: number) => (
                         <Item key={index} className="bg-white">
-                            <div className="font-semibold lg:text-4xl text-red text-[2rem]" data-aos="fade-up" data-aos-delay={DURATION_AOS * index}>
+                            <div className="font-medium lg:text-4xl text-red text-[2rem]" data-aos="fade-up" data-aos-delay={DURATION_AOS * index}>
                                 {item?.prefix}
                                 {formatNumber(item.value, item.decimal)}
                                 {item?.suffix}
@@ -98,14 +98,7 @@ const Item = styled.div.attrs<any>({
 `
 const Background = styled.section.attrs({
     className: ' banner-landing lg:px-6 min-h-[180px] flex flex-col justify-end mt-0 -mt-[206px] lg:-mt-[180px]',
-    // className: '-pt-12 banner-landing px-4 lg:px-20 min-h-[350px] flex flex-col justify-end',
 })<any>`
-        // background-image: ${({ isMobile }) => `url(${`/images/screens/landing-page/bg_banner${isMobile ? '_mobile' : ''}.png`})`};
-    //background-position: top;
-    //background-repeat: no-repeat;
-    //background-size: cover;
-    //box-shadow: 0px -3px 5px rgba(235, 43, 62, 0.15);
-    //border-radius: 1rem;
     border-bottom: 0;
 `
 

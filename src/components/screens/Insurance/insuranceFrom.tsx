@@ -6,7 +6,7 @@ import axios from 'axios'
 import { Menu, Popover, Switch, Tab } from '@headlessui/react'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { CheckCircle, InfoCircle, XMark, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp, ArrowLeft } from 'react-feather'
 import { useTranslation } from 'next-i18next'
@@ -23,6 +23,9 @@ import colors from 'styles/colors'
 import GlossaryModal from 'components/screens/Glossary/GlossaryModal'
 import InputNumber from 'components/common/Input/InputNumber'
 import HeaderContent from './HeaderContent'
+import fetchApi from 'services/fetch-api'
+import { API_GET_PRICE_CHART } from 'services/apis'
+import { countDecimals } from 'utils/utils'
 
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
@@ -115,7 +118,7 @@ const InsuranceFrom = () => {
     })
 
     const [dataChart, setDataChart] = useState()
-    const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', 'ALL']
+    const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', `${language === 'vi' ? 'Tất cả' : 'All'}`]
     const listTabPeriod: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     const menu = [
         { menuId: 'home', router: 'home', name: t('insurance:buy:home'), parentId: 0 },
@@ -156,30 +159,37 @@ const InsuranceFrom = () => {
         return (
             <div className="mx-[1rem] relative">
                 <div>
-                    {t('insurance:buy_mobile:q_covered')}{' '}
+                    {t('insurance:buy_mobile:q_covered')}
                     <label>
-                        <span id="label_q_coverd" className="z-1 !w-max text-redPrimary">
-                            {state.q_covered}
+                        <span
+                            id="label_q_coverd"
+                            className="z-1 !w-max text-redPrimary"
+                            onClick={() => {
+                                setOpenChangeToken(true)
+                            }}
+                        >
+                            {' '}
+                            {width && width > 358 && <br />}
+                            {state.q_covered}{' '}
                         </span>
-                    </label>{' '}
+                    </label>
                     <span
                         className="text-redPrimary z-1"
                         onClick={() => {
                             setOpenChangeToken(true)
                         }}
                     >
-                        {selectCoin.type}
-                    </span>{' '}
+                        {selectCoin.type}{' '}
+                    </span>
                     {state.p_claim > 0 && (
                         <>
-                            {t('insurance:buy_mobile:at')} <span className="text-redPrimary">${state.p_claim}</span>
+                            {t('insurance:buy_mobile:at')} <span className="text-redPrimary">${state.p_claim} </span>
                             {tab != 6 && '?'}
                         </>
                     )}
                     {tab == 6 && (
                         <>
-                            {' '}
-                            {t('insurance:buy_mobile:and')} <br /> {t('insurance:buy_mobile:margin')}{' '}
+                            {t('insurance:buy_mobile:and')} {t('insurance:buy_mobile:margin')}{' '}
                             <label>
                                 <span className="text-redPrimary">
                                     <span
@@ -187,10 +197,11 @@ const InsuranceFrom = () => {
                                             setShowInput({ isShow: true, name: 'margin' })
                                         }}
                                     >
-                                        {state.margin}
-                                    </span>{' '}
+                                        {state.margin && state.margin}{' '}
+                                    </span>
                                     <span
                                         onClick={() => {
+                                            setShowInput({ isShow: true, name: 'margin' })
                                             // setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:margin')}` })
                                         }}
                                     >
@@ -556,6 +567,7 @@ const InsuranceFrom = () => {
             getPrice(selectCoin.symbol, state, setState)
             setState({ ...state, symbol: { ...selectCoin } })
             getConfig(selectCoin.type)
+            getBalaneToken(selectCoin.type)
         }
     }, [selectCoin])
 
@@ -576,7 +588,6 @@ const InsuranceFrom = () => {
         validator('q_covered')
         validator('margin')
 
-        console.log()
         if (res_q_covered.isValid) {
             if (state.q_covered && state.p_claim) {
                 const margin = Number((8 * state.q_covered * state.p_market) / 100)
@@ -615,13 +626,6 @@ const InsuranceFrom = () => {
             }
             createSaved()
         } else {
-            setState({
-                ...state,
-                q_claim: 0,
-                r_claim: 0,
-                p_expired: 0,
-                margin: 0,
-            })
             setSaved(0)
         }
     }, [state.q_covered, state.margin, state.p_claim])
@@ -653,9 +657,6 @@ const InsuranceFrom = () => {
         const defaultQ_covered = pair_configs?.filters?.find((e: any) => {
             return e.filterType === 'LOT_SIZE'
         })
-        const min = Number(defaultQ_covered?.minQty)
-        const max = Math.min(Number(defaultQ_covered?.maxQty), userBalance)
-        setRangeQ_covered({ min: min, max: max })
     }, [percentInsurance, state.margin, state.q_covered])
 
     useEffect(() => {
@@ -683,18 +684,23 @@ const InsuranceFrom = () => {
     const [priceFilter, setPriceFilter] = useState<any>()
 
     useEffect(() => {
+        const _decimalList = { ...decimalList }
         pair_configs?.filters?.map((item: any) => {
             if (item?.filterType === 'LOT_SIZE') {
-                const decimal: number = (1 / item.stepSize).toString().replace('1', '').length
-                setDecimalList({ ...decimalList, decimal_q_covered: decimal })
+                const decimal = countDecimals(item.stepSize)
+                _decimalList.decimal_q_covered = +decimal
+
+                const min = Number(item?.minQty)
+                const max = Number(item?.maxQty) < userBalance ? Number(item?.maxQty) : userBalance
+                setRangeQ_covered({ min: min, max: max })
             }
             if (item?.filterType === 'PERCENT_PRICE') {
                 setPercentPrice({ ...item })
             }
             if (item?.filterType === 'PRICE_FILTER') {
                 setPriceFilter({ ...item })
-                const tmp = ((1 / item.tickSize) * 1).toString().replace('1', '').length
-                setDecimalList({ ...decimalList, decimal_p_claim: tmp > 0 ? tmp : 3 })
+                const decimal_p_claim = countDecimals(Number(item.tickSize))
+                _decimalList.decimal_p_claim = +decimal_p_claim
 
                 const min1 = state.p_market + (2 / 100) * state.p_market
                 const max1 = state.p_market + (70 / 100) * state.p_market
@@ -717,16 +723,16 @@ const InsuranceFrom = () => {
                 }
             }
             if (item?.filterType === 'MARGIN') {
-                const decimalMargin: number = (1 / item.stepSize).toString().replace('1', '').length
-                setDecimalList({ ...decimalList, decimal_margin: decimalMargin })
-                const MIN = Number((state.q_covered * state.p_market * item.minQtyRatio).toFixed(decimalMargin))
-                const MAX = Number((state.q_covered * state.p_market * item.maxQtyRatio).toFixed(decimalMargin))
+                const decimalMargin = countDecimals(item.stepSize)
+                _decimalList.decimal_margin = +decimalMargin
+
+                const MIN = Number((state.q_covered * state.p_market * item.minQtyRatio).toFixed(Number(decimalMargin)))
+                const MAX = Number((state.q_covered * state.p_market * item.maxQtyRatio).toFixed(Number(decimalMargin)))
                 setRangeMargin({ ...rangeP_claim, min: MIN, max: MAX })
             }
+            setDecimalList({ ..._decimalList })
         })
     }, [pair_configs, state.q_covered, selectCoin, state.p_claim])
-
-    console.log(decimalList)
 
     const validator = (key: string) => {
         let rs = { isValid: true, message: '' }
@@ -739,14 +745,14 @@ const InsuranceFrom = () => {
                     state.q_covered <= 0
                 )
                 rs.message = `<div class="flex items-center ">
-                ${
-                    state.q_covered > Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered))
-                        ? t('common:available', {
-                              value: `${Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered))}`,
-                          })
-                        : t('common:minimum_balance', { value: rangeQ_covered.min })
-                }
-            </div>`
+                    ${
+                        state.q_covered > Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered))
+                            ? t('common:available', {
+                                  value: `${Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered))}`,
+                              })
+                            : t('common:minimum_balance', { value: rangeQ_covered.min })
+                    }
+                </div>`
                 break
             case 'p_claim':
                 rs.isValid =
@@ -801,7 +807,6 @@ const InsuranceFrom = () => {
 
         return rs
     }
-
     const renderPopoverQCover = () => (
         <Popover className="relative outline-none bg-hover focus:ring-0 flex items-center justify-center">
             <Popover.Button
@@ -855,7 +860,7 @@ const InsuranceFrom = () => {
                                         <div className="max-w-[20px] mr-[8px] max-h-[20px] ">
                                             <img alt={''} src={`${coin.icon}`} width="20" height="20" className={'mr-[5px] rounded-[50%]'}></img>
                                         </div>
-                                        <div className={'flex flex-row justify-between w-full'}>
+                                        <div className={'flex flex-row justify-between w-full text-sm'}>
                                             <span>{coin.name}</span>
                                         </div>
                                     </a>
@@ -901,19 +906,26 @@ const InsuranceFrom = () => {
         </Popover>
     )
 
+    const [isCanSave, setIsCanSave] = useState<boolean>(false)
     const onHandleChange = (key: string, e: any) => {
         const value = +e.value
+
+        if (value == 0) {
+            setIsCanSave(false)
+        } else {
+            setIsCanSave(true)
+        }
 
         switch (key) {
             case 'q_covered':
                 setState({ ...state, [key]: value })
+                setPercentInsurance(0)
                 break
             case 'p_claim':
                 setState({ ...state, [key]: value })
-                setPercentInsurance(8)
-
                 break
             case 'margin':
+                setPercentMargin(0)
                 setState({ ...state, margin: value, percent_margin: 0 })
                 break
             default:
@@ -1146,6 +1158,7 @@ const InsuranceFrom = () => {
                                                                 <Tooltip className="max-w-[200px]" id={'p_claim'} placement="right" />
                                                             </div>
                                                         </span>
+
                                                         <InputNumber
                                                             className="mt-2"
                                                             validator={validator('p_claim')}
@@ -1154,7 +1167,7 @@ const InsuranceFrom = () => {
                                                             customSuffix={() => unitMoney}
                                                             suffixClassName="text-txtSecondary"
                                                             placeholder={`${menu[9].name}`}
-                                                            decimal={decimalList.decimal_q_covered}
+                                                            decimal={decimalList.decimal_p_claim}
                                                         />
                                                         {/* {!errorPCalim && state.p_claim != 0 && (
                                                     <span className="flex flex-row text-[#E5544B] mt-[8px]">
@@ -1584,14 +1597,30 @@ const InsuranceFrom = () => {
                                                 </div>
                                             </div>
 
-                                            <div className={`flex justify-between border-collapse rounded-[3px] shadow-none w-full mb-[0.5rem]`}>
-                                                <InputNumber
-                                                    validator={validator(`${showInput.name}`)}
-                                                    value={showInput.name === 'q_covered' ? state.q_covered : state.margin}
-                                                    onChange={(e: any) => onHandleChange(`${showInput.name}`, e)}
-                                                    decimal={showInput.name === 'q_covered' ? decimalList.decimal_q_covered : decimalList.decimal_margin}
-                                                />
-                                            </div>
+                                            {showInput.name === 'q_covered' ? (
+                                                <>
+                                                    <div className={`flex justify-between border-collapse rounded-[3px] shadow-none w-full mb-[0.5rem]`}>
+                                                        <InputNumber
+                                                            validator={validator(`q_covered`)}
+                                                            value={state.q_covered}
+                                                            onChange={(e: any) => onHandleChange('q_covered', e)}
+                                                            decimal={decimalList.decimal_q_covered}
+                                                        />
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className={`flex justify-between border-collapse rounded-[3px] shadow-none w-full mb-[0.5rem]`}>
+                                                        <InputNumber
+                                                            validator={validator(`margin`)}
+                                                            value={state.margin}
+                                                            onChange={(e: any) => onHandleChange('margin', e)}
+                                                            decimal={decimalList.decimal_margin}
+                                                        />
+                                                    </div>
+                                                </>
+                                            )}
+
                                             <div className={`flex flex-row justify-between space-x-4 w-full text-xs mb-[1.5rem]`}>
                                                 {showInput.name === 'q_covered' &&
                                                     [25, 50, 75, 100].map((data) => {
@@ -1635,8 +1664,11 @@ const InsuranceFrom = () => {
                                                     })}
                                             </div>
                                             <Button
+                                                disabled={!isCanSave}
                                                 variants={'primary'}
-                                                className={`bg-red h-[48px] w-full flex justify-center items-center text-white rounded-[8px] py-[12px]`}
+                                                className={`${
+                                                    !isCanSave ? 'bg-hover' : 'bg-red'
+                                                } h-[48px] w-full flex justify-center items-center text-white rounded-[8px] py-[12px]`}
                                                 onClick={() => setShowInput({ ...showInput, isShow: false, name: '' })}
                                             >
                                                 {t('insurance:buy:save')}
@@ -1655,7 +1687,7 @@ const InsuranceFrom = () => {
                                         }}
                                     >
                                         <div className="bg-white text-sm  mx-auto">
-                                            <div className="font-semibold text-xl my-[24px]">{t('insurance:buy:asset')}</div>
+                                            <div className="font-semibold text-xl mb-[24px]">{t('insurance:buy:asset')}</div>
                                             <div>
                                                 {listCoin &&
                                                     listCoin.map((coin, key) => {
@@ -1848,7 +1880,7 @@ const InsuranceFrom = () => {
                                                 customSuffix={() => unitMoney}
                                                 suffixClassName="text-txtSecondary"
                                                 placeholder={`${menu[9].name}`}
-                                                decimal={decimalList.decimal_q_covered}
+                                                decimal={decimalList?.decimal_p_claim}
                                             />
                                         </div>
                                     </div>
@@ -2013,22 +2045,19 @@ const InsuranceFrom = () => {
 
 export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any) => {
     try {
-        const response = await fetch(
-            'https://datav2.nami.exchange/api/v1/chart/history?' +
-                'broker=NAMI_SPOT' +
-                '&symbol=' +
-                symbol +
-                '&from=' +
-                from +
-                '&to=' +
-                to +
-                '&resolution=' +
-                resolution,
-        )
+        const ts = Math.round(new Date().getTime() / 1000)
+        const tsYesterday = ts - 7 * (24 * 3600)
+        const params = {
+            broker: 'NAMI_SPOT',
+            symbol: symbol,
+            from: tsYesterday,
+            to: ts,
+            resolution: resolution,
+        }
+        const test = await fetchApi({ url: API_GET_PRICE_CHART, baseURL: '', params: params })
 
-        let list = await response.json()
         let data: { date: number; value: any }[] = []
-        list?.map((item: any) => {
+        test?.map((item: any) => {
             data.push({
                 date: item[0] * 1000,
                 value: item[1],

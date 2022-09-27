@@ -4,7 +4,7 @@ export const PORTAL_MODAL_ID: string = 'PORTAL_MODAL'
 
 export const screens = {
     drawer: 820,
-    drawerHome: 992
+    drawerHome: 1024,
 }
 
 const SUPPORT = {
@@ -110,8 +110,10 @@ export const days: any = [
 export const DURATION_AOS = 400
 
 export const errorsWallet = {
+    Already_opened: 32002,
     Cancel: 4001,
     Not_found: 4902,
     Success: 1013,
     NetWork_error: 'ERR_NETWORK',
+    Connect_failed: 'CONNECT_FAILED',
 }

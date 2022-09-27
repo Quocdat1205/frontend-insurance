@@ -277,12 +277,13 @@ const AcceptBuyInsurance = () => {
     const rangeOfRefund = () => {
         if (state) {
             const p_refund = 0.05 * state.p_market
+            console.log(state.p_claim.toFixed(state?.decimalList?.decimal_p_claim))
 
             if (p_refund > state.p_claim) {
-                return ` ${state.p_claim} - ${p_refund} `
+                return ` $${state.p_claim.toFixed(state?.decimalList?.decimal_p_claim)} - $${p_refund.toFixed(state?.decimalList?.decimal_p_claim)} `
             }
             if (p_refund < state.p_claim) {
-                return ` ${p_refund} - ${state.p_claim} `
+                return ` $${p_refund.toFixed(state?.decimalList?.decimal_p_claim)} - $${state.p_claim.toFixed(state?.decimalList?.decimal_p_claim)} `
             }
         }
     }
@@ -297,6 +298,16 @@ const AcceptBuyInsurance = () => {
             }
         }, 1000)
     }, [count])
+
+    // const timeEnd = () => {
+    //     if (state) {
+    //         let time = new Date()
+    //         time.setDate(time.getDate() + state.period)
+
+    //         return `${time.getDate()}/${time.getMonth()}/${time.getFullYear()} - ${time.getHours()}:0${time.getMinutes()}`
+    //     }
+    //     return ''
+    // }
 
     return !loading && state != undefined ? (
         !isMobile ? (
@@ -360,7 +371,7 @@ const AcceptBuyInsurance = () => {
                     style={{ filter: 'drop-shadow(0px 6px 18px rgba(9, 30, 66, 0.15)) drop-shadow(0px 0px 1px rgba(9, 30, 66, 0.31))' }}
                 >
                     <div className="relative bg-white" style={{ borderRadius: '5px 5px 0 0' }}>
-                        <div className={'flex justify-center items-center my-[32px]'}>
+                        <div className={'flex justify-center items-center mt-[32px]'}>
                             <CheckCircle />
                             <span className={'font-semibold text-txtPrimary px-[4px]'}>
                                 {`${t('insurance:buy:saved')} `}
@@ -497,7 +508,7 @@ const AcceptBuyInsurance = () => {
                                 </div>
                             </div>
                             <div className="text-[#B2B7BC] text-xs py-[16px]">
-                                *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')}
+                                *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')} {/*timeEnd()*/}
                             </div>
 
                             <div
@@ -713,7 +724,9 @@ const AcceptBuyInsurance = () => {
                                         }}
                                         type="text"
                                         placeholder={language === 'vi' ? 'Nhập mã giới thiệu tại đây' : 'Text referral ID here'}
-                                        className={`text-txtPrimary h-auto !p-0 !m-0 !shadow-none !border-none text-base font-normal bg-hover text-right min-w-[13.5rem]`}
+                                        className={`${
+                                            referral.length > 0 ? 'text-redPrimary' : 'text-txtPrimary'
+                                        } h-auto !p-0 !m-0 !shadow-none !border-none text-base font-normal bg-hover text-right min-w-[13.5rem]`}
                                     />
                                 </div>
                             </div>

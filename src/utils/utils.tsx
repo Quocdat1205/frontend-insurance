@@ -212,3 +212,5 @@ export const getModalSubscribeStorage = () => {
 }
 
 export const getMessageSign = (nonce: number) => `Sign message with nonce: ${nonce}`
+
+export const capitalizeFirstLetter = (string: string) => string.charAt(0).toUpperCase() + string.slice(1)

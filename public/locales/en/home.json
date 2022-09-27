@@ -29,28 +29,28 @@
         "document": "Document",
         "products_sponsored_by": "Products sponsored by",
         "register_successfully": "Register successfully",
-        "register_content": "The lasted information will be sent to you. Please check email regularly",
+        "register_content": "The lasted information will be sent to you. Please check email regularly.",
         "email_invalid": "Confirmation email invalid. Please try again.",
 
         "faq_type_asset_q": "What types of assets does Nami Insurance now cover?",
-        "faq_type_asset_a": "Included thus far are Bitcoin (BTC), Binance coin (BNB), and Ethereum (ETH)\nRead more tutorial: ",
+        "faq_type_asset_a": "Included thus far are Bitcoin (BTC), Binance coin (BNB), and Ethereum (ETH). Read more tutorial: ",
         "faq_type_asset_link": "How to Margin Insurance contract",
 
         "faq_title": "FAQ",
 
         "faq_claim_q": "Which Coins/Tokens am I allowed to margin and receive cover payout?",
-        "faq_claim_a": "Margin unit: USDT\nCover payout (Q-Claim) unit: USDT or Covered Asset",
+        "faq_claim_a": "Margin unit: USDT.\nCover payout. (Q-Claim) unit: USDT or Covered Asset.",
 
         "faq_period_q": "Minimum number of days to margin an insurance contract?",
-        "faq_period_a": "Minimum 2 days and maximum 15 days\nThe period of the insurance contract has an effect on Q-Claim",
+        "faq_period_a": "Minimum 2 days and maximum 15 days\nThe period of the insurance contract has an effect on Q-Claim.",
 
         "faq_claim_when_q": "Will I get cover payout as soon as the price reaches?",
-        "faq_claim_when_a": "When reaching P-Claim, the status of the insurance contract switches to \"Claim waiting\". The system automatically sends cover payout (Q-Claim) to the user's wallet address on the end date of insurance contract\nRead more: ",
-        "faq_claim_when_link": "Nami Insurance's Glossary System",
+        "faq_claim_when_a": "When reaching P-Claim, the status of the insurance contract switches to \"Claim waiting\". The system automatically sends cover payout (Q-Claim) to the user's wallet address on the end date of insurance contract. Read more: ",
+        "faq_claim_when_link": "Nami Insurance's Glossary System.",
 
         "faq_claim_how_q": "Can I separately margin two insurance contracts of the same asset type at the same time?",
-        "faq_claim_how_a": "Sure, users can get two separate insurance contracts and can use Explorer to check on them.\nRead more tutorial: ",
-        "faq_claim_how_link": "How to check the details of your insurance contract"
+        "faq_claim_how_a": "Sure, users can get two separate insurance contracts and can use Explorer to check on them. Read more: ",
+        "faq_claim_how_link": "How to check the details of your insurance contract."
     },
     "home": {
         "connect_wallet": "Connect Wallet",

@@ -43,7 +43,7 @@ export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number, state
     trend.defaultState.transitionDuration = 1
 
     let endPoint = new Date(chart.data[chart.data.length - 1]?.date)
-    endPoint.setDate(endPoint.getDate() + 10)
+    endPoint.setDate(endPoint.getDate() + 8)
 
     if (!p_claim) {
         trend.data = [
@@ -109,6 +109,10 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
     useEffect(() => {
         if (data && data.length > 0) setDataChart(data)
     }, [data])
+
+    useEffect(() => {
+        InitChart(dataChart)
+    }, [dataChart])
 
     const timer = useRef<any>(null)
     useEffect(() => {
@@ -329,6 +333,10 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                     claimLabel.label.dx = -90
                 }
 
+                console.log(state.p_market, state.p_claim)
+
+                const percent = (((state.p_claim - state.p_market) / state.p_market) * 100).toFixed(2)
+
                 if (p_claim > 0) {
                     if (isMobile) {
                         claimLabel.label.html = `<div id="claimLabel" class="justify-end mt-[0.25rem] hover:cursor-pointer items-center flex text-xs h-[24px] text-[${
@@ -337,16 +345,13 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                             latitudeClaim.data[0].value
                         }</span><span class="ml-[8px] h-[24px] py-[2px] px-[8px] items-center border rounded-full bg-[${
                             latitudeClaim.data[0].value < state.p_market ? '#FFF1F2' : '#F1FFF5'
-                        }]">${(((latitudeClaim.data[0].value - state.p_market) / state.p_market) * 100).toFixed(2)}%</span></div>`
+                        }]">${percent}%</span></div>`
                     } else {
                         claimLabel.label.html = `<div id="claimLabel" class="hover:cursor-pointer text-sm z-[1000]" style="color: ${
                             latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : '#52CC74'
                         } ; border-radius: 800px; padding: 4px 16px; background-color: ${
                             latitudeClaim.data[0].value < state.p_market ? '#FFF1F2' : '#F1FFF5'
-                        }  "><span class="mr-[8px]">P-Claim: $${latitudeClaim.data[0].value}</span> <span> ${(
-                            ((latitudeClaim.data[0].value - state.p_market) / state.p_market) *
-                            100
-                        ).toFixed(2)}%
+                        }  "><span class="mr-[8px]">P-Claim: $${latitudeClaim.data[0].value}</span> <span> ${percent}%
                         </span></div>`
                     }
                 }

@@ -15,18 +15,18 @@ const SloganLanding = () => {
             {/* <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto slider-landing flex flex-col space-y-6 sm:space-y-0 sm:flex-row items-center justify-between mt-[4.25rem] sm:mt-9 mt-[4.25rem] sm:mt-9 h-[calc(100vh-300px)] sm:h-auto"> */}
             {/* <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto slider-landing flex flex-col space-y-6 lg:space-y-0 lg:flex-row items-center justify-between max-h-[calc(100vh-68px)] lg:h-auto"> */}
             <div
-                className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto slider-landing flex flex-col space-y-6 lg:space-y-0 lg:flex-row items-center justify-between
+                className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto slider-landing flex flex-col space-y-6 lg:space-y-0 lg:flex-row items-center md:justify-between
                 h-full"
             >
                 <div className="flex flex-col space-y-6 lg:space-y-9 w-full">
                     <div className="flex flex-col space-y-2 pt-[4.25rem] lg:pt-0 text-center lg:text-left font-semibold">
-                        <span className="text-[2rem] lg:text-[4.25rem] lg:leading-[5rem]">{t('common:slogan_first')}</span>
-                        <span className="text-4xl text-gradient text-[2rem] lg:text-[4.25rem] lg:leading-[5rem]">{t('common:slogan_second')}</span>
+                        <span className="text-[2rem] leading-[2.75rem] lg:text-[4.25rem] lg:leading-[5rem]">{t('common:slogan_first')}</span>
+                        <span className="leading-[3.75rem] text-gradient text-[2rem] lg:text-[5.5rem] lg:leading-[6rem]">{t('common:slogan_second')}</span>
                     </div>
-                    <div className="flex items-center justify-between lg:justify-start space-x-4 text-sm font-semibold">
+                    <div className="flex items-center justify-center lg:justify-start space-x-4 text-sm font-semibold">
                         <Button
                             onClick={handleClickBuyCover}
-                            className="w-full lg:w-max h-12 text-sm lg:text-xl lg:h-full whitespace-nowrap !rounded-xl px-6 py-4 leading-6"
+                            className=" w-[342px] lg:w-max h-12 text-sm lg:text-xl lg:h-full whitespace-nowrap !rounded-xl px-6 py-4 leading-6"
                         >
                             {t('home:landing:buy_covered')}
                         </Button>

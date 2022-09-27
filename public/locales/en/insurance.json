@@ -2,7 +2,7 @@
     "buy": {
         "home": "Home",
         "buy_covered": "Buy Cover",
-        "back_to_home": "Back to Home",
+        "back_to_home": "Back Home",
         "default": "Default",
         "change": "Customize",
         "change_margin": "Customize Margin",
@@ -20,7 +20,7 @@
         "accept_buy": "I agree to",
         "accept_buy_sub": "the terms of service",
         "notified": "Get 100% Margin when P-Market reaches between",
-        "notified_sub": "at T-Expired",
+        "notified_sub": "at",
         "price_had_update": "Updated Price",
         "accept": "Confirm",
         "period": "Period",
