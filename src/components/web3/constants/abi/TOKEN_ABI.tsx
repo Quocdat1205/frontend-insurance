@@ -1,4 +1,4 @@
-export const ETH_ABI = [
+export const TOKEN_ABI = [
     { inputs: [], payable: false, stateMutability: 'nonpayable', type: 'constructor' },
     {
         anonymous: false,
