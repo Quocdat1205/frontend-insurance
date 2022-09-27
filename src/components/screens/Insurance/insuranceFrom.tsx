@@ -304,57 +304,16 @@ const InsuranceFrom = () => {
     }
 
     const getStorage = async () => {
-        setLoadings(true)
-
         const data = await localStorage.getItem('buy_covered_state')
         if (data) {
             const res = JSON.parse(data)
-            setState({
-                ...state,
-                symbol: {
-                    icon: res.icon,
-                    id: res.id,
-                    name: res.name,
-                    symbol: res.symbol,
-                    type: res.type,
-                    disable: res.disable,
-                },
-            })
-            if (res.symbol != '') {
-                setSelectedCoin({
-                    icon: res.icon,
-                    id: res.id,
-                    name: res.name,
-                    symbol: res.symbol,
-                    type: res.type,
-                    disable: res.disable,
-                })
-
-                setState({
-                    ...state,
-                    symbol: {
-                        icon: res.icon,
-                        id: res.id,
-                        name: res.name,
-                        symbol: res.symbol,
-                        type: res.type,
-                        disable: res.disable,
-                    },
-                })
+            if (res) {
+                return res
             } else {
-                if (listCoin.length > 0) {
-                }
+                return false
             }
-
-            setTab(res.tab)
-            setUnitMoney(res.unitMoney)
-            setIndex(res.index)
-            setThisFisrt(true)
-            refreshApi(selectTime, selectCoin)
-        } else {
-            setThisFisrt(false)
-            setStorage(state)
         }
+        return false
     }
 
     const refreshApi = (
@@ -417,26 +376,51 @@ const InsuranceFrom = () => {
                 disable: token.disable,
             }
 
-            if (tmp.type == 'BNB') {
-                setSelectedCoin({
-                    icon: tmp.icon,
-                    id: tmp.id,
-                    name: tmp.name,
-                    symbol: tmp.symbol,
-                    type: tmp.type,
-                    disable: tmp.disable,
-                })
-                setState({
-                    ...state,
-                    symbol: {
+            const res = await getStorage()
+            if (res?.symbol?.type != '') {
+                if (tmp.type == res?.symbol?.type) {
+                    setSelectedCoin({
+                        icon: res?.symbol?.icon,
+                        id: res?.symbol?.id,
+                        name: res?.symbol?.name,
+                        symbol: res?.symbol?.symbol,
+                        type: res?.symbol?.type,
+                        disable: res?.symbol?.disable,
+                    })
+                    setState({
+                        ...state,
+                        symbol: {
+                            icon: res?.symbol?.icon,
+                            id: res?.symbol?.id,
+                            name: res?.symbol?.name,
+                            symbol: res?.symbol?.symbol,
+                            type: res?.symbol?.type,
+                            disable: res?.symbol?.disable,
+                        },
+                    })
+                }
+            } else {
+                if (tmp.type == 'BNB') {
+                    setSelectedCoin({
                         icon: tmp.icon,
                         id: tmp.id,
                         name: tmp.name,
                         symbol: tmp.symbol,
                         type: tmp.type,
                         disable: tmp.disable,
-                    },
-                })
+                    })
+                    setState({
+                        ...state,
+                        symbol: {
+                            icon: tmp.icon,
+                            id: tmp.id,
+                            name: tmp.name,
+                            symbol: tmp.symbol,
+                            type: tmp.type,
+                            disable: tmp.disable,
+                        },
+                    })
+                }
             }
 
             list.push(tmp)
@@ -455,16 +439,6 @@ const InsuranceFrom = () => {
             return
         }
     }, [userBalance])
-
-    useEffect(() => {
-        try {
-            if (account.address != null) {
-                getStorage()
-            }
-        } catch (error) {
-            console.log('error get USDT balance')
-        }
-    }, [account])
 
     // useEffect(() => {
     //     try {

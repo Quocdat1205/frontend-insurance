@@ -28,7 +28,7 @@ const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) 
                 <span
                     className={'hover:cursor-pointer ml-2'}
                     onClick={() => {
-                        return router.push('/ ')
+                        return router.push('/home')
                     }}
                 >
                     {t('insurance:buy:back_to_home')}
