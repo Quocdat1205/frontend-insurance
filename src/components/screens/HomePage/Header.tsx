@@ -81,7 +81,7 @@ const Header = () => {
 
     const menuAddress = [
         isMobile
-            ? { menuId: 'account-info', router: '/home', name: 'common:header:account_info_title', parentId: 0 }
+            ? { menuId: 'account-info', name: 'common:header:account_info_title', parentId: 0 }
             : {
                   menuId: 'account-info',
                   name: NameComponent,
@@ -103,7 +103,7 @@ const Header = () => {
     return (
         <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 homeNav:px-10 border-b border-divider sticky top-0 bg-white z-[50]">
             <div className="flex items-center justify-between w-full m-auto space-x-4 max-w-screen-layout 4xl:max-w-screen-4xl sm:space-x-12">
-                <div className="min-w-[67px] w-[75px]" onClick={() => router.push('/')}>
+                <div className="min-w-[67px] w-[75px] cursor-pointer" onClick={() => router.push('/')}>
                     <img src="/images/ic_logo.png" />
                 </div>
                 <div className="flex items-center justify-end w-full py-3 text-sm font-semibold homeNav:justify-between homeNav:py-0">

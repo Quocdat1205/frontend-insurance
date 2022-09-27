@@ -14,12 +14,13 @@ import { createSelector } from 'reselect'
 import { useRouter } from 'next/router'
 import { TendencyIcon } from 'components/common/Svg/SvgIcon'
 import colors from 'styles/colors'
-import { formatNumber } from 'utils/utils'
+import { formatNumber, getDecimalPrice } from 'utils/utils'
 import fetchApi from 'services/fetch-api'
 import { API_GET_FUTURES_MARKET_WATCH } from 'services/apis'
 import FuturesMarketWatch from 'models/FuturesMarketWatch'
 import { roundTo } from 'round-to'
 import dynamic from 'next/dynamic'
+import { PairConfig } from 'types/types'
 const LineChart = dynamic(() => import('components/common/Chart/LineChart'), {
     ssr: false,
 })
@@ -31,7 +32,8 @@ const getNewAssets = createSelector([(state: RootStore) => state.setting.assetsT
 const Assets = () => {
     const { t } = useTranslation()
     const assetsToken = useAppSelector((state: RootStore) => getNewAssets(state))
-    const { account } = useWeb3Wallet()
+    const allPairConfigs = useAppSelector((state: RootStore) => state.setting.pairConfigs)
+    const account = useAppSelector((state: RootStore) => state.setting.account)
     const { width } = useWindowSize()
     const isMobile = width && width < 640
     const router = useRouter()
@@ -42,8 +44,8 @@ const Assets = () => {
         Config.connectWallet()
     }
 
-    const onBuy = (id: string) => {
-        if (!account) {
+    const onBuy = (item: any) => {
+        if (!account.address) {
             Config.toast.show('error', t('common:please_connect_your_wallet'), {
                 button: (
                     <button className="text-sm font-semibold underline" onClick={onConnectWallet}>
@@ -52,41 +54,29 @@ const Assets = () => {
                 ),
             })
         } else {
-            console.log(id)
-
-            let state: any = localStorage.getItem('buy_covered_state')
-
-            const item = assetsToken.find((token: any) => {
-                console.log(token)
-
-                if (token._id === id) return token
-            })
-
-            if (item) {
-                const newSymbol = {
-                    timeframe: 'ALL',
-                    margin: 0,
-                    percent_margin: 0,
-                    symbol: {
-                        id: item._id,
-                        name: item.name,
-                        icon: item.attachment,
-                        symbol: `${item.symbol}USDT`,
-                        type: item.symbol,
-                        disable: !item.isActive,
-                    },
-                    period: 2,
-                    p_claim: 0,
-                    q_claim: 0,
-                    r_claim: 0,
-                    q_covered: 0,
-                    p_market: 0,
-                    t_market: 0,
-                    p_expired: 0,
-                    index: 1,
-                }
-                localStorage.setItem('buy_covered_state', JSON.stringify({ ...newSymbol }))
+            const newSymbol = {
+                timeframe: 'ALL',
+                margin: 0,
+                percent_margin: 0,
+                symbol: {
+                    id: item._id,
+                    name: item.name,
+                    icon: item.attachment,
+                    symbol: `${item.symbol}USDT`,
+                    type: item.symbol,
+                    disable: !item.isActive,
+                },
+                period: 2,
+                p_claim: 0,
+                q_claim: 0,
+                r_claim: 0,
+                q_covered: 0,
+                p_market: 0,
+                t_market: 0,
+                p_expired: 0,
+                index: 1,
             }
+            localStorage.setItem('buy_covered_state', JSON.stringify({ ...newSymbol }))
             setTimeout(() => {
                 router.push('/buy-covered')
             }, 2000)
@@ -134,6 +124,8 @@ const Assets = () => {
                 const _24hChange = pairPrice?.priceChangePercent * 100 || 0
                 const negative = _24hChange < 0
                 const sparkLineColor = negative ? colors.red.red : colors.success
+                const symbol = allPairConfigs.find((rs: PairConfig) => rs.baseAsset === asset?.symbol)
+                const decimal = getDecimalPrice(symbol)
                 // const sparkLine = sparkLineBuilder(asset?.symbol + 'USDT', sparkLineColor)
 
                 return (
@@ -150,7 +142,7 @@ const Assets = () => {
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <div className={`text-2xl sm:text-[1.875rem] sm:leading-[2.75rem] font-medium ${negative ? 'text-red' : 'text-success'}`}>
-                                        ${formatNumber(pairPrice?.lastPrice)}
+                                        ${formatNumber(pairPrice?.lastPrice, decimal)}
                                     </div>
                                     <div className="flex items-center space-x-1">
                                         <TendencyIcon down={negative} color={sparkLineColor} />
@@ -164,7 +156,7 @@ const Assets = () => {
                                     {/* <img src={sparkLine} alt="Nami Exchange" className="w-full" /> */}
                                 </div>
                             </div>
-                            <Button onClick={() => onBuy(asset?._id)} variants="outlined" className="py-3 font-medium text-sm sm:text-base">
+                            <Button onClick={() => onBuy(asset)} variants="outlined" className="py-3 font-medium text-sm sm:text-base">
                                 {t('home:landing:buy_covered')}
                             </Button>
                         </CardShadow>

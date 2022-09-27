@@ -74,6 +74,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
 
     useEffect(() => {
         if (address && account.address && account.address !== address) {
+            localStorage.setItem('PUBLIC_ADDRESS', address)
             dispatch(setAccount({ address: address }))
         }
     }, [account, address])
@@ -252,17 +253,6 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         { name: 'Trustwallet', icon: '/images/icons/ic_trustwallet.png', active: false, wallet: 'Trustwallet' },
         { name: t('common:other'), active: false, wallet: 'other' },
     ]
-
-    const disabledClick = (e: any) => {
-        e.stopPropagation()
-    }
-
-    useEffect(() => {
-        if (switchNetwork || networkError) window.addEventListener('click', disabledClick)
-        return () => {
-            window.removeEventListener('click', disabledClick)
-        }
-    }, [switchNetwork, networkError])
 
     if (!isVisible) return null
     return (

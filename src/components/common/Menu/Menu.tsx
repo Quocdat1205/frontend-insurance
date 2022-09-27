@@ -9,6 +9,7 @@ import { RootStore, useAppSelector } from 'redux/store'
 import { IconSvg } from 'types/types'
 import { screens } from 'utils/constants'
 import { isFunction } from 'utils/utils'
+import { useRouter } from 'next/router'
 
 interface MenuItem {
     name?: any
@@ -40,7 +41,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
     const isMobile = (width && width < screens.drawerHome) || mobile
     const [active, setActive] = useState<any>(null)
     const [isHover, setIsHover] = useState(false)
-    const account = useAppSelector((state: RootStore) => state.setting.account)
+    const router = useRouter()
 
     const onToggleMenu = (e: any, menu: any) => {
         const _active = !menu.parentId && (active?.parentId === menu.menuId || active?.menuId === menu.menuId) ? null : menu
@@ -98,6 +99,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
     const dataFilter = useMemo(() => recursiveData(data), [data])
 
     const renderMenu = (menu: any, index: number, child = false) => {
+        const isActive = router.pathname === menu?.router
         const hasChildren = menu.children.length > 0
         const _active = active?.menuId === menu.menuId || active?.parentId === menu.menuId
         const level = menu.level + 1
@@ -137,6 +139,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                 })}
                 isChild={child}
                 isDropdown={menu?.isDropdown}
+                active={isActive}
             >
                 {!hasChildren ? (
                     <div className="flex items-center px-4 space-x-4">
@@ -178,15 +181,17 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
 }
 
 interface Item {
-    isChild?: boolean,
-    isDropdown?: boolean,
+    isChild?: boolean
+    isDropdown?: boolean
+    active?: boolean
 }
 
-const ItemMenu = styled.li.attrs<Item>(({ isChild, isDropdown }) => ({
+const ItemMenu = styled.li.attrs<Item>(({ isChild, isDropdown, active }) => ({
     className: classnames('cursor-pointer text-sm py-3 relative lg:hover:active-menu', {
         'mb:hover:text-red': !isChild && !isDropdown,
         'lg:py-3': !isChild,
         'lg:!py-[10px] pl-4 font-normal lg:text-txtPrimary lg:hover:bg-hover lg:hover:rounded-[3px]': isChild,
+        'text-red': active,
     }),
 }))<Item>``
 export default Menu
