@@ -139,6 +139,9 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 setErrorConnect(true)
                 break
             default:
+                showIconReload.current = true
+                reason.current = t('errors:CONNECT_FAILED')
+                setErrorConnect(true)
                 break
         }
         setLoading(false)
@@ -179,11 +182,16 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 }
                 break
             case wallets.coinbaseWallet:
-                return
+                if (isMobile) {
+                    if (!Config.isMetaMaskInstalled) {
+                        window.open(`https://go.cb-w.com/dapp?cb_url=${Config.env.APP_URL}`)
+                        return
+                    }
+                }
+                break
             default:
                 break
         }
-
         if (!isMobile) Config.web3?.activate(wallet?.wallet)
         if (!oldAddress.current) return
         setErrorConnect(false)
