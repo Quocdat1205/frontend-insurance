@@ -2,12 +2,12 @@ import axios from 'axios'
 import Button from 'components/common/Button/Button'
 import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CheckBoxIcon, CheckCircle, ErrorCircleIcon, InfoCircle, LeftArrow, StartIcon, XMark } from 'components/common/Svg/SvgIcon'
 import { buyInsurance } from 'services/buy-insurance'
 import useWindowSize from 'hooks/useWindowSize'
-import { screens } from 'utils/constants'
+import { errorsWallet, screens } from 'utils/constants'
 import { useRouter } from 'next/router'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
@@ -18,6 +18,9 @@ import { ChevronDown, ChevronUp } from 'react-feather'
 import Modal from 'components/common/Modal/Modal'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
 import { Input } from 'components/common/Input/input'
+import { RootStore, useAppSelector } from 'redux/store'
+import { isString } from 'lodash'
+import { useWeb3React } from '@web3-react/core'
 
 export type IBuyInsurance = {
     createInsurance: number
@@ -56,6 +59,8 @@ const AcceptBuyInsurance = () => {
     const router = useRouter()
     const { width } = useWindowSize()
     const isMobile = width && width < screens.drawer
+    const { account: address, error, chainId, isActive } = useWeb3React()
+    const account = useAppSelector((state: RootStore) => state.setting.account)
     const [Noti, setNoti] = useState<string>('')
     const [price, setPrice] = useState<number>(0)
     const [checkUpgrade, setCheckUpgrade] = useState<boolean>(false)
@@ -68,11 +73,78 @@ const AcceptBuyInsurance = () => {
     const [saved, setSaved] = useState(0)
     const [referral, setReferral] = useState('')
     const [count, setCount] = useState(10)
+    const reason = useRef<any>(null)
+    const textErrorButton = useRef<string>(t(`common:reconnect`))
+    const showIconReload = useRef<boolean>(true)
+    const [errorConnect, setErrorConnect] = useState<boolean>(false)
+    const [switchNetwork, setSwitchNetwork] = useState<boolean>(false)
+    const [networkError, setNetworkError] = useState<boolean>(false)
+    const [isVisible, setVisible] = useState(false)
+    const isReload = useRef<boolean>(false)
 
     useEffect(() => {
         fetch()
         getData()
     }, [])
+
+    const inValidNetword = useMemo(() => {
+        return account.address ? (chainId ? Config.chains.includes(chainId) : false) : true
+    }, [chainId, account])
+
+    const lostConnection = () => {
+        connectionError({ code: errorsWallet.Connect_failed, message: t('errors:CONNECT_FAILED') })
+    }
+
+    const connectionError = (error: any) => {
+        let isNotFoundNetWork = false
+        const code = isString(error?.code) ? error?.code : Math.abs(error?.code)
+        switch (code) {
+            case 32600:
+            case 32601:
+            case 32602:
+            case 32603:
+            case errorsWallet.Cancel:
+                if (inValidNetword) {
+                    reason.current = t('errors:40001')
+                    textErrorButton.current = t(`common:reconnect`)
+                    showIconReload.current = true
+                    setErrorConnect(true)
+                }
+                break
+            case errorsWallet.Not_found:
+                isNotFoundNetWork = true
+                setNetworkError(true)
+                break
+            case errorsWallet.Success:
+                Config.toast.show('success', t('common:connect_successful'))
+                setVisible(false)
+                break
+            case errorsWallet.NetWork_error:
+                showIconReload.current = true
+                reason.current = t('common:network_error')
+                setErrorConnect(true)
+                break
+            case errorsWallet.Connect_failed:
+                reason.current = t('errors:CONNECT_FAILED')
+                textErrorButton.current = t(`common:refresh`)
+                isReload.current = true
+                setErrorConnect(true)
+                break
+            case errorsWallet.Already_opened:
+                reason.current = t('common:user_not_login')
+                showIconReload.current = false
+                textErrorButton.current = t('common:got_it')
+                setErrorConnect(true)
+                break
+            default:
+                showIconReload.current = true
+                reason.current = t('errors:CONNECT_FAILED')
+                setErrorConnect(true)
+                break
+        }
+        setLoading(false)
+        if (!isNotFoundNetWork) setSwitchNetwork(code !== errorsWallet.Success ? !inValidNetword : false)
+    }
 
     const getData = async () => {
         setLoading(true)
@@ -82,7 +154,9 @@ const AcceptBuyInsurance = () => {
             setState({ ...res })
 
             if (res.p_claim < res.p_market) {
-                setSaved(res.q_claim + res.q_covered * (res.p_claim - res.p_market) - res.margin + res.q_covered * Math.abs(res.p_claim - res.p_market))
+                console.log(res.q_claim + res.q_covered * (res.p_claim - res.p_market) - res.margin + res.q_covered * (res.p_market - res.p_claim))
+
+                setSaved(res.q_claim + res.q_covered * (res.p_claim - res.p_market) - res.margin + res.q_covered * (res.p_market - res.p_claim))
             }
 
             if (res.p_claim > res.p_market) {
@@ -122,7 +196,7 @@ const AcceptBuyInsurance = () => {
     // })
 
     const createContract = async () => {
-        if (!wallet.account) {
+        if (account.address == null) {
             return Config.toast.show('error', t('common:please_connect_your_wallet'), {
                 button: (
                     <button className="text-sm font-semibold underline" onClick={onConnectWallet}>
@@ -135,7 +209,7 @@ const AcceptBuyInsurance = () => {
         setActive(true)
 
         try {
-            if (wallet && state != undefined) {
+            if (account.address != null && state != undefined) {
                 const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${state.symbol}${state.unit}`)
 
                 if (data.data.length > 0) {
@@ -150,7 +224,7 @@ const AcceptBuyInsurance = () => {
 
                 if (!checkUpgrade && state != undefined) {
                     const dataPost = {
-                        buyer: wallet.account as string,
+                        buyer: account.address as string,
                         asset: state.symbol,
                         margin: formatPriceToWeiValue(Number(state.margin.toFixed(state.decimalList.decimal_margin))),
                         q_covered: formatPriceToWeiValue(Number(state.q_covered.toFixed(state.decimalList.decimal_q_covered))),
@@ -159,75 +233,87 @@ const AcceptBuyInsurance = () => {
                         period: Number(state.period),
                         isUseNain: false,
                     }
-                    const allowance = await wallet.contractCaller.usdtContract.contract.allowance(wallet.account, contractAddress)
-                    const parseAllowance = formatWeiValueToPrice(allowance)
-                    if (parseAllowance < state.margin) {
-                        await wallet.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(1000), { from: wallet.account })
-                    }
-                    const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
-                        dataPost.buyer,
-                        dataPost.asset,
-                        dataPost.margin,
-                        dataPost.q_covered,
-                        dataPost.p_market,
-                        dataPost.p_claim,
-                        dataPost.period,
-                        dataPost.isUseNain,
-                        { value: 0 },
-                    )
-                    await buy.wait()
+                    const token = await Config.web3.contractCaller.sign(account.address)
 
-                    const id_sc = await buy.wait()
-                    if (buy && id_sc.events[2].args[0]) {
-                        handlePostInsurance(buy, dataPost, state, Number(id_sc.events[2].args[0]))
+                    if (!token) {
+                        lostConnection()
+                        return
+                    }
+                    if (token?.message || token?.code) {
+                        connectionError(token)
+                    } else {
+                        const allowance = await Config.web3.contractCaller.usdtContract.contract.allowance(account.address, contractAddress)
+                        const parseAllowance = formatWeiValueToPrice(allowance)
+                        if (parseAllowance < state.margin) {
+                            await Config.web3.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(1000), {
+                                from: account.address,
+                            })
+                        }
+                        const buy = await Config.web3.contractCaller.insuranceContract.contract.createInsurance(
+                            dataPost.buyer,
+                            dataPost.asset,
+                            dataPost.margin,
+                            dataPost.q_covered,
+                            dataPost.p_market,
+                            dataPost.p_claim,
+                            dataPost.period,
+                            dataPost.isUseNain,
+                            { value: 0 },
+                        )
+                        await buy.wait()
+
+                        const id_sc = await buy.wait()
+                        if (buy && id_sc.events[2].args[0]) {
+                            handlePostInsurance(buy, dataPost, state, Number(id_sc.events[2].args[0]), token)
+                        }
                     }
                 }
-                if (checkUpgrade && state != undefined) {
-                    const dataPost = {
-                        buyer: wallet.account as string,
-                        asset: state.symbol,
-                        margin: formatPriceToWeiValue(Number(state.margin.toFixed(state.decimalList.decimal_margin))),
-                        q_covered: formatPriceToWeiValue(Number(state.q_covered.toFixed(state.decimalList.decimal_q_covered))),
-                        p_market: formatPriceToWeiValue(data.data[0].p),
-                        p_claim: formatPriceToWeiValue(Number(state.p_claim)),
-                        period: Number(state.period) + 2,
-                        isUseNain: true,
-                    }
+                // if (checkUpgrade && state != undefined) {
+                //     const dataPost = {
+                //         buyer: account.address as string,
+                //         asset: state.symbol,
+                //         margin: formatPriceToWeiValue(Number(state.margin.toFixed(state.decimalList.decimal_margin))),
+                //         q_covered: formatPriceToWeiValue(Number(state.q_covered.toFixed(state.decimalList.decimal_q_covered))),
+                //         p_market: formatPriceToWeiValue(data.data[0].p),
+                //         p_claim: formatPriceToWeiValue(Number(state.p_claim)),
+                //         period: Number(state.period) + 2,
+                //         isUseNain: true,
+                //     }
 
-                    const allowance = await wallet.contractCaller.usdtContract.contract.allowance(wallet.account, contractAddress)
-                    const parseAllowance = formatWeiValueToPrice(allowance)
-                    if (parseAllowance < state.margin) {
-                        await wallet.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(100000), {
-                            from: wallet.account,
-                        })
-                    }
-                    // if (state.symbol == 'ETH') {
-                    //     const allowance = await wallet.contractCaller.ethContract.contract.allowance(wallet.account, contractAddress)
-                    //     const parseAllowance = formatWeiValueToPrice(allowance)
-                    //     if (parseAllowance < state.margin) {
-                    //         await wallet.contractCaller.ethContract.contract.approve(contractAddress, formatPriceToWeiValue(state.margin), {
-                    //             from: wallet.account,
-                    //         })
-                    //     }
-                    // }
+                //     const allowance = await Config.web3.contractCaller.usdtContract.contract.allowance(account.address, contractAddress)
+                //     const parseAllowance = formatWeiValueToPrice(allowance)
+                //     if (parseAllowance < state.margin) {
+                //         await Config.web3.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(100000), {
+                //             from: account.address,
+                //         })
+                //     }
+                //     // if (state.symbol == 'ETH') {
+                //     //     const allowance = await wallet.contractCaller.ethContract.contract.allowance(wallet.account, contractAddress)
+                //     //     const parseAllowance = formatWeiValueToPrice(allowance)
+                //     //     if (parseAllowance < state.margin) {
+                //     //         await wallet.contractCaller.ethContract.contract.approve(contractAddress, formatPriceToWeiValue(state.margin), {
+                //     //             from: wallet.account,
+                //     //         })
+                //     //     }
+                //     // }
 
-                    const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
-                        dataPost.buyer,
-                        dataPost.asset,
-                        dataPost.margin,
-                        dataPost.q_covered,
-                        dataPost.p_market,
-                        dataPost.p_claim,
-                        dataPost.period,
-                        dataPost.isUseNain,
-                        { value: 0 },
-                    )
-                    await buy.wait()
-                    const id_sc = await buy.wait()
-                    if (buy && id_sc.events[2].args[0]) {
-                        handlePostInsurance(buy, dataPost, state, Number(id_sc.events[2].args[0]))
-                    }
-                }
+                //     const buy = await wallet.contractCaller.insuranceContract.contract.createInsurance(
+                //         dataPost.buyer,
+                //         dataPost.asset,
+                //         dataPost.margin,
+                //         dataPost.q_covered,
+                //         dataPost.p_market,
+                //         dataPost.p_claim,
+                //         dataPost.period,
+                //         dataPost.isUseNain,
+                //         { value: 0 },
+                //     )
+                //     await buy.wait()
+                //     const id_sc = await buy.wait()
+                //     if (buy && id_sc.events[2].args[0]) {
+                //         handlePostInsurance(buy, dataPost, state, Number(id_sc.events[2].args[0]))
+                //     }
+                // }
             }
         } catch (err) {
             console.log(err)
@@ -236,7 +322,7 @@ const AcceptBuyInsurance = () => {
         }
     }
 
-    const handlePostInsurance = async (props: any, dataPost: any, state: any, _id: any) => {
+    const handlePostInsurance = async (props: any, dataPost: any, state: any, _id: any, authToken: any) => {
         if (props) {
             try {
                 console.log(props)
@@ -261,6 +347,7 @@ const AcceptBuyInsurance = () => {
                     p_claim: Number(state.p_claim),
                     period: Number(state.period),
                     isUseNain: dataPost.isUseNain,
+                    authToken: authToken,
                 }
 
                 await buyInsurance(data).then((res) => {
@@ -277,8 +364,6 @@ const AcceptBuyInsurance = () => {
     const rangeOfRefund = () => {
         if (state) {
             const p_refund = 0.05 * state.p_market
-            console.log(state.p_claim.toFixed(state?.decimalList?.decimal_p_claim))
-
             if (p_refund > state.p_claim) {
                 return ` $${state.p_claim.toFixed(state?.decimalList?.decimal_p_claim)} - $${p_refund.toFixed(state?.decimalList?.decimal_p_claim)} `
             }

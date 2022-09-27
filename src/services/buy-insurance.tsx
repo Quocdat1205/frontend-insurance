@@ -13,10 +13,10 @@ export const buyInsurance = async (props: {
     p_claim: number
     period: number
     isUseNain: boolean
+    authToken: any
 }) => {
     try {
-        const { owner, transaction_hash, id_sc, asset_covered, asset_refund, margin, q_covered, p_claim, period, isUseNain } = props
-
+        const { owner, transaction_hash, id_sc, asset_covered, asset_refund, margin, q_covered, p_claim, period, isUseNain, authToken } = props
         const data = await axios.post(
             `${Config.env.API_URL}${API_GET_BUY_INSURANCE}`,
             {
@@ -37,7 +37,7 @@ export const buyInsurance = async (props: {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Headers': '*',
-                    Authorization: `Bearer ${Config.token.token}`,
+                    Authorization: `Bearer ${authToken}`,
                 },
             },
         )

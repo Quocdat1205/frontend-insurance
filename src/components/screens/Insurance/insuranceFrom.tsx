@@ -301,6 +301,8 @@ const InsuranceFrom = () => {
         }
     }
 
+    console.log(userBalance)
+
     const getConfig = (symbol: string) => {
         if (pairConfigs) {
             const item = pairConfigs.find((i: any) => {
@@ -337,6 +339,7 @@ const InsuranceFrom = () => {
                     type: res.type,
                     disable: res.disable,
                 })
+
                 setState({
                     ...state,
                     symbol: {
@@ -548,7 +551,7 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         refreshApi(selectTime, selectCoin)
-        getBalaneToken(selectCoin.type)
+
         const data = localStorage.getItem('buy_covered_state')
         if (data) {
             let res = JSON.parse(data)
@@ -685,17 +688,19 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         const _decimalList = { ...decimalList }
-        pair_configs?.filters?.map((item: any) => {
+        let _percentPrice: any
+        pair_configs?.filters?.map(async (item: any) => {
             if (item?.filterType === 'LOT_SIZE') {
+                const tmp = await getBalaneToken(selectCoin.type)
                 const decimal = countDecimals(item.stepSize)
                 _decimalList.decimal_q_covered = +decimal
-
-                const min = Number(item?.minQty)
-                const max = Number(item?.maxQty) < userBalance ? Number(item?.maxQty) : userBalance
-                setRangeQ_covered({ min: min, max: max })
+                const min_Market = +(10 / state.p_market).toFixed(+decimal)
+                const min = Number(item?.minQty) > min_Market ? Number(item?.minQty) : min_Market
+                const max = Number(item?.maxQty) < tmp ? Number(item?.maxQty) : tmp
+                setRangeQ_covered({ ...rangeQ_covered, min: min, max: max })
             }
             if (item?.filterType === 'PERCENT_PRICE') {
-                setPercentPrice({ ...item })
+                _percentPrice = item
             }
             if (item?.filterType === 'PRICE_FILTER') {
                 setPriceFilter({ ...item })
@@ -711,14 +716,14 @@ const InsuranceFrom = () => {
                 if (state.p_claim > state.p_market) {
                     setRangeP_claim({
                         ...rangeP_claim,
-                        min: Number(min1.toFixed(decimalList.decimal_p_claim)),
-                        max: Number(max1.toFixed(decimalList.decimal_p_claim)),
+                        min: Number(min1),
+                        max: Number(max1),
                     })
                 } else {
                     setRangeP_claim({
                         ...rangeP_claim,
-                        min: Number(min2.toFixed(decimalList.decimal_p_claim)),
-                        max: Number(max2.toFixed(decimalList.decimal_p_claim)),
+                        min: Number(min2),
+                        max: Number(max2),
                     })
                 }
             }
@@ -731,8 +736,38 @@ const InsuranceFrom = () => {
                 setRangeMargin({ ...rangeP_claim, min: MIN, max: MAX })
             }
             setDecimalList({ ..._decimalList })
+            setPercentPrice({ ..._percentPrice })
+            validateP_Claim(state.p_claim)
         })
     }, [pair_configs, state.q_covered, selectCoin, state.p_claim])
+
+    const validateP_Claim = (value: number) => {
+        const _rangeP_claim = rangeP_claim
+
+        let _check = true
+        //Pm*multiplierDown/Up
+        const PmDown = state.p_market * percentPrice?.multiplierDown
+        const PmUp = state.p_market * percentPrice?.multiplierUp
+        ///Pm*(1-minDifferenceRatio)
+        const Pm_minDiff = state.p_market * (1 - percentPrice?.minDifferenceRatio)
+        const Pm_maxDiff = state.p_market * (1 + percentPrice?.minDifferenceRatio)
+        if (state.p_claim < state.p_market) {
+            const min =
+                rangeQ_covered.min > PmDown ? (rangeQ_covered.min > Pm_minDiff ? rangeQ_covered.min : Pm_minDiff) : PmDown > Pm_minDiff ? PmDown : Pm_minDiff
+            const max = rangeQ_covered.min > PmUp ? (rangeQ_covered.min > Pm_minDiff ? rangeQ_covered.min : Pm_minDiff) : PmUp > Pm_minDiff ? PmUp : Pm_minDiff
+            _rangeP_claim.min = +min.toFixed(decimalList.decimal_p_claim)
+            _rangeP_claim.max = +max.toFixed(decimalList.decimal_p_claim)
+            return setRangeP_claim({ ..._rangeP_claim })
+        }
+        if (state.p_claim > state.p_market) {
+            const min =
+                rangeQ_covered.min > PmDown ? (rangeQ_covered.min > Pm_maxDiff ? rangeQ_covered.min : Pm_maxDiff) : PmDown > Pm_maxDiff ? PmDown : Pm_maxDiff
+            const max = rangeQ_covered.min > PmUp ? (rangeQ_covered.min > Pm_maxDiff ? rangeQ_covered.min : Pm_maxDiff) : PmUp > Pm_maxDiff ? PmUp : Pm_maxDiff
+            _rangeP_claim.min = +min.toFixed(decimalList.decimal_p_claim)
+            _rangeP_claim.max = +max.toFixed(decimalList.decimal_p_claim)
+            return setRangeP_claim({ ..._rangeP_claim })
+        }
+    }
 
     const validator = (key: string) => {
         let rs = { isValid: true, message: '' }
@@ -740,7 +775,7 @@ const InsuranceFrom = () => {
         switch (key) {
             case 'q_covered':
                 rs.isValid = !(
-                    state.q_covered > Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered)) ||
+                    state.q_covered > Number(rangeQ_covered?.max?.toFixed(decimalList.decimal_q_covered)) ||
                     state.q_covered < rangeQ_covered.min ||
                     state.q_covered <= 0
                 )
@@ -755,41 +790,14 @@ const InsuranceFrom = () => {
                 </div>`
                 break
             case 'p_claim':
-                rs.isValid =
-                    !(state.p_claim > Number(rangeP_claim.max) || state.p_claim < Number(rangeP_claim.min) || state.p_claim <= 0) &&
-                    !(Number(priceFilter?.minPrice) > state.p_claim || state.p_claim > Number(priceFilter?.maxPrice)) &&
-                    !(
-                        state.p_claim > Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered)) ||
-                        state.p_claim < Number((state.p_market * Number(percentPrice?.multiplierDown)).toFixed(decimalList.decimal_q_covered))
-                    )
-                if (state.p_claim > Number(rangeP_claim.max) || state.p_claim < Number(rangeP_claim.min)) {
-                    rs.message = `<div class="flex items-center">
+                rs.isValid = !(state.p_claim < rangeP_claim.min || state.p_claim > rangeP_claim.max)
+                rs.message = `<div class="flex items-center">
                   ${
                       state.p_claim > Number(rangeP_claim.max)
                           ? t('common:max', { value: `${Number(rangeP_claim.max)}` })
                           : t('common:min', { value: `${Number(rangeP_claim.min)}` })
                   }
                   </div>`
-                } else if (Number(priceFilter?.minPrice) > state.p_claim || state.p_claim > Number(priceFilter?.maxPrice)) {
-                    rs.message = `<div class="flex items-center">
-              ${
-                  state.p_claim > +priceFilter.maxPrice
-                      ? t('common:max', { value: `${Number(priceFilter.maxPrice)}` })
-                      : t('common:min', { value: `${Number(priceFilter.minPrice)}` })
-              }
-              </div>`
-                } else if (
-                    state.p_claim > Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered)) ||
-                    state.p_claim < Number((state.p_market * Number(percentPrice?.multiplierDown)).toFixed(decimalList.decimal_q_covered))
-                ) {
-                    rs.message = `<div class="flex items-center">
-              ${
-                  state.p_claim > Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered))
-                      ? t('common:max', { value: `${Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered))}` })
-                      : t('common:min', { value: `${Number((state.p_market * Number(percentPrice?.multiplierDown)).toFixed(decimalList.decimal_q_covered))}` })
-              }
-              </div>`
-                }
                 break
             case 'margin':
                 rs.isValid = !(state.margin < Number(rangeMargin.min) || state.margin > Number(rangeMargin.max) || state.margin <= 0)
@@ -1036,7 +1044,31 @@ const InsuranceFrom = () => {
                                                 </div>
                                                 <div className="flex flex-row w-full space-x-6 text-xs font-semibold">
                                                     <div className={`flex flex-row justify-between space-x-4 w-full `}>
-                                                        <div
+                                                        {[25, 50, 75, 100].map((data) => {
+                                                            return (
+                                                                <div
+                                                                    key={data}
+                                                                    className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
+                                                                    onClick={() => {
+                                                                        console.log(rangeQ_covered, 'min max')
+
+                                                                        setState({
+                                                                            ...state,
+                                                                            q_covered: Number(
+                                                                                ((data / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
+                                                                            ),
+                                                                        })
+                                                                        setPercentInsurance(data)
+                                                                    }}
+                                                                >
+                                                                    <div
+                                                                        className={`${percentInsurance == data ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}
+                                                                    ></div>
+                                                                    <div className={percentInsurance === data ? 'text-red' : 'text-gray'}>{data}%</div>
+                                                                </div>
+                                                            )
+                                                        })}
+                                                        {/* <div
                                                             className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                             onClick={() => {
                                                                 setState({
@@ -1089,7 +1121,7 @@ const InsuranceFrom = () => {
                                                         >
                                                             <div className={`${percentInsurance == 100 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
                                                             <div className={percentInsurance === 100 ? 'text-red' : 'text-gray'}>{100}%</div>
-                                                        </div>
+                                                        </div> */}
                                                     </div>
                                                 </div>
 
