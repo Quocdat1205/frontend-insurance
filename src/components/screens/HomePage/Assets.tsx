@@ -119,7 +119,7 @@ const Assets = () => {
     const renderAssets = () => (
         <div className="d-flex">
             {assetsToken.map((asset: any, index: number) => {
-                const _marketWatch = marketWatch.find((m: any) => m.b === asset?.symbol)
+                const _marketWatch = marketWatch.find((m: any) => m.b === asset?.symbol && m.q === 'USDT')
                 const pairPrice = FuturesMarketWatch.create(_marketWatch)
                 const _24hChange = pairPrice?.priceChangePercent * 100 || 0
                 const negative = _24hChange < 0
