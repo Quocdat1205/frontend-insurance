@@ -95,7 +95,7 @@
         "title": "Your wallet does not currently have BNB Smart Chain.",
         "description": "Please click 'Add BNB Smart Chain' and copy the following information",
         "network_name": "Network Name",
-        "new_url:": "New RPC URL",
+        "new_rpc_url": "New RPC URL",
         "chainID": "ChainID",
         "symbol": "Symbol",
         "add_bnb": "Add BNB Smart Chain"
@@ -105,5 +105,9 @@
     "available": "Available Balances {{value}}",
     "minimum_balance": "Minimum Balance {{value}}",
     "max": "Maximum {{value}}",
-    "min": "Minimum {{value}}"
+    "min": "Minimum {{value}}",
+    "refresh": "Refresh",
+    "dont_have_wallet": "Don't yet have a Wallet Extension? Explore <span class='text-blue underline cursor-pointer'>How to add a wallet </span> now",
+    "user_not_login": "User is not currently logged in. Please enter the user's password at the Wallet application.",
+    "got_it": "Got it"
 }

@@ -1,11 +1,11 @@
 import AOS from 'aos'
-import { useTranslation } from 'next-i18next'
-import React, { useEffect } from 'react'
-import styled from 'styled-components'
 import 'aos/dist/aos.css'
+import { useTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import styled from 'styled-components'
 import { RightArrow } from 'components/common/Svg/SvgIcon'
 import { DURATION_AOS } from 'utils/constants'
-import { useRouter } from 'next/router'
 
 //
 const LAST_INDEX = 2
@@ -59,7 +59,7 @@ const FeaturesLanding = () => {
                                     last={LAST_INDEX === index}
                                 >
                                     <Item key={index}>
-                                        <div className="flex flex-col h-full justify-start h-full lg:justify-between items-start p-6">
+                                        <div className="flex flex-col h-full justify-start lg:justify-between items-start p-6">
                                             <div className={'sm:mt-9 text-left max-w-[370px] mb-6 sm:bm-0'}>
                                                 <div className="text-xl lg:text-2xl font-medium text-red mb-2">{item.title}</div>
                                                 <div className="text-sm lg:text-base">{item.content}</div>
@@ -75,9 +75,9 @@ const FeaturesLanding = () => {
                     })}
 
                     {/* Use FlexBox instead grid to prevent image scale error --- image t0o large */}
-                    <div className="rounded-xl bg-hover flex flex-col w-full md:flex-row h-full justify-start h-full md:justify-between items-start">
-                        <div className={'flex-1 w-full h-full flex flex-col items-start justify-between md:min-h-[400px] p-6'}>
-                            <div className={'md:mt-9 text-left max-w-[370px] mb-6 md:bm-0'}>
+                    <div className="rounded-xl bg-hover flex flex-col w-full lg:flex-row justify-start h-full lg:justify-between items-start">
+                        <div className={'flex-1 w-full h-full flex flex-col items-start justify-between lg:min-h-[400px] p-6'}>
+                            <div className={'lg:mt-9 text-left max-w-[370px] mb-6 md:bm-0'}>
                                 <div className="text-xl md:text-2xl font-medium text-red mb-2">{features[2].title}</div>
                                 <div className="text-sm md:text-base">{features[2].content}</div>
                             </div>
@@ -95,8 +95,8 @@ const FeaturesLanding = () => {
 
 const DemandImage = styled.div.attrs({
     className:
-        'w-full flex bg-contain md:pt-0 pt-2 bg-no-repeat md:bg-cover rounded-b-xl md:rounded-r-md ' +
-        'min-h-[200px] max-h-[277px] mt-[3.625rem] md:mt-0 md:min-h-[400px]  ',
+        'w-full flex bg-contain lg:pt-0 pt-2 bg-no-repeat lg:bg-cover rounded-b-xl lg:rounded-r-md ' +
+        'h-[307px] mt-[3.625rem] lg:mt-0 lg:h-[400px]',
 })<any>`
     background-image: ${({ img }) => `url(${img})`};
     background-repeat: no-repeat;

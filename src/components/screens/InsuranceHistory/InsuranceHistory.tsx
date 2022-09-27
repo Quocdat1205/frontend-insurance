@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import Assets from 'components/screens/HomePage/Assets'
 import InsuranceContract from 'components/screens/InsuranceHistory/InsuranceContract'
 import Statistics from 'components/screens/InsuranceHistory/Statistics'
-import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import { useTranslation } from 'next-i18next'
 import Modal from 'components/common/Modal/Modal'
 import Popover from 'components/common/Popover/Popover'
@@ -21,7 +20,7 @@ const Guideline = dynamic(() => import('components/screens/InsuranceHistory/Guid
 
 const InsuranceHistory = () => {
     const unitConfig = useAppSelector((state: RootStore) => getUnit(state, 'USDT'))
-    const { account } = useWeb3Wallet()
+    const account = useAppSelector((state: RootStore) => state.setting.account)
     const { t } = useTranslation()
     const [showGuideModal, setShowGuideModal] = useState<boolean>(false)
     const [showTerminologyModal, setShowTerminologyModal] = useState<boolean>(false)
@@ -37,7 +36,7 @@ const InsuranceHistory = () => {
     }, [showGuide])
 
     useEffect(() => {
-        if (account && isMobile) checkGuideLine()
+        if (account?.address && isMobile) checkGuideLine()
     }, [account])
 
     const timer = useRef<any>(null)
@@ -48,7 +47,7 @@ const InsuranceHistory = () => {
                 url: API_CHECK_GUIDE_LINE,
                 options: { method: 'GET' },
                 params: {
-                    owner: account,
+                    owner: account?.address,
                 },
             })
             seen.current = data
@@ -70,7 +69,7 @@ const InsuranceHistory = () => {
                 url: API_UPDATE_GUIDE_LINE,
                 options: { method: 'GET' },
                 params: {
-                    owner: account,
+                    owner: account?.address,
                 },
             })
         } catch (e) {
@@ -125,14 +124,16 @@ const InsuranceHistory = () => {
                             </div>
                         </Popover>
                     </div>
-                    {((account && hasInsurance) || showGuide) && <Statistics hasInsurance={hasInsurance} unitConfig={unitConfig} />}
+                    {((account?.address && hasInsurance) || showGuide) && (
+                        <Statistics account={account?.address} hasInsurance={hasInsurance} unitConfig={unitConfig} />
+                    )}
                     <CardShadow mobileNoShadow className="sm:mt-12 sm:p-8">
                         <InsuranceContract
                             hasInsurance={hasInsurance}
                             setHasInsurance={setHasInsurance}
                             unitConfig={unitConfig}
                             showGuide={showGuide}
-                            account={account}
+                            account={account?.address}
                         />
                     </CardShadow>
                     <div className="pt-[30px] sm:pt-12">

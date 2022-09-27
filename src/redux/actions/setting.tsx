@@ -19,10 +19,6 @@ export const setting = () => async (dispatch: Dispatch) => {
     try {
         const address = localStorage.getItem('PUBLIC_ADDRESS')
         const wallet = localStorage.getItem('PUBLIC_WALLET')
-        const token_cookie = localStorage.getItem('PUBLIC_TOKEN_COOKIE')
-        if (token_cookie) {
-            Config.token.token = token_cookie
-        }
         if (address && wallet) {
             dispatch({
                 type: types.SET_ACCOUNT,
