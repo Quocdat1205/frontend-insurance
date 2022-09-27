@@ -5,8 +5,7 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
-        "build:staging": "cp .env.staging .env.production && next build",
-        "start:staging": "next start -p 3001",
+        "build:staging": "cp .env.staging .env.production && next build && next start -p 3001",
         "start": "next start -p 9837",
         "lint:es": "eslint . --ext ts,tsx,js",
         "lint:fix": "eslint --fix --ext .ts,.tsx,.js .",
