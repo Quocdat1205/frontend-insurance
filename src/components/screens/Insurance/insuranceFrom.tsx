@@ -374,9 +374,7 @@ const InsuranceFrom = () => {
                         `${Math.ceil(timeEnd.getTime() / 1000)}`,
                         '1m',
                         setDataChart,
-                    ).then(() => {
-                        return setLoadings(false)
-                    })
+                    )
                 } else if (selectTime == '1W') {
                     timeBegin.setDate(timeEnd.getDate() - 10)
                     fetchApiNami(
@@ -385,9 +383,7 @@ const InsuranceFrom = () => {
                         `${Math.ceil(timeEnd.getTime() / 1000)}`,
                         '1h',
                         setDataChart,
-                    ).then(() => {
-                        return setLoadings(false)
-                    })
+                    )
                 } else {
                     timeBegin.setDate(timeEnd.getDate() - 10)
                     fetchApiNami(
@@ -396,13 +392,13 @@ const InsuranceFrom = () => {
                         `${Math.ceil(timeEnd.getTime() / 1000)}`,
                         '1h',
                         setDataChart,
-                    ).then(() => {
-                        return setLoadings(false)
-                    })
+                    )
                 }
             }
         } catch (err) {
             console.log(err)
+        } finally {
+            setLoadings(false)
         }
     }
 

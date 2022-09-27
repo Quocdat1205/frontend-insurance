@@ -185,9 +185,12 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             valueAxis.tooltip.disabled = true
 
             let gradient = new am4core.LinearGradient()
-            gradient.addColor(am4core.color('#EB2B3E'), 1)
-            gradient.addColor(am4core.color('#EB2B3E'), 0)
-            gradient.rotation = 45
+            gradient.addColor(am4core.color('red'))
+            gradient.addColor(am4core.color('red'))
+            gradient.addColor(am4core.color('blue'))
+            gradient.addColor(am4core.color('blue'))
+            gradient.addColor(am4core.color('blue'))
+            gradient.rotation = 90
 
             let series = chart.series.push(new am4charts.LineSeries())
             series.dataFields.dateX = 'date'
