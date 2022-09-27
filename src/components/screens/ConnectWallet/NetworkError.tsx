@@ -30,7 +30,7 @@ const NetworkError = () => {
                     </div>
                 </div>
                 <div className="flex items-center justify-between">
-                    <div className="text-txtSecondary">{t('common:not_found_network:new_url')}</div>
+                    <div className="text-txtSecondary">{t('common:not_found_network:new_rpc_url')}</div>
                     <div onClick={() => onCopy('https://bsc-dataseed.binance.org/')} className="font-semibold flex items-center space-x-1">
                         <span>https://bsc-dataseed.binance.org/</span>
                         <CopyIcon size={18} />
