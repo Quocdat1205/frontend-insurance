@@ -100,7 +100,7 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
     return active ? (
         isMobile ? (
             <>
-                <div className="w-full absolute z-50 bg-gray/[0.25] flex flex-col-reverse">
+                <div className="w-full absolute z-50 bg-gray/[0.25] flex flex-col-reverse ">
                     {noti.map((item, index) => {
                         if (item.name === name) {
                             return (
@@ -184,7 +184,7 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
             </>
         ) : (
             <>
-                <div className="z-50 flex flex-col-reverse ">
+                <div className={`z-50 flex flex-col-reverse ${name == 'loading' && '!m-[3rem]'} `}>
                     {noti.map((item, index) => {
                         if (item.name === name) {
                             return (

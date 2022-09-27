@@ -184,13 +184,14 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             valueAxis.hidden = true
             valueAxis.tooltip.disabled = true
 
-            let gradient = new am4core.LinearGradient()
-            gradient.addColor(am4core.color('red'))
-            gradient.addColor(am4core.color('red'))
-            gradient.addColor(am4core.color('blue'))
-            gradient.addColor(am4core.color('blue'))
-            gradient.addColor(am4core.color('blue'))
-            gradient.rotation = 90
+            chart.events.on('datavalidated', function () {
+                dateAxis.zoom({ start: 1 / 500, end: 1.1 }, false, true)
+            })
+
+            // let gradient = new am4core.LinearGradient()
+            // gradient.addColor(am4core.color('#EB2B3E'), 0.15, 0)
+            // gradient.addColor(am4core.color('#EB2B3E'), 1, 1)
+            // gradient.rotation = 270
 
             let series = chart.series.push(new am4charts.LineSeries())
             series.dataFields.dateX = 'date'
@@ -203,6 +204,13 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             series.fullWidthLineX = 0.05
             series.fullWidthLineY = 0.05
             series.fillOpacity = 0.25
+            // series.fill = gradient
+
+            // series.fillOpacity = 1
+            let gradient = new am4core.LinearGradient()
+            gradient.addColor(am4core.color('#EB2B3E'), 1, 1)
+            gradient.addColor(am4core.color('#EB2B3E'), 0, 0)
+            gradient.rotation = 90
             series.fill = gradient
 
             //chart sub

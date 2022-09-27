@@ -45,9 +45,11 @@ const InsuranceFrom = () => {
     const pairConfigs = useAppSelector((state: RootStore) => state.setting.pairConfigs)
     const account = useAppSelector((state: RootStore) => state.setting.account)
 
-    const [percentInsurance, setPercentInsurance] = useState<number>(0)
     const [selectTime, setSelectTime] = useState<string>('ALL')
     const clear = useRef<boolean>(false)
+    const percentInsurance = useRef<number>(0)
+    const percentMargin = useRef<number>(8)
+
     const [index, setIndex] = useState<1 | 2>(1)
     const [tab, setTab] = useState<number>(0)
     const [loadings, setLoadings] = useState(true)
@@ -280,11 +282,9 @@ const InsuranceFrom = () => {
         setThisFisrt(false)
     }
 
-    const [percentMargin, setPercentMargin] = useState(8)
-
     const updateFormPercentMargin = (value: number) => {
         if (state.q_covered > 0) {
-            setPercentMargin(value)
+            percentMargin.current = value
             setState({
                 ...state,
                 percent_margin: value,
@@ -366,16 +366,7 @@ const InsuranceFrom = () => {
         setLoadings(true)
         try {
             if (selectCoin.symbol !== '') {
-                if (selectTime == '1H' || selectTime == '1D') {
-                    timeBegin.setDate(timeEnd.getDate() - 10)
-                    fetchApiNami(
-                        `${selectCoin.type && selectCoin.type}${unitMoney}`,
-                        `${Math.floor(timeBegin.getTime() / 1000)}`,
-                        `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                        '1m',
-                        setDataChart,
-                    )
-                } else if (selectTime == '1W') {
+                if (selectTime == '1H') {
                     timeBegin.setDate(timeEnd.getDate() - 10)
                     fetchApiNami(
                         `${selectCoin.type && selectCoin.type}${unitMoney}`,
@@ -383,6 +374,17 @@ const InsuranceFrom = () => {
                         `${Math.ceil(timeEnd.getTime() / 1000)}`,
                         '1h',
                         setDataChart,
+                        120,
+                    )
+                } else if (selectTime == '1W' || selectTime == '1D') {
+                    timeBegin.setDate(timeEnd.getDate() - 10)
+                    fetchApiNami(
+                        `${selectCoin.type && selectCoin.type}${unitMoney}`,
+                        `${Math.floor(timeBegin.getTime() / 1000)}`,
+                        `${Math.ceil(timeEnd.getTime() / 1000)}`,
+                        '1d',
+                        setDataChart,
+                        500,
                     )
                 } else {
                     timeBegin.setDate(timeEnd.getDate() - 10)
@@ -390,8 +392,9 @@ const InsuranceFrom = () => {
                         `${selectCoin.type && selectCoin.type}${unitMoney}`,
                         `${Math.floor(timeBegin.getTime() / 1000)}`,
                         `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                        '1h',
+                        '1d',
                         setDataChart,
+                        1095,
                     )
                 }
             }
@@ -576,6 +579,30 @@ const InsuranceFrom = () => {
         const res_q_covered = validator('p_claim')
         validator('q_covered')
         validator('margin')
+
+        if (state.q_covered > 0) {
+            if (userBalance > 0) {
+                const a = Math.ceil((state.q_covered / userBalance) * 100)
+                percentInsurance.current = a >= 100 ? 100 : a
+            }
+        }
+
+        if (state.margin > 0) {
+            if (userBalance > 0) {
+                const b = Math.ceil((state.margin / (state.q_covered * state.p_market)) * 100)
+                if (b >= 10 || state.margin == rangeMargin.max) {
+                    percentMargin.current = 10
+                } else if (b >= 7) {
+                    percentMargin.current = 7
+                } else if (b >= 5) {
+                    percentMargin.current = 5
+                } else if (b >= 2) {
+                    percentMargin.current = 2
+                } else {
+                    percentMargin.current = b
+                }
+            }
+        }
 
         if (res_q_covered.isValid) {
             if (state.q_covered && state.p_claim) {
@@ -920,13 +947,13 @@ const InsuranceFrom = () => {
         switch (key) {
             case 'q_covered':
                 setState({ ...state, [key]: value })
-                setPercentInsurance(0)
+                percentInsurance.current = 0
                 break
             case 'p_claim':
                 setState({ ...state, [key]: value })
                 break
             case 'margin':
-                setPercentMargin(0)
+                percentMargin.current = 0
                 setState({ ...state, margin: value, percent_margin: 0 })
                 break
             default:
@@ -938,6 +965,8 @@ const InsuranceFrom = () => {
         if (account.address == null) {
             return false
         } else if (state.q_covered <= 0 || state.margin <= 0 || state.p_claim <= 0) {
+            return false
+        } else if (userBalance == null || userBalance == 0) {
             return false
         } else {
             return true
@@ -1037,23 +1066,27 @@ const InsuranceFrom = () => {
                                                                             key={data}
                                                                             className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                                             onClick={() => {
-                                                                                setState({
-                                                                                    ...state,
-                                                                                    q_covered: Number(
-                                                                                        ((data / 100) * rangeQ_covered.max).toFixed(
-                                                                                            decimalList.decimal_q_covered,
+                                                                                if (userBalance) {
+                                                                                    setState({
+                                                                                        ...state,
+                                                                                        q_covered: Number(
+                                                                                            ((data / 100) * rangeQ_covered.max).toFixed(
+                                                                                                decimalList.decimal_q_covered,
+                                                                                            ),
                                                                                         ),
-                                                                                    ),
-                                                                                })
-                                                                                setPercentInsurance(data)
+                                                                                    })
+                                                                                    percentInsurance.current = data
+                                                                                }
                                                                             }}
                                                                         >
                                                                             <div
                                                                                 className={`${
-                                                                                    percentInsurance == data ? 'bg-red' : 'bg-gray-1'
+                                                                                    percentInsurance.current == data ? 'bg-red' : 'bg-gray-1'
                                                                                 } h-1 w-full rounded-sm`}
                                                                             ></div>
-                                                                            <div className={percentInsurance === data ? 'text-red' : 'text-gray'}>{data}%</div>
+                                                                            <div className={percentInsurance.current === data ? 'text-red' : 'text-gray'}>
+                                                                                {data}%
+                                                                            </div>
                                                                         </div>
                                                                     )
                                                                 })}
@@ -1309,10 +1342,10 @@ const InsuranceFrom = () => {
                                                                             >
                                                                                 <div
                                                                                     className={`${
-                                                                                        percentMargin == item ? 'bg-red' : 'bg-gray-1'
+                                                                                        percentMargin.current == item ? 'bg-red' : 'bg-gray-1'
                                                                                     } h-1 w-full rounded-sm`}
                                                                                 ></div>
-                                                                                <span className={percentMargin == item ? 'text-red' : 'text-gray'}>
+                                                                                <span className={percentMargin.current == item ? 'text-red' : 'text-gray'}>
                                                                                     {item}%
                                                                                 </span>
                                                                             </div>
@@ -1538,19 +1571,23 @@ const InsuranceFrom = () => {
                                                                 key={data}
                                                                 className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                                 onClick={() => {
-                                                                    setState({
-                                                                        ...state,
-                                                                        q_covered: Number(
-                                                                            ((data / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
-                                                                        ),
-                                                                    })
-                                                                    setPercentInsurance(data)
+                                                                    if (userBalance > 0) {
+                                                                        setState({
+                                                                            ...state,
+                                                                            q_covered: Number(
+                                                                                ((data / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
+                                                                            ),
+                                                                        })
+                                                                        percentInsurance.current = data
+                                                                    }
                                                                 }}
                                                             >
                                                                 <div
-                                                                    className={`${percentInsurance == data ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}
+                                                                    className={`${
+                                                                        percentInsurance.current == data ? 'bg-red' : 'bg-gray-1'
+                                                                    } h-1 w-full rounded-sm`}
                                                                 ></div>
-                                                                <div className={percentInsurance === data ? 'text-red' : 'text-gray'}>{data}%</div>
+                                                                <div className={percentInsurance.current == data ? 'text-red' : 'text-gray'}>{data}%</div>
                                                             </div>
                                                         )
                                                     })}
@@ -1565,9 +1602,11 @@ const InsuranceFrom = () => {
                                                                 }}
                                                             >
                                                                 <div
-                                                                    className={`${percentMargin == data ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}
+                                                                    className={`${
+                                                                        percentMargin.current == data ? 'bg-red' : 'bg-gray-1'
+                                                                    } h-1 w-full rounded-sm`}
                                                                 ></div>
-                                                                <div className={percentMargin === data ? 'text-red' : 'text-gray'}>{data}%</div>
+                                                                <div className={percentMargin.current === data ? 'text-red' : 'text-gray'}>{data}%</div>
                                                             </div>
                                                         )
                                                     })}
@@ -1959,10 +1998,12 @@ const InsuranceFrom = () => {
     )
 }
 
-export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any) => {
+export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any, timeLine: number) => {
     try {
         const ts = Math.round(new Date().getTime() / 1000)
-        const tsYesterday = ts - 7 * (24 * 3600)
+        console.log(timeLine)
+
+        const tsYesterday = ts - timeLine * (24 * 3600)
         const params = {
             broker: 'NAMI_SPOT',
             symbol: symbol,

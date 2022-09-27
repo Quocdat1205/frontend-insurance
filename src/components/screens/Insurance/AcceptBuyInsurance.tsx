@@ -12,7 +12,7 @@ import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatPriceToWeiValue, formatWeiValueToPrice } from 'utils/format'
 import { contractAddress } from 'components/web3/constants/contractAddress'
-import { Popover } from '@headlessui/react'
+import { Menu, Popover } from '@headlessui/react'
 import { ChevronDown } from 'react-feather'
 import Modal from 'components/common/Modal/Modal'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
@@ -82,6 +82,7 @@ const AcceptBuyInsurance = () => {
     const [networkError, setNetworkError] = useState<boolean>(false)
     const [isVisible, setVisible] = useState(false)
     const isReload = useRef<boolean>(false)
+    const unitMoney = useRef<string>('USDT')
 
     useEffect(() => {
         fetch()
@@ -224,10 +225,11 @@ const AcceptBuyInsurance = () => {
 
                     if (!token) {
                         lostConnection()
-                        return
+                        return setActive(false)
                     }
                     if (token?.message || token?.code) {
                         connectionError(token)
+                        return setActive(false)
                     } else {
                         const allowance = await Config.web3.contractCaller.usdtContract.contract.allowance(account.address, contractAddress)
                         const parseAllowance = formatWeiValueToPrice(allowance)
@@ -355,8 +357,10 @@ const AcceptBuyInsurance = () => {
     return !loading && state != undefined ? (
         <>
             <Modal
+                isMobile={isMobile == true && true}
                 portalId="modal"
                 isVisible={active}
+                closeButton={Noti == 'loading' && false}
                 onBackdropCb={() => {
                     if (Noti == 'email' || Noti == 'loading') {
                         setActive(false)
@@ -365,7 +369,7 @@ const AcceptBuyInsurance = () => {
                         setNoti('email')
                     }
                 }}
-                className={`${!isMobile ? 'w-max' : 'rounded-none !sticky !bottom-0 !left-0 !translate-y-0 !translate-x-0 !h-1/2'} `}
+                className={`${!isMobile ? 'w-max' : 'rounded-none !sticky !bottom-0 !left-0 !translate-y-0 !translate-x-0'} ${Noti === 'loading' && ''}`}
             >
                 <NotificationInsurance id={res ? res : ''} name={`${Noti}`} state={state} active={active} setActive={() => setActive(false)} isMobile={false} />
             </Modal>
@@ -453,14 +457,49 @@ const AcceptBuyInsurance = () => {
                                                 <Tooltip className="max-w-[200px] !left-[120px] !top-[179px]" id={'q_claim'} placement="right" />
                                             </div>
                                         </div>
-                                        <div className={'font-semibold flex flex-row items-center'}>
+                                        <div className={'font-semibold flex flex-row items-center '}>
                                             <span className={`${checkUpgrade ? 'line-through text-txtSecondary pr-[8px] text-xs' : 'pr-[8px]'}`}>
                                                 {(state?.q_claim).toFixed(state?.decimalList?.decimal_q_covered)}
                                             </span>{' '}
                                             <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
                                                 {(state?.q_claim + (state?.q_claim * 5) / 100).toFixed(state?.decimalList?.decimal_q_covered)}
                                             </span>{' '}
-                                            <span className={''}>{state?.unit}</span>
+                                            <div className="relative">
+                                                <Menu>
+                                                    <Menu.Button className={' text-blue underline hover:cursor-pointer'}>
+                                                        <span className={'text-redPrimary decoration-white underline'}>{unitMoney.current}</span>
+                                                    </Menu.Button>
+                                                    <Menu.Items
+                                                        className={'flex flex-col text-txtPrimary  bg-white absolute w-max right-0 text-base'}
+                                                        style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                                                    >
+                                                        <Menu.Item>
+                                                            {({ active }) => (
+                                                                <a
+                                                                    className={`${active && 'bg-blue-500'} py-[0.5rem] px-[1rem] w-max hover:bg-hover`}
+                                                                    onClick={() => {
+                                                                        unitMoney.current = 'USDT'
+                                                                    }}
+                                                                >
+                                                                    <span>{'USDT'}</span>
+                                                                </a>
+                                                            )}
+                                                        </Menu.Item>
+                                                        <Menu.Item>
+                                                            {({ active }) => (
+                                                                <a
+                                                                    className={`${active && 'bg-blue-500'} py-[0.5rem] px-[1rem] w-max hover:bg-hover`}
+                                                                    onClick={() => {
+                                                                        unitMoney.current = state.symbol
+                                                                    }}
+                                                                >
+                                                                    <span>{state.symbol}</span>
+                                                                </a>
+                                                            )}
+                                                        </Menu.Item>
+                                                    </Menu.Items>
+                                                </Menu>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
@@ -538,6 +577,7 @@ const AcceptBuyInsurance = () => {
                                                         id="test1"
                                                         checked={checkUpgrade}
                                                         onClick={() => setCheckUpgrade(!checkUpgrade)}
+                                                        onChange={() => {}}
                                                     />
                                                     <CheckBoxIcon
                                                         bgColor="#F7F8FA"
@@ -550,6 +590,7 @@ const AcceptBuyInsurance = () => {
                                                         checkBorderColor="#EB2B3E"
                                                         className="hover:cursor-pointer mr-[8px]"
                                                         onClick={() => setCheckUpgrade(!checkUpgrade)}
+                                                        onChange={() => {}}
                                                     />
                                                     <label htmlFor="test1" className="select-none font-semibold text-base text-txtPrimary">
                                                         {t('insurance:buy:upgrade')}
@@ -675,7 +716,43 @@ const AcceptBuyInsurance = () => {
                                         <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
                                             {(state?.q_claim + (state?.q_claim * 5) / 100).toFixed(state?.decimalList?.decimal_q_covered)}
                                         </span>{' '}
-                                        <span className={'pl-[8px]'}>{state?.unit}</span>
+                                        {/* <span className={'pl-[8px]'}>{state?.unit}</span> */}
+                                        <div className="relative pl-[0.5rem]">
+                                            <Menu>
+                                                <Menu.Button className={' text-blue underline hover:cursor-pointer min-w-[2.5rem]'}>
+                                                    <span className={'text-redPrimary decoration-white underline '}>{unitMoney.current}</span>
+                                                </Menu.Button>
+                                                <Menu.Items
+                                                    className={'flex flex-col text-txtPrimary  bg-white absolute w-max right-0 text-base'}
+                                                    style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                                                >
+                                                    <Menu.Item>
+                                                        {({ active }) => (
+                                                            <a
+                                                                className={`${active && 'bg-blue-500'} py-[0.5rem] px-[1rem] w-max hover:bg-hover`}
+                                                                onClick={() => {
+                                                                    unitMoney.current = 'USDT'
+                                                                }}
+                                                            >
+                                                                <span>{'USDT'}</span>
+                                                            </a>
+                                                        )}
+                                                    </Menu.Item>
+                                                    <Menu.Item>
+                                                        {({ active }) => (
+                                                            <a
+                                                                className={`${active && 'bg-blue-500'} py-[0.5rem] px-[1rem] w-max hover:bg-hover`}
+                                                                onClick={() => {
+                                                                    unitMoney.current = state.symbol
+                                                                }}
+                                                            >
+                                                                <span>{state.symbol}</span>
+                                                            </a>
+                                                        )}
+                                                    </Menu.Item>
+                                                </Menu.Items>
+                                            </Menu>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
@@ -750,7 +827,7 @@ const AcceptBuyInsurance = () => {
                                                     type="radio"
                                                     id="test1"
                                                     checked={checkUpgrade}
-                                                    onChange={(e) => {}}
+                                                    onChange={() => {}}
                                                     onClick={() => setCheckUpgrade(!checkUpgrade)}
                                                 />
                                                 <CheckBoxIcon
@@ -764,7 +841,7 @@ const AcceptBuyInsurance = () => {
                                                     checkBorderColor="#EB2B3E"
                                                     className="hover:cursor-pointer mr-[8px]"
                                                     onClick={() => setCheckUpgrade(!checkUpgrade)}
-                                                    onChange={(e: any) => {}}
+                                                    onChange={() => {}}
                                                 />
                                                 <label htmlFor="test1" className="select-none text-sm text-txtPrimary font-semibold">
                                                     {t('insurance:buy:upgrade')}

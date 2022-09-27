@@ -102,7 +102,7 @@
     "slogan_second": "Thành lợi nhuận",
     "available": "Số dư khả dụng {{value}}",
     "minimum_balance": "Số dư tối thiểu {{value}}",
-    "max": "Tối da {{value}}",
+    "max": "Tối đa {{value}}",
     "min": "Tối thiểu {{value}}",
     "refresh": "Thử lại",
     "dont_have_wallet": "Chưa sở hữu Ví? Xem <span class='text-blue underline cursor-pointer'>Hướng dẫn tạo Ví</span> ngay",
