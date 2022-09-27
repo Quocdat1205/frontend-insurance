@@ -78,10 +78,10 @@
     "installer": {
         "metamask_title": "Install Metamask Extension",
         "metamask_content": "Please add Metamask Extension to continue the wallet connection process with Nami Insurance.",
-        "metamask_guide": "Having trouble installing the wallet? Read more <span class='text-blue underline cursor-pointer'>how to Install Metamask Extension</span> now.",
+        "metamask_guide": "Having trouble installing the wallet? Read more <span class='underline cursor-pointer text-blue'>how to Install Metamask Extension</span> now.",
         "coinbase_title": "Cài đặt Coinbase Wallet Extension",
         "coinbase_content": "Vui lòng cài đặt Coinbase Wallet Extension để tiếp tục quá trình kết nối ví đến Nami Insurance.",
-        "coinbase_guide": "Chưa biết cách cài đặt ví? Đọc <span class='text-blue underline cursor-pointer'>Hướng dẫn cài đặt Coinbase Wallet Extension</span> ngay.",
+        "coinbase_guide": "Chưa biết cách cài đặt ví? Đọc <span class='underline cursor-pointer text-blue'>Hướng dẫn cài đặt Coinbase Wallet Extension</span> ngay.",
         "install": "Install"
     },
     "error_switch_network": "Connection failed! Please switch network to connect wallet.",
@@ -112,7 +112,7 @@
 
     "modal": {
         "dont_show_later": "Không hiện lại thông báo này",
-        "email_placeholder": "Email",
+        "email_placeholder": "Enter Email",
         "error_format_email": "Incorrect Email format. Ex: xxx@gmail.com",
 
         "success_update_email": "Update Email successfully",
@@ -134,6 +134,8 @@
             "request_placeholder": "How can we help you?",
 
             "send_request": "Submit your request",
+            "sending_request": "Submitting",
+
 
             "send_success_title": "Your request was sent",
             "send_success_desc": "We will respond within 2-3 working days. Please check your mail box regularly"

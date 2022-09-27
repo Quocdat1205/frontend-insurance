@@ -213,6 +213,11 @@ class Config {
             parentId: 0,
             section: 'faq_section',
         },
+        {
+            menuId: 'modal_contact',
+            name: 'home:landing:contact',
+            parentId: 0,
+        },
     ]
 }
 
