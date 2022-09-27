@@ -95,7 +95,7 @@
         "title": "Your wallet does not currently have BNB Smart Chain.",
         "description": "Please click 'Add BNB Smart Chain' and copy the following information",
         "network_name": "Network Name",
-        "new_url:": "New RPC URL",
+        "new_rpc_url": "New RPC URL",
         "chainID": "ChainID",
         "symbol": "Symbol",
         "add_bnb": "Add BNB Smart Chain"

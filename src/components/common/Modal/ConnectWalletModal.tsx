@@ -100,6 +100,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     }, [isActive, chainId, account, loading, inValidNetword])
 
     const connectionError = (error: any) => {
+        let isNotFoundNetWork = false
         const code = isString(error?.code) ? error?.code : Math.abs(error?.code)
         switch (code) {
             case 32600:
@@ -115,6 +116,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 }
                 break
             case errorsWallet.Not_found:
+                isNotFoundNetWork = true
                 setNetworkError(true)
                 break
             case errorsWallet.Success:
@@ -145,7 +147,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 break
         }
         setLoading(false)
-        setSwitchNetwork(code !== errorsWallet.Success ? !inValidNetword : false)
+        if (!isNotFoundNetWork) setSwitchNetwork(code !== errorsWallet.Success ? !inValidNetword : false)
     }
 
     const onShow = () => {
@@ -250,6 +252,17 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         { name: 'Trustwallet', icon: '/images/icons/ic_trustwallet.png', active: false, wallet: 'Trustwallet' },
         { name: 'Khác', active: false, wallet: 'other' },
     ]
+
+    const disabledClick = (e: any) => {
+        e.stopPropagation()
+    }
+
+    useEffect(() => {
+        if (switchNetwork || networkError) window.addEventListener('click', disabledClick)
+        return () => {
+             window.removeEventListener('click', disabledClick)
+        }
+    }, [switchNetwork, networkError])
 
     if (!isVisible) return null
     return (
