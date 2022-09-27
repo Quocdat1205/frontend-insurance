@@ -498,8 +498,8 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
 
 const NoData = ({ hasInsurance, onBuyInsurance, t, account }: any) => {
     return (
-        <div className="w-full flex flex-col items-center justify-center pt-8 pb-4 sm:py-0">
-            <div>
+        <div className="w-full flex flex-col items-center justify-center pt-8 pb-4 sm:py-0 sm:min-h-[300px]">
+            <div className="sm:min-h-[255px]">
                 <img className="max-w-[230px] sm:max-w-[310px]" src="/images/icons/bg_noData.png" />
             </div>
             <div className="mt-4 pb-6">

@@ -10,7 +10,7 @@ const Breadcrumbs = ({ children }: any) => {
 
     if (!mount) return null
     return (
-        <div className="bg-hover px-4 sm:px-10">
+        <div className="bg-hover px-4 mb:px-10">
             <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto flex items-center flex-wrap text-xs sm:text-sm text-txtSecondary py-2 sm:py-4 ">
                 {children.length ? (
                     children.map((child: any, index: number) => (

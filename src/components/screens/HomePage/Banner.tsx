@@ -8,10 +8,12 @@ import useWindowSize from 'hooks/useWindowSize'
 import { API_GET_INFO_GENERAL } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { DURATION_AOS } from 'utils/constants'
-import { formatNumber } from 'utils/utils'
+import { formatNumber, getUnit } from 'utils/utils'
 import 'aos/dist/aos.css'
+import { RootStore, useAppSelector } from 'redux/store'
 
 const Banner = () => {
+    const unitConfig = useAppSelector((state: RootStore) => getUnit(state, 'USDT'))
     const { width } = useWindowSize()
     const { t } = useTranslation()
     const isMobile = width && width < 640
@@ -36,12 +38,27 @@ const Banner = () => {
 
     const list = useMemo(() => {
         return [
-            { title: t('home:landing:total_q_covered'), icon: '/images/screens/home/ic_banner_1.svg', value: general?.q_coverd ?? 0, decimal: 4 },
-            { title: t('home:landing:total_margin'), icon: '/images/screens/home/ic_banner_2.svg', value: general?.q_margin ?? 0, decimal: 4 },
-            { title: t('home:landing:users'), icon: '/images/screens/home/ic_banner_3.svg', value: general?.total_user ?? 0, decimal: 4 },
+            {
+                title: t('home:landing:total_q_covered'),
+                icon: '/images/screens/home/ic_banner_1.svg',
+                value: general?.q_coverd ?? 0,
+                decimal: unitConfig?.assetDigit ?? 2,
+            },
+            {
+                title: t('home:landing:total_margin'),
+                icon: '/images/screens/home/ic_banner_2.svg',
+                value: general?.q_margin ?? 0,
+                decimal: unitConfig?.assetDigit ?? 2,
+            },
+            {
+                title: t('home:landing:users'),
+                icon: '/images/screens/home/ic_banner_3.svg',
+                value: general?.total_user ?? 0,
+                decimal: 0,
+            },
             { title: t('home:landing:avg_r_claim'), icon: '/images/screens/home/ic_banner_4.svg', value: general?.r_claim ?? 0, suffix: '%', decimal: 2 },
         ]
-    }, [general])
+    }, [general, unitConfig])
 
     useEffect(() => {
         AOS.init({

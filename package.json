@@ -4,8 +4,9 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "next build",
-        "build:staging": "cp .env.staging .env.production && next build && next start -p 3001",
+        "build": "cp .env.base.production .env.production && next build",
+        "start": "next start -p 3001",
+        "build:staging": "cp .env.base.staging .env.production && next build",
         "start:staging": "next start -p 3001",
         "build:dev": "cp .env.base.development .env.production && next build",
         "start:dev": "next start -p 9837",

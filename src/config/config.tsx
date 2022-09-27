@@ -90,15 +90,13 @@ class Config {
     static homeMenu = [
         { menuId: 'home', router: '/home', name: 'common:header:home', parentId: 0 },
         { menuId: 'buy-covered-parent', router: '/buy-covered', name: 'common:header:buy_covered', parentId: 0 },
-        { menuId: 'commission_policy', router: '/buy-covered', name: 'common:header:commission_policy', parentId: 0 },
+        // { menuId: 'commission_policy', router: '/buy-covered', name: 'common:header:commission_policy', parentId: 0 },
     ]
-
-   
 
     static subMenu = [
         {
             menuId: 'recent-transaction',
-            router: '/home',
+            // router: '/insurance-history',
             name: 'common:header:recent_transactions',
             parentId: 'account-info',
             // icon: '/images/icons/ic_recent_transaction.png',
@@ -114,14 +112,14 @@ class Config {
             icon: UserIcon,
             isIconSvg: true,
         },
-        {
-            menuId: 'update-email',
-            name: 'common:header:update_my_email',
-            parentId: 'account-info',
-            // icon: '/images/icons/ic_email.png',
-            icon: EmailIcon,
-            isIconSvg: true,
-        },
+        // {
+        //     menuId: 'update-email',
+        //     name: 'common:header:update_my_email',
+        //     parentId: 'account-info',
+        //     // icon: '/images/icons/ic_email.png',
+        //     icon: EmailIcon,
+        //     isIconSvg: true,
+        // },
         {
             menuId: 'disconnect',
             name: 'common:header:disconnect',
@@ -131,7 +129,6 @@ class Config {
             isIconSvg: true,
         },
     ]
-
 
     static landingPageMenu = [
         {

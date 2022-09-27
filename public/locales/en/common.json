@@ -109,5 +109,6 @@
     "refresh": "Refresh",
     "dont_have_wallet": "Don't yet have a Wallet Extension? Explore <span class='text-blue underline cursor-pointer'>How to add a wallet </span> now",
     "user_not_login": "User is not currently logged in. Please enter the user's password at the Wallet application.",
-    "got_it": "Got it"
+    "got_it": "Got it",
+    "other": "Other"
 }
