@@ -1,24 +1,25 @@
-import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
-import React, { useEffect, useMemo, useState } from 'react';
-import { ChevronDown, ChevronUp, X } from 'react-feather';
-import Button from 'components/common/Button/Button';
-import ButtonLanguage from 'components/common/Button/ButtonLanguage';
-import Menu from 'components/common/Menu/Menu';
-import { MenuIcon } from 'components/common/Svg/SvgIcon';
-import Drawer from 'components/layout/Drawer';
-import Notifications from 'components/layout/Notifications';
-import EmailSubscriptionModal from 'components/screens/HomePage/EmailSubModal';
-import { ChainDataList } from 'components/web3/constants/chains';
-import Config from 'config/config';
-import useWeb3Wallet from 'hooks/useWeb3Wallet';
-import useWindowSize from 'hooks/useWindowSize';
-import { setAccount } from 'redux/actions/setting';
-import { RootStore, useAppDispatch, useAppSelector } from 'redux/store';
-import { API_GET_INFO_USER } from 'services/apis';
-import fetchApi from 'services/fetch-api';
-import { screens } from 'utils/constants';
-import { getModalSubscribeStorage, setModalSubscribeStorage } from 'utils/utils';
+import { useTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
+import React, { useEffect, useMemo, useState } from 'react'
+import { ChevronDown, ChevronUp, X } from 'react-feather'
+import Button from 'components/common/Button/Button'
+import ButtonLanguage from 'components/common/Button/ButtonLanguage'
+import Menu from 'components/common/Menu/Menu'
+import { MenuIcon } from 'components/common/Svg/SvgIcon'
+import Drawer from 'components/layout/Drawer'
+import Notifications from 'components/layout/Notifications'
+import EmailSubscriptionModal from 'components/screens/HomePage/EmailSubModal'
+import UpdateEmailSubscriptionModal from 'components/screens/HomePage/EmailSubUpdateModal'
+import { ChainDataList } from 'components/web3/constants/chains'
+import Config from 'config/config'
+import useWeb3Wallet from 'hooks/useWeb3Wallet'
+import useWindowSize from 'hooks/useWindowSize'
+import { setAccount } from 'redux/actions/setting'
+import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
+import { API_GET_INFO_USER } from 'services/apis'
+import fetchApi from 'services/fetch-api'
+import { screens } from 'utils/constants'
+import { getModalSubscribeStorage, setModalSubscribeStorage } from 'utils/utils'
 
 const Header = () => {
     const { t } = useTranslation()
@@ -34,7 +35,10 @@ const Header = () => {
     const [userInfo, setUserInfo] = useState<any>(null)
 
     // check modal subscribe able to show first time - local storage
-    const [isShowModal, setIsShowModal] = useState(false)
+    const [visibleModal, setVisibleModal] = useState({
+        [Config.MODAL_REGISTER_EMAIL]: false,
+        [Config.MODAL_UPDATE_EMAIL]: false,
+    })
 
     const onConnect = async () => {
         Config.connectWallet()
@@ -55,6 +59,16 @@ const Header = () => {
                 dispatch(setAccount({ address: null, wallet: null }))
                 Config.logout()
                 Config.toast.show('success', t('common:disconnect_successful'))
+                break
+            case Config.MODAL_UPDATE_EMAIL:
+                console.log(userInfo)
+                // check update or register new email
+                if (!userInfo?.email) {
+                    setVisibleModal({
+                        ...visibleModal,
+                        [Config.MODAL_REGISTER_EMAIL]: true,
+                    })
+                } else setVisibleModal({ ...visibleModal, [Config.MODAL_UPDATE_EMAIL]: true })
                 break
             default:
                 break
@@ -85,7 +99,7 @@ const Header = () => {
     }
 
     const getInfo = async () => {
-        const { data } = await fetchApi({
+        const { data, statusCode } = await fetchApi({
             url: API_GET_INFO_USER,
             params: {
                 owner: account?.address,
@@ -93,43 +107,21 @@ const Header = () => {
         })
         const isShownModal = getModalSubscribeStorage()
         setUserInfo(data)
-        if (!data && !isShownModal) {
-            setIsShowModal(true)
+
+        if (!data || !data?.email) {
+            setVisibleModal({ ...visibleModal, [Config.MODAL_REGISTER_EMAIL]: true })
         } else {
-            setIsShowModal(false)
+            // setIsShowModal(false)
         }
     }
+
     // get info after connect wallet
     useEffect(() => {
         if (!account || !network) return
         getInfo()
     }, [account, network])
 
-    const [isOpenModalUpdateEmail, setIsOpenModalUpdateEmail] = useState(false)
-
-    const handleOpenModal = () => {
-        setIsOpenModalUpdateEmail(true)
-    }
-
-    const TransformSubMenu = Config.subMenu.map((item, index) => {
-        if (item?.modalName) {
-            return {
-                ...item,
-                handleOpenModal,
-            }
-        }
-        return item
-    })
-
-    // const menuConfig = [
-    //     { menuId: 'account-info', router: '/', name: NameComponent, parentId: 0, hideArrowIcon: true, nameComponentProps: { ...props } },
-    //     ...TransformSubMenu,
-    // ]
-
-    const menuA1ddress = [
-        { menuId: 'account-info', router: '/', name: NameComponent, parentId: 0, hideArrowIcon: true, nameComponentProps: { ...props } },
-        ...TransformSubMenu,
-    ]
+    const handleCloseModalRegisterEmail = () => {}
 
     const menuAddress = [
         isMobile
@@ -142,13 +134,12 @@ const Header = () => {
                   isDropdown: true,
                   nameComponentProps: { ...props },
               },
-        // ...Config.subMenu,
-        ...TransformSubMenu,
+        ...Config.subMenu,
     ]
 
-    const handleCloseModal = () => {
-        setIsShowModal(false)
-        setModalSubscribeStorage('true')
+    const handleCloseModal = (modalType: string) => {
+        // setIsShowModal(false)
+        setVisibleModal((prev) => ({ ...prev, [modalType]: false }))
     }
 
     const MenuFilter = useMemo(() => {
@@ -165,11 +156,20 @@ const Header = () => {
                     <img src="/images/ic_logo.png" />
                 </div>
                 <div className="flex items-center justify-end w-full py-3 text-sm font-semibold homeNav:justify-between homeNav:py-0">
+                    {/* Modal */}
+                    {visibleModal[Config.MODAL_REGISTER_EMAIL] && (
+                        <EmailSubscriptionModal
+                            visible={visibleModal[Config.MODAL_REGISTER_EMAIL]}
+                            onClose={() => handleCloseModal(Config.MODAL_REGISTER_EMAIL)}
+                        />
+                    )}
 
-                <EmailSubscriptionModal visible={isOpenModalUpdateEmail} onClose={() => setIsOpenModalUpdateEmail(false)} />
-                {/* <UpdateEmailSubscriptionModal visible={isOpenModalUpdateEmail} onClose={() => setIsOpenModalUpdateEmail(false)} /> */}
+                    <UpdateEmailSubscriptionModal
+                        visible={visibleModal[Config.MODAL_UPDATE_EMAIL]}
+                        onClose={() => handleCloseModal(Config.MODAL_UPDATE_EMAIL)}
+                    />
 
-                {/* <div className="w-full flex items-center justify-end homeNav:justify-between  py-3 mb:py-0 text-sm font-semibold"> */}
+                    {/* <div className="w-full flex items-center justify-end homeNav:justify-between  py-3 mb:py-0 text-sm font-semibold"> */}
                     {!isMobile && (
                         <div className="hidden mb:block">
                             <Menu data={Config.homeMenu} onChange={onChangeMenu} />

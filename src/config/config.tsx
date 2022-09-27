@@ -69,6 +69,10 @@ class Config {
         localStorage.removeItem('PUBLIC_WALLET')
     }
 
+    static MODAL_REGISTER_EMAIL = 'registerEmail'
+
+    static MODAL_UPDATE_EMAIL = 'updateEmail'
+
     static pattern = (key: string) => {
         let rs: any = ''
         switch (key) {
@@ -93,8 +97,6 @@ class Config {
         { menuId: 'commission_policy', router: '/buy-covered', name: 'common:header:commission_policy', parentId: 0 },
     ]
 
-
-
     static subMenu = [
         {
             menuId: 'recent-transaction',
@@ -115,10 +117,9 @@ class Config {
             isIconSvg: true,
         },
         {
-            menuId: 'update-email',
+            menuId: Config.MODAL_UPDATE_EMAIL,
             name: 'common:header:update_my_email',
             parentId: 'account-info',
-            modalName: 'updateEmail',
             // icon: '/images/icons/ic_email.png',
             icon: EmailIcon,
             isIconSvg: true,
@@ -132,7 +133,6 @@ class Config {
             isIconSvg: true,
         },
     ]
-
 
     static landingPageMenu = [
         {

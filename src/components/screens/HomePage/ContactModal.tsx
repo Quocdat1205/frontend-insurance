@@ -185,4 +185,4 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
     )
 }
 
-export default ContactModal
+export default React.memo(ContactModal)

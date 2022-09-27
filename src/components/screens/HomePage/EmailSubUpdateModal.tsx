@@ -8,7 +8,7 @@ import Toast from 'components/layout/Toast'
 import Config from 'config/config'
 import * as types from 'redux/actions/types'
 import { RootStore, useAppSelector } from 'redux/store'
-import { API_GET_INFO_USER, API_GET_UNIT_CONFIG, API_UPDATE_USER_INFO } from 'services/apis';
+import { API_GET_INFO_USER, API_GET_UNIT_CONFIG, API_UPDATE_USER_INFO } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 
 interface UpdateEmailSubscriptionModal {
@@ -34,8 +34,6 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
     const [ableSubmit, setAbleSubmit] = useState(false)
     const account = useAppSelector((state: RootStore) => state.setting.account)
 
-    console.log({ account })
-
     const getInfo = async () => {
         const { data } = await fetchApi({
             url: API_GET_INFO_USER,
@@ -44,7 +42,9 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
             },
         })
         console.log('fetch---', data)
+
         if (data) {
+            setCurrentEmail(data.email)
             // dispatch({
             //     type: types.SET_CONFIG_UNIT,
             //     payload: data,
@@ -59,7 +59,7 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
         // return
         const { data, message, statusCode } = await fetchApi({
             url: API_UPDATE_USER_INFO,
-            options :{
+            options: {
                 method: 'PUT',
             },
             params: {
