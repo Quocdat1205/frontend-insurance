@@ -33,21 +33,21 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
         },
         {
             name: 'expired',
-            icon: <img src="/images/expired.png" className="w-[100px] h-[100px]" />,
+            icon: <img src="/images/insurance/expired.png" className="w-[100px] h-[100px]" />,
             description: `${t('insurance:final:contract')}`,
             sub_Description: `${t('insurance:final:contract_sub')}`,
             reason: `${t('insurance:final:reasons')}`,
         },
         {
             name: 'expired1',
-            icon: <img src="/images/calendar.png" className="w-[100px] h-[100px]" />,
+            icon: <img src="/images/insurance/calendar.png" className="w-[100px] h-[100px]" />,
             description: `${t('insurance:final:contract')}`,
             sub_Description: `${t('insurance:final:contract_sub')}`,
             reason: `${t('insurance:final:reasons1')}`,
         },
         {
             name: 'email',
-            icon: <img src="/images/email.png" className="w-[100px] h-[100px]" />,
+            icon: <img src="/images/icons/ic_gmail.png" className="w-[100px] h-[100px]" />,
             description: `${t('insurance:final:get_noti')}`,
             reason: `${t('insurance:final:input_email')}`,
         },
@@ -100,7 +100,7 @@ const NotificationInsurance = ({ id, name, state, active, setActive, isMobile }:
     return active ? (
         isMobile ? (
             <>
-                <div className="w-full h-full absolute z-50 bg-gray/[0.25] flex flex-col-reverse">
+                <div className="w-full absolute z-50 bg-gray/[0.25] flex flex-col-reverse">
                     {noti.map((item, index) => {
                         if (item.name === name) {
                             return (
