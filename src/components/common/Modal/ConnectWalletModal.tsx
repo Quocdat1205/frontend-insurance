@@ -100,6 +100,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     }, [isActive, chainId, account, loading, inValidNetword])
 
     const connectionError = (error: any) => {
+        let isNotFoundNetWork = false
         const code = isString(error?.code) ? error?.code : Math.abs(error?.code)
         switch (code) {
             case 32600:
@@ -115,6 +116,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 }
                 break
             case errorsWallet.Not_found:
+                isNotFoundNetWork = true
                 setNetworkError(true)
                 break
             case errorsWallet.Success:
@@ -139,10 +141,13 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 setErrorConnect(true)
                 break
             default:
+                showIconReload.current = true
+                reason.current = t('errors:CONNECT_FAILED')
+                setErrorConnect(true)
                 break
         }
         setLoading(false)
-        setSwitchNetwork(code !== errorsWallet.Success ? !inValidNetword : false)
+        if (!isNotFoundNetWork) setSwitchNetwork(code !== errorsWallet.Success ? !inValidNetword : false)
     }
 
     const onShow = () => {
@@ -179,11 +184,16 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 }
                 break
             case wallets.coinbaseWallet:
-                return
+                if (isMobile) {
+                    if (!Config.isMetaMaskInstalled) {
+                        window.open(`https://go.cb-w.com/dapp?cb_url=${Config.env.APP_URL}`)
+                        return
+                    }
+                }
+                break
             default:
                 break
         }
-
         if (!isMobile) Config.web3?.activate(wallet?.wallet)
         if (!oldAddress.current) return
         setErrorConnect(false)
@@ -242,6 +252,17 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         { name: 'Trustwallet', icon: '/images/icons/ic_trustwallet.png', active: false, wallet: 'Trustwallet' },
         { name: 'Khác', active: false, wallet: 'other' },
     ]
+
+    const disabledClick = (e: any) => {
+        e.stopPropagation()
+    }
+
+    useEffect(() => {
+        if (switchNetwork || networkError) window.addEventListener('click', disabledClick)
+        return () => {
+             window.removeEventListener('click', disabledClick)
+        }
+    }, [switchNetwork, networkError])
 
     if (!isVisible) return null
     return (

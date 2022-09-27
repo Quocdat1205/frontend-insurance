@@ -93,7 +93,7 @@
         "title": "Ví bạn chưa có BNB Smart Chain",
         "description": "Vui lòng ấn nút “Thêm BNB Smart Chain” và sao chép thông tin dưới đây",
         "network_name": "Tên mạng",
-        "new_url:": "RPC URL mới",
+        "new_rpc_url": "RPC URL mới",
         "chainID": "Mã chuỗi",
         "symbol": "Ký hiệu tiền tệ",
         "add_bnb": "Thêm BNB Smart Chain"
