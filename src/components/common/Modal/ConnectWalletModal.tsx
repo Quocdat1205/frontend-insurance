@@ -250,7 +250,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         { name: 'Metamask', icon: '/images/icons/ic_metamask.png', active: true, wallet: wallets.metaMask },
         { name: 'Coinbase Wallet', icon: '/images/icons/ic_coinbase.png', active: false, wallet: wallets.coinbaseWallet },
         { name: 'Trustwallet', icon: '/images/icons/ic_trustwallet.png', active: false, wallet: 'Trustwallet' },
-        { name: 'Khác', active: false, wallet: 'other' },
+        { name: t('common:other'), active: false, wallet: 'other' },
     ]
 
     const disabledClick = (e: any) => {
@@ -260,7 +260,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     useEffect(() => {
         if (switchNetwork || networkError) window.addEventListener('click', disabledClick)
         return () => {
-             window.removeEventListener('click', disabledClick)
+            window.removeEventListener('click', disabledClick)
         }
     }, [switchNetwork, networkError])
 

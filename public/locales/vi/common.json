@@ -107,5 +107,6 @@
     "refresh": "Thử lại",
     "dont_have_wallet": "Chưa sở hữu Ví? Xem <span class='text-blue underline cursor-pointer'>Hướng dẫn tạo Ví</span> ngay",
     "user_not_login": "Người dùng chưa truy cập tài khoản. Vui lòng nhập mật khẩu người dùng tại tiện ích Ví.",
-    "got_it": "Đã hiểu"
+    "got_it": "Đã hiểu",
+    "other": "Khác"
 }
