@@ -61,7 +61,7 @@ const Header = () => {
         <div className="p-2 bg-hover rounded-[5px] flex items-center space-x-2">
             {network && <img src={network?.icon} width={24} height={24} />}
             {network && <div>{network?.chain}</div>}
-            <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-4 lg:py-0">{`${account?.address?.substr(
+            <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-4 homeNav:py-0">{`${account?.address?.substr(
                 0,
                 isMobile ? 2 : 4,
             )}...${account?.address?.substr(-4)}`}</div>
@@ -98,7 +98,7 @@ const Header = () => {
     }, [isMobile, account])
 
     return (
-        <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 lg:px-10 border-b border-divider sticky top-0 bg-white z-[50]">
+        <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 homeNav:px-10 border-b border-divider sticky top-0 bg-white z-[50]">
             <div className="max-w-screen-layout 4xl:max-w-screen-4xl m-auto w-full flex items-center justify-between space-x-4 sm:space-x-12">
                 <div className="min-w-[67px] w-[75px]" onClick={() => router.push('/')}>
                     <img src="/images/ic_logo.png" />
