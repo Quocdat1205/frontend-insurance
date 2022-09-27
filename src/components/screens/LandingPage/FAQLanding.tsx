@@ -89,7 +89,10 @@ const FaqLanding = () => {
                             <Disclosure>
                                 {({ open }) => (
                                     <>
-                                        <Disclosure.Button as={"div"} className=" active:outline-transparent active:bg-transparent focus:bg-none touch-none active:outline-none text-left flex w-full justify-between items-center rounded-lg bg-purple-100 px-4 text-left font-medium text-purple-900 focus:outline-none">
+                                        <Disclosure.Button
+                                            as={'div'}
+                                            className=" active:outline-transparent active:bg-transparent focus:bg-none touch-none active:outline-none flex w-full justify-between items-center rounded-lg bg-purple-100 px-4 text-left font-medium text-purple-900 focus:outline-none"
+                                        >
                                             <span className={'font-semibold text-sm lg:text-base'}>{question}</span>
                                             <div>
                                                 <DownArrow className={`${!open ? 'rotate-180 transform' : ''}`} color={colors.txtPrimary} size={20} />

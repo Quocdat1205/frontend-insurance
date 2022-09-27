@@ -31,7 +31,6 @@ const HeaderLanding = () => {
 
     const onChangeMenu = (e: any) => {
         // Redirect link
-        console.log(`href_${language}`)
         if (e?.[`href_${language}`]) {
             window.open(e[`href_${language}`])
             return
