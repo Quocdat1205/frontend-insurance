@@ -738,21 +738,23 @@ const InsuranceFrom = () => {
         //Pm*multiplierDown/Up
         const PmDown = state.p_market * percentPrice?.multiplierDown
         const PmUp = state.p_market * percentPrice?.multiplierUp
-        ///Pm*(1-minDifferenceRatio)
-        const Pm_minDiff = state.p_market * (1 - percentPrice?.minDifferenceRatio)
-        const Pm_maxDiff = state.p_market * (1 + percentPrice?.minDifferenceRatio)
+        //+-2 -> +-70
+        const min1 = state.p_market + (2 / 100) * state.p_market
+        const max1 = state.p_market + (70 / 100) * state.p_market
+
+        const min2 = state.p_market - (70 / 100) * state.p_market
+        const max2 = state.p_market - (2 / 100) * state.p_market
+
         if (state.p_claim < state.p_market) {
-            const min =
-                rangeQ_covered.min > PmDown ? (rangeQ_covered.min > Pm_minDiff ? rangeQ_covered.min : Pm_minDiff) : PmDown > Pm_minDiff ? PmDown : Pm_minDiff
-            const max = rangeQ_covered.min > PmUp ? (rangeQ_covered.min > Pm_minDiff ? rangeQ_covered.min : Pm_minDiff) : PmUp > Pm_minDiff ? PmUp : Pm_minDiff
+            const min = min2 > PmDown ? PmDown : min2
+            const max = max2 > PmUp ? PmUp : max2
             _rangeP_claim.min = +min.toFixed(decimalList.decimal_p_claim)
             _rangeP_claim.max = +max.toFixed(decimalList.decimal_p_claim)
             return setRangeP_claim({ ..._rangeP_claim })
         }
         if (state.p_claim > state.p_market) {
-            const min =
-                rangeQ_covered.min > PmDown ? (rangeQ_covered.min > Pm_maxDiff ? rangeQ_covered.min : Pm_maxDiff) : PmDown > Pm_maxDiff ? PmDown : Pm_maxDiff
-            const max = rangeQ_covered.min > PmUp ? (rangeQ_covered.min > Pm_maxDiff ? rangeQ_covered.min : Pm_maxDiff) : PmUp > Pm_maxDiff ? PmUp : Pm_maxDiff
+            const min = min1 > PmDown ? min1 : PmDown
+            const max = max1 > PmUp ? max1 : PmUp
             _rangeP_claim.min = +min.toFixed(decimalList.decimal_p_claim)
             _rangeP_claim.max = +max.toFixed(decimalList.decimal_p_claim)
             return setRangeP_claim({ ..._rangeP_claim })
@@ -838,7 +840,7 @@ const InsuranceFrom = () => {
                                         onMouseUp={() => {
                                             isPress = false
                                             setSelectedCoin(coin)
-                                            setState({ ...state, symbol: { ...coin }, q_covered: 0, p_claim: 0 })
+                                            setState({ ...state, symbol: { ...coin }, q_covered: 0, p_claim: 0, q_claim: 0, margin: 0, r_claim: 0 })
                                             setChosing(false)
                                         }}
                                         onClick={() => close()}
@@ -1613,7 +1615,15 @@ const InsuranceFrom = () => {
                                                                 onMouseUp={() => {
                                                                     isPress = false
                                                                     setSelectedCoin(coin)
-                                                                    setState({ ...state, symbol: { ...coin }, q_covered: 0, p_claim: 0 })
+                                                                    setState({
+                                                                        ...state,
+                                                                        symbol: { ...coin },
+                                                                        q_covered: 0,
+                                                                        p_claim: 0,
+                                                                        q_claim: 0,
+                                                                        margin: 0,
+                                                                        r_claim: 0,
+                                                                    })
                                                                     setOpenChangeToken(false)
                                                                     setShowInput({ isShow: true, name: 'q_covered' })
                                                                 }}

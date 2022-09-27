@@ -181,18 +181,6 @@ const AcceptBuyInsurance = () => {
             console.log(err)
         }
     }
-    // useEffect(() => {
-    //     setInterval(() => {
-    //         if (Noti === 'loading') {
-    //             return
-    //         }
-    //         if (isUpdated) {
-    //             setUpdated(false)
-    //             setCanBuy(false)
-    //             return
-    //         }
-    //     }, 10000)
-    // })
 
     const createContract = async () => {
         if (account.address == null) {
