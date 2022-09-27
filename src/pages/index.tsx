@@ -5,10 +5,11 @@ import BannerLanding from 'components/screens/LandingPage/BannerLanding'
 import FaqLanding from 'components/screens/LandingPage/FAQLanding'
 import FeaturesLanding from 'components/screens/LandingPage/FeaturesLanding'
 // import RegisterLanding from 'components/screens/LandingPage/RegisterLanding'
-import SloganLanding from 'components/screens/LandingPage/SloganLanding'
+import SloganLanding from 'components/screens/LandingPage/SloganLanding1'
 
 const LandingPage = (props: any) => (
     <LayoutLanding>
+        {/* <SloganLanding /> */}
         <SloganLanding />
         <BannerLanding />
         <FeaturesLanding />

@@ -89,7 +89,7 @@ const BannerLanding = () => {
 
 const Item = styled.div.attrs<any>({
     className: classnames(
-        'pt-6 pb-9 last:pb-6 -mb-3 lg:m-0 first:mt-0 sm:!p-x4 sm:py-12 w-full ',
+        'lg:pt-6 pb-9 last:pb-6 -mb-3 lg:m-0 first:mt-0 sm:!p-x4 py-8 lg:py-12 w-full ',
         'text-center flex flex-col items-center space-y-[2px] sm:even:mb-0 last:m-0',
     ),
 })`
@@ -97,7 +97,7 @@ const Item = styled.div.attrs<any>({
     border-bottom: 0;
 `
 const Background = styled.section.attrs({
-    className: ' banner-landing lg:px-6 min-h-[180px] flex flex-col justify-end mt-0 -mt-[206px] lg:-mt-[180px]',
+    className: ' banner-landing lg:px-6 min-h-[140px] sm:min-h-[180px] flex flex-col justify-end mt-0 -mt-[140px] lg:-mt-[180px]',
 })<any>`
     border-bottom: 0;
 `
