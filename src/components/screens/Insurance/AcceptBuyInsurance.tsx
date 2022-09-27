@@ -299,15 +299,20 @@ const AcceptBuyInsurance = () => {
         }, 1000)
     }, [count])
 
-    // const timeEnd = () => {
-    //     if (state) {
-    //         let time = new Date()
-    //         time.setDate(time.getDate() + state.period)
+    const timeEnd = () => {
+        if (state) {
+            let time = new Date()
+            time.setDate(time.getDate() + state.period)
 
-    //         return `${time.getDate()}/${time.getMonth()}/${time.getFullYear()} - ${time.getHours()}:0${time.getMinutes()}`
-    //     }
-    //     return ''
-    // }
+            return (
+                <span>
+                    {time.getDate()}/{time.getMonth()}/{time.getFullYear()} - {time.getHours()}:
+                    {time.getMinutes() < 10 ? '0' + time.getMinutes() : time.getMinutes()}
+                </span>
+            )
+        }
+        return ''
+    }
 
     return !loading && state != undefined ? (
         !isMobile ? (
@@ -508,7 +513,7 @@ const AcceptBuyInsurance = () => {
                                 </div>
                             </div>
                             <div className="text-[#B2B7BC] text-xs py-[16px]">
-                                *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')} {/*timeEnd()*/}
+                                *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')} {timeEnd()}
                             </div>
 
                             <div
