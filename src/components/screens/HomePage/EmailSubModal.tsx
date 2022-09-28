@@ -29,8 +29,6 @@ const EmailSubscriptionModal = ({ visible, onClose }: EmailSubModal) => {
     const [ableSubmit, setAbleSubmit] = useState(false)
     const { account, chain } = useWeb3Wallet()
 
-    console.log('account-----', account)
-
     const handleChange = (name: string, event: any) => {
         setEmail(event.target.value)
         if (validator(name).isValid) {
@@ -125,7 +123,7 @@ const EmailSubscriptionModal = ({ visible, onClose }: EmailSubModal) => {
                     </Button>
                 </div>
                 <div onClick={onClose} className={'text-center text-red text-base underline mt-4 font-semibold'}>
-                    Bỏ qua, tôi sẽ cập nhật sau!
+                    {t('common:modal:email_subscription:subscribe_later')}
                 </div>
             </div>
         </Modal>

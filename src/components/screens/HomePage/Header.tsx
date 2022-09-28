@@ -19,7 +19,7 @@ import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
 import { API_GET_INFO_USER } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { screens } from 'utils/constants'
-import { getModalSubscribeStorage, setModalSubscribeStorage } from 'utils/utils'
+import { getModalSubscribeStorage, removeLocalStorage, setModalSubscribeStorage } from 'utils/utils'
 
 const Header = () => {
     const { t } = useTranslation()
@@ -54,14 +54,15 @@ const Header = () => {
     }
 
     const onClickMenuAddress = async (e: any) => {
+        const isShownModal = getModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL)
         switch (e?.menuId) {
             case 'disconnect':
                 dispatch(setAccount({ address: null, wallet: null }))
                 Config.logout()
                 Config.toast.show('success', t('common:disconnect_successful'))
+                removeLocalStorage(Config.MODAL_REGISTER_EMAIL)
                 break
             case Config.MODAL_UPDATE_EMAIL:
-                console.log(userInfo)
                 // check update or register new email
                 if (!userInfo?.email) {
                     setVisibleModal({
@@ -105,12 +106,14 @@ const Header = () => {
                 owner: account?.address,
             },
         })
-        const isShownModal = getModalSubscribeStorage()
         setUserInfo(data)
 
-        if (!data || !data?.email) {
+        const isShownModal = getModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL)
+
+        if (!data?.email && !isShownModal) {
             setVisibleModal({ ...visibleModal, [Config.MODAL_REGISTER_EMAIL]: true })
         } else {
+            setModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL, 'true')
             // setIsShowModal(false)
         }
     }
@@ -120,8 +123,6 @@ const Header = () => {
         if (!account || !network) return
         getInfo()
     }, [account, network])
-
-    const handleCloseModalRegisterEmail = () => {}
 
     const menuAddress = [
         isMobile
@@ -138,8 +139,12 @@ const Header = () => {
     ]
 
     const handleCloseModal = (modalType: string) => {
-        // setIsShowModal(false)
         setVisibleModal((prev) => ({ ...prev, [modalType]: false }))
+
+        // save to local storage if modal is register email
+        if (modalType === Config.MODAL_REGISTER_EMAIL) {
+            setModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL, 'true')
+        }
     }
 
     const MenuFilter = useMemo(() => {
@@ -163,11 +168,12 @@ const Header = () => {
                             onClose={() => handleCloseModal(Config.MODAL_REGISTER_EMAIL)}
                         />
                     )}
-
-                    <UpdateEmailSubscriptionModal
-                        visible={visibleModal[Config.MODAL_UPDATE_EMAIL]}
-                        onClose={() => handleCloseModal(Config.MODAL_UPDATE_EMAIL)}
-                    />
+                    {visibleModal[Config.MODAL_UPDATE_EMAIL] && (
+                        <UpdateEmailSubscriptionModal
+                            visible={visibleModal[Config.MODAL_UPDATE_EMAIL]}
+                            onClose={() => handleCloseModal(Config.MODAL_UPDATE_EMAIL)}
+                        />
+                    )}
 
                     {/* <div className="w-full flex items-center justify-end homeNav:justify-between  py-3 mb:py-0 text-sm font-semibold"> */}
                     {!isMobile && (

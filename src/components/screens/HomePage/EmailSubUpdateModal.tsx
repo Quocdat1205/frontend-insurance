@@ -25,7 +25,7 @@ const isValidEmail = (email: any) =>
             ),
     )
 
-const isDuplicateEmail = (oldEmail: any, newEmail: any) => newEmail.toLowerCase() === oldEmail.toLowerCase()
+const isDuplicateEmail = (oldEmail: any, newEmail: any) => newEmail?.toLowerCase() === oldEmail?.toLowerCase()
 
 const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscriptionModal) => {
     const { t } = useTranslation()
@@ -82,7 +82,7 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
 
     useEffect(() => {
         getInfo()
-    }, [])
+    }, [account])
 
     const handleChange = (event: any) => {
         setEmail(event.target.value)
@@ -136,7 +136,7 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
                 id={'curEmail'}
                 key={'curEmail'}
                 label={t('common:modal:email_subscription:current_email')}
-                value={currentEmail}
+                value={currentEmail || ''}
                 disabled={true}
                 placeholder={`${t('insurance:final:label_email')}`}
             />
@@ -147,7 +147,7 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
                 label={t('common:modal:email_subscription:new_email')}
                 onChange={handleChange}
                 validator={validator('newEmail')}
-                value={email}
+                value={email || ''}
                 placeholder={`${t('insurance:final:label_email')}`}
             />
             <div className="flex justify-center items-center text-base ">

@@ -199,17 +199,19 @@ export function isFunction(functionToCheck: any) {
     return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]'
 }
 
-export const setModalSubscribeStorage = (status = 'false') => {
-    localStorage.setItem('showModalInput', status)
+export const setModalSubscribeStorage = (name: string, status = 'false') => {
+    localStorage.setItem(name, status)
 }
 
-export const getModalSubscribeStorage = () => {
-    const status = localStorage.getItem('showModalInput') || 'false'
+export const getModalSubscribeStorage = (name: string) => {
+    const status = localStorage.getItem(name) || 'false'
     if (JSON.parse(status) === true) {
         return true
     }
     return false
 }
+
+export const removeLocalStorage = (name: string) => localStorage.removeItem(name)
 
 export const getMessageSign = (nonce: number) => `Sign message with nonce: ${nonce}`
 
