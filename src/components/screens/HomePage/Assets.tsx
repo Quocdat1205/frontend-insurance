@@ -54,26 +54,12 @@ const Assets = () => {
             })
         } else {
             const newSymbol = {
-                timeframe: 'ALL',
-                margin: 0,
-                percent_margin: 0,
-                symbol: {
-                    id: item._id,
-                    name: item.name,
-                    icon: item.attachment,
-                    symbol: `${item.symbol}USDT`,
-                    type: item.symbol,
-                    disable: !item.isActive,
-                },
-                period: 2,
-                p_claim: 0,
-                q_claim: 0,
-                r_claim: 0,
-                q_covered: 0,
-                p_market: 0,
-                t_market: 0,
-                p_expired: 0,
-                index: 1,
+                id: item._id,
+                name: item.name,
+                icon: item.attachment,
+                symbol: `${item.symbol}USDT`,
+                type: item.symbol,
+                disable: !item.isActive,
             }
             localStorage.setItem('buy_covered_state', JSON.stringify({ ...newSymbol }))
             setTimeout(() => {
