@@ -274,7 +274,7 @@ const AcceptBuyInsurance = () => {
                                     return setActive(false)
                                 })
                         }
-                    }, 3000)
+                    }, 1000)
                 }
             }
         } catch (err) {
