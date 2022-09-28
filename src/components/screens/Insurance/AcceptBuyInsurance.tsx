@@ -377,6 +377,7 @@ const AcceptBuyInsurance = () => {
     return !loading && state != undefined ? (
         <>
             <Modal
+                canBlur={false}
                 isMobile={isMobile == true && true}
                 portalId="modal"
                 isVisible={active}

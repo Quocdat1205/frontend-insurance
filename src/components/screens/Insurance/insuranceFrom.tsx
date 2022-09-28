@@ -281,11 +281,28 @@ const InsuranceFrom = () => {
                 return false
             }
         }
+
+        if (symbol === 'BTC') {
+            const balanceBTC = await wallet.contractCaller?.btcContract.contract.balanceOf(account.address)
+            if (balanceBTC) {
+                console.log(Number(ethers.utils.formatEther(balanceBTC)))
+
+                if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
+                    setUserBalance(Number((Number(ethers.utils.formatEther(balanceBTC)) / Number(state.p_market)).toFixed(decimalList.decimal_q_covered)))
+                    return Number(ethers.utils.formatEther(balanceBTC))
+                } else {
+                    setUserBalance(0)
+                    return 0
+                }
+            } else {
+                return false
+            }
+        }
     }
-    const setStorage = (value: any) => {
-        localStorage.setItem('buy_covered_state', JSON.stringify(value))
-        setThisFisrt(false)
-    }
+    // const setStorage = (value: any) => {
+    //     localStorage.setItem('buy_covered_state', JSON.stringify(value))
+    //     setThisFisrt(false)
+    // }
 
     const updateFormPercentMargin = (value: number) => {
         if (state.q_covered > 0) {
@@ -382,25 +399,25 @@ const InsuranceFrom = () => {
             }
 
             const res = await getStorage()
-            if (res?.symbol?.type) {
-                if (tmp.type == res?.symbol?.type) {
+            if (res?.type) {
+                if (tmp.type == res?.type) {
                     setSelectedCoin({
-                        icon: res?.symbol?.icon,
-                        id: res?.symbol?.id,
-                        name: res?.symbol?.name,
-                        symbol: res?.symbol?.symbol,
-                        type: res?.symbol?.type,
-                        disable: res?.symbol?.disable,
+                        icon: res?.icon,
+                        id: res?.id,
+                        name: res?.name,
+                        symbol: res?.symbol,
+                        type: res?.type,
+                        disable: res?.disable,
                     })
                     setState({
                         ...state,
                         symbol: {
-                            icon: res?.symbol?.icon,
-                            id: res?.symbol?.id,
-                            name: res?.symbol?.name,
-                            symbol: res?.symbol?.symbol,
-                            type: res?.symbol?.type,
-                            disable: res?.symbol?.disable,
+                            icon: res?.icon,
+                            id: res?.id,
+                            name: res?.name,
+                            symbol: res?.symbol,
+                            type: res?.type,
+                            disable: res?.disable,
                         },
                     })
                 }
@@ -443,69 +460,6 @@ const InsuranceFrom = () => {
         }
     }, [userBalance])
 
-    // useEffect(() => {
-    //     try {
-    //     } catch (error) {
-    //         setLoadings(false)
-    //         return console.log(error)
-    //     }
-    // }, [account])
-
-    useEffect(() => {
-        if (unitMoney) {
-            const data = localStorage.getItem('buy_covered_state')
-            if (data) {
-                const res = JSON.parse(data)
-                const newData = { ...res, unitMoney: unitMoney }
-                localStorage.setItem('buy_covered_state', JSON.stringify(newData))
-            }
-        }
-    }, [unitMoney])
-
-    useEffect(() => {
-        if (index) {
-            const data = localStorage.getItem('buy_covered_state')
-            if (data) {
-                const res = JSON.parse(data)
-                const newData = { ...res, index: index }
-                localStorage.setItem('buy_covered_state', JSON.stringify(newData))
-            }
-        }
-    }, [index])
-
-    useEffect(() => {
-        if (state) {
-            setTimeout(() => {
-                const data = localStorage.getItem('buy_covered_state')
-                if (data) {
-                    const res = JSON.parse(data)
-                    const newData = {
-                        ...res,
-                        disable: state.symbol.disable,
-                        icon: state.symbol.icon,
-                        id: state.symbol.id,
-                        name: state.symbol.name,
-                        symbol: state.symbol.symbol,
-                        type: state.symbol.type,
-                    }
-                    setStorage(newData)
-                }
-            }, 5000)
-        }
-        if (thisFisrt) {
-            return setThisFisrt(false)
-        }
-    }, [state])
-
-    useEffect(() => {
-        const data = localStorage.getItem('buy_covered_state')
-        if (data) {
-            const res = JSON.parse(data)
-            const newData = { ...res, tab: tab }
-            return localStorage.setItem('buy_covered_state', JSON.stringify(newData))
-        }
-    }, [tab])
-
     useEffect(() => {
         if (listCoin.length > 0) {
             const timeEnd = new Date()
@@ -517,18 +471,6 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         refreshApi(selectTime, selectCoin)
-
-        const data = localStorage.getItem('buy_covered_state')
-        if (data) {
-            let res = JSON.parse(data)
-            res.icon = selectCoin.icon
-            res.id = selectCoin.id
-            res.name = selectCoin.name
-            res.symbol = selectCoin.symbol
-            res.type = selectCoin.type
-            res.disable = selectCoin.disable
-            localStorage.setItem('buy_covered_state', JSON.stringify(res))
-        }
     }, [selectTime, selectCoin])
 
     useEffect(() => {
@@ -537,6 +479,17 @@ const InsuranceFrom = () => {
             setState({ ...state, symbol: { ...selectCoin } })
             getConfig(selectCoin.type)
             getBalaneToken(selectCoin.type)
+
+            let res = {
+                icon: selectCoin.icon,
+                id: selectCoin.id,
+                name: selectCoin.name,
+                symbol: selectCoin.symbol,
+                type: selectCoin.type,
+                disable: selectCoin.disable,
+            }
+
+            localStorage.setItem('buy_covered_state', JSON.stringify(res))
         }
     }, [selectCoin])
 
@@ -562,7 +515,20 @@ const InsuranceFrom = () => {
         if (state.q_covered > 0) {
             if (userBalance > 0) {
                 const a = Math.ceil((state.q_covered / userBalance) * 100)
+                console.log(a)
+
                 percentInsurance.current = a >= 100 ? 100 : a
+                if (a >= 100 || state.q_covered == rangeQ_covered.max) {
+                    percentInsurance.current = 100
+                } else if (a >= 75) {
+                    percentInsurance.current = 75
+                } else if (a >= 50) {
+                    percentInsurance.current = 50
+                } else if (a >= 25) {
+                    percentInsurance.current = 25
+                } else {
+                    percentInsurance.current = a
+                }
             }
         }
 
@@ -680,19 +646,30 @@ const InsuranceFrom = () => {
 
     const [percentPrice, setPercentPrice] = useState<any>()
     const [priceFilter, setPriceFilter] = useState<any>()
+    console.log(rangeQ_covered)
+    const min_notinal = useRef(0)
 
     useEffect(() => {
         const _decimalList = { ...decimalList }
         let _percentPrice: any
         pair_configs?.filters?.map(async (item: any) => {
+            if (item?.filterType === 'MIN_NOTIONAL') {
+                min_notinal.current = item?.notional
+            }
             if (item?.filterType === 'LOT_SIZE') {
                 const tmp = await getBalaneToken(selectCoin.type)
                 const decimal = countDecimals(item.stepSize)
                 _decimalList.decimal_q_covered = +decimal
-                const min_Market = +(10 / state.p_market).toFixed(+decimal)
-                const min = Number(item?.minQty) > min_Market ? Number(item?.minQty) : min_Market
-                const max = Number(item?.maxQty) < tmp ? Number(item?.maxQty) : tmp
-                setRangeQ_covered({ ...rangeQ_covered, min: min, max: max })
+                const min_Market = +(min_notinal.current / state.p_market).toFixed(+decimal)
+                if (min_Market == Infinity) {
+                    const min = Number(item?.minQty)
+                    const max = Number(item?.maxQty) < tmp ? Number(item?.maxQty) : tmp
+                    setRangeQ_covered({ ...rangeQ_covered, min: min, max: max })
+                } else {
+                    const min = Number(item?.minQty) > min_Market ? Number(item?.minQty) : min_Market
+                    const max = Number(item?.maxQty) < tmp ? Number(item?.maxQty) : tmp
+                    setRangeQ_covered({ ...rangeQ_covered, min: min, max: max })
+                }
             }
             if (item?.filterType === 'PERCENT_PRICE') {
                 _percentPrice = item
@@ -1054,7 +1031,7 @@ const InsuranceFrom = () => {
                                                                             key={data}
                                                                             className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                                             onClick={() => {
-                                                                                if (userBalance) {
+                                                                                if (userBalance > 0) {
                                                                                     setState({
                                                                                         ...state,
                                                                                         q_covered: Number(

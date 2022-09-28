@@ -1,7 +1,7 @@
 import { BigNumber, ethers, providers } from 'ethers'
 import { weiToEther } from 'components/web3/Web3Types'
 import { INSURANCE_ABI } from 'components/web3/constants/abi/INSURANCE_ABI'
-import { contractAddress, ETHaddress, USDTaddress } from 'components/web3/constants/contractAddress'
+import { BTCaddress, contractAddress, ETHaddress, USDTaddress } from 'components/web3/constants/contractAddress'
 import ContractInterface from 'components/web3/contract/Insurance'
 import { TOKEN_ABI } from '../constants/abi/TOKEN_ABI'
 import { getMessageSign } from 'utils/utils'
@@ -14,12 +14,14 @@ export class ContractCaller {
     public insuranceContract: ContractInterface
     public usdtContract: ContractInterface
     public ethContract: ContractInterface
+    public btcContract: ContractInterface
 
     constructor(provider: providers.Web3Provider) {
         this.provider = provider
         this.insuranceContract = new ContractInterface(this.provider, contractAddress, INSURANCE_ABI)
         this.usdtContract = new ContractInterface(this.provider, USDTaddress, TOKEN_ABI)
         this.ethContract = new ContractInterface(this.provider, ETHaddress, TOKEN_ABI)
+        this.btcContract = new ContractInterface(this.provider, BTCaddress, TOKEN_ABI)
     }
 
     public async getEtherBalance(from: string) {
