@@ -41,18 +41,35 @@ const BannerLanding = () => {
             // { title: t('home:landing:total_q_claim'), value: general?.q_claim ?? 0, decimal: 4 },
             {
                 title: t('home:landing:total_q_covered'),
-                value: general?.q_coverd,
+                // value: general?.q_coverd,
+                value: 119059000,
                 decimal: unitConfig?.assetDigit ?? 2,
             },
-            { title: t('home:landing:users'), value: general?.total_user ?? 0, decimal: 0, prefix: '', suffix: '' },
+            {
+                title: t('home:landing:users'),
+                // value: general?.total_user ?? 0,
+                value: 29,
+                decimal: 0,
+                prefix: '',
+                suffix: '',
+            },
             {
                 title: t('home:landing:total_margin'),
-                value: general?.q_margin,
+                // value: general?.q_margin,
+                value: 79000,
+                // value: 29,
                 decimal: unitConfig?.assetDigit ?? 2,
                 prefix: '$',
                 suffix: '',
             },
-            { title: t('home:landing:avg_r_claim'), value: general?.r_claim ?? 0, suffix: '%', decimal: 2, prefix: '' },
+            {
+                title: t('home:landing:avg_r_claim'),
+                // value: general?.r_claim ?? 0,
+                value: 139,
+                suffix: '%',
+                decimal: 2,
+                prefix: '',
+            },
         ],
         [general, unitConfig],
     )
@@ -78,7 +95,8 @@ const BannerLanding = () => {
                                 data-aos="fade-up"
                                 data-aos-delay={0}
                             >
-                                ${formatCurrency(general?.q_claim, unitConfig?.assetDigit ?? 2)}
+                                {/* ${formatCurrency(general?.q_claim, unitConfig?.assetDigit ?? 2)} */}
+                                $129,000
                             </div>
                             <div className="text-txtSecondary leading-5 text-sm lg:text-base lg:leading-6">{t('home:landing:total_q_claim')}</div>
                         </div>

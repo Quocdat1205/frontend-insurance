@@ -41,22 +41,32 @@ const Banner = () => {
             {
                 title: t('home:landing:total_q_covered'),
                 icon: '/images/screens/home/ic_banner_1.svg',
-                value: general?.q_coverd ?? 0,
+                // value: general?.q_coverd ?? 0,
+                value: 119059000,
                 decimal: unitConfig?.assetDigit ?? 2,
             },
             {
                 title: t('home:landing:total_margin'),
                 icon: '/images/screens/home/ic_banner_2.svg',
-                value: general?.q_margin ?? 0,
+                // value: general?.q_margin ?? 0,
+                value: 79000,
                 decimal: unitConfig?.assetDigit ?? 2,
             },
             {
                 title: t('home:landing:users'),
                 icon: '/images/screens/home/ic_banner_3.svg',
-                value: general?.total_user ?? 0,
+                // value: general?.total_user ?? 0,
+                value: 29,
                 decimal: 0,
             },
-            { title: t('home:landing:avg_r_claim'), icon: '/images/screens/home/ic_banner_4.svg', value: general?.r_claim ?? 0, suffix: '%', decimal: 2 },
+            {
+                title: t('home:landing:avg_r_claim'),
+                icon: '/images/screens/home/ic_banner_4.svg',
+                // value: general?.r_claim ?? 0,
+                value: 139,
+                suffix: '%',
+                decimal: 2,
+            },
         ]
     }, [general, unitConfig])
 
@@ -81,7 +91,8 @@ const Banner = () => {
                             data-aos="fade-up"
                             data-aos-delay={DURATION_AOS}
                         >
-                            {formatNumber(general?.q_claim, 4)}
+                            {/* {formatNumber(general?.q_claim, 4)} */}
+                            129,000
                         </div>
                     </div>
                     <div className="grid grid-rows-4 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-4 grid-flow-col gap-x-6 lg:gap-6">
