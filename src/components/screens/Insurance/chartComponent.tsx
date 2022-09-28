@@ -210,6 +210,8 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             let gradient = new am4core.LinearGradient()
             gradient.addColor(am4core.color('#EB2B3E'), 1, 1)
             gradient.addColor(am4core.color('#EB2B3E'), 0, 0)
+            gradient.addColor(am4core.color('#EB2B3E'), 1, 1)
+            gradient.addColor(am4core.color('#EB2B3E'), 0, 0)
             gradient.rotation = 90
             series.fill = gradient
 
