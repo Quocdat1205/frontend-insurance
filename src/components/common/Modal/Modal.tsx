@@ -1,5 +1,5 @@
 import classnames from 'classnames'
-import useOutsideAlerter, { useOutside } from 'hooks/useOutsideAlerter'
+import { useOutside } from 'hooks/useOutsideAlerter'
 import useWindowSize from 'hooks/useWindowSize'
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { X } from 'react-feather'

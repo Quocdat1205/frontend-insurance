@@ -1,5 +1,4 @@
-import classnames from 'classnames'
-import React, { useState, useImperativeHandle, useEffect, forwardRef, useRef } from 'react'
+import { useState, useImperativeHandle, forwardRef, useRef } from 'react'
 import Modal from './Modal'
 
 interface AlertModal {

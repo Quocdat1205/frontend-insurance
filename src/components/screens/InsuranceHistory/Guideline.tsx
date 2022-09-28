@@ -1,5 +1,5 @@
 import { useTranslation } from 'next-i18next'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock'
 import Tour from 'reactour'
 import { X } from 'react-feather'

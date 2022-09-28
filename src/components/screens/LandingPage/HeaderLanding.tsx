@@ -1,4 +1,3 @@
-import { lighten } from '@amcharts/amcharts4/.internal/core/utils/Colors'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'

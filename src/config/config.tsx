@@ -1,4 +1,4 @@
-import { DisconnectIcon, EmailIcon, HistoryIcon, UserIcon } from 'components/common/Svg/SvgIcon'
+import { DisconnectIcon, HistoryIcon, UserIcon } from 'components/common/Svg/SvgIcon'
 import { BasicChainInformation, ExtendedChainInformation, wallets } from 'components/web3/Web3Types'
 import env from 'config/env'
 import { ConnectWalletType, Toast } from 'types/types'

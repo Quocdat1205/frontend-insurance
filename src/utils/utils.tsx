@@ -8,8 +8,6 @@ import { createSelector } from 'reselect'
 import { RootStore } from 'redux/store'
 import { stateInsurance } from './constants'
 import get from 'lodash/get'
-import fetchApi from 'services/fetch-api'
-import { API_GET_NONCE } from 'services/apis'
 
 export const getS3Url = (url: string) => Config.env.CDN + url
 

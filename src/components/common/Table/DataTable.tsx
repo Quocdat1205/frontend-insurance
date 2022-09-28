@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTable, useSortBy, useResizeColumns } from 'react-table'
 import { SortIcon } from 'components/common/Svg/SvgIcon'
 import colors from 'styles/colors'

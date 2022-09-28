@@ -3,7 +3,6 @@ import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themes_animated from '@amcharts/amcharts4/themes/animated'
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
-import { throttle, debounce } from 'lodash'
 
 export type iProps = {
     p_expired?: any
@@ -279,7 +278,6 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
 
                 //label expired
                 let expiredLabel = latitudeExpired.bullets.push(new am4charts.LabelBullet())
-                console.log(latitudeExpired.data[0].value, 'thuc')
                 if (state.p_claim && state.q_covered) {
                     expiredLabel.label.html = `<div class="text-xs">P-Expired: $${latitudeExpired.data[0].value}</div>`
                 } else {
@@ -345,8 +343,6 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 if (isMobile) {
                     claimLabel.label.dx = -90
                 }
-
-                console.log(state.p_market, state.p_claim)
 
                 const percent = (((state.p_claim - state.p_market) / state.p_market) * 100).toFixed(2)
 

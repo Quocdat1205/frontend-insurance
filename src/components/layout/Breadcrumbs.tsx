@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { ChevronRight } from 'react-feather'
 import colors from 'styles/colors'
 import { isMobile } from 'react-device-detect'

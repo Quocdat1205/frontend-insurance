@@ -6,7 +6,7 @@ import axios from 'axios'
 import { Menu, Popover, Switch, Tab } from '@headlessui/react'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CheckCircle, InfoCircle, XMark, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp, ArrowLeft } from 'react-feather'
 import { useTranslation } from 'next-i18next'
@@ -374,7 +374,6 @@ const InsuranceFrom = () => {
                 type: token.symbol,
                 disable: token.disable,
             }
-            console.log(tmp.type)
 
             const res = await getStorage()
             if (res?.symbol?.type) {
@@ -1909,8 +1908,6 @@ const InsuranceFrom = () => {
                                                     <span
                                                         className={'text-red pl-[8px]'}
                                                         onClick={() => {
-                                                            console.log(state.q_claim)
-
                                                             setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:q_claim')}` })
                                                         }}
                                                     >
@@ -1975,8 +1972,6 @@ const InsuranceFrom = () => {
 export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any, timeLine: number) => {
     try {
         const ts = Math.round(new Date().getTime() / 1000)
-        console.log(timeLine)
-
         const tsYesterday = ts - timeLine * (24 * 3600)
         const params = {
             broker: 'NAMI_SPOT',
