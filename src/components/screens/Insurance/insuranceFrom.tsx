@@ -131,7 +131,7 @@ const InsuranceFrom = () => {
     ]
 
     const Leverage = (p_market: number, p_stop: number) => {
-        const leverage = Number(p_market / Math.abs(p_market - p_stop))
+        const leverage = Math.floor(p_market / Math.abs(p_market - p_stop))
         return leverage < 1 ? 1 : leverage
     }
 
@@ -140,12 +140,11 @@ const InsuranceFrom = () => {
         const ratio_min_profit = Math.abs(p_claim - p_market) / p_market / 2
 
         if (p_claim > p_market) {
-            const p_stop = ((p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2)
-
-            return Math.abs(Number(p_stop)) / 100
+            const p_stop = p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)
+            return Math.abs(Number(p_stop))
         } else {
-            const p_stop = ((p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2)
-            return Math.abs(Number(p_stop)) / 100
+            const p_stop = p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)
+            return Math.abs(Number(p_stop))
         }
     }
 
@@ -537,7 +536,7 @@ const InsuranceFrom = () => {
     }, [selectCoin])
 
     const createSaved = async () => {
-        const x = state.q_claim + state.q_covered * (state.p_claim - state.p_market)
+        const x = state.q_claim + state.q_covered * Math.abs(state.p_claim - state.p_market)
 
         if (state.p_claim < state.p_market) {
             setSaved(x - state.margin + state.q_covered * Math.abs(state.p_claim - state.p_market))
@@ -587,10 +586,10 @@ const InsuranceFrom = () => {
                 const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
                 const laverage = Leverage(state.p_market, p_stop)
                 const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-                const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
+                const q_claim = Number((ratio_profit / 2) * hedge_capital * laverage) * (1 - 0.05) + margin
                 setState({
                     ...state,
-                    q_claim: Number(q_claim.toFixed(2)),
+                    q_claim: Number(q_claim.toFixed(decimalList.decimal_q_covered)),
                     r_claim: Number((Number(q_claim / margin) * 100).toFixed(decimalList.decimal_q_covered)),
                     p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
                     margin: Number(margin.toFixed(decimalList.decimal_margin)),
@@ -608,7 +607,7 @@ const InsuranceFrom = () => {
                 const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + state.margin
                 setState({
                     ...state,
-                    q_claim: Number(q_claim.toFixed(2)),
+                    q_claim: Number(q_claim.toFixed(decimalList.decimal_q_covered)),
                     r_claim: Number((Number(q_claim / state.margin) * 100).toFixed(decimalList.decimal_q_covered)),
                     p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
                 })
@@ -1909,9 +1908,11 @@ const InsuranceFrom = () => {
                                                     {state.q_claim > 0 ? Number(state.q_claim.toFixed(decimalList.decimal_q_covered)) : 0}
                                                     <span
                                                         className={'text-red pl-[8px]'}
-                                                        onClick={() =>
+                                                        onClick={() => {
+                                                            console.log(state.q_claim)
+
                                                             setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:q_claim')}` })
-                                                        }
+                                                        }}
                                                     >
                                                         {unitMoney}
                                                     </span>

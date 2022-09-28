@@ -223,39 +223,49 @@ const AcceptBuyInsurance = () => {
                     }
                     const token = await Config.web3.contractCaller.sign(account.address)
 
-                    if (!token) {
-                        lostConnection()
-                        return setActive(false)
-                    }
-                    if (token?.message || token?.code) {
-                        connectionError(token)
-                        return setActive(false)
-                    } else {
-                        const allowance = await Config.web3.contractCaller.usdtContract.contract.allowance(account.address, contractAddress)
-                        const parseAllowance = formatWeiValueToPrice(allowance)
-                        if (parseAllowance < state.margin) {
-                            await Config.web3.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(1000), {
-                                from: account.address,
-                            })
+                    setTimeout(async () => {
+                        if (!token) {
+                            lostConnection()
+                            Config.toast.show(
+                                'error',
+                                `${language === 'vi' ? 'Giao dịch không thành công, vui lòng thử lại' : 'Transaction fail, try again please'}`,
+                            )
+                            return setActive(false)
                         }
-                        const buy = await Config.web3.contractCaller.insuranceContract.contract.createInsurance(
-                            dataPost.buyer,
-                            dataPost.asset,
-                            dataPost.margin,
-                            dataPost.q_covered,
-                            dataPost.p_market,
-                            dataPost.p_claim,
-                            dataPost.period,
-                            dataPost.isUseNain,
-                            { value: 0 },
-                        )
-                        await buy.wait()
+                        if (token?.message || token?.code) {
+                            connectionError(token)
+                            Config.toast.show(
+                                'error',
+                                `${language === 'vi' ? 'Giao dịch không thành công, vui lòng thử lại' : 'Transaction fail, try again please'}`,
+                            )
+                            return setActive(false)
+                        } else {
+                            const allowance = await Config.web3.contractCaller.usdtContract.contract.allowance(account.address, contractAddress)
+                            const parseAllowance = formatWeiValueToPrice(allowance)
+                            if (parseAllowance < state.margin) {
+                                await Config.web3.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(1000), {
+                                    from: account.address,
+                                })
+                            }
+                            const buy = await Config.web3.contractCaller.insuranceContract.contract.createInsurance(
+                                dataPost.buyer,
+                                dataPost.asset,
+                                dataPost.margin,
+                                dataPost.q_covered,
+                                dataPost.p_market,
+                                dataPost.p_claim,
+                                dataPost.period,
+                                dataPost.isUseNain,
+                                { value: 0 },
+                            )
+                            await buy.wait()
 
-                        const id_sc = await buy.wait()
-                        if (buy && id_sc.events[2].args[0]) {
-                            handlePostInsurance(buy, dataPost, state, Number(id_sc.events[2].args[0]), token)
+                            const id_sc = await buy.wait()
+                            if (buy && id_sc.events[2].args[0]) {
+                                handlePostInsurance(buy, dataPost, state, Number(id_sc.events[2].args[0]), token)
+                            }
                         }
-                    }
+                    }, 3000)
                 }
             }
         } catch (err) {
