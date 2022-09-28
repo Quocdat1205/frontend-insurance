@@ -260,7 +260,6 @@ const AcceptBuyInsurance = () => {
                             )
                             await buy.wait()
                             const id_sc = await buy.wait()
-                            console.log(buy)
 
                             if (buy && id_sc.events[2].args[0]) {
                                 handlePostInsurance(buy, dataPost, state, Number(id_sc.events[2].args[0]), token)
