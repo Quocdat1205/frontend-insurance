@@ -9,6 +9,7 @@ import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import { API_UPDATE_USER_INFO } from 'services/apis'
 import fetchApi from 'services/fetch-api'
+import { setModalSubscribeStorage } from 'utils/utils';
 
 interface EmailRegisterModal {
     visible: boolean
@@ -67,6 +68,8 @@ const EmailSubscriptionModal = ({ visible, onClose }: EmailRegisterModal) => {
                 Config.toast.show('error', message[0])
             }
             if (data) {
+                // update local storage
+                setModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL, 'true')
                 Config.toast.show('success', t('common:modal:success_update_email'))
                 onClose()
             }

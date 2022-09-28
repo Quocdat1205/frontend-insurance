@@ -41,7 +41,7 @@ const Modal = ({
         if (isVisible && onBackdropCb) onBackdropCb()
     }
 
-    useOutside(wrapperRef, handleOutside, container)
+    // useOutside(wrapperRef, handleOutside, container)
     // useOutsideAlerter(wrapperRef, handleOutside)
 
     useEffect(() => {
@@ -69,6 +69,12 @@ const Modal = ({
     return (
         <Portal portalId={portalId} isVisible={isVisible}>
             <div
+                onClick={() => {
+                    return
+                }}
+                onBlur={() => {
+                    return
+                }}
                 className={classnames(
                     'fixed top-0 left-0 z-[99] w-full h-full overflow-hidden bg-bgModal/[0.3]',
                     'z-30',

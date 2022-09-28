@@ -17,8 +17,6 @@ const SloganLanding = () => {
 
     return (
         <Background>
-            {/* <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto slider-landing flex flex-col space-y-6 sm:space-y-0 sm:flex-row items-center justify-between mt-[4.25rem] sm:mt-9 mt-[4.25rem] sm:mt-9 h-[calc(100vh-300px)] sm:h-auto"> */}
-            {/* <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto slider-landing flex flex-col space-y-6 lg:space-y-0 lg:flex-row items-center justify-between max-h-[calc(100vh-68px)] lg:h-auto"> */}
             <div
                 className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto slider-landing flex flex-col space-y-6 lg:space-y-0 lg:flex-row items-center md:justify-between
                 h-full position-absolute justify-between"

@@ -9,6 +9,12 @@ export interface BasicChainInformation {
     name: string
 }
 
+export interface ProviderRpcError extends Error {
+    message: string
+    code: number
+    data?: unknown
+}
+
 export interface ExtendedChainInformation extends BasicChainInformation {
     nativeCurrency: AddEthereumChainParameter['nativeCurrency']
     blockExplorerUrls: AddEthereumChainParameter['blockExplorerUrls']
