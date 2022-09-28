@@ -375,9 +375,10 @@ const InsuranceFrom = () => {
                 type: token.symbol,
                 disable: token.disable,
             }
+            console.log(tmp.type)
 
             const res = await getStorage()
-            if (res?.symbol?.type != '') {
+            if (res?.symbol?.type) {
                 if (tmp.type == res?.symbol?.type) {
                     setSelectedCoin({
                         icon: res?.symbol?.icon,
@@ -399,28 +400,26 @@ const InsuranceFrom = () => {
                         },
                     })
                 }
-            } else {
-                if (tmp.type == 'BNB') {
-                    setSelectedCoin({
-                        icon: tmp.icon,
-                        id: tmp.id,
-                        name: tmp.name,
-                        symbol: tmp.symbol,
-                        type: tmp.type,
-                        disable: tmp.disable,
-                    })
-                    setState({
-                        ...state,
-                        symbol: {
-                            icon: tmp.icon,
-                            id: tmp.id,
-                            name: tmp.name,
-                            symbol: tmp.symbol,
-                            type: tmp.type,
-                            disable: tmp.disable,
-                        },
-                    })
-                }
+            } else if (tmp.type == 'BNB') {
+                setSelectedCoin({
+                    id: token._id,
+                    name: token.name,
+                    icon: token.attachment,
+                    symbol: `${token.symbol}USDT`,
+                    type: token.symbol,
+                    disable: token.disable,
+                })
+                setState({
+                    ...state,
+                    symbol: {
+                        id: token._id,
+                        name: token.name,
+                        icon: token.attachment,
+                        symbol: `${token.symbol}USDT`,
+                        type: token.symbol,
+                        disable: token.disable,
+                    },
+                })
             }
 
             list.push(tmp)
