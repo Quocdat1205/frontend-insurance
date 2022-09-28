@@ -57,15 +57,22 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
         setReqDetail({ ...reqDetail, [name]: event.target.value })
     }
 
-    const validator = (key: string) => {
+    const handlePaste = (name: string, event: any) => {
+        event.preventDefault()
+        const pastedValue = event.clipboardData.getData('text')
+        setReqDetail({ ...reqDetail, [name]: pastedValue })
+        validator(name, pastedValue)
+    }
+
+    const validator = (key: string, value?: '') => {
         const rs = { isValid: false, message: '' }
         switch (key) {
             case 'email':
-                rs.isValid = isValidEmail(reqDetail?.email)
+                rs.isValid = isValidEmail(value || reqDetail?.email)
                 rs.message = t('common:modal:error_format_email')
                 break
             case 'request':
-                rs.isValid = !isNotEmptyString(reqDetail?.request)
+                rs.isValid = !isNotEmptyString(value || reqDetail?.request)
                 break
             default:
                 return rs
@@ -144,6 +151,7 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
                         label={t('common:email')}
                         value={reqDetail?.email || ''}
                         onChange={(e: any) => handleChange('email', e)}
+                        onPaste={(e: any) => handlePaste('email', e)}
                         validator={validator('email')}
                         placeholder={`${t('common:modal:email_placeholder')}`}
                     />
@@ -155,6 +163,7 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
                         label={t('common:modal:contact:request')}
                         value={reqDetail?.request || ''}
                         onChange={(e: any) => handleChange('request', e)}
+                        onPaste={(e: any) => handlePaste('request', e)}
                         validator={validator('request')}
                         placeholder={`${t('common:modal:contact:request_placeholder')}`}
                     />

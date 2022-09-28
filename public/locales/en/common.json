@@ -119,13 +119,16 @@
         "email_placeholder": "Enter Email",
         "error_format_email": "Incorrect Email format. Ex: xxx@gmail.com",
         "success_update_email": "Update Email successfully",
+        "error_duplicate_email": "Email was registered",
+        "label_email": "Enter your email ",
         "email_subscription": {
+            "update_description": "Your Insurance Contract status will be updated the soonest possible",
             "subscribe_later": "Skip! I will update later",
             "update_email": "Update Email",
             "input_email": "Enter Email",
             "current_email": "Current Email",
             "new_email": "New Email",
-            "ignore_description": "Skip and update later by clicking\"Update Email\" at My Wallet",
+            "ignore_description": "Skip and update later by clicking \"Update Email\" at My Wallet",
             "description": "Enter Email to get latest about your Insurance Contract status"
         },
         "contact": {

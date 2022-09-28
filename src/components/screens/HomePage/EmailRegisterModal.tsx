@@ -9,7 +9,7 @@ import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import { API_UPDATE_USER_INFO } from 'services/apis'
 import fetchApi from 'services/fetch-api'
-import { setModalSubscribeStorage } from 'utils/utils';
+import { setModalSubscribeStorage } from 'utils/utils'
 
 interface EmailRegisterModal {
     visible: boolean
@@ -32,16 +32,25 @@ const EmailSubscriptionModal = ({ visible, onClose }: EmailRegisterModal) => {
 
     const handleChange = (name: string, event: any) => {
         setEmail(event.target.value)
-        if (validator(name).isValid) {
+        if (validator(name, event.target.value).isValid) {
             setAbleSubmit(true)
         } else setAbleSubmit(false)
     }
 
-    const validator = (key: string) => {
+    const handlePaste = (name: string, event: any) => {
+        event.preventDefault()
+        const pastedValue = event.clipboardData.getData('text')
+        setEmail(pastedValue)
+        if (validator(name, pastedValue).isValid) {
+            setAbleSubmit(true)
+        } else setAbleSubmit(false)
+    }
+
+    const validator = (key: string, value?: '') => {
         const rs = { isValid: true, message: '' }
         switch (key) {
             case 'email':
-                rs.isValid = isValidEmail(email)
+                rs.isValid = isValidEmail(value || email)
                 rs.message = t('common:modal:error_format_email')
                 break
             default:
@@ -82,11 +91,16 @@ const EmailSubscriptionModal = ({ visible, onClose }: EmailRegisterModal) => {
         }
     }
 
+    const handleOnClose = () => {
+        setModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL, 'true')
+        onClose()
+    }
+
     return (
         <Modal
             isMobile={isMobile}
             isVisible={visible}
-            onBackdropCb={onClose}
+            onBackdropCb={handleOnClose}
             wrapClassName="!p-6"
             className={'lg:max-w-[524px]'}
             containerClassName="z-[9999999]"
@@ -104,9 +118,10 @@ const EmailSubscriptionModal = ({ visible, onClose }: EmailRegisterModal) => {
                 key={'email'}
                 label={t('common:email')}
                 onChange={(e: any) => handleChange('email', e)}
+                onPaste={(e: any) => handlePaste('email', e)}
                 validator={validator('email')}
-                value={email}
-                placeholder={`${t('insurance:final:label_email')}`}
+                value={email || ''}
+                placeholder={`${t('common:modal:label_email')}`}
             />
             <div className="flex flex-col text-sm overflow-auto -mx-6 px-6 mt-8 ">
                 <div className="flex justify-center items-center text-base">
@@ -124,7 +139,7 @@ const EmailSubscriptionModal = ({ visible, onClose }: EmailRegisterModal) => {
                         {t('common:update')}
                     </Button>
                 </div>
-                <div onClick={onClose} className={'text-center text-red text-base underline mt-4 font-semibold'}>
+                <div onClick={onClose} className={'text-center cursor-pointer text-red text-base underline mt-4 font-semibold'}>
                     {t('common:modal:email_subscription:subscribe_later')}
                 </div>
             </div>
