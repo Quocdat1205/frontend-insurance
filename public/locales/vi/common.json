@@ -106,7 +106,7 @@
     "email": "Email",
     "update": "Cập nhật",
     "submitting": "Đang gửi...",
-    "minimum_balance": "Số dư tối thiểu {{value}}",
+    "minimum_balance": "Tối thiểu {{value}}",
     "max": "Tối đa {{value}}",
     "min": "Tối thiểu {{value}}",
     "refresh": "Thử lại",

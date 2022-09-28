@@ -17,6 +17,7 @@ interface Modal {
     customHeader?: () => void
     wrapClassName?: string
     closeButton?: boolean
+    canBlur?: boolean
 }
 
 const Modal = ({
@@ -30,6 +31,7 @@ const Modal = ({
     customHeader,
     wrapClassName = '',
     closeButton = true,
+    canBlur = true,
 }: Modal) => {
     const wrapperRef = useRef<any>(null)
     const container = useRef<any>(null)
@@ -41,7 +43,10 @@ const Modal = ({
         if (isVisible && onBackdropCb) onBackdropCb()
     }
 
-    // useOutside(wrapperRef, handleOutside, container)
+    if (canBlur) {
+        useOutside(wrapperRef, handleOutside, container)
+    }
+
     // useOutsideAlerter(wrapperRef, handleOutside)
 
     useEffect(() => {

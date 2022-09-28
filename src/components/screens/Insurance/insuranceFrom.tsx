@@ -281,11 +281,26 @@ const InsuranceFrom = () => {
                 return false
             }
         }
+
+        if (symbol === 'BTC') {
+            const balanceBTC = await wallet.contractCaller?.btcContract.contract.balanceOf(account.address)
+            if (balanceBTC) {
+                if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
+                    setUserBalance(Number((Number(ethers.utils.formatEther(balanceBTC)) / Number(state.p_market)).toFixed(decimalList.decimal_q_covered)))
+                    return Number(ethers.utils.formatEther(balanceBTC))
+                } else {
+                    setUserBalance(0)
+                    return 0
+                }
+            } else {
+                return false
+            }
+        }
     }
-    const setStorage = (value: any) => {
-        localStorage.setItem('buy_covered_state', JSON.stringify(value))
-        setThisFisrt(false)
-    }
+    // const setStorage = (value: any) => {
+    //     localStorage.setItem('buy_covered_state', JSON.stringify(value))
+    //     setThisFisrt(false)
+    // }
 
     const updateFormPercentMargin = (value: number) => {
         if (state.q_covered > 0) {
@@ -382,25 +397,27 @@ const InsuranceFrom = () => {
             }
 
             const res = await getStorage()
-            if (res?.symbol?.type) {
-                if (tmp.type == res?.symbol?.type) {
+            console.log(res)
+
+            if (res?.type) {
+                if (tmp.type == res?.type) {
                     setSelectedCoin({
-                        icon: res?.symbol?.icon,
-                        id: res?.symbol?.id,
-                        name: res?.symbol?.name,
-                        symbol: res?.symbol?.symbol,
-                        type: res?.symbol?.type,
-                        disable: res?.symbol?.disable,
+                        icon: res?.icon,
+                        id: res?.id,
+                        name: res?.name,
+                        symbol: res?.symbol,
+                        type: res?.type,
+                        disable: res?.disable,
                     })
                     setState({
                         ...state,
                         symbol: {
-                            icon: res?.symbol?.icon,
-                            id: res?.symbol?.id,
-                            name: res?.symbol?.name,
-                            symbol: res?.symbol?.symbol,
-                            type: res?.symbol?.type,
-                            disable: res?.symbol?.disable,
+                            icon: res?.icon,
+                            id: res?.id,
+                            name: res?.name,
+                            symbol: res?.symbol,
+                            type: res?.type,
+                            disable: res?.disable,
                         },
                     })
                 }
@@ -451,60 +468,51 @@ const InsuranceFrom = () => {
     //     }
     // }, [account])
 
-    useEffect(() => {
-        if (unitMoney) {
-            const data = localStorage.getItem('buy_covered_state')
-            if (data) {
-                const res = JSON.parse(data)
-                const newData = { ...res, unitMoney: unitMoney }
-                localStorage.setItem('buy_covered_state', JSON.stringify(newData))
-            }
-        }
-    }, [unitMoney])
+    // useEffect(() => {
+    //     if (unitMoney) {
+    //         const data = localStorage.getItem('buy_covered_state')
+    //         if (data) {
+    //             const res = JSON.parse(data)
+    //             const newData = { ...res, unitMoney: unitMoney }
+    //             localStorage.setItem('buy_covered_state', JSON.stringify(newData))
+    //         }
+    //     }
+    // }, [unitMoney])
 
-    useEffect(() => {
-        if (index) {
-            const data = localStorage.getItem('buy_covered_state')
-            if (data) {
-                const res = JSON.parse(data)
-                const newData = { ...res, index: index }
-                localStorage.setItem('buy_covered_state', JSON.stringify(newData))
-            }
-        }
-    }, [index])
+    // useEffect(() => {
+    //     if (index) {
+    //         const data = localStorage.getItem('buy_covered_state')
+    //         if (data) {
+    //             const res = JSON.parse(data)
+    //             const newData = { ...res, index: index }
+    //             localStorage.setItem('buy_covered_state', JSON.stringify(newData))
+    //         }
+    //     }
+    // }, [index])
 
-    useEffect(() => {
-        if (state) {
-            setTimeout(() => {
-                const data = localStorage.getItem('buy_covered_state')
-                if (data) {
-                    const res = JSON.parse(data)
-                    const newData = {
-                        ...res,
-                        disable: state.symbol.disable,
-                        icon: state.symbol.icon,
-                        id: state.symbol.id,
-                        name: state.symbol.name,
-                        symbol: state.symbol.symbol,
-                        type: state.symbol.type,
-                    }
-                    setStorage(newData)
-                }
-            }, 5000)
-        }
-        if (thisFisrt) {
-            return setThisFisrt(false)
-        }
-    }, [state])
-
-    useEffect(() => {
-        const data = localStorage.getItem('buy_covered_state')
-        if (data) {
-            const res = JSON.parse(data)
-            const newData = { ...res, tab: tab }
-            return localStorage.setItem('buy_covered_state', JSON.stringify(newData))
-        }
-    }, [tab])
+    // useEffect(() => {
+    //     if (state) {
+    //         setTimeout(() => {
+    //             const data = localStorage.getItem('buy_covered_state')
+    //             if (data) {
+    //                 const res = JSON.parse(data)
+    //                 const newData = {
+    //                     ...res,
+    //                     disable: state.symbol.disable,
+    //                     icon: state.symbol.icon,
+    //                     id: state.symbol.id,
+    //                     name: state.symbol.name,
+    //                     symbol: state.symbol.symbol,
+    //                     type: state.symbol.type,
+    //                 }
+    //                 setStorage(newData)
+    //             }
+    //         }, 5000)
+    //     }
+    //     if (thisFisrt) {
+    //         return setThisFisrt(false)
+    //     }
+    // }, [state])
 
     useEffect(() => {
         if (listCoin.length > 0) {
@@ -517,18 +525,6 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         refreshApi(selectTime, selectCoin)
-
-        const data = localStorage.getItem('buy_covered_state')
-        if (data) {
-            let res = JSON.parse(data)
-            res.icon = selectCoin.icon
-            res.id = selectCoin.id
-            res.name = selectCoin.name
-            res.symbol = selectCoin.symbol
-            res.type = selectCoin.type
-            res.disable = selectCoin.disable
-            localStorage.setItem('buy_covered_state', JSON.stringify(res))
-        }
     }, [selectTime, selectCoin])
 
     useEffect(() => {
@@ -537,6 +533,17 @@ const InsuranceFrom = () => {
             setState({ ...state, symbol: { ...selectCoin } })
             getConfig(selectCoin.type)
             getBalaneToken(selectCoin.type)
+
+            let res = {
+                icon: selectCoin.icon,
+                id: selectCoin.id,
+                name: selectCoin.name,
+                symbol: selectCoin.symbol,
+                type: selectCoin.type,
+                disable: selectCoin.disable,
+            }
+
+            localStorage.setItem('buy_covered_state', JSON.stringify(res))
         }
     }, [selectCoin])
 
