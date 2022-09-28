@@ -64,7 +64,7 @@ const Header = () => {
                 break
             case Config.MODAL_UPDATE_EMAIL:
                 // check update or register new email
-                if (!userInfo?.email) {
+                if (!userInfo?.email || !isShownModal) {
                     setVisibleModal({
                         ...visibleModal,
                         [Config.MODAL_REGISTER_EMAIL]: true,

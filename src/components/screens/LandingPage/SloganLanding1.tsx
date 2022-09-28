@@ -17,8 +17,6 @@ const SloganLanding = () => {
 
     return (
         <Background>
-            {/* <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto slider-landing flex flex-col space-y-6 sm:space-y-0 sm:flex-row items-center justify-between mt-[4.25rem] sm:mt-9 mt-[4.25rem] sm:mt-9 h-[calc(100vh-300px)] sm:h-auto"> */}
-            {/* <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto slider-landing flex flex-col space-y-6 lg:space-y-0 lg:flex-row items-center justify-between max-h-[calc(100vh-68px)] lg:h-auto"> */}
             <div
                 className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto slider-landing flex flex-col space-y-6 lg:space-y-0 lg:flex-row items-center md:justify-between
                 h-full position-absolute justify-between"
@@ -26,7 +24,7 @@ const SloganLanding = () => {
                 <div className="flex flex-col space-y-6 lg:space-y-9 w-full max-w-[400px] lg:max-w-[526px] lg:h-auto max-h-[200px] ">
                     <div className="flex flex-col space-y-2 pt-[3.25rem] lg:pt-[4.25rem] lg:pt-0 text-center lg:text-left font-semibold">
                         <span className="text-[2rem] leading-[2.75rem] lg:text-[3.625rem] lg:leading-[5rem]">{t('common:slogan_first')}</span>
-                        <span className="leading-[3.75rem] text-gradient text-5xl lg:text-[4.875rem] lg:leading-[6rem]">{t('common:slogan_second')}</span>
+                        <span className="leading-[3.75rem] text-gradient text-[3rem] lg:text-[4.875rem] lg:leading-[6rem]">{t('common:slogan_second')}</span>
                     </div>
                     <div className="flex items-center justify-center lg:justify-start space-x-4 text-sm font-semibold">
                         <Button
