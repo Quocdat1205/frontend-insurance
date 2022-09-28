@@ -60,6 +60,7 @@ const commonColors = {
         1: '#F2F3F5',
     },
     bgModal: '#3d4252',
+    disabled: '#E5E7E8',
 }
 
 module.exports = {
@@ -184,6 +185,7 @@ module.exports = {
             success: '#52CC74',
             skeleton: '#F0F0F1',
             bgModal: commonColors.bgModal,
+            disabled: commonColors.disabled,
             red: {
                 DEFAULT: commonColors.red.red,
                 ...commonColors.red,

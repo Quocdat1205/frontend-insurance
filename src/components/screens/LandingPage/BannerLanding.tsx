@@ -8,13 +8,15 @@ import { API_GET_INFO_GENERAL } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import 'aos/dist/aos.css'
 import { DURATION_AOS } from 'utils/constants'
-import { formatCurrency, formatNumber } from 'utils/utils'
+import { formatCurrency, getUnit } from 'utils/utils'
+import { RootStore, useAppSelector } from 'redux/store'
 
 const BannerLanding = () => {
     const { t } = useTranslation()
     const { width } = useWindowSize()
     const isMobile = width && width < 640
     const [general, setGeneral] = useState<any>(null)
+    const unitConfig = useAppSelector((state: RootStore) => getUnit(state, 'USDT'))
 
     useEffect(() => {
         getInfoGeneral().catch((r) => {
@@ -37,12 +39,39 @@ const BannerLanding = () => {
     const list = useMemo(
         () => [
             // { title: t('home:landing:total_q_claim'), value: general?.q_claim ?? 0, decimal: 4 },
-            { title: t('home:landing:total_q_covered'), value: formatCurrency(+formatNumber(general?.q_coverd ?? 0), 2), decimal: 2 },
-            { title: t('home:landing:users'), value: general?.total_user ?? 0, decimal: 2, prefix: '', suffix: '' },
-            { title: t('home:landing:total_margin'), value: formatCurrency(general?.q_margin || 0, 2), decimal: 2, prefix: '$', suffix: '' },
-            { title: t('home:landing:avg_r_claim'), value: general?.r_claim ?? 0, suffix: '%', decimal: 2, prefix: '' },
+            {
+                title: t('home:landing:total_q_covered'),
+                // value: general?.q_coverd,
+                value: 119059000,
+                decimal: unitConfig?.assetDigit ?? 2,
+            },
+            {
+                title: t('home:landing:users'),
+                // value: general?.total_user ?? 0,
+                value: 29,
+                decimal: 0,
+                prefix: '',
+                suffix: '',
+            },
+            {
+                title: t('home:landing:total_margin'),
+                // value: general?.q_margin,
+                value: 79000,
+                // value: 29,
+                decimal: unitConfig?.assetDigit ?? 2,
+                prefix: '$',
+                suffix: '',
+            },
+            {
+                title: t('home:landing:avg_r_claim'),
+                // value: general?.r_claim ?? 0,
+                value: 139,
+                suffix: '%',
+                decimal: 2,
+                prefix: '',
+            },
         ],
-        [general],
+        [general, unitConfig],
     )
 
     useEffect(() => {
@@ -66,7 +95,8 @@ const BannerLanding = () => {
                                 data-aos="fade-up"
                                 data-aos-delay={0}
                             >
-                                ${formatNumber(+QClaimValue, 2)}
+                                {/* ${formatCurrency(general?.q_claim, unitConfig?.assetDigit ?? 2)} */}
+                                $129,000
                             </div>
                             <div className="text-txtSecondary leading-5 text-sm lg:text-base lg:leading-6">{t('home:landing:total_q_claim')}</div>
                         </div>
@@ -75,7 +105,7 @@ const BannerLanding = () => {
                         <Item key={index} className="bg-white">
                             <div className="font-medium lg:text-4xl text-red text-[2rem]" data-aos="fade-up" data-aos-delay={DURATION_AOS * index}>
                                 {item?.prefix}
-                                {formatNumber(item.value, item.decimal)}
+                                {formatCurrency(item.value, item.decimal)}
                                 {item?.suffix}
                             </div>
                             <div className="text-txtSecondary text-sm lg:text-base">{item.title}</div>
@@ -89,7 +119,7 @@ const BannerLanding = () => {
 
 const Item = styled.div.attrs<any>({
     className: classnames(
-        'pt-6 pb-9 last:pb-6 -mb-3 lg:m-0 first:mt-0 sm:!p-x4 sm:py-12 w-full ',
+        'lg:pt-6 pb-9 last:pb-6 -mb-3 lg:m-0 first:mt-0 sm:!p-x4 py-8 lg:py-12 w-full ',
         'text-center flex flex-col items-center space-y-[2px] sm:even:mb-0 last:m-0',
     ),
 })`
@@ -97,7 +127,7 @@ const Item = styled.div.attrs<any>({
     border-bottom: 0;
 `
 const Background = styled.section.attrs({
-    className: ' banner-landing lg:px-6 min-h-[180px] flex flex-col justify-end mt-0 -mt-[206px] lg:-mt-[180px]',
+    className: ' banner-landing lg:px-6 min-h-[140px] sm:min-h-[180px] flex flex-col justify-end mt-0 -mt-[140px] lg:-mt-[180px]',
 })<any>`
     border-bottom: 0;
 `

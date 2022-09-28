@@ -115,6 +115,7 @@ export const ChainDataList: ChainType = {
         chain: 'BSC',
         network: 'binance',
         networkId: 56,
+        icon: '/images/icons/ic_bnb.png',
     },
     60: {
         chainId: 60,

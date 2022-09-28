@@ -1,6 +1,5 @@
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 import Header from 'components/screens/HomePage/Header'
-import Breadcrumbs from './Breadcrumbs'
 import { useTranslation } from 'next-i18next'
 import useWindowSize from 'hooks/useWindowSize'
 import { screens } from 'utils/constants'

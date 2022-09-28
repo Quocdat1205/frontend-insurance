@@ -1,4 +1,4 @@
-import React, { ReactNode, useRef } from 'react'
+import { ReactNode, useRef } from 'react'
 import styled from 'styled-components'
 import classnames from 'classnames'
 import ReactTooltip from 'react-tooltip'

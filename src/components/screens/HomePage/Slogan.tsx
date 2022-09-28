@@ -1,4 +1,3 @@
-import Button from 'components/common/Button/Button'
 import useWindowSize from 'hooks/useWindowSize'
 import { useTranslation } from 'next-i18next'
 import React from 'react'

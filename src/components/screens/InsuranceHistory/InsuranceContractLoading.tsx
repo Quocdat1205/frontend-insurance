@@ -6,7 +6,7 @@ const InsuranceContractLoading = () => {
     const cols = [1, 2, 3, 4, 5, 6, 7]
     const rows = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     return (
-        <div className="px-4 sm:px-10 lg:px-20">
+        <div className="px-4 mb:px-10 lg:px-20">
             <div className="pt-12 sm:pt-[4.25rem] max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
                 <div className="flex items-center justify-between">
                     <Skeleton className="h-9 w-[12rem] sm:w-[25rem]" />

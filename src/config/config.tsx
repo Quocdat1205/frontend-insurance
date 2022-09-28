@@ -69,6 +69,10 @@ class Config {
         localStorage.removeItem('PUBLIC_WALLET')
     }
 
+    static MODAL_REGISTER_EMAIL = 'registerEmail'
+
+    static MODAL_UPDATE_EMAIL = 'updateEmail'
+
     static pattern = (key: string) => {
         let rs: any = ''
         switch (key) {
@@ -90,15 +94,13 @@ class Config {
     static homeMenu = [
         { menuId: 'home', router: '/home', name: 'common:header:home', parentId: 0 },
         { menuId: 'buy-covered-parent', router: '/buy-covered', name: 'common:header:buy_covered', parentId: 0 },
-        { menuId: 'commission_policy', router: '/buy-covered', name: 'common:header:commission_policy', parentId: 0 },
+        // { menuId: 'commission_policy', router: '/buy-covered', name: 'common:header:commission_policy', parentId: 0 },
     ]
-
-   
 
     static subMenu = [
         {
             menuId: 'recent-transaction',
-            router: '/home',
+            // router: '/insurance-history',
             name: 'common:header:recent_transactions',
             parentId: 'account-info',
             // icon: '/images/icons/ic_recent_transaction.png',
@@ -115,7 +117,7 @@ class Config {
             isIconSvg: true,
         },
         {
-            menuId: 'update-email',
+            menuId: Config.MODAL_UPDATE_EMAIL,
             name: 'common:header:update_my_email',
             parentId: 'account-info',
             // icon: '/images/icons/ic_email.png',
@@ -132,7 +134,6 @@ class Config {
         },
     ]
 
-
     static landingPageMenu = [
         {
             menuId: 'buy_covered',
@@ -148,6 +149,11 @@ class Config {
             name: 'home:landing:faq_title',
             parentId: 0,
             section: 'faq_section',
+        },
+        {
+            menuId: 'modal_contact',
+            name: 'home:landing:contact',
+            parentId: 0,
         },
     ]
 }

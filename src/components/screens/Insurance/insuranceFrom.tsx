@@ -6,7 +6,7 @@ import axios from 'axios'
 import { Menu, Popover, Switch, Tab } from '@headlessui/react'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CheckCircle, InfoCircle, XMark, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp, ArrowLeft } from 'react-feather'
 import { useTranslation } from 'next-i18next'
@@ -15,7 +15,6 @@ import { screens } from 'utils/constants'
 import { Suspense } from 'react'
 import { RootStore, useAppSelector } from 'redux/store'
 import Config from 'config/config'
-// import NotificationInsurance from 'components/layout/notifucationInsurance'
 import Modal from 'components/common/Modal/Modal'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import { ethers } from 'ethers'
@@ -46,22 +45,17 @@ const InsuranceFrom = () => {
     const pairConfigs = useAppSelector((state: RootStore) => state.setting.pairConfigs)
     const account = useAppSelector((state: RootStore) => state.setting.account)
 
-    const [percentInsurance, setPercentInsurance] = useState<number>(0)
     const [selectTime, setSelectTime] = useState<string>('ALL')
-    const [isDrop, setDrop] = useState(false)
-    // const [checkUpgrade, setCheckUpgrade] = useState(false)
-    const [clear, setClear] = useState(false)
+    const clear = useRef<boolean>(false)
+    const percentInsurance = useRef<number>(0)
+    const percentMargin = useRef<number>(8)
+
     const [index, setIndex] = useState<1 | 2>(1)
     const [tab, setTab] = useState<number>(0)
     const [loadings, setLoadings] = useState(true)
     const [openChangeToken, setOpenChangeToken] = useState(false)
-    // const [active, setActive] = useState<boolean>(false)
-    // const [nameNoti, setNameNoti] = useState<'success' | 'expired' | 'expired1' | 'email' | 'loading'>('loading')
-    // const [res, setRes] = useState<any>()
     const [showDetails, setShowDetails] = useState(false)
     const [unitMoney, setUnitMoney] = useState('USDT')
-    const [changeUnit, setChangeUnit] = useState<boolean>(false)
-    const [changeUnit1, setChangeUnit1] = useState<boolean>(false)
     const [changeUnit2, setChangeUnit2] = useState<boolean>(false)
     const [showCroll, setShowCroll] = useState(false)
     const [showGuide, setShowGuide] = useState<boolean>(false)
@@ -137,7 +131,7 @@ const InsuranceFrom = () => {
     ]
 
     const Leverage = (p_market: number, p_stop: number) => {
-        const leverage = Number(p_market / Math.abs(p_market - p_stop))
+        const leverage = Math.floor(p_market / Math.abs(p_market - p_stop))
         return leverage < 1 ? 1 : leverage
     }
 
@@ -146,12 +140,11 @@ const InsuranceFrom = () => {
         const ratio_min_profit = Math.abs(p_claim - p_market) / p_market / 2
 
         if (p_claim > p_market) {
-            const p_stop = ((p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2)
-
-            return Math.abs(Number(p_stop)) / 100
+            const p_stop = p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)
+            return Math.abs(Number(p_stop))
         } else {
-            const p_stop = ((p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2)
-            return Math.abs(Number(p_stop)) / 100
+            const p_stop = p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)
+            return Math.abs(Number(p_stop))
         }
     }
 
@@ -288,11 +281,9 @@ const InsuranceFrom = () => {
         setThisFisrt(false)
     }
 
-    const [percentMargin, setPercentMargin] = useState(8)
-
     const updateFormPercentMargin = (value: number) => {
         if (state.q_covered > 0) {
-            setPercentMargin(value)
+            percentMargin.current = value
             setState({
                 ...state,
                 percent_margin: value,
@@ -312,56 +303,16 @@ const InsuranceFrom = () => {
     }
 
     const getStorage = async () => {
-        setLoadings(true)
-
         const data = await localStorage.getItem('buy_covered_state')
         if (data) {
             const res = JSON.parse(data)
-            setState({
-                ...state,
-                symbol: {
-                    icon: res.icon,
-                    id: res.id,
-                    name: res.name,
-                    symbol: res.symbol,
-                    type: res.type,
-                    disable: res.disable,
-                },
-            })
-            if (res.symbol != '') {
-                setSelectedCoin({
-                    icon: res.icon,
-                    id: res.id,
-                    name: res.name,
-                    symbol: res.symbol,
-                    type: res.type,
-                    disable: res.disable,
-                })
-                setState({
-                    ...state,
-                    symbol: {
-                        icon: res.icon,
-                        id: res.id,
-                        name: res.name,
-                        symbol: res.symbol,
-                        type: res.type,
-                        disable: res.disable,
-                    },
-                })
+            if (res) {
+                return res
             } else {
-                if (listCoin.length > 0) {
-                }
+                return false
             }
-
-            setTab(res.tab)
-            setUnitMoney(res.unitMoney)
-            setIndex(res.index)
-            setThisFisrt(true)
-            refreshApi(selectTime, selectCoin)
-        } else {
-            setThisFisrt(false)
-            setStorage(state)
         }
+        return false
     }
 
     const refreshApi = (
@@ -373,18 +324,7 @@ const InsuranceFrom = () => {
         setLoadings(true)
         try {
             if (selectCoin.symbol !== '') {
-                if (selectTime == '1H' || selectTime == '1D') {
-                    timeBegin.setDate(timeEnd.getDate() - 10)
-                    fetchApiNami(
-                        `${selectCoin.type && selectCoin.type}${unitMoney}`,
-                        `${Math.floor(timeBegin.getTime() / 1000)}`,
-                        `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                        '1m',
-                        setDataChart,
-                    ).then(() => {
-                        return setLoadings(false)
-                    })
-                } else if (selectTime == '1W') {
+                if (selectTime == '1H') {
                     timeBegin.setDate(timeEnd.getDate() - 10)
                     fetchApiNami(
                         `${selectCoin.type && selectCoin.type}${unitMoney}`,
@@ -392,24 +332,34 @@ const InsuranceFrom = () => {
                         `${Math.ceil(timeEnd.getTime() / 1000)}`,
                         '1h',
                         setDataChart,
-                    ).then(() => {
-                        return setLoadings(false)
-                    })
+                        120,
+                    )
+                } else if (selectTime == '1W' || selectTime == '1D') {
+                    timeBegin.setDate(timeEnd.getDate() - 10)
+                    fetchApiNami(
+                        `${selectCoin.type && selectCoin.type}${unitMoney}`,
+                        `${Math.floor(timeBegin.getTime() / 1000)}`,
+                        `${Math.ceil(timeEnd.getTime() / 1000)}`,
+                        '1d',
+                        setDataChart,
+                        500,
+                    )
                 } else {
                     timeBegin.setDate(timeEnd.getDate() - 10)
                     fetchApiNami(
                         `${selectCoin.type && selectCoin.type}${unitMoney}`,
                         `${Math.floor(timeBegin.getTime() / 1000)}`,
                         `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                        '1h',
+                        '1d',
                         setDataChart,
-                    ).then(() => {
-                        return setLoadings(false)
-                    })
+                        1095,
+                    )
                 }
             }
         } catch (err) {
             console.log(err)
+        } finally {
+            setLoadings(false)
         }
     }
 
@@ -425,24 +375,47 @@ const InsuranceFrom = () => {
                 disable: token.disable,
             }
 
-            if (tmp.type == 'BNB') {
+            const res = await getStorage()
+            if (res?.symbol?.type) {
+                if (tmp.type == res?.symbol?.type) {
+                    setSelectedCoin({
+                        icon: res?.symbol?.icon,
+                        id: res?.symbol?.id,
+                        name: res?.symbol?.name,
+                        symbol: res?.symbol?.symbol,
+                        type: res?.symbol?.type,
+                        disable: res?.symbol?.disable,
+                    })
+                    setState({
+                        ...state,
+                        symbol: {
+                            icon: res?.symbol?.icon,
+                            id: res?.symbol?.id,
+                            name: res?.symbol?.name,
+                            symbol: res?.symbol?.symbol,
+                            type: res?.symbol?.type,
+                            disable: res?.symbol?.disable,
+                        },
+                    })
+                }
+            } else if (tmp.type == 'BNB') {
                 setSelectedCoin({
-                    icon: tmp.icon,
-                    id: tmp.id,
-                    name: tmp.name,
-                    symbol: tmp.symbol,
-                    type: tmp.type,
-                    disable: tmp.disable,
+                    id: token._id,
+                    name: token.name,
+                    icon: token.attachment,
+                    symbol: `${token.symbol}USDT`,
+                    type: token.symbol,
+                    disable: token.disable,
                 })
                 setState({
                     ...state,
                     symbol: {
-                        icon: tmp.icon,
-                        id: tmp.id,
-                        name: tmp.name,
-                        symbol: tmp.symbol,
-                        type: tmp.type,
-                        disable: tmp.disable,
+                        id: token._id,
+                        name: token.name,
+                        icon: token.attachment,
+                        symbol: `${token.symbol}USDT`,
+                        type: token.symbol,
+                        disable: token.disable,
                     },
                 })
             }
@@ -463,16 +436,6 @@ const InsuranceFrom = () => {
             return
         }
     }, [userBalance])
-
-    useEffect(() => {
-        try {
-            if (account.address != null) {
-                getStorage()
-            }
-        } catch (error) {
-            console.log('error get USDT balance')
-        }
-    }, [account])
 
     // useEffect(() => {
     //     try {
@@ -548,7 +511,7 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         refreshApi(selectTime, selectCoin)
-        getBalaneToken(selectCoin.type)
+
         const data = localStorage.getItem('buy_covered_state')
         if (data) {
             let res = JSON.parse(data)
@@ -572,7 +535,7 @@ const InsuranceFrom = () => {
     }, [selectCoin])
 
     const createSaved = async () => {
-        const x = state.q_claim + state.q_covered * (state.p_claim - state.p_market)
+        const x = state.q_claim + state.q_covered * Math.abs(state.p_claim - state.p_market)
 
         if (state.p_claim < state.p_market) {
             setSaved(x - state.margin + state.q_covered * Math.abs(state.p_claim - state.p_market))
@@ -588,6 +551,30 @@ const InsuranceFrom = () => {
         validator('q_covered')
         validator('margin')
 
+        if (state.q_covered > 0) {
+            if (userBalance > 0) {
+                const a = Math.ceil((state.q_covered / userBalance) * 100)
+                percentInsurance.current = a >= 100 ? 100 : a
+            }
+        }
+
+        if (state.margin > 0) {
+            if (userBalance > 0) {
+                const b = Math.ceil((state.margin / (state.q_covered * state.p_market)) * 100)
+                if (b >= 10 || state.margin == rangeMargin.max) {
+                    percentMargin.current = 10
+                } else if (b >= 7) {
+                    percentMargin.current = 7
+                } else if (b >= 5) {
+                    percentMargin.current = 5
+                } else if (b >= 2) {
+                    percentMargin.current = 2
+                } else {
+                    percentMargin.current = b
+                }
+            }
+        }
+
         if (res_q_covered.isValid) {
             if (state.q_covered && state.p_claim) {
                 const margin = Number((8 * state.q_covered * state.p_market) / 100)
@@ -598,10 +585,10 @@ const InsuranceFrom = () => {
                 const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
                 const laverage = Leverage(state.p_market, p_stop)
                 const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-                const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
+                const q_claim = Number((ratio_profit / 2) * hedge_capital * laverage) * (1 - 0.05) + margin
                 setState({
                     ...state,
-                    q_claim: Number(q_claim.toFixed(2)),
+                    q_claim: Number(q_claim.toFixed(decimalList.decimal_q_covered)),
                     r_claim: Number((Number(q_claim / margin) * 100).toFixed(decimalList.decimal_q_covered)),
                     p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
                     margin: Number(margin.toFixed(decimalList.decimal_margin)),
@@ -619,7 +606,7 @@ const InsuranceFrom = () => {
                 const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + state.margin
                 setState({
                     ...state,
-                    q_claim: Number(q_claim.toFixed(2)),
+                    q_claim: Number(q_claim.toFixed(decimalList.decimal_q_covered)),
                     r_claim: Number((Number(q_claim / state.margin) * 100).toFixed(decimalList.decimal_q_covered)),
                     p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
                 })
@@ -685,17 +672,19 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         const _decimalList = { ...decimalList }
-        pair_configs?.filters?.map((item: any) => {
+        let _percentPrice: any
+        pair_configs?.filters?.map(async (item: any) => {
             if (item?.filterType === 'LOT_SIZE') {
+                const tmp = await getBalaneToken(selectCoin.type)
                 const decimal = countDecimals(item.stepSize)
                 _decimalList.decimal_q_covered = +decimal
-
-                const min = Number(item?.minQty)
-                const max = Number(item?.maxQty) < userBalance ? Number(item?.maxQty) : userBalance
-                setRangeQ_covered({ min: min, max: max })
+                const min_Market = +(10 / state.p_market).toFixed(+decimal)
+                const min = Number(item?.minQty) > min_Market ? Number(item?.minQty) : min_Market
+                const max = Number(item?.maxQty) < tmp ? Number(item?.maxQty) : tmp
+                setRangeQ_covered({ ...rangeQ_covered, min: min, max: max })
             }
             if (item?.filterType === 'PERCENT_PRICE') {
-                setPercentPrice({ ...item })
+                _percentPrice = item
             }
             if (item?.filterType === 'PRICE_FILTER') {
                 setPriceFilter({ ...item })
@@ -711,14 +700,14 @@ const InsuranceFrom = () => {
                 if (state.p_claim > state.p_market) {
                     setRangeP_claim({
                         ...rangeP_claim,
-                        min: Number(min1.toFixed(decimalList.decimal_p_claim)),
-                        max: Number(max1.toFixed(decimalList.decimal_p_claim)),
+                        min: Number(min1),
+                        max: Number(max1),
                     })
                 } else {
                     setRangeP_claim({
                         ...rangeP_claim,
-                        min: Number(min2.toFixed(decimalList.decimal_p_claim)),
-                        max: Number(max2.toFixed(decimalList.decimal_p_claim)),
+                        min: Number(min2),
+                        max: Number(max2),
                     })
                 }
             }
@@ -731,8 +720,40 @@ const InsuranceFrom = () => {
                 setRangeMargin({ ...rangeP_claim, min: MIN, max: MAX })
             }
             setDecimalList({ ..._decimalList })
+            setPercentPrice({ ..._percentPrice })
+            validateP_Claim(state.p_claim)
         })
     }, [pair_configs, state.q_covered, selectCoin, state.p_claim])
+
+    const validateP_Claim = (value: number) => {
+        const _rangeP_claim = rangeP_claim
+
+        let _check = true
+        //Pm*multiplierDown/Up
+        const PmDown = state.p_market * percentPrice?.multiplierDown
+        const PmUp = state.p_market * percentPrice?.multiplierUp
+        //+-2 -> +-70
+        const min1 = state.p_market + (2 / 100) * state.p_market
+        const max1 = state.p_market + (70 / 100) * state.p_market
+
+        const min2 = state.p_market - (70 / 100) * state.p_market
+        const max2 = state.p_market - (2 / 100) * state.p_market
+
+        if (state.p_claim < state.p_market) {
+            const min = min2 > PmDown ? PmDown : min2
+            const max = max2 > PmUp ? PmUp : max2
+            _rangeP_claim.min = +min.toFixed(decimalList.decimal_p_claim)
+            _rangeP_claim.max = +max.toFixed(decimalList.decimal_p_claim)
+            return setRangeP_claim({ ..._rangeP_claim })
+        }
+        if (state.p_claim > state.p_market) {
+            const min = min1 > PmDown ? min1 : PmDown
+            const max = max1 > PmUp ? max1 : PmUp
+            _rangeP_claim.min = +min.toFixed(decimalList.decimal_p_claim)
+            _rangeP_claim.max = +max.toFixed(decimalList.decimal_p_claim)
+            return setRangeP_claim({ ..._rangeP_claim })
+        }
+    }
 
     const validator = (key: string) => {
         let rs = { isValid: true, message: '' }
@@ -740,56 +761,29 @@ const InsuranceFrom = () => {
         switch (key) {
             case 'q_covered':
                 rs.isValid = !(
-                    state.q_covered > Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered)) ||
+                    state.q_covered > Number(rangeQ_covered?.max?.toFixed(decimalList.decimal_q_covered)) ||
                     state.q_covered < rangeQ_covered.min ||
                     state.q_covered <= 0
                 )
                 rs.message = `<div class="flex items-center ">
                     ${
-                        state.q_covered > Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered))
+                        state.q_covered > Number(rangeQ_covered?.max?.toFixed(decimalList.decimal_q_covered))
                             ? t('common:available', {
-                                  value: `${Number(rangeQ_covered.max.toFixed(decimalList.decimal_q_covered))}`,
+                                  value: `${Number(rangeQ_covered?.max?.toFixed(decimalList.decimal_q_covered))}`,
                               })
-                            : t('common:minimum_balance', { value: rangeQ_covered.min })
+                            : t('common:min', { value: rangeQ_covered.min })
                     }
                 </div>`
                 break
             case 'p_claim':
-                rs.isValid =
-                    !(state.p_claim > Number(rangeP_claim.max) || state.p_claim < Number(rangeP_claim.min) || state.p_claim <= 0) &&
-                    !(Number(priceFilter?.minPrice) > state.p_claim || state.p_claim > Number(priceFilter?.maxPrice)) &&
-                    !(
-                        state.p_claim > Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered)) ||
-                        state.p_claim < Number((state.p_market * Number(percentPrice?.multiplierDown)).toFixed(decimalList.decimal_q_covered))
-                    )
-                if (state.p_claim > Number(rangeP_claim.max) || state.p_claim < Number(rangeP_claim.min)) {
-                    rs.message = `<div class="flex items-center">
+                rs.isValid = !(state.p_claim < rangeP_claim.min || state.p_claim > rangeP_claim.max)
+                rs.message = `<div class="flex items-center">
                   ${
                       state.p_claim > Number(rangeP_claim.max)
                           ? t('common:max', { value: `${Number(rangeP_claim.max)}` })
                           : t('common:min', { value: `${Number(rangeP_claim.min)}` })
                   }
                   </div>`
-                } else if (Number(priceFilter?.minPrice) > state.p_claim || state.p_claim > Number(priceFilter?.maxPrice)) {
-                    rs.message = `<div class="flex items-center">
-              ${
-                  state.p_claim > +priceFilter.maxPrice
-                      ? t('common:max', { value: `${Number(priceFilter.maxPrice)}` })
-                      : t('common:min', { value: `${Number(priceFilter.minPrice)}` })
-              }
-              </div>`
-                } else if (
-                    state.p_claim > Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered)) ||
-                    state.p_claim < Number((state.p_market * Number(percentPrice?.multiplierDown)).toFixed(decimalList.decimal_q_covered))
-                ) {
-                    rs.message = `<div class="flex items-center">
-              ${
-                  state.p_claim > Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered))
-                      ? t('common:max', { value: `${Number((state.p_market * Number(percentPrice?.multiplierUp)).toFixed(decimalList.decimal_q_covered))}` })
-                      : t('common:min', { value: `${Number((state.p_market * Number(percentPrice?.multiplierDown)).toFixed(decimalList.decimal_q_covered))}` })
-              }
-              </div>`
-                }
                 break
             case 'margin':
                 rs.isValid = !(state.margin < Number(rangeMargin.min) || state.margin > Number(rangeMargin.max) || state.margin <= 0)
@@ -805,8 +799,13 @@ const InsuranceFrom = () => {
                 break
         }
 
+        if (!rs.isValid) {
+            clear.current = false
+        }
+
         return rs
     }
+
     const renderPopoverQCover = () => (
         <Popover className="relative outline-none bg-hover focus:ring-0 flex items-center justify-center">
             <Popover.Button
@@ -835,7 +834,7 @@ const InsuranceFrom = () => {
                                         onMouseUp={() => {
                                             isPress = false
                                             setSelectedCoin(coin)
-                                            setState({ ...state, symbol: { ...coin } })
+                                            setState({ ...state, symbol: { ...coin }, q_covered: 0, p_claim: 0, q_claim: 0, margin: 0, r_claim: 0 })
                                             setChosing(false)
                                         }}
                                         onClick={() => close()}
@@ -919,13 +918,13 @@ const InsuranceFrom = () => {
         switch (key) {
             case 'q_covered':
                 setState({ ...state, [key]: value })
-                setPercentInsurance(0)
+                percentInsurance.current = 0
                 break
             case 'p_claim':
                 setState({ ...state, [key]: value })
                 break
             case 'margin':
-                setPercentMargin(0)
+                percentMargin.current = 0
                 setState({ ...state, margin: value, percent_margin: 0 })
                 break
             default:
@@ -935,20 +934,19 @@ const InsuranceFrom = () => {
 
     const handleCheckFinal = () => {
         if (account.address == null) {
-            return setClear(false)
-        } else if (!validator('p_claim') || !validator('margin') || !validator('q_covered')) {
-            return setClear(false)
-        } else if (state.q_covered > 0 && state.margin > 0 && state.p_claim > 0) {
-            return setClear(true)
+            return false
+        } else if (state.q_covered <= 0 || state.margin <= 0 || state.p_claim <= 0) {
+            return false
+        } else if (userBalance == null || userBalance == 0) {
+            return false
+        } else {
+            return true
         }
     }
 
     useEffect(() => {
-        handleCheckFinal()
-        if (state.q_covered <= 0 || state.margin <= 0 || state.p_claim <= 0) {
-            setClear(false)
-        }
-    }, [state.q_covered, state.margin, state.p_claim])
+        clear.current = handleCheckFinal()
+    }, [state])
 
     return (
         <>
@@ -960,523 +958,438 @@ const InsuranceFrom = () => {
                         <LayoutInsurance
                             hiddenHeader={showGuide}
                             handleClick={() => {
-                                setDrop(false)
                                 setChosing(false)
                                 setChangeUnit2(false)
-                                setChangeUnit(false)
-                                setChangeUnit1(false)
                             }}
                         >
-                            <div className="w-full bg-[#E5E7E8] h-[0.25rem] sticky top-[4.1875rem] z-[50]">
+                            <div className="w-full bg-[#E5E7E8]  h-[0.25rem] sticky top-[4.1875rem] z-[50]">
                                 <div className="bg-red h-[0.25rem] w-1/2"></div>
                             </div>
-                            {
-                                // head Insurance
-                                <HeaderContent state={tab} setState={setTab} props={state} setProps={setState} wallet={wallet} auth={account.address} />
-                            }
-
-                            {
-                                //checkAuth
-                                account.address == null
-                                    ? !isMobile && (
-                                          <div
-                                              className="w-full flex flex-col justify-center items-center max-w-screen-layout 4xl:max-w-screen-3xl m-auto mb-[1rem]"
-                                              onClick={() => {
-                                                  setDrop(false)
-                                                  setChosing(false)
-                                              }}
-                                          >
-                                              <Button
-                                                  variants={'primary'}
-                                                  className={`bg-red h-[48px] w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
-                                                  onClick={() => {
-                                                      Config.connectWallet()
-                                                  }}
-                                              >
-                                                  {t('insurance:buy:connect_wallet')}
-                                              </Button>
-                                          </div>
-                                      )
-                                    : ''
-                            }
-                            <div className="max-w-/screen-layout 4xl:max-w-screen-3xl m-auto flex flex-row mb-[8rem] overflow-hidden">
-                                <div className="w-8/12">
+                            <div className="px-4 mb:px-10 lg:px-20">
+                                <div className="max-w-/screen-layout 4xl:max-w-screen-3xl m-auto">
                                     {
-                                        //chart
-                                        index == 1 && (
-                                            <div
-                                                className={`shadow border border-1 border-divider h-auto rounded-xl  p-8`}
-                                                onClick={() => {
-                                                    setDrop(false)
-                                                    setChosing(false)
-                                                }}
-                                            >
-                                                {/*head*/}
-                                                <div id="tour_statistics" data-tut="tour_statistics">
-                                                    <div className={'pb-2 text-sm leading-5 text-txtSecondary flex items-center space-x-6'}>
-                                                        <div className={'w-full flex flex-row items-center'}>
-                                                            <span className="mr-2">{menu[7].name}</span>
-                                                            <div data-tip={t('insurance:terminology:q_covered')} data-for={`q_covered`}>
-                                                                <InfoCircle size={14} color={colors.txtSecondary} />
-                                                                <Tooltip className="max-w-[200px]" id={'q_covered'} placement="right" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className={'pb-2 space-x-6 flex justify-between'}>
-                                                        <div className={`flex justify-between border-collapse rounded-[3px] shadow-none w-full`}>
-                                                            <InputNumber
-                                                                validator={validator('q_covered')}
-                                                                value={state.q_covered}
-                                                                onChange={(e: any) => onHandleChange('q_covered', e)}
-                                                                customSuffix={renderPopoverQCover}
-                                                                decimal={decimalList.decimal_q_covered}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-row w-full space-x-6 text-xs font-semibold">
-                                                    <div className={`flex flex-row justify-between space-x-4 w-full `}>
-                                                        <div
-                                                            className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
-                                                            onClick={() => {
-                                                                setState({
-                                                                    ...state,
-                                                                    q_covered: Number(((25 / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered)),
-                                                                })
-                                                                setPercentInsurance(25)
-                                                            }}
-                                                        >
-                                                            <div className={`${percentInsurance == 25 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                            <div className={percentInsurance === 25 ? 'text-red' : 'text-gray'}>{25}%</div>
-                                                        </div>
-                                                        <div
-                                                            className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
-                                                            onClick={() => {
-                                                                setState({
-                                                                    ...state,
-                                                                    q_covered: Number(((50 / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered)),
-                                                                })
-                                                                setPercentInsurance(50)
-                                                            }}
-                                                        >
-                                                            <div className={`${percentInsurance == 50 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                            <div className={percentInsurance === 50 ? 'text-red' : 'text-gray'}>{50}%</div>
-                                                        </div>
-                                                        <div
-                                                            className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
-                                                            onClick={() => {
-                                                                setState({
-                                                                    ...state,
-                                                                    q_covered: Number(((75 / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered)),
-                                                                })
-                                                                setPercentInsurance(75)
-                                                            }}
-                                                        >
-                                                            <div className={`${percentInsurance == 75 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                            <div className={percentInsurance === 75 ? 'text-red' : 'text-gray'}>{75}%</div>
-                                                        </div>
-                                                        <div
-                                                            className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
-                                                            onClick={() => {
-                                                                setState({
-                                                                    ...state,
-                                                                    q_covered: Number(
-                                                                        ((100 / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
-                                                                    ),
-                                                                })
-                                                                setPercentInsurance(100)
-                                                            }}
-                                                        >
-                                                            <div className={`${percentInsurance == 100 ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}></div>
-                                                            <div className={percentInsurance === 100 ? 'text-red' : 'text-gray'}>{100}%</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/*end head*/}
-                                                <div data-tut="tour_chart" id="tour_chart" className="mt-6 mb-4">
-                                                    {/*body*/}
-                                                    <div className={'flex flex-row relative'}>
-                                                        <Suspense fallback={`Loading...`}>
-                                                            <ChartComponent
-                                                                width={795}
-                                                                height={280}
-                                                                data={dataChart}
-                                                                state={state ? state : null}
-                                                                p_claim={Number(state && state.p_claim)}
-                                                                p_expired={Number(state.p_expired)}
-                                                                setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
-                                                                setP_Market={(data: number) => setState({ ...state, p_market: data })}
-                                                            />
-                                                            <svg
-                                                                className={`absolute right-0 z-10`}
-                                                                width="3"
-                                                                height={280}
-                                                                viewBox="0 0 2 500"
-                                                                fill="none"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                            >
-                                                                <line
-                                                                    x1="1"
-                                                                    y1="3.5011e-08"
-                                                                    x2="0.999987"
-                                                                    y2="500"
-                                                                    stroke="#B2B7BC"
-                                                                    strokeWidth="150"
-                                                                    strokeDasharray="0.74 3.72"
-                                                                ></line>
-                                                            </svg>
-                                                        </Suspense>
-                                                    </div>
-                                                    {/*end body*/}
-
-                                                    {/*footer*/}
-                                                    {/* fill of time */}
-                                                    <div className={'flex flex-row justify-between items-center w-full mt-5'}>
-                                                        {listTime.map((time, key) => {
-                                                            return (
-                                                                <div
-                                                                    key={key}
-                                                                    className={`${
-                                                                        selectTime == time ? 'text-red' : 'text-txtSecondary'
-                                                                    } hover:cursor-pointer font-medium  text-sm`}
-                                                                    onClick={() => {
-                                                                        setSelectTime(time)
-                                                                    }}
-                                                                >
-                                                                    {time}
-                                                                </div>
-                                                            )
-                                                        })}
-                                                    </div>
-                                                    {/*P-Claim*/}
-                                                    <div className={'my-6'}>
-                                                        <span className={'flex flex-row items-center text-txtSecondary text-sm'}>
-                                                            <span className={'mr-2'}>P-Claim</span>
-                                                            <div data-tip={t('insurance:terminology:p_claim')} data-for={`p_claim`}>
-                                                                <InfoCircle size={14} color={colors.txtSecondary} />
-                                                                <Tooltip className="max-w-[200px]" id={'p_claim'} placement="right" />
-                                                            </div>
-                                                        </span>
-
-                                                        <InputNumber
-                                                            className="mt-2"
-                                                            validator={validator('p_claim')}
-                                                            value={state.p_claim}
-                                                            onChange={(e: any) => onHandleChange('p_claim', e)}
-                                                            customSuffix={() => unitMoney}
-                                                            suffixClassName="text-txtSecondary"
-                                                            placeholder={`${menu[9].name}`}
-                                                            decimal={decimalList.decimal_p_claim}
-                                                        />
-                                                        {/* {!errorPCalim && state.p_claim != 0 && (
-                                                    <span className="flex flex-row text-[#E5544B] mt-[8px]">
-                                                        <ErrorTriggersIcon /> <span className="pl-[6px]">{t('insurance:error:p_claim')}</span>
-                                                    </span>
-                                                )} */}
-                                                    </div>
-                                                </div>
-
-                                                {/* Period */}
-                                                <div className={'mt-5 text-sm '} data-tut="tour_period" id="tour_period">
-                                                    <span className="flex flex-row items-center text-txtSecondary">
-                                                        <span className={'mr-[8px]'}>Period ({menu[8].name})</span>
-                                                        <div data-tip={t('insurance:terminology:period')} data-for={`period`}>
-                                                            <InfoCircle size={14} color={colors.txtSecondary} />
-                                                            <Tooltip className="max-w-[200px]" id={'period'} placement="right" />
-                                                        </div>
-                                                    </span>
-                                                    <Tab.Group>
-                                                        <Tab.List
-                                                            className={`flex flex-row mt-4 justify-between`}
-                                                            onTouchStart={() => {
-                                                                setShowCroll(true)
-                                                            }}
-                                                            onTouchEnd={() => {
-                                                                setShowCroll(false)
-                                                            }}
-                                                        >
-                                                            {listTabPeriod.map((item, key) => {
-                                                                return (
-                                                                    <div
-                                                                        key={key}
-                                                                        className={`${
-                                                                            state.period == item && 'bg-pink text-red font-semibold'
-                                                                        } bg-hover rounded-[300px] px-4 py-1 flex justify-center items-center hover:cursor-pointer ${
-                                                                            isMobile && !(item == 15) && 'mr-[12px]'
-                                                                        }`}
-                                                                        onClick={() => setState({ ...state, period: item })}
-                                                                    >
-                                                                        {item}
-                                                                    </div>
-                                                                )
-                                                            })}
-                                                        </Tab.List>
-                                                    </Tab.Group>
-                                                </div>
-                                            </div>
-                                        )
+                                        // head Insurance
+                                        <HeaderContent state={tab} setState={setTab} props={state} setProps={setState} wallet={wallet} auth={account.address} />
                                     }
-                                </div>
 
-                                <div className="w-4/12 flex flex-col justify-between shadow border border-1 border-divider rounded-xl p-8 ml-[1.5rem]">
-                                    <div>
-                                        {
-                                            //description
-                                            index == 1 && saved > 0 && (
-                                                <div
-                                                    className={
-                                                        'flex flex-col justify-center items-center mb-[2.5rem] max-w-screen-layout 4xl:max-w-screen-3xl m-auto'
-                                                    }
-                                                    onClick={() => {
-                                                        setDrop(false)
-                                                        setChosing(false)
-                                                    }}
-                                                >
-                                                    <CheckCircle size={68}></CheckCircle>
-                                                    <span className={'font-medium text-base text-txtPrimary mt-[1rem]'}>
-                                                        {`${t('insurance:buy:saved')} `}
-                                                        <span className={'text-red'}>
-                                                            ${saved.toFixed(4)} {unitMoney}
-                                                        </span>{' '}
-                                                        {t('insurance:buy:sub_saved')}
-                                                    </span>
-                                                </div>
-                                            )
-                                        }
-                                        {/*Only Show Claim And Margin*/}
-                                        {index == 1 && (
-                                            <div
-                                                className={'flex flex-col w-full justify-center items-center hover:cursor-default z-50'}
-                                                onClick={() => {
-                                                    setDrop(false)
-                                                    setChosing(false)
-                                                }}
-                                            >
-                                                <div
-                                                    className={`${
-                                                        tab == 4 ? 'hidden' : ''
-                                                    } flex flex-row justify-between items-center w-full rounded-[12px] border border-divider border-0.5 px-5 py-4`}
-                                                >
-                                                    <div className={'text-txtSecondary flex flex-row items-center'}>
-                                                        <span className={'mr-[8px]'}>R-Claim</span>
-                                                        <div data-tip={t('insurance:terminology:r_claim')} data-for={`r_claim`}>
-                                                            <InfoCircle size={14} color={colors.txtSecondary} />
-                                                            <Tooltip className="max-w-[200px]" id={'r_claim'} placement="right" />
-                                                        </div>
-                                                    </div>
-                                                    <div className={''}>
-                                                        <span>{state?.r_claim > 0 ? Number(state?.r_claim.toFixed(decimalList.decimal_q_covered)) : 0}%</span>
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    className={`${
-                                                        tab == 5 ? 'hidden' : ''
-                                                    } flex flex-row justify-between items-center w-full rounded-[12px] border border-divider border-0.5 px-5 py-4 my-[1rem]`}
-                                                >
-                                                    <div className={'text-txtSecondary flex flex-row items-center'}>
-                                                        <span className={'mr-[8px]'}>Q-Claim</span>
-                                                        <div data-tip={t('insurance:terminology:q_claim')} data-for={`q_claim`}>
-                                                            <InfoCircle size={14} color={colors.txtSecondary} />
-                                                            <Tooltip className="max-w-[200px]" id={'q_claim'} placement="right" />
-                                                        </div>
-                                                    </div>
-                                                    <div className={'flex flex-row justify-center items-center hover:cursor-pointer relative max-h-[24px]'}>
-                                                        {state.q_claim > 0 ? Number(state?.q_claim.toFixed(decimalList.decimal_q_covered)) : 0}
-                                                        <span className={'pl-2 mr-1'}>{unitMoney}</span>
-                                                        <div className="relative">
-                                                            {/* <Popover className="relative">
-                                                            <Popover.Button
-                                                                className={'my-4 text-txtPrimary underline hover:cursor-pointer '}
-                                                                onClick={() => setChangeUnit(!changeUnit)}
-                                                            >
-                                                                {!changeUnit ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-                                                            </Popover.Button>
-                                                            <Popover.Panel
-                                                                className="flex flex-col text-txtPrimary absolute  top-[63px] right-[-15px] bg-white z-[100] rounded"
-                                                                style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
-                                                            >
-                                                                {({ close }) => (
-                                                                    <div className="flex flex-col justify-center h-full font-normal text-sm">
-                                                                        {['USDT', 'BUSD', 'USDC'].map((e, key) => {
-                                                                            return (
-                                                                                <div
-                                                                                    key={key}
-                                                                                    className={` py-2 px-4 hover:bg-hover font-normal`}
-                                                                                    onClick={() => {
-                                                                                        setUnitMoney(e)
-                                                                                        setChangeUnit(false)
-                                                                                        close()
-                                                                                    }}
-                                                                                >
-                                                                                    <span>{e}</span>
-                                                                                </div>
-                                                                            )
-                                                                        })}
+                                    {
+                                        //checkAuth
+                                        account.address == null
+                                            ? !isMobile && (
+                                                  <div
+                                                      className="w-full flex flex-col justify-center items-center max-w-screen-layout 4xl:max-w-screen-3xl m-auto mb-[1rem]"
+                                                      onClick={() => {
+                                                          setChosing(false)
+                                                      }}
+                                                  >
+                                                      <Button
+                                                          variants={'primary'}
+                                                          className={`bg-red h-[48px] w-[374px] flex justify-center items-center text-white rounded-[8px] py-[12px]`}
+                                                          onClick={() => {
+                                                              Config.connectWallet()
+                                                          }}
+                                                      >
+                                                          {t('insurance:buy:connect_wallet')}
+                                                      </Button>
+                                                  </div>
+                                              )
+                                            : ''
+                                    }
+                                    <div className="  flex flex-row mb-[8rem] overflow-hidden">
+                                        <div className="w-8/12">
+                                            {
+                                                //chart
+                                                index == 1 && (
+                                                    <div
+                                                        className={`shadow border border-1 border-divider h-auto rounded-xl  p-8`}
+                                                        onClick={() => {
+                                                            setChosing(false)
+                                                        }}
+                                                    >
+                                                        {/*head*/}
+                                                        <div id="tour_statistics" data-tut="tour_statistics">
+                                                            <div className={'pb-2 text-sm leading-5 text-txtSecondary flex items-center space-x-6'}>
+                                                                <div className={'w-full flex flex-row items-center'}>
+                                                                    <span className="mr-2">{menu[7].name}</span>
+                                                                    <div data-tip={t('insurance:terminology:q_covered')} data-for={`q_covered`}>
+                                                                        <InfoCircle size={14} color={colors.txtSecondary} />
+                                                                        <Tooltip className="max-w-[200px]" id={'q_covered'} placement="right" />
                                                                     </div>
-                                                                )}
-                                                            </Popover.Panel>
-                                                        </Popover> */}
+                                                                </div>
+                                                            </div>
+                                                            <div className={'pb-2 space-x-6 flex justify-between'}>
+                                                                <div className={`flex justify-between border-collapse rounded-[3px] shadow-none w-full`}>
+                                                                    <InputNumber
+                                                                        validator={validator('q_covered')}
+                                                                        value={state.q_covered}
+                                                                        onChange={(e: any) => onHandleChange('q_covered', e)}
+                                                                        customSuffix={renderPopoverQCover}
+                                                                        decimal={decimalList.decimal_q_covered}
+                                                                    />
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    className={`${
-                                                        tab == 1 ? 'hidden' : ''
-                                                    } flex flex-row justify-between items-center w-full rounded-[12px] border border-divider border-0.5 px-5 py-4`}
-                                                >
-                                                    <div className={'text-txtSecondary flex flex-row items-center'}>
-                                                        <span className={'mr-[8px]'}>Margin</span>
-                                                        <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
-                                                            <InfoCircle size={14} color={colors.txtSecondary} />
-                                                            <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
-                                                        </div>
-                                                    </div>
-                                                    <div className={'flex flex-row items-center justify-center hover:cursor-pointer relative max-h-[24px]'}>
-                                                        {state.margin > 0 ? Number(state?.margin.toFixed(decimalList.decimal_margin)) : 0}
-                                                        <span className={'pl-2 mr-1'}>{unitMoney}</span>
-                                                        <div className="relative">
-                                                            {/* <Popover className="relative">
-                                                    <Popover.Button
-                                                        className={'my-[16px] text-txtPrimary underline hover:cursor-pointer'}
-                                                        onClick={() => setChangeUnit1(!changeUnit1)}
-                                                    >
-                                                        {!changeUnit1 ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-                                                    </Popover.Button>
-                                                    <Popover.Panel
-                                                        className="flex flex-col text-txtPrimary absolute  top-[63px] right-[-15px] bg-white z-[100] rounded"
-                                                        style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
-                                                    >
-                                                        {({ close }) => (
-                                                            <div className="flex flex-col justify-center h-full font-normal text-sm">
-                                                                {['USDT', 'BUSD', 'USDC'].map((e, key) => {
+                                                        <div className="flex flex-row w-full space-x-6 text-xs font-semibold">
+                                                            <div className={`flex flex-row justify-between space-x-4 w-full `}>
+                                                                {[25, 50, 75, 100].map((data) => {
                                                                     return (
                                                                         <div
-                                                                            key={key}
-                                                                            className={` py-[8px] px-[16px] hover:bg-hover font-normal`}
+                                                                            key={data}
+                                                                            className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                                             onClick={() => {
-                                                                                setUnitMoney(e)
-                                                                                setChangeUnit1(false)
-                                                                                close()
+                                                                                if (userBalance) {
+                                                                                    setState({
+                                                                                        ...state,
+                                                                                        q_covered: Number(
+                                                                                            ((data / 100) * rangeQ_covered.max).toFixed(
+                                                                                                decimalList.decimal_q_covered,
+                                                                                            ),
+                                                                                        ),
+                                                                                    })
+                                                                                    percentInsurance.current = data
+                                                                                }
                                                                             }}
                                                                         >
-                                                                            <span>{e}</span>
+                                                                            <div
+                                                                                className={`${
+                                                                                    percentInsurance.current == data ? 'bg-red' : 'bg-gray-1'
+                                                                                } h-1 w-full rounded-sm`}
+                                                                            ></div>
+                                                                            <div className={percentInsurance.current === data ? 'text-red' : 'text-gray'}>
+                                                                                {data}%
+                                                                            </div>
                                                                         </div>
                                                                     )
                                                                 })}
                                                             </div>
-                                                        )}
-                                                    </Popover.Panel>
-                                                </Popover> */}
                                                         </div>
-                                                    </div>
-                                                </div>
 
-                                                {tab === 1 && (
-                                                    <>
-                                                        {' '}
-                                                        <div className={`w-full flex flex-row items-center text-sm text-txtSecondary mb-[0.5rem]`}>
-                                                            <span className={'mr-2'}>Margin</span>
-                                                            <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
-                                                                <InfoCircle size={14} color={colors.txtSecondary} />
-                                                                <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
+                                                        {/*end head*/}
+                                                        <div data-tut="tour_chart" id="tour_chart" className="mt-6 mb-4">
+                                                            {/*body*/}
+                                                            <div className={'flex flex-row relative'}>
+                                                                <Suspense fallback={`Loading...`}>
+                                                                    <ChartComponent
+                                                                        width={795}
+                                                                        height={280}
+                                                                        data={dataChart}
+                                                                        state={state ? state : null}
+                                                                        p_claim={Number(state && state.p_claim)}
+                                                                        p_expired={Number(state.p_expired)}
+                                                                        setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
+                                                                        setP_Market={(data: number) => setState({ ...state, p_market: data })}
+                                                                    />
+                                                                    <svg
+                                                                        className={`absolute right-0 z-10`}
+                                                                        width="3"
+                                                                        height={280}
+                                                                        viewBox="0 0 2 500"
+                                                                        fill="none"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                    >
+                                                                        <line
+                                                                            x1="1"
+                                                                            y1="3.5011e-08"
+                                                                            x2="0.999987"
+                                                                            y2="500"
+                                                                            stroke="#B2B7BC"
+                                                                            strokeWidth="150"
+                                                                            strokeDasharray="0.74 3.72"
+                                                                        ></line>
+                                                                    </svg>
+                                                                </Suspense>
+                                                            </div>
+                                                            {/*end body*/}
+
+                                                            {/*footer*/}
+                                                            {/* fill of time */}
+                                                            <div className={'flex flex-row justify-between items-center w-full mt-5'}>
+                                                                {listTime.map((time, key) => {
+                                                                    return (
+                                                                        <div
+                                                                            key={key}
+                                                                            className={`${
+                                                                                selectTime == time ? 'text-red' : 'text-txtSecondary'
+                                                                            } hover:cursor-pointer font-medium  text-sm`}
+                                                                            onClick={() => {
+                                                                                setSelectTime(time)
+                                                                            }}
+                                                                        >
+                                                                            {time}
+                                                                        </div>
+                                                                    )
+                                                                })}
+                                                            </div>
+                                                            {/*P-Claim*/}
+                                                            <div className={'my-6'}>
+                                                                <span className={'flex flex-row items-center text-txtSecondary text-sm'}>
+                                                                    <span className={'mr-2'}>P-Claim</span>
+                                                                    <div data-tip={t('insurance:terminology:p_claim')} data-for={`p_claim`}>
+                                                                        <InfoCircle size={14} color={colors.txtSecondary} />
+                                                                        <Tooltip className="max-w-[200px]" id={'p_claim'} placement="right" />
+                                                                    </div>
+                                                                </span>
+
+                                                                <InputNumber
+                                                                    className="mt-2"
+                                                                    validator={validator('p_claim')}
+                                                                    value={state.p_claim}
+                                                                    onChange={(e: any) => onHandleChange('p_claim', e)}
+                                                                    customSuffix={() => unitMoney}
+                                                                    suffixClassName="text-txtSecondary"
+                                                                    placeholder={`${menu[9].name}`}
+                                                                    decimal={decimalList.decimal_p_claim}
+                                                                />
                                                             </div>
                                                         </div>
-                                                        <div className={`flex justify-between border-collapse rounded-[3px] shadow-none w-full`}>
-                                                            <InputNumber
-                                                                validator={validator('margin')}
-                                                                value={state.q_covered > 0 ? state.margin : 0}
-                                                                onChange={(e: any) => onHandleChange('margin', e)}
-                                                                customSuffix={renderPopoverMargin}
-                                                                decimal={decimalList.decimal_margin}
-                                                            />
+
+                                                        {/* Period */}
+                                                        <div className={'mt-5 text-sm '} data-tut="tour_period" id="tour_period">
+                                                            <span className="flex flex-row items-center text-txtSecondary">
+                                                                <span className={'mr-[8px]'}>Period ({menu[8].name})</span>
+                                                                <div data-tip={t('insurance:terminology:period')} data-for={`period`}>
+                                                                    <InfoCircle size={14} color={colors.txtSecondary} />
+                                                                    <Tooltip className="max-w-[200px]" id={'period'} placement="right" />
+                                                                </div>
+                                                            </span>
+                                                            <Tab.Group>
+                                                                <Tab.List
+                                                                    className={`flex flex-row mt-4 justify-between`}
+                                                                    onTouchStart={() => {
+                                                                        setShowCroll(true)
+                                                                    }}
+                                                                    onTouchEnd={() => {
+                                                                        setShowCroll(false)
+                                                                    }}
+                                                                >
+                                                                    {listTabPeriod.map((item, key) => {
+                                                                        return (
+                                                                            <div
+                                                                                key={key}
+                                                                                className={`${
+                                                                                    state.period == item && 'bg-pink text-red font-semibold'
+                                                                                } bg-hover rounded-[300px] px-4 py-1 flex justify-center items-center hover:cursor-pointer ${
+                                                                                    isMobile && !(item == 15) && 'mr-[12px]'
+                                                                                }`}
+                                                                                onClick={() => setState({ ...state, period: item })}
+                                                                            >
+                                                                                {item}
+                                                                            </div>
+                                                                        )
+                                                                    })}
+                                                                </Tab.List>
+                                                            </Tab.Group>
                                                         </div>
-                                                        <div className={`flex flex-row justify-between space-x-4 !w-full mt-[0.5rem]`}>
-                                                            {[2, 5, 7, 10].map((item, key) => {
-                                                                return (
-                                                                    <div
-                                                                        key={key}
-                                                                        className={
-                                                                            'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'
-                                                                        }
-                                                                        onClick={() => {
-                                                                            updateFormPercentMargin(item)
-                                                                        }}
-                                                                    >
-                                                                        <div
-                                                                            className={`${
-                                                                                percentMargin == item ? 'bg-red' : 'bg-gray-1'
-                                                                            } h-1 w-full rounded-sm`}
-                                                                        ></div>
-                                                                        <span className={percentMargin == item ? 'text-red' : 'text-gray'}>{item}%</span>
+                                                    </div>
+                                                )
+                                            }
+                                        </div>
+
+                                        <div className="w-4/12 flex flex-col justify-between shadow border border-1 border-divider rounded-xl p-8 ml-[1.5rem]">
+                                            <div>
+                                                {
+                                                    //description
+                                                    index == 1 && saved > 0 && (
+                                                        <div
+                                                            className={
+                                                                'flex flex-col justify-center items-center mb-[2.5rem] max-w-screen-layout 4xl:max-w-screen-3xl m-auto'
+                                                            }
+                                                            onClick={() => {
+                                                                setChosing(false)
+                                                            }}
+                                                        >
+                                                            <CheckCircle size={68}></CheckCircle>
+                                                            <span className={'font-medium text-base text-txtPrimary mt-[1rem]'}>
+                                                                {`${t('insurance:buy:saved')} `}
+                                                                <span className={'text-red'}>
+                                                                    ${saved.toFixed(4)} {unitMoney}
+                                                                </span>{' '}
+                                                                {t('insurance:buy:sub_saved')}
+                                                            </span>
+                                                        </div>
+                                                    )
+                                                }
+                                                {/*Only Show Claim And Margin*/}
+                                                {index == 1 && (
+                                                    <div
+                                                        className={'flex flex-col w-full justify-center items-center hover:cursor-default z-50'}
+                                                        onClick={() => {
+                                                            setChosing(false)
+                                                        }}
+                                                    >
+                                                        <div
+                                                            className={`${
+                                                                tab == 4 ? 'hidden' : ''
+                                                            } flex flex-row justify-between items-center w-full rounded-[12px] border border-divider border-0.5 px-5 py-4`}
+                                                        >
+                                                            <div className={'text-txtSecondary flex flex-row items-center'}>
+                                                                <span className={'mr-[8px]'}>R-Claim</span>
+                                                                <div data-tip={t('insurance:terminology:r_claim')} data-for={`r_claim`}>
+                                                                    <InfoCircle size={14} color={colors.txtSecondary} />
+                                                                    <Tooltip className="max-w-[200px]" id={'r_claim'} placement="right" />
+                                                                </div>
+                                                            </div>
+                                                            <div className={''}>
+                                                                <span>
+                                                                    {state?.r_claim > 0 ? Number(state?.r_claim.toFixed(decimalList.decimal_q_covered)) : 0}%
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div
+                                                            className={`${
+                                                                tab == 5 ? 'hidden' : ''
+                                                            } flex flex-row justify-between items-center w-full rounded-[12px] border border-divider border-0.5 px-5 py-4 my-[1rem]`}
+                                                        >
+                                                            <div className={'text-txtSecondary flex flex-row items-center'}>
+                                                                <span className={'mr-[8px]'}>Q-Claim</span>
+                                                                <div data-tip={t('insurance:terminology:q_claim')} data-for={`q_claim`}>
+                                                                    <InfoCircle size={14} color={colors.txtSecondary} />
+                                                                    <Tooltip className="max-w-[200px]" id={'q_claim'} placement="right" />
+                                                                </div>
+                                                            </div>
+                                                            <div
+                                                                className={
+                                                                    'flex flex-row justify-center items-center hover:cursor-pointer relative max-h-[24px]'
+                                                                }
+                                                            >
+                                                                {state.q_claim > 0 ? Number(state?.q_claim.toFixed(decimalList.decimal_q_covered)) : 0}
+                                                                <span className={'pl-2 mr-1'}>{unitMoney}</span>
+                                                                <div className="relative"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div
+                                                            className={`${
+                                                                tab == 1 ? 'hidden' : ''
+                                                            } flex flex-row justify-between items-center w-full rounded-[12px] border border-divider border-0.5 px-5 py-4`}
+                                                        >
+                                                            <div className={'text-txtSecondary flex flex-row items-center'}>
+                                                                <span className={'mr-[8px]'}>Margin</span>
+                                                                <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
+                                                                    <InfoCircle size={14} color={colors.txtSecondary} />
+                                                                    <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
+                                                                </div>
+                                                            </div>
+                                                            <div
+                                                                className={
+                                                                    'flex flex-row items-center justify-center hover:cursor-pointer relative max-h-[24px]'
+                                                                }
+                                                            >
+                                                                {state.margin > 0 ? Number(state?.margin.toFixed(decimalList.decimal_margin)) : 0}
+                                                                <span className={'pl-2 mr-1'}>{unitMoney}</span>
+                                                                <div className="relative"></div>
+                                                            </div>
+                                                        </div>
+
+                                                        {tab === 1 && (
+                                                            <>
+                                                                {' '}
+                                                                <div className={`w-full flex flex-row items-center text-sm text-txtSecondary mb-[0.5rem]`}>
+                                                                    <span className={'mr-2'}>Margin</span>
+                                                                    <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
+                                                                        <InfoCircle size={14} color={colors.txtSecondary} />
+                                                                        <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
                                                                     </div>
-                                                                )
-                                                            })}
-                                                        </div>
-                                                    </>
+                                                                </div>
+                                                                <div className={`flex justify-between border-collapse rounded-[3px] shadow-none w-full`}>
+                                                                    <InputNumber
+                                                                        validator={validator('margin')}
+                                                                        value={state.q_covered > 0 ? state.margin : 0}
+                                                                        onChange={(e: any) => onHandleChange('margin', e)}
+                                                                        customSuffix={renderPopoverMargin}
+                                                                        decimal={decimalList.decimal_margin}
+                                                                    />
+                                                                </div>
+                                                                <div className={`flex flex-row justify-between space-x-4 !w-full mt-[0.5rem]`}>
+                                                                    {[2, 5, 7, 10].map((item, key) => {
+                                                                        return (
+                                                                            <div
+                                                                                key={key}
+                                                                                className={
+                                                                                    'flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer'
+                                                                                }
+                                                                                onClick={() => {
+                                                                                    updateFormPercentMargin(item)
+                                                                                }}
+                                                                            >
+                                                                                <div
+                                                                                    className={`${
+                                                                                        percentMargin.current == item ? 'bg-red' : 'bg-gray-1'
+                                                                                    } h-1 w-full rounded-sm`}
+                                                                                ></div>
+                                                                                <span className={percentMargin.current == item ? 'text-red' : 'text-gray'}>
+                                                                                    {item}%
+                                                                                </span>
+                                                                            </div>
+                                                                        )
+                                                                    })}
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 )}
                                             </div>
-                                        )}
-                                    </div>
 
-                                    {/* the next level*/}
-                                    {index == 1 && (
-                                        <div
-                                            className={`flex flex-col justify-center items-center mb-[2rem] max-w-screen-layout 4xl:max-w-screen-3xl m-auto`}
-                                            onClick={() => {
-                                                setDrop(false)
-                                                setChosing(false)
-                                            }}
-                                        >
-                                            <button
-                                                className={`${
-                                                    clear ? 'bg-red text-white border border-red' : 'text-white bg-divider border border-divider'
-                                                }flex items-center justify-center rounded-lg px-auto py-auto font-semibold py-[12px] px-[148px]`}
-                                                onClick={() => {
-                                                    if (clear) {
-                                                        handleNext()
-                                                    }
-                                                }}
-                                                disabled={!clear}
-                                            >
-                                                {menu[11].name}
-                                            </button>
-                                            <Menu>
-                                                <Menu.Button className={'my-[16px] text-blue underline hover:cursor-pointer'}>{menu[12].name}</Menu.Button>
-                                                <Menu.Items
-                                                    className={'flex flex-col text-txtPrimary text-sm'}
-                                                    style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                                            {/* the next level*/}
+                                            {index == 1 && (
+                                                <div
+                                                    className={`flex flex-col justify-center items-center mb-[2rem] `}
+                                                    onClick={() => {
+                                                        setChosing(false)
+                                                    }}
                                                 >
-                                                    <Menu.Item>
-                                                        {({ active }) => (
-                                                            <a
-                                                                className={`${active && 'bg-blue-500'}  py-[8px] pl-[16px] w-[300px] hover:bg-hover`}
-                                                                onClick={() => {
-                                                                    setShowGuide(true)
-                                                                }}
-                                                            >
-                                                                <span>{t('insurance:buy:help1')}</span>
-                                                            </a>
-                                                        )}
-                                                    </Menu.Item>
-                                                    <Menu.Item>
-                                                        {({ active }) => (
-                                                            <a
-                                                                className={`${
-                                                                    active && 'bg-blue-500'
-                                                                }  py-[8px] pl-[16px] w-[300px] hover:bg-hover hover:cursor-pointer`}
-                                                                onClick={() => {
-                                                                    setShowDetails(true)
-                                                                }}
-                                                            >
-                                                                <span>{t('insurance:buy:detailed_terminology')}</span>
-                                                            </a>
-                                                        )}
-                                                    </Menu.Item>
-                                                </Menu.Items>
-                                            </Menu>
+                                                    <button
+                                                        className={`${
+                                                            clear.current == true
+                                                                ? 'bg-red text-white border border-red'
+                                                                : 'text-white bg-divider border border-divider'
+                                                        }flex items-center justify-center rounded-lg px-auto py-auto font-semibold py-[12px] w-full`}
+                                                        onClick={() => {
+                                                            handleNext()
+                                                        }}
+                                                        disabled={!clear.current}
+                                                    >
+                                                        {menu[11].name}
+                                                    </button>
+                                                    <Menu>
+                                                        <Menu.Button className={'my-[16px] text-blue underline hover:cursor-pointer'}>
+                                                            {menu[12].name}
+                                                        </Menu.Button>
+                                                        <Menu.Items
+                                                            className={'flex flex-col text-txtPrimary text-sm'}
+                                                            style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                                                        >
+                                                            <Menu.Item>
+                                                                {({ active }) => (
+                                                                    <a
+                                                                        className={`${active && 'bg-blue-500'}  py-[8px] pl-[16px] w-[300px] hover:bg-hover`}
+                                                                        onClick={() => {
+                                                                            setShowGuide(true)
+                                                                        }}
+                                                                    >
+                                                                        <span>{t('insurance:buy:help1')}</span>
+                                                                    </a>
+                                                                )}
+                                                            </Menu.Item>
+                                                            <Menu.Item>
+                                                                {({ active }) => (
+                                                                    <a
+                                                                        className={`${
+                                                                            active && 'bg-blue-500'
+                                                                        }  py-[8px] pl-[16px] w-[300px] hover:bg-hover hover:cursor-pointer`}
+                                                                        onClick={() => {
+                                                                            setShowDetails(true)
+                                                                        }}
+                                                                    >
+                                                                        <span>{t('insurance:buy:detailed_terminology')}</span>
+                                                                    </a>
+                                                                )}
+                                                            </Menu.Item>
+                                                        </Menu.Items>
+                                                    </Menu>
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
                             </div>
                         </LayoutInsurance>
@@ -1490,7 +1403,7 @@ const InsuranceFrom = () => {
                                         <XMark />
                                     </div>
                                     <div className="flex flex-col items-center px-[60px] pt-[8px]">
-                                        <img src={'/images/buyInsurance.png'} width="269" height="212" className="w-[269px] h-auto" />
+                                        <img src={'/images/icons/ic_pig.png'} width="269" height="212" className="w-[269px] h-auto" />
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-center pt-[16px] text-txtPrimary">
@@ -1629,19 +1542,23 @@ const InsuranceFrom = () => {
                                                                 key={data}
                                                                 className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                                 onClick={() => {
-                                                                    setState({
-                                                                        ...state,
-                                                                        q_covered: Number(
-                                                                            ((data / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
-                                                                        ),
-                                                                    })
-                                                                    setPercentInsurance(data)
+                                                                    if (userBalance > 0) {
+                                                                        setState({
+                                                                            ...state,
+                                                                            q_covered: Number(
+                                                                                ((data / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
+                                                                            ),
+                                                                        })
+                                                                        percentInsurance.current = data
+                                                                    }
                                                                 }}
                                                             >
                                                                 <div
-                                                                    className={`${percentInsurance == data ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}
+                                                                    className={`${
+                                                                        percentInsurance.current == data ? 'bg-red' : 'bg-gray-1'
+                                                                    } h-1 w-full rounded-sm`}
                                                                 ></div>
-                                                                <div className={percentInsurance === data ? 'text-red' : 'text-gray'}>{data}%</div>
+                                                                <div className={percentInsurance.current == data ? 'text-red' : 'text-gray'}>{data}%</div>
                                                             </div>
                                                         )
                                                     })}
@@ -1656,9 +1573,11 @@ const InsuranceFrom = () => {
                                                                 }}
                                                             >
                                                                 <div
-                                                                    className={`${percentMargin == data ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}
+                                                                    className={`${
+                                                                        percentMargin.current == data ? 'bg-red' : 'bg-gray-1'
+                                                                    } h-1 w-full rounded-sm`}
                                                                 ></div>
-                                                                <div className={percentMargin === data ? 'text-red' : 'text-gray'}>{data}%</div>
+                                                                <div className={percentMargin.current === data ? 'text-red' : 'text-gray'}>{data}%</div>
                                                             </div>
                                                         )
                                                     })}
@@ -1702,7 +1621,15 @@ const InsuranceFrom = () => {
                                                                 onMouseUp={() => {
                                                                     isPress = false
                                                                     setSelectedCoin(coin)
-                                                                    setState({ ...state, symbol: { ...coin } })
+                                                                    setState({
+                                                                        ...state,
+                                                                        symbol: { ...coin },
+                                                                        q_covered: 0,
+                                                                        p_claim: 0,
+                                                                        q_claim: 0,
+                                                                        margin: 0,
+                                                                        r_claim: 0,
+                                                                    })
                                                                     setOpenChangeToken(false)
                                                                     setShowInput({ isShow: true, name: 'q_covered' })
                                                                 }}
@@ -1931,7 +1858,6 @@ const InsuranceFrom = () => {
                                 {index == 1 && (
                                     <div
                                         onClick={() => {
-                                            setDrop(false)
                                             setChosing(false)
                                         }}
                                         className={`${clear ? 'visible' : 'invisible'} items-center w-[300px] xs:w-full`}
@@ -1981,9 +1907,9 @@ const InsuranceFrom = () => {
                                                     {state.q_claim > 0 ? Number(state.q_claim.toFixed(decimalList.decimal_q_covered)) : 0}
                                                     <span
                                                         className={'text-red pl-[8px]'}
-                                                        onClick={() =>
+                                                        onClick={() => {
                                                             setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:q_claim')}` })
-                                                        }
+                                                        }}
                                                     >
                                                         {unitMoney}
                                                     </span>
@@ -2018,14 +1944,14 @@ const InsuranceFrom = () => {
                                         <div className={`flex flex-col justify-center items-center mb-[32px] mx-[16px]`}>
                                             <button
                                                 className={`${
-                                                    clear ? 'bg-red text-white border border-red' : 'text-white bg-divider border border-divider'
+                                                    clear.current == true
+                                                        ? 'bg-red text-white border border-red'
+                                                        : 'text-white bg-divider border border-divider'
                                                 }flex items-center justify-center rounded-lg px-auto py-auto font-semibold py-[12px] !px-[100px] xs:px-[148px]`}
                                                 onClick={() => {
-                                                    if (clear) {
-                                                        handleNext()
-                                                    }
+                                                    handleNext()
                                                 }}
-                                                disabled={!clear}
+                                                disabled={!clear.current}
                                             >
                                                 {menu[11].name}
                                             </button>
@@ -2043,10 +1969,10 @@ const InsuranceFrom = () => {
     )
 }
 
-export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any) => {
+export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any, timeLine: number) => {
     try {
         const ts = Math.round(new Date().getTime() / 1000)
-        const tsYesterday = ts - 7 * (24 * 3600)
+        const tsYesterday = ts - timeLine * (24 * 3600)
         const params = {
             broker: 'NAMI_SPOT',
             symbol: symbol,

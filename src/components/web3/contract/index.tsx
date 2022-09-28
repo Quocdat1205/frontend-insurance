@@ -3,12 +3,11 @@ import { weiToEther } from 'components/web3/Web3Types'
 import { INSURANCE_ABI } from 'components/web3/constants/abi/INSURANCE_ABI'
 import { contractAddress, ETHaddress, USDTaddress } from 'components/web3/constants/contractAddress'
 import ContractInterface from 'components/web3/contract/Insurance'
-import { USDT_ABI } from '../constants/abi/USDT_ABI'
+import { TOKEN_ABI } from '../constants/abi/TOKEN_ABI'
 import { getMessageSign } from 'utils/utils'
 import fetchApi from 'services/fetch-api'
 import { API_GET_NONCE, API_LOGIN } from 'services/apis'
 import Config from 'config/config'
-import { ETH_ABI } from '../constants/abi/ETH_ABI'
 
 export class ContractCaller {
     public provider: providers.Web3Provider
@@ -19,8 +18,8 @@ export class ContractCaller {
     constructor(provider: providers.Web3Provider) {
         this.provider = provider
         this.insuranceContract = new ContractInterface(this.provider, contractAddress, INSURANCE_ABI)
-        this.usdtContract = new ContractInterface(this.provider, USDTaddress, USDT_ABI)
-        this.ethContract = new ContractInterface(this.provider, ETHaddress, ETH_ABI)
+        this.usdtContract = new ContractInterface(this.provider, USDTaddress, TOKEN_ABI)
+        this.ethContract = new ContractInterface(this.provider, ETHaddress, TOKEN_ABI)
     }
 
     public async getEtherBalance(from: string) {
