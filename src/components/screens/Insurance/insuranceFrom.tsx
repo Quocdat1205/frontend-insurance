@@ -110,6 +110,8 @@ const InsuranceFrom = () => {
         t_market: new Date(),
         p_expired: 0,
     })
+    const tmp_q_covered = useRef(0)
+    const tmp_margin = useRef(0)
 
     const [dataChart, setDataChart] = useState()
     const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', `${language === 'vi' ? 'Tất cả' : 'All'}`]
@@ -159,6 +161,7 @@ const InsuranceFrom = () => {
                             className="z-1 !w-max text-redPrimary"
                             onClick={() => {
                                 setOpenChangeToken(true)
+                                tmp_q_covered.current = state.q_covered
                             }}
                         >
                             {' '}
@@ -170,6 +173,7 @@ const InsuranceFrom = () => {
                         className="text-redPrimary z-1"
                         onClick={() => {
                             setOpenChangeToken(true)
+                            tmp_q_covered.current = state.q_covered
                         }}
                     >
                         {selectCoin.type}{' '}
@@ -188,6 +192,7 @@ const InsuranceFrom = () => {
                                     <span
                                         onClick={() => {
                                             setShowInput({ isShow: true, name: 'margin' })
+                                            tmp_margin.current = state.margin
                                         }}
                                     >
                                         {state.margin && state.margin}{' '}
@@ -195,6 +200,7 @@ const InsuranceFrom = () => {
                                     <span
                                         onClick={() => {
                                             setShowInput({ isShow: true, name: 'margin' })
+                                            tmp_margin.current = state.margin
                                             // setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:margin')}` })
                                         }}
                                     >
@@ -535,14 +541,16 @@ const InsuranceFrom = () => {
     }, [selectCoin])
 
     const createSaved = async () => {
-        const x = state.q_claim + state.q_covered * Math.abs(state.p_claim - state.p_market)
+        const y = state.q_covered * (state.p_claim - state.p_market)
+        const z = state.q_covered * Math.abs(state.p_claim - state.p_market)
+        console.log(y, 'state.q_covered * (state.p_claim - state.p_market)')
 
         if (state.p_claim < state.p_market) {
-            setSaved(x - state.margin + state.q_covered * Math.abs(state.p_claim - state.p_market))
+            setSaved(state.q_claim + y - state.margin + z)
         }
 
         if (state.p_claim > state.p_market) {
-            setSaved(x - state.margin)
+            setSaved(state.q_claim + y - state.margin)
         }
     }
 
@@ -611,11 +619,14 @@ const InsuranceFrom = () => {
                     p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
                 })
             }
-            createSaved()
         } else {
             setSaved(0)
         }
     }, [state.q_covered, state.margin, state.p_claim])
+
+    useEffect(() => {
+        createSaved()
+    }, [state.margin, state.q_claim])
 
     useEffect(() => {
         if (tab === 0 || tab === 3) {
@@ -909,19 +920,25 @@ const InsuranceFrom = () => {
     const onHandleChange = (key: string, e: any) => {
         const value = +e.value
 
-        if (value == 0) {
-            setIsCanSave(false)
-        } else {
-            setIsCanSave(true)
-        }
-
         switch (key) {
             case 'q_covered':
                 setState({ ...state, [key]: value })
                 percentInsurance.current = 0
+                if (value > Number(rangeQ_covered?.max?.toFixed(decimalList.decimal_q_covered)) || value < rangeQ_covered.min || value <= 0) {
+                    setIsCanSave(false)
+                } else {
+                    setIsCanSave(true)
+                }
+
                 break
             case 'p_claim':
                 setState({ ...state, [key]: value })
+                if (value < Number(rangeMargin.min) || value > Number(rangeMargin.max) || value <= 0) {
+                    setIsCanSave(false)
+                } else {
+                    setIsCanSave(true)
+                }
+
                 break
             case 'margin':
                 percentMargin.current = 0
@@ -1498,7 +1515,15 @@ const InsuranceFrom = () => {
                                         portalId="modal"
                                         isVisible={true}
                                         className={`!sticky !bottom-0 !left-0 !rounded-none !translate-x-0 !translate-y-0 h-1/2 `}
-                                        onBackdropCb={() => setShowInput({ ...showInput, isShow: false, name: '' })}
+                                        onBackdropCb={() => {
+                                            setShowInput({ ...showInput, isShow: false, name: '' })
+                                            if (showInput.name == 'q_covered') {
+                                                setState({ ...state, q_covered: tmp_q_covered.current })
+                                            }
+                                            if (showInput.name == 'margin') {
+                                                setState({ ...state, margin: tmp_margin.current })
+                                            }
+                                        }}
                                     >
                                         <div className="bg-white  !sticky !bottom-0 !left-0">
                                             <div className="text-txtPrimary text-xl font-semibold mb-[1.5rem]">{t(`insurance:buy:${showInput.name}`)}</div>
@@ -1588,7 +1613,17 @@ const InsuranceFrom = () => {
                                                 className={`${
                                                     !isCanSave ? 'bg-hover' : 'bg-red'
                                                 } h-[48px] w-full flex justify-center items-center text-white rounded-[8px] py-[12px]`}
-                                                onClick={() => setShowInput({ ...showInput, isShow: false, name: '' })}
+                                                onClick={() => {
+                                                    // if (showInput.name === 'q_covered') {
+                                                    //     onHandleChange('q_covered', tmp_q_covered.current)
+                                                    //     return setShowInput({ ...showInput, isShow: false, name: '' })
+                                                    // }
+                                                    // if (showInput.name === 'margin') {
+                                                    //     onHandleChange('margin', tmp_margin.current)
+                                                    //     return setShowInput({ ...showInput, isShow: false, name: '' })
+                                                    // }
+                                                    setShowInput({ ...showInput, isShow: false, name: '' })
+                                                }}
                                             >
                                                 {t('insurance:buy:save')}
                                             </Button>

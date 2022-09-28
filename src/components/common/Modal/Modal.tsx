@@ -69,6 +69,9 @@ const Modal = ({
     return (
         <Portal portalId={portalId} isVisible={isVisible}>
             <div
+                onBlur={() => {
+                    return
+                }}
                 className={classnames(
                     'fixed top-0 left-0 z-[99] w-full h-full overflow-hidden bg-bgModal/[0.3]',
                     'z-30',

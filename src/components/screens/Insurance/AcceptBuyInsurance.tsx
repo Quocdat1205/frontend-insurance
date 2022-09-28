@@ -22,6 +22,7 @@ import { isString } from 'lodash'
 import { useWeb3React } from '@web3-react/core'
 import fetchApi from 'services/fetch-api'
 import { API_GET_BUY_INSURANCE } from 'services/apis'
+import { ethers } from 'ethers'
 
 export type IBuyInsurance = {
     createInsurance: number
@@ -247,32 +248,31 @@ const AcceptBuyInsurance = () => {
                                     from: account.address,
                                 })
                             }
-                            const buy = await Config.web3.contractCaller.insuranceContract.contract.createInsurance(
-                                dataPost.buyer,
-                                dataPost.asset,
-                                dataPost.margin,
-                                dataPost.q_covered,
-                                dataPost.p_market,
-                                dataPost.p_claim,
-                                dataPost.period,
-                                dataPost.isUseNain,
-                                { value: 0 },
-                            )
-                            await buy.wait()
-                            const id_sc = await buy.wait()
+                            const buy = await Config.web3.contractCaller.insuranceContract.contract
+                                .createInsurance(
+                                    dataPost.buyer,
+                                    dataPost.asset,
+                                    dataPost.margin,
+                                    dataPost.q_covered,
+                                    dataPost.p_market,
+                                    dataPost.p_claim,
+                                    dataPost.period,
+                                    dataPost.isUseNain,
+                                    { value: 0 },
+                                )
+                                .then(async (res: any) => {
+                                    const id_sc = await res.wait()
 
-                            if (buy && id_sc.events[2].args[0]) {
-                                handlePostInsurance(buy, dataPost, state, Number(id_sc.events[2].args[0]), token)
-                            }
-                            // else {
-                            //     console.log(buy, id_sc.events[2].args[0])
-
-                            //     Config.toast.show(
-                            //         'error',
-                            //         `${language === 'vi' ? 'Giao dịch không thành công, vui lòng thử lại' : 'Transaction fail, try again please'}`,
-                            //     )
-                            //     return setActive(false)
-                            // }
+                                    if (res && id_sc.events[2].args[0]) {
+                                        handlePostInsurance(res, dataPost, state, Number(id_sc.events[2].args[0]), token)
+                                    }
+                                })
+                                .catch((result: any) => {
+                                    if (result.code === 4001) {
+                                        Config.toast.show('error', `${language === 'vi' ? 'Bạn đã hủy giao dịch' : 'You rejected transaction'}`)
+                                    }
+                                    return setActive(false)
+                                })
                         }
                     }, 3000)
                 }
@@ -281,10 +281,6 @@ const AcceptBuyInsurance = () => {
             console.log(err, 'Transaction fail, try again please')
             setNoti('')
             setActive(false)
-        } finally {
-            if (Noti === 'loading') {
-                setActive(false)
-            }
         }
     }
 
@@ -353,11 +349,13 @@ const AcceptBuyInsurance = () => {
 
     useEffect(() => {
         setTimeout(() => {
-            if (count > 0) {
-                setCount(count - 1)
-            }
-            if (count == 0) {
-                return setUpdated(false)
+            if (isUpdated) {
+                if (count > 0) {
+                    setCount(count - 1)
+                }
+                if (count == 0) {
+                    return setUpdated(false)
+                }
             }
         }, 1000)
     }, [count])
@@ -645,10 +643,12 @@ const AcceptBuyInsurance = () => {
                                         createContract()
                                     }
                                     if (!isUpdated) {
-                                        getPrice(`${state.symbol}${state?.unit}`, setPrice)
-                                        setUpdated(true)
-                                        setCanBuy(true)
-                                        setCount(10)
+                                        getPrice(`${state.symbol}${state?.unit}`, setPrice).then(() => {
+                                            setUpdated(true)
+                                            setCanBuy(true)
+                                            setCount(10)
+                                        })
+
                                         Config.toast.show('success', `${t('insurance:buy:price_had_update')}`)
                                     }
                                 }}
@@ -922,10 +922,12 @@ const AcceptBuyInsurance = () => {
                                     createContract()
                                 }
                                 if (!isUpdated) {
-                                    getPrice(`${state.symbol}${state?.unit}`, setPrice)
-                                    setUpdated(true)
-                                    setCanBuy(true)
-                                    setCount(10)
+                                    getPrice(`${state.symbol}${state?.unit}`, setPrice).then(() => {
+                                        setUpdated(true)
+                                        setCanBuy(true)
+                                        setCount(10)
+                                    })
+
                                     Config.toast.show('success', `${t('insurance:buy:price_had_update')}`)
                                 }
                             }}
