@@ -31,6 +31,8 @@
     "days": "Ngày",
     "asset_type": "Loại tài sản",
     "choose_asset_type": "Chọn loại tài sản",
+    "status_ins": "Trạng thái",
+    "choose_status": "Chọn trạng thái",
     "insurance": "Hợp đồng",
     "confirm": "Chọn",
     "filter": "Lọc",
@@ -76,10 +78,10 @@
     "installer": {
         "metamask_title": "Cài đặt Metamask Extension",
         "metamask_content": "Vui lòng cài đặt Metamask Extension để tiếp tục quá trình kết nối ví đến Nami Insurance.",
-        "metamask_guide": "Chưa biết cách cài đặt ví? Đọc <span class='text-blue underline cursor-pointer'>Hướng dẫn cài đặt Metamask Extension</span> ngay.",
+        "metamask_guide": "Chưa biết cách cài đặt ví? Đọc <span class='underline cursor-pointer text-blue'>Hướng dẫn cài đặt Metamask Extension</span> ngay.",
         "coinbase_title": "Cài đặt Coinbase Wallet Extension",
         "coinbase_content": "Vui lòng cài đặt Coinbase Wallet Extension để tiếp tục quá trình kết nối ví đến Nami Insurance.",
-        "coinbase_guide": "Chưa biết cách cài đặt ví? Đọc <span class='text-blue underline cursor-pointer'>Hướng dẫn cài đặt Coinbase Wallet Extension</span> ngay.",
+        "coinbase_guide": "Chưa biết cách cài đặt ví? Đọc <span class='underline cursor-pointer text-blue'>Hướng dẫn cài đặt Coinbase Wallet Extension</span> ngay.",
         "install": "Cài đặt"
     },
     "error_switch_network": "Kết nối thất bại! Vui lòng chuyển mạng lưới lại để kết nối ví.",
@@ -101,6 +103,9 @@
     "slogan_first": "Biến rủi ro",
     "slogan_second": "Thành lợi nhuận",
     "available": "Số dư khả dụng {{value}}",
+    "email": "Email",
+    "update": "Cập nhật",
+    "submitting": "Đang gửi...",
     "minimum_balance": "Số dư tối thiểu {{value}}",
     "max": "Tối đa {{value}}",
     "min": "Tối thiểu {{value}}",
@@ -108,5 +113,31 @@
     "dont_have_wallet": "Chưa sở hữu Ví? Xem <span class='text-blue underline cursor-pointer'>Hướng dẫn tạo Ví</span> ngay",
     "user_not_login": "Người dùng chưa truy cập tài khoản. Vui lòng nhập mật khẩu người dùng tại tiện ích Ví.",
     "got_it": "Đã hiểu",
-    "other": "Khác"
+    "other": "Khác",
+    "modal": {
+        "dont_show_later": "Không hiện lại thông báo này",
+        "email_placeholder": "Nhập Email",
+        "error_format_email": "Vui lòng nhập Email đúng định dạng. Ví dụ: xxxx@gmail.com.",
+        "error_duplicate_email": "Email mới trùng với email cũ",
+        "success_update_email": "Cập nhật email thành công",
+        "email_subscription": {
+            "subscribe_later": "Bỏ qua, tôi sẽ cập nhật sau!",
+            "update_email": "Cập nhật Email",
+            "input_email": "Nhập email",
+            "current_email": "Email hiện tại",
+            "new_email": "Email mới",
+            "ignore_description": "Có thể bỏ qua và cập nhật sau bằng cách chọn \"Cập nhật Email của tôi\" tại Quản lý Ví. ",
+            "description": "Nhập Email để nhận ngay cập nhật trạng thái HĐBH của bạn"
+        },
+        "contact": {
+            "title": "Liên hệ Nami Insurance",
+            "description": "Chúng tôi rất vui khi nhận được những yêu cầu từ bạn.",
+            "request": "Yêu cầu",
+            "request_placeholder": "Bạn cần Nami Insurance hỗ trợ gì?",
+            "send_request": "Gửi yêu cầu",
+            "sending_request": "Đang gửi yêu cầu",
+            "send_success_title": "Yêu cầu của bạn đã được tiếp nhận",
+            "send_success_desc": "Chúng tôi sẽ phản hồi sớm nhất trong 2-3 ngày làm việc, vui lòng kiểm tra hộp thư thường xuyên."
+        }
+    }
 }

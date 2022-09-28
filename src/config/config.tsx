@@ -1,4 +1,4 @@
-import { DisconnectIcon, HistoryIcon, UserIcon } from 'components/common/Svg/SvgIcon'
+import { DisconnectIcon, EmailIcon, HistoryIcon, UserIcon } from 'components/common/Svg/SvgIcon'
 import { BasicChainInformation, ExtendedChainInformation, wallets } from 'components/web3/Web3Types'
 import env from 'config/env'
 import { ConnectWalletType, Toast } from 'types/types'
@@ -69,6 +69,10 @@ class Config {
         localStorage.removeItem('PUBLIC_WALLET')
     }
 
+    static MODAL_REGISTER_EMAIL = 'registerEmail'
+
+    static MODAL_UPDATE_EMAIL = 'updateEmail'
+
     static pattern = (key: string) => {
         let rs: any = ''
         switch (key) {
@@ -112,14 +116,14 @@ class Config {
             icon: UserIcon,
             isIconSvg: true,
         },
-        // {
-        //     menuId: 'update-email',
-        //     name: 'common:header:update_my_email',
-        //     parentId: 'account-info',
-        //     // icon: '/images/icons/ic_email.png',
-        //     icon: EmailIcon,
-        //     isIconSvg: true,
-        // },
+        {
+            menuId: Config.MODAL_UPDATE_EMAIL,
+            name: 'common:header:update_my_email',
+            parentId: 'account-info',
+            // icon: '/images/icons/ic_email.png',
+            icon: EmailIcon,
+            isIconSvg: true,
+        },
         {
             menuId: 'disconnect',
             name: 'common:header:disconnect',
@@ -145,6 +149,11 @@ class Config {
             name: 'home:landing:faq_title',
             parentId: 0,
             section: 'faq_section',
+        },
+        {
+            menuId: 'modal_contact',
+            name: 'home:landing:contact',
+            parentId: 0,
         },
     ]
 }

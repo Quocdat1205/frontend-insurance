@@ -4,6 +4,11 @@ import React, { useMemo, useState } from 'react'
 import { isMobile as mobile } from 'react-device-detect'
 import { ChevronDown, ChevronUp } from 'react-feather'
 import styled from 'styled-components'
+import Modal from 'components/common/Modal/Modal'
+import NotificationInsurance from 'components/layout/notifucationInsurance'
+import ContactModal from 'components/screens/HomePage/ContactModal'
+import EmailSubscriptionModal from 'components/screens/HomePage/EmailRegisterModal'
+import UpdateEmailSubscriptionModal from 'components/screens/HomePage/EmailRegisterUpdateModal'
 import useWindowSize from 'hooks/useWindowSize'
 import { IconSvg } from 'types/types'
 import { screens } from 'utils/constants'
@@ -15,9 +20,9 @@ interface MenuItem {
     router?: string
     icon?: string | React.ReactNode | IconSvg | any
     // when the icon is a custom react node
-    isIconSvg?: boolean
+    isIconSvg?: undefined | boolean
     isMobile?: boolean
-    menuId: string
+    menuId: undefined | string
     parentId?: string | number
     // when the name is custom react node
     nameComponentProps?: any
@@ -25,6 +30,7 @@ interface MenuItem {
     // show arrow down when the menu has children
     hideArrowIcon?: boolean
     isDropdown?: boolean
+    modalName?: undefined | string
 }
 
 interface Menu {
@@ -79,8 +85,6 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
         if (cbOnMouseOut) {
             if (isFunction(cbOnMouseOut)) cbOnMouseOut(false)
         }
-
-        // setActive(false)
     }
 
     const handleOnMouseOver = (e: any) => {
@@ -92,10 +96,20 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
         if (cbOnMouseOver) {
             if (isFunction(cbOnMouseOver)) cbOnMouseOver(true)
         }
-        // setActive(true)
     }
 
     const dataFilter = useMemo(() => recursiveData(data), [data])
+
+    // const [isShowEmailModal, setIsShowEmailModal] = useState(false)
+
+    const handleOpenModal = () => {
+        // console.log("handleOpenModal")
+        // setIsShowEmailModal(true);
+    }
+
+    const handleCloseModal = () => {
+        // setIsShowEmailModal(false);
+    }
 
     const renderMenu = (menu: any, index: number, child = false) => {
         const isActive = router.pathname === menu?.router

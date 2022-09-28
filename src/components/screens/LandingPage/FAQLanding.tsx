@@ -113,7 +113,7 @@ const FaqLanding = () => {
 export default FaqLanding
 
 const Background = styled.section.attrs({
-    className: 'pt-12 banner-landing px-4 lg:px-20 min-h-[350px] flex flex-col justify-end mt-[7.5rem]',
+    className: 'pt-12 banner-landing px-4 lg:px-20 min-h-[350px] flex flex-col justify-end mt-[7.5rem] scroll-mt-[4.25rem]',
 })<any>`
     background-image: ${({ isMobile }) => `url(${`/images/screens/landing-page/bg_faq.png`})`};
     background-position: top;

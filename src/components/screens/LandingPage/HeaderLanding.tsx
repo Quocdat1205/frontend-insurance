@@ -1,12 +1,13 @@
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { X } from 'react-feather'
 import Button from 'components/common/Button/Button'
 import ButtonLanguage from 'components/common/Button/ButtonLanguage'
 import Menu from 'components/common/Menu/Menu'
 import { MenuIcon, RightArrow } from 'components/common/Svg/SvgIcon'
 import Drawer from 'components/layout/Drawer'
+import ContactModal from 'components/screens/HomePage/ContactModal'
 import Config from 'config/config'
 import useWindowSize from 'hooks/useWindowSize'
 import { RootStore, useAppSelector } from 'redux/store'
@@ -22,11 +23,17 @@ const HeaderLanding = () => {
         i18n: { language },
     } = useTranslation()
 
+    const [isShowContactModal, setIsShowContactModal] = useState(false)
+
     const scrollTo = (id: string) => {
         const elId = id.split('#')[1]
         const section = document.querySelector(`${elId}`)
         section?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
+
+    const handleCloseContactModal = useCallback(() => {
+        setIsShowContactModal(false)
+    }, [])
 
     const onChangeMenu = (e: any) => {
         // Redirect link
@@ -35,9 +42,24 @@ const HeaderLanding = () => {
             return
         }
 
+        handleOnClickMenuItem(e)
+
         if (isMobile && e?.children.length > 0) return
         if (e?.menuId && e.router) router.push(e.router)
         if (isMobile) setVisible(false)
+    }
+
+    const handleOnClickMenuItem = (item: any) => {
+        switch (item?.menuId) {
+            case 'modal_contact':
+                setIsShowContactModal(true)
+                // dispatch(setAccount({ address: null, wallet: null }))
+                // Config.logout()
+                // Config.toast.show('success', t('common:disconnect_successful'))
+                break
+            default:
+                break
+        }
     }
 
     return (
@@ -53,6 +75,9 @@ const HeaderLanding = () => {
                         </div>
                     )}
                 </div>
+                {/* Modal */}
+                <ContactModal visible={isShowContactModal} onClose={handleCloseContactModal} />
+
                 {!loading_account && (
                     <div className="flex items-center space-x-6 py-3 mb:py-0 text-sm font-semibold">
                         {!isMobile ? (
