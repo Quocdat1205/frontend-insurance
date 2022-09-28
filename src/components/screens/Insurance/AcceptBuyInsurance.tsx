@@ -259,19 +259,33 @@ const AcceptBuyInsurance = () => {
                                 { value: 0 },
                             )
                             await buy.wait()
-
                             const id_sc = await buy.wait()
+                            console.log(buy)
+
                             if (buy && id_sc.events[2].args[0]) {
                                 handlePostInsurance(buy, dataPost, state, Number(id_sc.events[2].args[0]), token)
                             }
+                            // else {
+                            //     console.log(buy, id_sc.events[2].args[0])
+
+                            //     Config.toast.show(
+                            //         'error',
+                            //         `${language === 'vi' ? 'Giao dịch không thành công, vui lòng thử lại' : 'Transaction fail, try again please'}`,
+                            //     )
+                            //     return setActive(false)
+                            // }
                         }
                     }, 3000)
                 }
             }
         } catch (err) {
-            console.log(err)
+            console.log(err, 'Transaction fail, try again please')
             setNoti('')
             setActive(false)
+        } finally {
+            if (Noti === 'loading') {
+                setActive(false)
+            }
         }
     }
 
@@ -361,7 +375,6 @@ const AcceptBuyInsurance = () => {
                 </span>
             )
         }
-        return ''
     }
 
     return !loading && state != undefined ? (
@@ -813,7 +826,7 @@ const AcceptBuyInsurance = () => {
                                     </div>
                                 </div>
                                 <div className="text-[#B2B7BC] text-xs py-[16px]">
-                                    *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')}
+                                    *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')} {timeEnd()}
                                 </div>
                                 <div
                                     //flex
