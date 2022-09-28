@@ -1,15 +1,13 @@
-import { useTranslation } from 'next-i18next'
-import React, { useEffect, useState } from 'react'
-import { isMobile } from 'react-device-detect'
-import Button from 'components/common/Button/Button'
-import InputField from 'components/common/Input/InputField'
-import Modal from 'components/common/Modal/Modal'
-import Toast from 'components/layout/Toast'
-import Config from 'config/config'
-import * as types from 'redux/actions/types'
-import { RootStore, useAppSelector } from 'redux/store'
-import { API_GET_INFO_USER, API_GET_UNIT_CONFIG, API_UPDATE_USER_INFO } from 'services/apis'
-import fetchApi from 'services/fetch-api'
+import { useTranslation } from 'next-i18next';
+import React, { useEffect, useState } from 'react';
+import { isMobile } from 'react-device-detect';
+import Button from 'components/common/Button/Button';
+import InputField from 'components/common/Input/InputField';
+import Modal from 'components/common/Modal/Modal';
+import Config from 'config/config';
+import { RootStore, useAppSelector } from 'redux/store';
+import { API_GET_INFO_USER, API_UPDATE_USER_INFO } from 'services/apis';
+import fetchApi from 'services/fetch-api';
 
 interface UpdateEmailSubscriptionModal {
     visible: boolean
@@ -41,8 +39,6 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
                 owner: account.address,
             },
         })
-        console.log('fetch---', data)
-
         if (data) {
             setCurrentEmail(data.email)
             // dispatch({
@@ -53,10 +49,6 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
     }
 
     const updateEmail = async () => {
-        // Config.toast.show('error', t('home:landing:email_invalid'), {
-        //     position: 'top-right',
-        // })
-        // return
         const { data, message, statusCode } = await fetchApi({
             url: API_UPDATE_USER_INFO,
             options: {
@@ -64,11 +56,10 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
             },
             params: {
                 owner: account.address,
-                email: 'i@mail.com',
+                email,
             },
         })
-        console.log('update---', data)
-        if (message === 'SUCCESS' && statusCode === 200) {
+        if (statusCode === 200) {
             onClose()
             Config.toast.show('success', t('common:modal:success_update_email'))
             // dispatch({

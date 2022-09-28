@@ -1,17 +1,15 @@
-import { useTranslation } from 'next-i18next'
-import React, { useState } from 'react'
-import { isMobile } from 'react-device-detect'
-import styled from 'styled-components'
-import Button from 'components/common/Button/Button'
-import InputField, { ErrorSectionNote } from 'components/common/Input/InputField'
-import Modal from 'components/common/Modal/Modal'
-import Config from 'config/config'
-import { API_GET_INFO_USER, API_UPDATE_USER_INFO } from 'services/apis'
-import fetchApi from 'services/fetch-api'
-import colors from 'styles/colors'
+import { useTranslation } from 'next-i18next';
+import React, { useState } from 'react';
+import { isMobile } from 'react-device-detect';
+import Button from 'components/common/Button/Button';
+import InputField, { ErrorSectionNote } from 'components/common/Input/InputField';
+import Modal from 'components/common/Modal/Modal';
+import Config from 'config/config';
+import { API_UPDATE_USER_INFO } from 'services/apis';
+import fetchApi from 'services/fetch-api';
 import useWeb3Wallet from 'hooks/useWeb3Wallet';
 
-interface EmailSubModal {
+interface EmailRegisterModal {
     visible: boolean
     onClose: () => void
 }
@@ -23,7 +21,7 @@ const isValidEmail = (email: any) =>
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
         )
 
-const EmailSubscriptionModal = ({ visible, onClose }: EmailSubModal) => {
+const EmailSubscriptionModal = ({ visible, onClose }: EmailRegisterModal) => {
     const { t } = useTranslation()
     const [email, setEmail] = useState('')
     const [ableSubmit, setAbleSubmit] = useState(false)
@@ -66,7 +64,7 @@ const EmailSubscriptionModal = ({ visible, onClose }: EmailSubModal) => {
                 Config.toast.show('error', message[0])
             }
             if (data) {
-                Config.toast.show('success', t('home:landing:email_update_success'))
+                Config.toast.show('success', t('common:modal:success_update_email'))
                 onClose()
             }
         } catch (e) {

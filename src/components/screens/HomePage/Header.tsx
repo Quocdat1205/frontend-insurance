@@ -8,8 +8,8 @@ import Menu from 'components/common/Menu/Menu'
 import { MenuIcon } from 'components/common/Svg/SvgIcon'
 import Drawer from 'components/layout/Drawer'
 import Notifications from 'components/layout/Notifications'
-import EmailSubscriptionModal from 'components/screens/HomePage/EmailSubModal'
-import UpdateEmailSubscriptionModal from 'components/screens/HomePage/EmailSubUpdateModal'
+import EmailSubscriptionModal from 'components/screens/HomePage/EmailRegisterModal'
+import UpdateEmailSubscriptionModal from 'components/screens/HomePage/EmailRegisterUpdateModal'
 import { ChainDataList } from 'components/web3/constants/chains'
 import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
@@ -110,19 +110,20 @@ const Header = () => {
 
         const isShownModal = getModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL)
 
+        // handle email subscription modal
         if (!data?.email && !isShownModal) {
             setVisibleModal({ ...visibleModal, [Config.MODAL_REGISTER_EMAIL]: true })
         } else {
+            setVisibleModal({ ...visibleModal, [Config.MODAL_REGISTER_EMAIL]: false })
             setModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL, 'true')
-            // setIsShowModal(false)
         }
     }
 
     // get info after connect wallet
     useEffect(() => {
-        if (!account || !network) return
+        if (!account?.address) return
         getInfo()
-    }, [account, network])
+    }, [account])
 
     const menuAddress = [
         isMobile
@@ -162,20 +163,19 @@ const Header = () => {
                 </div>
                 <div className="flex items-center justify-end w-full py-3 text-sm font-semibold homeNav:justify-between homeNav:py-0">
                     {/* Modal */}
-                    {visibleModal[Config.MODAL_REGISTER_EMAIL] && (
+                    {account?.address && visibleModal[Config.MODAL_REGISTER_EMAIL] && (
                         <EmailSubscriptionModal
                             visible={visibleModal[Config.MODAL_REGISTER_EMAIL]}
                             onClose={() => handleCloseModal(Config.MODAL_REGISTER_EMAIL)}
                         />
                     )}
-                    {visibleModal[Config.MODAL_UPDATE_EMAIL] && (
+                    {account?.address && visibleModal[Config.MODAL_UPDATE_EMAIL] && (
                         <UpdateEmailSubscriptionModal
                             visible={visibleModal[Config.MODAL_UPDATE_EMAIL]}
                             onClose={() => handleCloseModal(Config.MODAL_UPDATE_EMAIL)}
                         />
                     )}
 
-                    {/* <div className="w-full flex items-center justify-end homeNav:justify-between  py-3 mb:py-0 text-sm font-semibold"> */}
                     {!isMobile && (
                         <div className="hidden mb:block">
                             <Menu data={Config.homeMenu} onChange={onChangeMenu} />
