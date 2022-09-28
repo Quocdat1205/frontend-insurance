@@ -120,7 +120,9 @@
         "error_format_email": "Vui lòng nhập Email đúng định dạng. Ví dụ: xxxx@gmail.com.",
         "error_duplicate_email": "Email mới trùng với email cũ",
         "success_update_email": "Cập nhật email thành công",
+        "label_email": "Nhập Email",
         "email_subscription": {
+            "update_description": "Trạng thái hợp đồng bảo hiểm của bạn sẽ được cập nhật nhanh chóng",
             "subscribe_later": "Bỏ qua, tôi sẽ cập nhật sau!",
             "update_email": "Cập nhật Email",
             "input_email": "Nhập email",

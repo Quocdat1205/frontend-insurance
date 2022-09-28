@@ -83,22 +83,32 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
 
     const handleChange = (event: any) => {
         setEmail(event.target.value)
-        if (validator('newEmail').isValid) {
+        if (validator('newEmail', event.target.value).isValid) {
             setAbleSubmit(true)
         } else {
             setAbleSubmit(false)
         }
     }
 
-    const validator = (key: string) => {
+    const handlePaste = (name: string, event: any) => {
+        event.preventDefault()
+        const pastedValue = event.clipboardData.getData('text')
+        setEmail(pastedValue)
+        if (validator(name, pastedValue).isValid) {
+            setAbleSubmit(true)
+        } else setAbleSubmit(false)
+    }
+
+
+    const validator = (key: string, value?: string) => {
         const rs = { isValid: true, message: '' }
         switch (key) {
             case 'newEmail': {
-                if (!isValidEmail(email)) {
-                    rs.isValid = isValidEmail(email)
+                if (!isValidEmail(value || email)) {
+                    rs.isValid = isValidEmail(value || value)
                     rs.message = t('common:modal:error_format_email')
                 }
-                if (isDuplicateEmail(currentEmail, email)) {
+                if (isDuplicateEmail(currentEmail, value || email)) {
                     rs.isValid = false
                     rs.message = t('common:modal:error_duplicate_email')
                 }
@@ -126,7 +136,7 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
                 <img src="/images/icons/ic_gmail.png" className="w-[80px] h-[80px]" />
                 <div className="text-center pt-6 text-xl">
                     {t('common:modal:email_subscription:update_email')}
-                    <div className="text-center text-sm md:text-base text-txtSecondary pt-2">{t('common:modal:email_subscription:description')}</div>
+                    <div className="text-center text-sm md:text-base text-txtSecondary pt-2">{t('common:modal:email_subscription:update_description')}</div>
                 </div>
             </div>
             <InputField
@@ -135,7 +145,7 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
                 label={t('common:modal:email_subscription:current_email')}
                 value={currentEmail || ''}
                 disabled={true}
-                placeholder={`${t('insurance:final:label_email')}`}
+                placeholder={`${t('common:modal:label_email')}`}
             />
 
             <InputField
@@ -143,9 +153,10 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
                 key={'newEmail'}
                 label={t('common:modal:email_subscription:new_email')}
                 onChange={handleChange}
+                onPaste={(e: any) => handlePaste('newEmail', e)}
                 validator={validator('newEmail')}
                 value={email || ''}
-                placeholder={`${t('insurance:final:label_email')}`}
+                placeholder={`${t('common:modal:label_email')}`}
             />
             <div className="flex justify-center items-center text-base ">
                 <Button

@@ -55,6 +55,7 @@ const Header = () => {
 
     const onClickMenuAddress = async (e: any) => {
         const isShownModal = getModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL)
+        let data = null
         switch (e?.menuId) {
             case 'disconnect':
                 dispatch(setAccount({ address: null, wallet: null }))
@@ -64,7 +65,8 @@ const Header = () => {
                 break
             case Config.MODAL_UPDATE_EMAIL:
                 // check update or register new email
-                if (!userInfo?.email || !isShownModal) {
+                data = await getInfo()
+                if (!data?.email) {
                     setVisibleModal({
                         ...visibleModal,
                         [Config.MODAL_REGISTER_EMAIL]: true,
@@ -120,6 +122,7 @@ const Header = () => {
             setVisibleModal({ ...visibleModal, [Config.MODAL_REGISTER_EMAIL]: false })
             setModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL, 'true')
         }
+        return data
     }
 
     // get info after connect wallet
@@ -144,11 +147,6 @@ const Header = () => {
 
     const handleCloseModal = (modalType: string) => {
         setVisibleModal((prev) => ({ ...prev, [modalType]: false }))
-
-        // save to local storage if modal is register email
-        if (modalType === Config.MODAL_REGISTER_EMAIL) {
-            setModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL, 'true')
-        }
     }
 
     const MenuFilter = useMemo(() => {
@@ -164,7 +162,7 @@ const Header = () => {
                 <div className="min-w-[67px] w-[75px] cursor-pointer" onClick={() => router.push('/')}>
                     <img src="/images/ic_logo.png" />
                 </div>
-                <div className="flex items-center justify-end w-full py-3 text-sm font-semibold homeNav:justify-between homeNav:py-0">
+                <div className="flex items-center justify-end w-full py-3 text-sm font-semibold  xl:justify-between homeNav:py-0">
                     {/* Modal */}
                     {account?.address && visibleModal[Config.MODAL_REGISTER_EMAIL] && (
                         <EmailSubscriptionModal
@@ -201,7 +199,7 @@ const Header = () => {
                                 )}
                                 {account?.address && network && isMobile && (
                                     // <Menu data={menuConfig} network={network} acount={account} isMobile={isMobile}/>
-                                    <div className="p-1 homeNav:p-0 bg-hover rounded-[5px] flex items-center space-x-2">
+                                    <div className="p-1 insurance:p-0 bg-hover rounded-[5px] flex items-center space-x-2">
                                         <img src={network.icon} width={24} height={24} />
                                         <div>{network.chain}</div>
                                         <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 my-1">
