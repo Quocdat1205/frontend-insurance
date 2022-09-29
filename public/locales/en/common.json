@@ -103,11 +103,56 @@
     "slogan_first": "Change risk",
     "slogan_second": "To payback",
     "available": "Available Balances {{value}}",
-    "minimum_balance": "Minimum Balance {{value}}",
     "max": "Maximum {{value}}",
-    "min": "Minimum {{value}}",
     "refresh": "Refresh",
     "dont_have_wallet": "Don't yet have a Wallet Extension? Explore <span class='text-blue underline cursor-pointer'>How to add a wallet </span> now",
     "user_not_login": "User is not currently logged in. Please enter the user's password at the Wallet application.",
-    "got_it": "Got it"
+    "got_it": "Got it",
+    "other": "Other",
+    "min": "Minimum {{value}}",
+    "minimum_balance": "Minimum {{value}}",
+    "email": "Email",
+    "update": "Update",
+    "submitting": "Submitting...",
+    "modal": {
+        "dont_show_later": "Không hiện lại thông báo này",
+        "email_placeholder": "Enter Email",
+        "error_format_email": "Incorrect Email format. Ex: xxx@gmail.com",
+        "success_update_email": "Update Email successfully",
+        "error_duplicate_email": "Email was registered",
+        "label_email": "Enter your email ",
+        "email_subscription": {
+            "update_description": "Your Insurance Contract status will be updated the soonest possible",
+            "subscribe_later": "Skip! I will update later",
+            "update_email": "Update Email",
+            "input_email": "Enter Email",
+            "current_email": "Current Email",
+            "new_email": "New Email",
+            "ignore_description": "Skip and update later by clicking \"Update Email\" at My Wallet",
+            "description": "Enter Email to get latest about your Insurance Contract status"
+        },
+        "contact": {
+            "title": "Contact Nami Insurance",
+            "description": "We are pleased to receive your request.",
+            "request": "Your request",
+            "request_placeholder": "How can we help you?",
+            "send_request": "Submit your request",
+            "sending_request": "Submitting",
+            "send_success_title": "Your request was sent",
+            "send_success_desc": "We will respond within 2-3 working days. Please check your mail box regularly"
+        }
+    },
+    "terminology": {
+        "q_covered": "Quanity of covered asset",
+        "p_market": "The current price of the covered asset",
+        "p_claim": "Price activates receiving cover payout",
+        "p_expired": "Price triggers the insurance contract to expire",
+        "p_refund": "Price is within the margin refund terms",
+        "period": "Period of the insurance contract",
+        "t_start": "Time triggers the start of insurance contract",
+        "t_expired": "Time triggers the expiration of insurance contract",
+        "r_claim": "Ratio of  cover payout to Margin ",
+        "q_claim": "Quantity of cover payout when reaching P-Claim",
+        "margin": "Margin of insurance contract"
+    }
 }

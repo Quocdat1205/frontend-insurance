@@ -16,7 +16,7 @@ const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) 
 
     return (
         <div
-            className={`max-w-screen-layout 4xl:max-w-screen-3xl m-auto mt-[2rem] ${
+            className={`max-w-screen-layout 4xl:max-w-screen-3xl  mt-[2rem] ${
                 auth ? 'mb-[3rem] ' : 'mb-[1rem] '
             } grid grid-cols-12 content-center items-center justify-between`}
             onClick={() => {
@@ -28,7 +28,7 @@ const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) 
                 <span
                     className={'hover:cursor-pointer ml-2'}
                     onClick={() => {
-                        return router.push('/ ')
+                        return router.push('/home')
                     }}
                 >
                     {t('insurance:buy:back_to_home')}

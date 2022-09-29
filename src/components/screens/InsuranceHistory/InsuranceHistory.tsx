@@ -89,7 +89,7 @@ const InsuranceHistory = () => {
                 onShowTerminologyModal={() => setShowTerminologyModal(true)}
                 onShowGuildline={() => setShowGuide(true)}
             />
-            <div className="px-4 sm:px-10 lg:px-20">
+            <div className="px-4 mb:px-10 lg:px-20">
                 <div className="pt-12 sm:pt-[4.25rem] max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
                     <div className={`flex items-center justify-between`}>
                         <div className="text-2xl sm:text-4xl font-semibold">{t('insurance_history:my_cover')}</div>

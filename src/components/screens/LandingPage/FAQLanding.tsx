@@ -17,10 +17,10 @@ const ContentDisclosure = ({ content, link = '', href = '' }: { content: string;
         leaveFrom="transform scale-100 opacity-100"
         leaveTo="transform scale-95 opacity-0"
     >
-        <Disclosure.Panel static className="leading-6 px-4 pt-4 pb-2 text-sm lg:text-base text-left text-gray-500 font-normal">
+        <Disclosure.Panel static className="px-4 pt-4 pb-2 text-sm font-normal leading-6 text-left text-gray-500 lg:text-base">
             {content}{' '}
             {link && (
-                <a href={href} target="_blank" className="text-red underline border-bottom-red">
+                <a href={href} target="_blank" className="underline text-red border-bottom-red">
                     {link}
                 </a>
             )}
@@ -80,9 +80,9 @@ const FaqLanding = () => {
     ]
     return (
         <Background id={'faq-section'}>
-            <div className="whitespace-pre-line max-w-screen-insurance 4xl:max-w-screen-3xl m-auto text-center flex flex-col justify-center items-center">
-                <div className="text-2xl sm:text-5xl leading-8 font-semibold mb-5">{t('home:landing:faq_title')}</div>
-                {faq_contents.map(({ question, ans, link, href }, index) => (
+            <div className="lg:py-[4.25rem] py-[3rem] whitespace-pre-line max-w-screen-insurance 4xl:max-w-screen-3xl m-auto text-center flex flex-col justify-center items-center">
+                <div className="mb-5 text-2xl font-semibold leading-8 sm:text-5xl">{t('home:landing:faq_title')}</div>
+                {faq_contents.map(({ question, ans, link, href }) => (
                     <div key={question}>
                         <div className="h-[1px] w-full bg-divider" />
                         <div key={question} className="mx-auto min-w-[20rem] lg:min-w-[48rem] w-full max-w-md rounded-2xl px-6 py-4 lg:p-[1.5rem] ">
@@ -91,7 +91,7 @@ const FaqLanding = () => {
                                     <>
                                         <Disclosure.Button
                                             as={'div'}
-                                            className=" active:outline-transparent active:bg-transparent focus:bg-none touch-none active:outline-none flex w-full justify-between items-center rounded-lg bg-purple-100 px-4 text-left font-medium text-purple-900 focus:outline-none"
+                                            className="flex items-center justify-between w-full px-4 font-medium text-left text-purple-900 bg-purple-100 rounded-lg active:outline-transparent active:bg-transparent focus:bg-none touch-none active:outline-none focus:outline-none"
                                         >
                                             <span className={'font-semibold text-sm lg:text-base'}>{question}</span>
                                             <div>
@@ -113,9 +113,9 @@ const FaqLanding = () => {
 export default FaqLanding
 
 const Background = styled.section.attrs({
-    className: 'pt-12 banner-landing px-4 lg:px-20 min-h-[350px] flex flex-col justify-end mt-[7.5rem]',
+    className: 'lg:mt-[11.25rem] mt-[5rem] banner-landing px-4 lg:px-20 min-h-[350px] flex flex-col justify-end mt-[7.5rem] scroll-mt-[4.25rem]',
 })<any>`
-    background-image: ${({ isMobile }) => `url(${`/images/screens/landing-page/bg_faq.png`})`};
+    background-image: ${() => `url(${`/images/screens/landing-page/bg_faq.png`})`};
     background-position: top;
     background-repeat: no-repeat;
     background-size: cover;

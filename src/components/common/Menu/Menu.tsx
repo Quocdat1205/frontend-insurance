@@ -1,23 +1,28 @@
 import classnames from 'classnames'
 import { useTranslation } from 'next-i18next'
-import React, { MouseEventHandler, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { isMobile as mobile } from 'react-device-detect'
 import { ChevronDown, ChevronUp } from 'react-feather'
 import styled from 'styled-components'
+import Modal from 'components/common/Modal/Modal'
+import NotificationInsurance from 'components/layout/notifucationInsurance'
+import ContactModal from 'components/screens/HomePage/ContactModal'
+import EmailSubscriptionModal from 'components/screens/HomePage/EmailRegisterModal'
+import UpdateEmailSubscriptionModal from 'components/screens/HomePage/EmailRegisterUpdateModal'
 import useWindowSize from 'hooks/useWindowSize'
-import { RootStore, useAppSelector } from 'redux/store'
 import { IconSvg } from 'types/types'
 import { screens } from 'utils/constants'
 import { isFunction } from 'utils/utils'
+import { useRouter } from 'next/router'
 
 interface MenuItem {
     name?: any
     router?: string
     icon?: string | React.ReactNode | IconSvg | any
     // when the icon is a custom react node
-    isIconSvg?: boolean
+    isIconSvg?: undefined | boolean
     isMobile?: boolean
-    menuId: string
+    menuId: undefined | string
     parentId?: string | number
     // when the name is custom react node
     nameComponentProps?: any
@@ -25,6 +30,7 @@ interface MenuItem {
     // show arrow down when the menu has children
     hideArrowIcon?: boolean
     isDropdown?: boolean
+    modalName?: undefined | string
 }
 
 interface Menu {
@@ -40,7 +46,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
     const isMobile = (width && width < screens.drawerHome) || mobile
     const [active, setActive] = useState<any>(null)
     const [isHover, setIsHover] = useState(false)
-    const account = useAppSelector((state: RootStore) => state.setting.account)
+    const router = useRouter()
 
     const onToggleMenu = (e: any, menu: any) => {
         const _active = !menu.parentId && (active?.parentId === menu.menuId || active?.menuId === menu.menuId) ? null : menu
@@ -79,8 +85,6 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
         if (cbOnMouseOut) {
             if (isFunction(cbOnMouseOut)) cbOnMouseOut(false)
         }
-
-        // setActive(false)
     }
 
     const handleOnMouseOver = (e: any) => {
@@ -92,12 +96,23 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
         if (cbOnMouseOver) {
             if (isFunction(cbOnMouseOver)) cbOnMouseOver(true)
         }
-        // setActive(true)
     }
 
     const dataFilter = useMemo(() => recursiveData(data), [data])
 
+    // const [isShowEmailModal, setIsShowEmailModal] = useState(false)
+
+    const handleOpenModal = () => {
+        // console.log("handleOpenModal")
+        // setIsShowEmailModal(true);
+    }
+
+    const handleCloseModal = () => {
+        // setIsShowEmailModal(false);
+    }
+
     const renderMenu = (menu: any, index: number, child = false) => {
+        const isActive = router.pathname === menu?.router
         const hasChildren = menu.children.length > 0
         const _active = active?.menuId === menu.menuId || active?.parentId === menu.menuId
         const level = menu.level + 1
@@ -112,7 +127,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                 const IconComponent = icon
                 return <IconComponent />
             }
-            return <img className="min-w-6 min-h-6 w-6 h-6" src={menu.icon} />
+            return <img className="w-6 h-6 min-w-6 min-h-6" src={menu.icon} />
         }
 
         const Name = ({ name, ...nameProps }: any) => {
@@ -137,9 +152,10 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                 })}
                 isChild={child}
                 isDropdown={menu?.isDropdown}
+                active={isActive}
             >
                 {!hasChildren ? (
-                    <div className="flex items-center space-x-4 px-4">
+                    <div className="flex items-center px-4 space-x-4">
                         {menu?.icon && <Icon isIconSvg={menu?.isIconSvg} icon={menu.icon} />}
                         {/* custom parent component: component passed from config as [name] props */}
                         <Name name={menu.name} {...menu?.nameComponentProps} />
@@ -150,7 +166,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                             'pb-3': _active && isMobile,
                         })}
                     >
-                        <div className="space-x-4 flex items-center">
+                        <div className="flex items-center space-x-4">
                             {menu?.icon && <Icon isIconSvg={menu?.isIconSvg} icon={menu.icon} />}
                             <Name name={menu.name} {...menu?.nameComponentProps} />
                         </div>
@@ -171,22 +187,24 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
     }
 
     return (
-        <ul onMouseOver={handleOnMouseOver} onMouseOut={handleOnMouseOut} className="sidebar-menu flex flex-col lg:items-center lg:flex-row">
+        <ul onMouseOver={handleOnMouseOver} onMouseOut={handleOnMouseOut} className="flex flex-col sidebar-menu lg:items-center lg:flex-row">
             {dataFilter.map((menu: any, index: number) => renderMenu(menu, index))}
         </ul>
     )
 }
 
 interface Item {
-    isChild?: boolean,
-    isDropdown?: boolean,
+    isChild?: boolean
+    isDropdown?: boolean
+    active?: boolean
 }
 
-const ItemMenu = styled.li.attrs<Item>(({ isChild, isDropdown }) => ({
+const ItemMenu = styled.li.attrs<Item>(({ isChild, isDropdown, active }) => ({
     className: classnames('cursor-pointer text-sm py-3 relative lg:hover:active-menu', {
         'mb:hover:text-red': !isChild && !isDropdown,
-        'lg:py-2': !isChild,
+        'lg:py-3': !isChild,
         'lg:!py-[10px] pl-4 font-normal lg:text-txtPrimary lg:hover:bg-hover lg:hover:rounded-[3px]': isChild,
+        'text-red': active,
     }),
 }))<Item>``
 export default Menu

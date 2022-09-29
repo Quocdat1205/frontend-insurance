@@ -1,5 +1,5 @@
 import classnames from 'classnames'
-import useOutsideAlerter, { useOutside } from 'hooks/useOutsideAlerter'
+import { useOutside } from 'hooks/useOutsideAlerter'
 import useWindowSize from 'hooks/useWindowSize'
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { X } from 'react-feather'
@@ -17,6 +17,7 @@ interface Modal {
     customHeader?: () => void
     wrapClassName?: string
     closeButton?: boolean
+    canBlur?: boolean
 }
 
 const Modal = ({
@@ -30,6 +31,7 @@ const Modal = ({
     customHeader,
     wrapClassName = '',
     closeButton = true,
+    canBlur = true,
 }: Modal) => {
     const wrapperRef = useRef<any>(null)
     const container = useRef<any>(null)
@@ -41,7 +43,10 @@ const Modal = ({
         if (isVisible && onBackdropCb) onBackdropCb()
     }
 
-    useOutside(wrapperRef, handleOutside, container)
+    if (canBlur) {
+        useOutside(wrapperRef, handleOutside, container)
+    }
+
     // useOutsideAlerter(wrapperRef, handleOutside)
 
     useEffect(() => {
@@ -69,6 +74,12 @@ const Modal = ({
     return (
         <Portal portalId={portalId} isVisible={isVisible}>
             <div
+                onClick={() => {
+                    return
+                }}
+                onBlur={() => {
+                    return
+                }}
                 className={classnames(
                     'fixed top-0 left-0 z-[99] w-full h-full overflow-hidden bg-bgModal/[0.3]',
                     'z-30',

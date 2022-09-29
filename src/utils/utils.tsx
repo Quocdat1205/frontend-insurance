@@ -1,15 +1,13 @@
+import GhostContentAPI from '@tryghost/content-api'
 import { formatDistanceToNow, format } from 'date-fns'
+import get from 'lodash/get'
 import isNil from 'lodash/isNil'
 import numeral from 'numeral'
-import Config from 'config/config'
-import GhostContentAPI from '@tryghost/content-api'
-import { PairConfig, UnitConfig } from 'types/types'
 import { createSelector } from 'reselect'
+import Config from 'config/config'
 import { RootStore } from 'redux/store'
+import { PairConfig, UnitConfig } from 'types/types'
 import { stateInsurance } from './constants'
-import get from 'lodash/get'
-import fetchApi from 'services/fetch-api'
-import { API_GET_NONCE } from 'services/apis'
 
 export const getS3Url = (url: string) => Config.env.CDN + url
 
@@ -33,7 +31,7 @@ export const formatNumber = (value: number, digits = 2, forceDigits = 0, acceptN
     return numeral(+value).format(`0,0.${'0'.repeat(forceDigits)}${digits > 0 ? `[${'0'.repeat(digits)}]` : ''}`, Math.floor)
 }
 
-export const formatCurrency = (n: number, digits = 4, e: number = 1e3) => {
+export const formatCurrency = (n: number, digits = 4, e = 1e3) => {
     if (n < e) return formatNumber(n, digits, 0, true)
     if (n >= 1e3 && n < 1e6) return `${formatNumber(+(n / 1e3).toFixed(4), digits, 0, true)}K`
     if (n >= 1e6 && n < 1e9) return `${formatNumber(+(n / 1e6).toFixed(4), digits, 0, true)}M`
@@ -67,10 +65,10 @@ export const ghost = new GhostContentAPI({
     version: 'v3',
 })
 
-export const getArticles = async (tag: string = '', limit: number = 10, language: string = 'vi', isHighlighted: boolean = false) => {
+export const getArticles = async (tag = '', limit = 10, language = 'vi', isHighlighted = false) => {
     const filter = []
     const options: any = {
-        limit: limit,
+        limit,
         include: 'tags',
         order: 'published_at DESC',
     }
@@ -102,14 +100,14 @@ export const timeMessage = (previous: any) => {
 
     if (Math.round(elapsed / 1000) < 15) {
         if (elapsed < msPerMinute) {
-            return Math.round(elapsed / 1000) + ' giây trước'
+            return `${Math.round(elapsed / 1000)} giây trước`
         }
     }
     const date = new Date(previous)
     let tempMinutes
     date.getMinutes() < 10 ? (tempMinutes = `0${date.getMinutes()}`) : (tempMinutes = `${date.getMinutes()}`)
 
-    return date.getHours() + ':' + tempMinutes + ' ' + date.getDate() + '/' + (date.getMonth() + 1)
+    return `${date.getHours()}:${tempMinutes} ${date.getDate()}/${date.getMonth() + 1}`
 }
 
 export const getDecimalPrice = (config: PairConfig) => {
@@ -117,9 +115,9 @@ export const getDecimalPrice = (config: PairConfig) => {
     return +countDecimals(decimalScalePrice?.tickSize)
 }
 
-export const getUnit = createSelector([(state: RootStore) => state.setting.unitConfig, (unitConfig, params) => params], (unitConfig, params) => {
-    return unitConfig.find((rs: UnitConfig) => rs?.assetCode === params)
-})
+export const getUnit = createSelector([(state: RootStore) => state.setting.unitConfig, (unitConfig, params) => params], (unitConfig, params) =>
+    unitConfig.find((rs: UnitConfig) => rs?.assetCode === params),
+)
 
 export const CStatus = ({ state, t }: any) => {
     let bg = 'bg-gradient-blue text-blue-5'
@@ -145,7 +143,7 @@ export const CStatus = ({ state, t }: any) => {
     )
 }
 
-export const initMarketWatchItem = (pair: any, debug: boolean = false) => {
+export const initMarketWatchItem = (pair: any, debug = false) => {
     const _ = {
         symbol: get(pair, 's', null), // this.symbol = source.s;
         lastPrice: get(pair, 'p', null), // this.lastPrice = +source.p;
@@ -168,9 +166,8 @@ export const initMarketWatchItem = (pair: any, debug: boolean = false) => {
     return _
 }
 
-export const sparkLineBuilder = (symbol: string, color: string, border: number = 0.5) => {
-    return `${Config.env.PRICE_API_URL}/api/v1/chart/sparkline?symbol=${symbol}&broker=NAMI_SPOT&color=%23${color?.replace('#', '')}&stroke_width=${border}`
-}
+export const sparkLineBuilder = (symbol: string, color: string, border = 0.5) =>
+    `${Config.env.PRICE_API_URL}/api/v1/chart/sparkline?symbol=${symbol}&broker=NAMI_SPOT&color=%23${color?.replace('#', '')}&stroke_width=${border}`
 
 export const getExchange24hPercentageChange = (price: any) => {
     let change24h = 0
@@ -188,7 +185,7 @@ export const getExchange24hPercentageChange = (price: any) => {
     return change24h
 }
 
-export const formatPercentage = (value: number, digits: number = 2, acceptNegative: boolean = false) => {
+export const formatPercentage = (value: number, digits = 2, acceptNegative = false) => {
     if (isNil(value)) return '0'
     if (Math.abs(+value) < 1e-2) return '0'
     if (!acceptNegative && +value < 0) return '0'
@@ -199,6 +196,20 @@ export function isFunction(functionToCheck: any) {
     return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]'
 }
 
-export const getMessageSign = (nonce: number) => {
-    return `Sign message with nonce: ${nonce}`
+export const setModalSubscribeStorage = (name: string, status = 'false') => {
+    localStorage.setItem(name, status)
 }
+
+export const getModalSubscribeStorage = (name: string) => {
+    const status = localStorage.getItem(name) || 'false'
+    if (JSON.parse(status) === true) {
+        return true
+    }
+    return false
+}
+
+export const removeLocalStorage = (name: string) => localStorage.removeItem(name)
+
+export const getMessageSign = (nonce: number) => `Sign message with nonce: ${nonce}`
+
+export const capitalizeFirstLetter = (string: string) => string.charAt(0).toUpperCase() + string.slice(1)

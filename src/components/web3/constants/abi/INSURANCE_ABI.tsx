@@ -1,5 +1,5 @@
 export const INSURANCE_ABI = [
-    { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
+    { inputs: [{ internalType: 'address', name: '_addressUSDT', type: 'address' }], stateMutability: 'nonpayable', type: 'constructor' },
     {
         anonymous: false,
         inputs: [
@@ -13,7 +13,7 @@ export const INSURANCE_ABI = [
             { indexed: false, internalType: 'string', name: 'state', type: 'string' },
             { indexed: false, internalType: 'uint256', name: 'period', type: 'uint256' },
             { indexed: false, internalType: 'uint256', name: 'recognition_date', type: 'uint256' },
-            { indexed: false, internalType: 'uint256', name: 'expired', type: 'uint256' },
+            { indexed: false, internalType: 'bool', name: 'isUseNain', type: 'bool' },
         ],
         name: 'EBuyInsurance',
         type: 'event',
@@ -73,6 +73,7 @@ export const INSURANCE_ABI = [
                     { internalType: 'uint256', name: 'period', type: 'uint256' },
                     { internalType: 'uint256', name: 'recognition_date', type: 'uint256' },
                     { internalType: 'uint256', name: 'expired', type: 'uint256' },
+                    { internalType: 'bool', name: 'isUseNain', type: 'bool' },
                 ],
                 internalType: 'struct Insurance.InsuranceStruct',
                 name: '',
@@ -99,6 +100,7 @@ export const INSURANCE_ABI = [
                     { internalType: 'uint256', name: 'period', type: 'uint256' },
                     { internalType: 'uint256', name: 'recognition_date', type: 'uint256' },
                     { internalType: 'uint256', name: 'expired', type: 'uint256' },
+                    { internalType: 'bool', name: 'isUseNain', type: 'bool' },
                 ],
                 internalType: 'struct Insurance.InsuranceStruct',
                 name: '',

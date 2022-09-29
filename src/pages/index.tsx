@@ -10,6 +10,7 @@ import SloganLanding from 'components/screens/LandingPage/SloganLanding'
 const LandingPage = (props: any) => (
     <LayoutLanding>
         <SloganLanding />
+        {/* <SloganLanding /> */}
         <BannerLanding />
         <FeaturesLanding />
         <FaqLanding />
