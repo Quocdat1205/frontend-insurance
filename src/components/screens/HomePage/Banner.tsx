@@ -104,7 +104,6 @@ const Banner = () => {
                     </div>
 
                     <div className="grid grid-rows-4 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-4 grid-flow-col gap-x-6 lg:gap-6">
-                        <Tooltip className="max-w-[200px]" id={'p_claim'} placement="bottom" />
                         <Tooltip className="max-w-[200px]" id={'common:terminology:q_covered'} placement="bottom" />
                         <Tooltip className="max-w-[200px]" id={'common:terminology:margin'} placement="bottom" />
                         <Tooltip className="max-w-[200px]" id={'common:terminology:r_claim'} placement="bottom" />
