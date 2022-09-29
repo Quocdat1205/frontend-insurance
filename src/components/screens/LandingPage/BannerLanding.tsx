@@ -131,7 +131,7 @@ const BannerLanding = () => {
                                 {item.tooltip && (
                                     <div className={'ml-[0.375rem] relative'} data-tip={t(item.tooltip)} data-for={item.tooltip}>
                                         <InfoCircle className={''} size={14} color={colors.txtSecondary} />
-                                        <Tooltip className="!max-w-[200px] !absolute !right-0 !top-0" id={item.tooltip} placement="top" />
+                                        {/* <Tooltip className="!max-w-[200px] !absolute !right-0 !top-0" id={item.tooltip} placement="top" /> */}
                                     </div>
                                 )}
                             </div>
