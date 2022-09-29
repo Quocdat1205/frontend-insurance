@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            name: 'nami-exchange-web-v2',
+            name: 'nami-insurance-web',
             script: 'npm run start:dev',
             max_memory_restart: '2G',
             env: {
