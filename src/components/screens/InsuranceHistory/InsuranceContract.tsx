@@ -94,7 +94,7 @@ export const renderContentStatus = (data: any, t: any) => {
                     <div className="text-txtSecondary flex items-center space-x-2 mt-2 sm:mt-3 text-sm sm:text-base">
                         <CalendarIcon color={colors.txtSecondary} size={16} />
                         <span>
-                            {t('common:insurance_history:price_reaching_date')}: {formatTime(data?.updatedAt, 'dd/MM/yyyy')}
+                            {t('common:insurance_history:price_reaching_date')}: {formatTime(data?.updatedAt, 'dd.MM.yyyy')}
                         </span>
                     </div>
                 )}

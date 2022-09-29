@@ -16,6 +16,8 @@ import NetworkError from 'components/screens/ConnectWallet/NetworkError'
 import SwitchNetwok from 'components/screens/ConnectWallet/SwitchNetwok'
 import { useWeb3React } from '@web3-react/core'
 import { isString } from 'lodash'
+import { API_GET_INFO_USER } from 'services/apis'
+import fetchApi from 'services/fetch-api'
 
 interface ConnectWalletModal {}
 
@@ -71,10 +73,17 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         }
     }, [account])
 
+    const getUserInfo = async (address: string, cb: (e: any) => void) => {
+        const { data } = await fetchApi({ url: API_GET_INFO_USER, params: { owner: address } })
+        if (cb) cb(data)
+    }
+
     useEffect(() => {
         if (address && account.address && account.address !== address) {
             localStorage.setItem('PUBLIC_ADDRESS', address)
-            dispatch(setAccount({ address: address }))
+            getUserInfo(address, (user) => {
+                if (user) dispatch(setAccount({ address: address, ...user }))
+            })
         }
     }, [account, address])
 
@@ -207,14 +216,16 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
             if (token?.message || token?.code) {
                 connectionError(token)
             } else {
-                if (chainId && Config.chains.includes(chainId)) {
-                    Config.toast.show('success', t('common:connect_successful'))
-                }
                 localStorage.setItem('PUBLIC_ADDRESS', oldAddress.current)
                 localStorage.setItem('PUBLIC_TOKEN', token)
                 if (wallet?.wallet) localStorage.setItem('PUBLIC_WALLET', wallet?.wallet)
-                dispatch(setAccount({ address: oldAddress.current, wallet: wallet?.wallet }))
-                setVisible(false)
+                getUserInfo(oldAddress.current, (user) => {
+                    if (chainId && Config.chains.includes(chainId)) {
+                        Config.toast.show('success', t('common:connect_successful'))
+                    }
+                    dispatch(setAccount({ address: oldAddress.current, wallet: wallet?.wallet, ...user }))
+                    setVisible(false)
+                })
             }
         } catch (error: any) {
             console.log('confirm', error)

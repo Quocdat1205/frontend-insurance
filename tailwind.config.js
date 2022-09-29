@@ -54,6 +54,7 @@ const commonColors = {
     pink: {
         pink: '#FFF1F2',
         1: '#FFF5F6',
+        2: '#FFF4F6'
     },
     gray: {
         gray: '#B2B7BC',

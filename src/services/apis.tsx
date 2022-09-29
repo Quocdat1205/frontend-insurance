@@ -22,6 +22,12 @@ export const API_GET_TOKEN_COOKIES: string = 'v1/get-token-cookies'
 export const API_GET_INFO_USER = '/v1/get-info-user'
 export const API_UPDATE_USER_INFO = '/v1/update-info-user'
 
+//commission
+export const API_GET_FRIENDS: string = '/v1/get-friends'
+export const API_GET_COMMISSION_HISTORY: string = '/v1/get-commission-history'
+export const API_GET_INFO_USER_COMMISSION: string = '/v1/get-info-user-commission'
+
+
 //futures
 export const API_GET_UNIT_CONFIG: string = Config.env.NAMI_API_URL + '/api/v3/asset/config'
 export const API_GET_FUTURES_MARKET_WATCH = Config.env.NAMI_API_URL + '/api/v3/futures/ticker'

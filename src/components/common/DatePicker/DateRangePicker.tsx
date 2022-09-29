@@ -12,6 +12,7 @@ import { formatTime } from 'utils/utils'
 import Button from 'components/common/Button/Button'
 import { Transition } from '@headlessui/react'
 import useOutsideAlerter from 'hooks/useOutsideAlerter'
+import classNames from 'classnames'
 
 interface ReactDateRangePicker {
     placeholder?: string
@@ -30,6 +31,8 @@ interface ReactDateRangePicker {
     renderContent?: any
     prefix?: string
     isClearable?: boolean
+    isRange?: boolean
+    customLabel?: any
 }
 const ReactDateRangePicker = (props: ReactDateRangePicker) => {
     const {
@@ -51,6 +54,8 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
         renderContent,
         prefix,
         isClearable = false,
+        isRange = true,
+        customLabel,
     } = props
 
     const wrapperRef = useRef<any>(null)
@@ -81,7 +86,15 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
     }
 
     const _onChange = (e: any) => {
-        setDate(e[value.key])
+        if (isRange) {
+            setDate(e[date.key])
+        } else {
+            setDate({
+                key: date.key,
+                startDate: e,
+                endDate: e,
+            })
+        }
     }
 
     const onConfirm = (close: any) => {
@@ -106,24 +119,30 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
     }
 
     return (
-        <div className={`flex flex-col space-y-2 ${className}`}>
-            <div className="text-sm text-txtSecondary">{label}</div>
-            <div ref={wrapperRef} className="date-range-picker relative px-4 rounded-[3px]">
+        <div className={classNames('flex flex-col', { 'space-y-2': label }, className)}>
+            {label && <div className="text-sm text-txtSecondary">{label}</div>}
+            <div ref={wrapperRef} className={classNames('date-range-picker relative', { '': !customLabel })}>
                 <div onClick={() => onAction('open')} className="flex items-center w-full space-x-2 relative">
-                    <div className="w-full h-full flex items-center">
-                        <span>
-                            {prefix} {value?.startDate ? formatTime(value?.startDate, dateFormat) + ' - ' + formatTime(value?.endDate, dateFormat) : ''}
-                        </span>
-                    </div>
-                    {isClearable && value?.startDate && (
-                        <div className="min-w-[1rem]" onClick={() => onAction('clear')}>
-                            <X size={16} />
-                        </div>
-                    )}
+                    {customLabel ? (
+                        customLabel()
+                    ) : (
+                        <div className="px-4 rounded-[3px] bg-hover h-[2.75rem] sm:h-[3rem] flex items-center">
+                            <div className="w-full h-full flex items-center">
+                                <span>
+                                    {prefix} {value?.startDate ? formatTime(value?.startDate, dateFormat) + ' - ' + formatTime(value?.endDate, dateFormat) : ''}
+                                </span>
+                            </div>
+                            {isClearable && value?.startDate && (
+                                <div className="min-w-[1rem]" onClick={() => onAction('clear')}>
+                                    <X size={16} />
+                                </div>
+                            )}
 
-                    {showIcon && (
-                        <div className="cursor-pointer">
-                            <CalendarIcon />
+                            {showIcon && (
+                                <div className="cursor-pointer">
+                                    <CalendarIcon />
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -141,11 +160,12 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
                         <div className="rounded-xl shadow-subMenu overflow-hidden">
                             {renderContent && renderContent()}
                             <DateRangePicker
-                                className="relative"
+                                className={`relative h-full ${!isRange ? 'single-select' : ''}`}
+                                date={date.startDate}
                                 ranges={[date]}
                                 months={2}
                                 onChange={_onChange}
-                                moveRangeOnFirstSelection={false}
+                                moveRangeOnFirstSelection={!isRange}
                                 direction="horizontal"
                                 locale={language === 'vi' ? vi : en}
                                 staticRanges={[]}

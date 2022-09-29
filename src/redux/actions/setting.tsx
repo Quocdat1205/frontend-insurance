@@ -1,7 +1,7 @@
 import Config from 'config/config'
 import { Dispatch } from 'redux'
 import * as types from 'redux/actions/types'
-import { API_GET_LIST_TOKEN, API_GET_CONFIG_ASSET, API_GET_UNIT_CONFIG } from 'services/apis'
+import { API_GET_LIST_TOKEN, API_GET_CONFIG_ASSET, API_GET_UNIT_CONFIG, API_GET_INFO_USER } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 
 export const onLoading = (data: boolean) => async (dispatch: Dispatch) => {
@@ -20,9 +20,10 @@ export const setting = () => async (dispatch: Dispatch) => {
         const address = localStorage.getItem('PUBLIC_ADDRESS')
         const wallet = localStorage.getItem('PUBLIC_WALLET')
         if (address && wallet) {
+            const { data } = await fetchApi({ url: API_GET_INFO_USER, params: { owner: address } })
             dispatch({
                 type: types.SET_ACCOUNT,
-                payload: { address, wallet },
+                payload: { address, wallet, ...data },
             })
         }
     } catch (error) {

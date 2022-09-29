@@ -9,7 +9,9 @@ import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import { API_UPDATE_USER_INFO } from 'services/apis'
 import fetchApi from 'services/fetch-api'
-import { setModalSubscribeStorage } from 'utils/utils';
+import { setModalSubscribeStorage } from 'utils/utils'
+import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
+import { setAccount } from 'redux/actions/setting'
 
 interface EmailRegisterModal {
     visible: boolean
@@ -28,7 +30,8 @@ const EmailSubscriptionModal = ({ visible, onClose }: EmailRegisterModal) => {
     const [email, setEmail] = useState('')
     const [ableSubmit, setAbleSubmit] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-    const { account, chain } = useWeb3Wallet()
+    const account = useAppSelector((state: RootStore) => state.setting.account)
+    const dispatch = useAppDispatch()
 
     const handleChange = (name: string, event: any) => {
         setEmail(event.target.value)
@@ -60,7 +63,7 @@ const EmailSubscriptionModal = ({ visible, onClose }: EmailRegisterModal) => {
                     method: 'PUT',
                 },
                 params: {
-                    owner: account,
+                    owner: account?.address,
                     email,
                 },
             })
@@ -69,6 +72,7 @@ const EmailSubscriptionModal = ({ visible, onClose }: EmailRegisterModal) => {
             }
             if (data) {
                 // update local storage
+                dispatch(setAccount({ ...data }))
                 setModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL, 'true')
                 Config.toast.show('success', t('common:modal:success_update_email'))
                 onClose()

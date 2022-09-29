@@ -102,30 +102,16 @@ const Header = () => {
         isMobile,
     }
 
-    const getInfo = async () => {
-        const { data, statusCode } = await fetchApi({
-            url: API_GET_INFO_USER,
-            params: {
-                owner: account?.address,
-            },
-        })
-        setUserInfo(data)
-
+    // get info after connect wallet
+    useEffect(() => {
+        if (!account?.address) return
         const isShownModal = getModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL)
-
-        // handle email subscription modal
-        if (!data?.email && !isShownModal) {
+        if (!account?.email && !isShownModal) {
             setVisibleModal({ ...visibleModal, [Config.MODAL_REGISTER_EMAIL]: true })
         } else {
             setVisibleModal({ ...visibleModal, [Config.MODAL_REGISTER_EMAIL]: false })
             setModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL, 'true')
         }
-    }
-
-    // get info after connect wallet
-    useEffect(() => {
-        if (!account?.address) return
-        getInfo()
     }, [account])
 
     const menuAddress = [

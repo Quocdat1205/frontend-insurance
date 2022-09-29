@@ -6,9 +6,10 @@ import InputField from 'components/common/Input/InputField'
 import CircleSpinner from 'components/common/Loader/CircleSpinner'
 import Modal from 'components/common/Modal/Modal'
 import Config from 'config/config'
-import { RootStore, useAppSelector } from 'redux/store'
+import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
 import { API_GET_INFO_USER, API_UPDATE_USER_INFO } from 'services/apis'
 import fetchApi from 'services/fetch-api'
+import { setAccount } from 'redux/actions/setting'
 
 interface UpdateEmailSubscriptionModal {
     visible: boolean
@@ -33,6 +34,7 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
     const [ableSubmit, setAbleSubmit] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const account = useAppSelector((state: RootStore) => state.setting.account)
+    const dispatch = useAppDispatch()
 
     const getInfo = async () => {
         const { data } = await fetchApi({
@@ -64,8 +66,9 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
                 },
             })
             setIsLoading(false)
-            if (statusCode === 200) {
+            if (statusCode === 200 && data) {
                 onClose()
+                dispatch(setAccount({ ...data }))
                 Config.toast.show('success', t('common:modal:success_update_email'))
             } else {
                 Config.toast.show('error', t('home:landing:email_invalid'))
