@@ -20,6 +20,7 @@ import { API_GET_INFO_USER } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { screens } from 'utils/constants'
 import { getModalSubscribeStorage, removeLocalStorage, setModalSubscribeStorage } from 'utils/utils'
+import { contractAddress } from 'components/web3/constants/contractAddress';
 
 const Header = () => {
     const { t } = useTranslation()
@@ -74,7 +75,7 @@ const Header = () => {
                 } else setVisibleModal({ ...visibleModal, [Config.MODAL_UPDATE_EMAIL]: true })
                 break
             case 'recent-transaction':
-                window.open(`https://bscscan.com/address/${account?.address}`, '_blank')
+                window.open(`https://bscscan.com/address/${account?.address}?fromaddress=${contractAddress}`, '_blank')
                 break
             default:
                 break

@@ -141,5 +141,18 @@
             "send_success_title": "Yêu cầu của bạn đã được tiếp nhận",
             "send_success_desc": "Chúng tôi sẽ phản hồi sớm nhất trong 2-3 ngày làm việc, vui lòng kiểm tra hộp thư thường xuyên."
         }
+    },
+    "terminology": {
+        "q_covered": "Số lượng tài sản cần bảo hiểm",
+        "p_market": "Mức giá hiện tại của tài sản cần bảo hiểm",
+        "p_claim": "Mức giá kích hoạt nhận chi trả bảo hiểm",
+        "p_expired": "Mức giá kích hoạt chấm dứt hợp đồng bảo hiểm trước hạn",
+        "p_refund": "Mức giá thuộc bộ điều kiện hoàn trả ký quỹ",
+        "period": "Kỳ hạn hợp đồng bảo hiểm",
+        "t_start": "Thời gian bắt đầu hợp đồng bảo hiểm",
+        "t_expired": "Thời gian kết thúc hợp đồng bảo hiểm",
+        "r_claim": "Tỷ lệ chi trả bảo hiểm so với ký quỹ ban đầu",
+        "q_claim": "Số lượng chi trả bảo hiểm khi chạm P-Claim",
+        "margin": "Giá trị ký quỹ hợp đồng bảo hiểm"
     }
 }

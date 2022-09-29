@@ -141,5 +141,18 @@
             "send_success_title": "Your request was sent",
             "send_success_desc": "We will respond within 2-3 working days. Please check your mail box regularly"
         }
+    },
+    "terminology": {
+        "q_covered": "Quanity of covered asset",
+        "p_market": "The current price of the covered asset",
+        "p_claim": "Price activates receiving cover payout",
+        "p_expired": "Price triggers the insurance contract to expire",
+        "p_refund": "Price is within the margin refund terms",
+        "period": "Period of the insurance contract",
+        "t_start": "Time triggers the start of insurance contract",
+        "t_expired": "Time triggers the expiration of insurance contract",
+        "r_claim": "Ratio of  cover payout to Margin ",
+        "q_claim": "Quantity of cover payout when reaching P-Claim",
+        "margin": "Margin of insurance contract"
     }
 }
