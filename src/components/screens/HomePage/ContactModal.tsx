@@ -1,14 +1,14 @@
-import { useTranslation } from 'next-i18next';
-import React, { useCallback, useState } from 'react';
-import { isMobile } from 'react-device-detect';
-import Button from 'components/common/Button/Button';
-import InputField from 'components/common/Input/InputField';
-import CircleSpinner from 'components/common/Loader/CircleSpinner';
-import Modal from 'components/common/Modal/Modal';
-import Config from 'config/config';
-import { API_SUBSCRIBE } from 'services/apis';
-import fetchApi from 'services/fetch-api';
-import { capitalizeFirstLetter } from 'utils/utils';
+import { useTranslation } from 'next-i18next'
+import React, { useCallback, useState } from 'react'
+import { isMobile } from 'react-device-detect'
+import Button from 'components/common/Button/Button'
+import InputField from 'components/common/Input/InputField'
+import CircleSpinner from 'components/common/Loader/CircleSpinner'
+import Modal from 'components/common/Modal/Modal'
+import Config from 'config/config'
+import { API_CONTACT, API_SUBSCRIBE } from 'services/apis'
+import fetchApi from 'services/fetch-api'
+import { capitalizeFirstLetter } from 'utils/utils'
 
 interface ContactModal {
     visible: boolean
@@ -16,9 +16,7 @@ interface ContactModal {
 }
 
 const Success = () => {
-    const {
-        t,
-    } = useTranslation()
+    const { t } = useTranslation()
     return (
         <>
             <div className="flex flex-col items-center justify-center pb-4 text-xl font-medium">
@@ -86,17 +84,17 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
             const { email, request } = reqDetail
 
             const { data, error, message, statusCode } = await fetchApi({
-                url: API_SUBSCRIBE,
+                url: API_CONTACT,
                 options: {
                     method: 'POST',
                 },
                 params: {
                     email,
-                    // request,
+                    content: request,
                 },
             })
             setIsLoading(false)
-            if (statusCode !== 201) {
+            if (statusCode !== 200) {
                 Config.toast.show('error', capitalizeFirstLetter(t(`errors:${message}`)))
             }
             if (data) {
@@ -108,7 +106,7 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
                 position: 'top-right',
             })
         }
-    },[reqDetail])
+    }, [reqDetail])
 
     const handleSubscribe = async () => {
         if (isLoading) return
