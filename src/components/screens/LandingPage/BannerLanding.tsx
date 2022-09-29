@@ -111,9 +111,8 @@ const BannerLanding = () => {
                             </div>
 
                             <div className={'flex flex-row justify-center items-center text-txtSecondary text-sm'}>
-                                <span className={'mr-2'}>P-Claim</span>
-                                <div data-tip={t('common:terminology:p_claim')} data-for={`p_claim`}>
-                                    {' '}
+                                <span className={''}>P-Claim</span>
+                                <div className={'ml-[0.375rem]'} data-tip={t('common:terminology:p_claim')} data-for={`p_claim`}>
                                     <InfoCircle size={14} color={colors.txtSecondary} />
                                     <Tooltip className="max-w-[200px]" id={'p_claim'} placement="bottom" />
                                 </div>
@@ -130,9 +129,8 @@ const BannerLanding = () => {
                             <div className="text-sm text-txtSecondary lg:text-base flex items-center">
                                 {item.title}
                                 {item.tooltip && (
-                                    <div className={'relative'} data-tip={t(item.tooltip)} data-for={item.tooltip}>
-                                        {' '}
-                                        <InfoCircle size={14} color={colors.txtSecondary} />
+                                    <div className={'ml-[0.375rem] relative'} data-tip={t(item.tooltip)} data-for={item.tooltip}>
+                                        <InfoCircle className={''} size={14} color={colors.txtSecondary} />
                                         <Tooltip className="!max-w-[200px] !absolute !right-0 !top-0" id={item.tooltip} placement="top" />
                                     </div>
                                 )}
