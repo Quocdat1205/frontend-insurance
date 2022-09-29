@@ -40,7 +40,7 @@ const SloganLanding = () => {
                 <img
                     src={`/images/screens/landing-page/bg_home.png`}
                     className="m-auto absolute h-full bottom-[196px] right-0 mx-auto left-0 lg:bottom-[15.75rem]
-                        insurance:max-h-[506px] 2xl:max-h-[800px] xl:max-h-[663px]  md:max-h-[420px] max-h-[220px] lg:left-auto "
+                        insurance:max-h-[506px] 3xl:max-h-[800px] 2xl:max-h-[663px]  md:max-h-[420px] max-h-[220px] lg:left-auto "
                 />
             </div>
         </Background>

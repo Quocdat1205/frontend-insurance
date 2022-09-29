@@ -99,7 +99,6 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
         } else setAbleSubmit(false)
     }
 
-
     const validator = (key: string, value?: string) => {
         const rs = { isValid: true, message: '' }
         switch (key) {
@@ -131,12 +130,11 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
             className={'lg:max-w-[600px]'}
             containerClassName="z-[9999999]"
         >
-            {/* <Toas/> */}
-            <div className="flex flex-col justify-center items-center pt-6 pb-6 md:pt-2 text-xl font-medium">
+            <div className="flex flex-col items-center justify-center pt-6 pb-6 text-xl font-medium md:pt-2">
                 <img src="/images/icons/ic_gmail.png" className="w-[80px] h-[80px]" />
-                <div className="text-center pt-6 text-xl">
+                <div className="pt-6 text-xl text-center">
                     {t('common:modal:email_subscription:update_email')}
-                    <div className="text-center text-sm md:text-base text-txtSecondary pt-2">{t('common:modal:email_subscription:update_description')}</div>
+                    <div className="pt-2 text-sm text-center md:text-base text-txtSecondary">{t('common:modal:email_subscription:update_description')}</div>
                 </div>
             </div>
             <InputField
@@ -158,10 +156,10 @@ const UpdateEmailSubscriptionModal = ({ visible, onClose }: UpdateEmailSubscript
                 value={email || ''}
                 placeholder={`${t('common:modal:label_email')}`}
             />
-            <div className="flex justify-center items-center text-base ">
+            <div className="flex items-center justify-center text-base ">
                 <Button
                     variants={'primary'}
-                    className={`mt-4 !w-full h-[48px] !w-[374px] flex justify-center items-center text-white rounded-[8px]`}
+                    className={`mt-4 h-[48px] !w-[374px] flex justify-center items-center text-white rounded-[8px]`}
                     onClick={() => {
                         if (isLoading) return
                         if (email || ableSubmit) {

@@ -105,11 +105,11 @@ const EmailSubscriptionModal = ({ visible, onClose }: EmailRegisterModal) => {
             className={'lg:max-w-[524px]'}
             containerClassName="z-[9999999]"
         >
-            <div className="flex flex-col justify-center items-center pb-5 text-xl font-medium">
+            <div className="flex flex-col items-center justify-center pb-5 text-xl font-medium">
                 <img src="/images/icons/ic_gmail.png" className="w-[80px] h-[80px]" />
-                <div className="text-center pt-6 text-xl">
+                <div className="pt-6 text-xl text-center">
                     {t('common:modal:email_subscription:update_email')}
-                    <div className="text-center text-sm md:text-base text-txtSecondary pt-2">{t('common:modal:email_subscription:description')}</div>
+                    <div className="pt-2 text-sm text-center md:text-base text-txtSecondary">{t('common:modal:email_subscription:description')}</div>
                 </div>
             </div>
             <ErrorSectionNote content={t('common:modal:email_subscription:ignore_description')} />
@@ -123,11 +123,11 @@ const EmailSubscriptionModal = ({ visible, onClose }: EmailRegisterModal) => {
                 value={email || ''}
                 placeholder={`${t('common:modal:label_email')}`}
             />
-            <div className="flex flex-col text-sm overflow-auto -mx-6 px-6 mt-8 ">
-                <div className="flex justify-center items-center text-base">
+            <div className="flex flex-col px-6 mt-8 -mx-6 overflow-auto text-sm ">
+                <div className="flex items-center justify-center text-base">
                     <Button
                         variants={'primary'}
-                        className={`!w-full h-[48px] !w-[374px] flex justify-center items-center text-white rounded-[8px]`}
+                        className={`h-[48px] !w-[374px] flex justify-center items-center text-white rounded-[8px]`}
                         onClick={() => {
                             if (isLoading) return
                             if (!email || !ableSubmit) return

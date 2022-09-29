@@ -53,9 +53,6 @@ const HeaderLanding = () => {
         switch (item?.menuId) {
             case 'modal_contact':
                 setIsShowContactModal(true)
-                // dispatch(setAccount({ address: null, wallet: null }))
-                // Config.logout()
-                // Config.toast.show('success', t('common:disconnect_successful'))
                 break
             default:
                 break
@@ -64,13 +61,13 @@ const HeaderLanding = () => {
 
     return (
         <header className="header-landing h-[4rem] mb:h-[4.25rem] flex items-center px-4 mb:px-10 border-b border-divider sticky top-0 bg-white z-[10]">
-            <div className="max-w-screen-layout 4xl:max-w-screen-4xl m-auto w-full flex items-center justify-between space-x-4 sm:space-x-12">
+            <div className="flex items-center justify-between w-full m-auto space-x-4 max-w-screen-layout 4xl:max-w-screen-4xl sm:space-x-12">
                 <div className={'flex items-center w-full'}>
                     <div className="w-[75px]">
                         <img src="/images/ic_logo.png" />
                     </div>
                     {!isMobile && !loading_account && (
-                        <div className="w-full flex items-center justify-end py-3 mb:py-0 text-sm font-semibold">
+                        <div className="flex items-center justify-end w-full py-3 text-sm font-semibold mb:py-0">
                             <Menu data={Config.landingPageMenu} onChange={onChangeMenu} />
                         </div>
                     )}
@@ -79,7 +76,7 @@ const HeaderLanding = () => {
                 <ContactModal visible={isShowContactModal} onClose={handleCloseContactModal} />
 
                 {!loading_account && (
-                    <div className="flex items-center space-x-6 py-3 mb:py-0 text-sm font-semibold">
+                    <div className="flex items-center py-3 space-x-6 text-sm font-semibold mb:py-0">
                         {!isMobile ? (
                             <>
                                 <ButtonLanguage />

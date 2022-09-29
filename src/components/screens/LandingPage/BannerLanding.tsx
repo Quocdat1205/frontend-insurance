@@ -99,7 +99,7 @@ const BannerLanding = () => {
                     <Tooltip className="max-w-[200px]" id={'common:terminology:margin'} placement="bottom" />
                     <Tooltip className="max-w-[200px]" id={'common:terminology:r_claim'} placement="bottom" />
 
-                    <Item key={'index'} className="flex bg-white col-span-4 lg:col-span-1">
+                    <Item key={'index'} className="flex col-span-4 bg-white lg:col-span-1">
                         <div className="flex flex-col space-y-2 ">
                             <div
                                 className="text-red text-[2rem] lg:text-4xl leading-[3.25rem] font-medium lg:leading-10 lg:font-semibold"
@@ -126,7 +126,7 @@ const BannerLanding = () => {
                                 {formatCurrency(item.value, item.decimal)}
                                 {item?.suffix}
                             </div>
-                            <div className="text-sm text-txtSecondary lg:text-base flex items-center">
+                            <div className="flex items-center text-sm text-txtSecondary lg:text-base">
                                 {item.title}
                                 {item.tooltip && (
                                     <div className={'ml-[0.375rem] relative'} data-tip={t(item.tooltip)} data-for={item.tooltip}>

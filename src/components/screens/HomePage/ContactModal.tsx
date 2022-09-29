@@ -167,7 +167,7 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
                         validator={validator('request')}
                         placeholder={`${t('common:modal:contact:request_placeholder')}`}
                     />
-                    <div className="flex flex-col px-6 -mx-6 mt-8 overflow-auto text-sm">
+                    <div className="flex flex-col px-6 mt-8 -mx-6 overflow-auto text-sm">
                         <div className="flex items-center justify-center text-base">
                             <Button
                                 variants={'primary'}
