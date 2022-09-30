@@ -508,7 +508,6 @@ const InsuranceFrom = () => {
             if (userBalance > 0) {
                 const a = Math.ceil((state.q_covered / userBalance) * 100)
                 console.log(a)
-
                 if ((a >= 99 && a <= 101) || state.q_covered == rangeQ_covered.max) {
                     percentInsurance.current = 100
                 } else if (a >= 74 && a <= 76) {
@@ -594,7 +593,7 @@ const InsuranceFrom = () => {
                 p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
             })
         }
-    }, [state.q_covered, state.margin, state.p_claim])
+    }, [state.q_covered, state.margin, state.p_claim, state.period])
 
     useEffect(() => {
         createSaved()
@@ -909,7 +908,9 @@ const InsuranceFrom = () => {
         switch (key) {
             case 'q_covered':
                 setState({ ...state, [key]: value })
-                percentInsurance.current = 0
+                if (value == 0 || state.q_covered.toString().length > value.toString().length) {
+                    percentInsurance.current = 0
+                }
                 if (value > Number(rangeQ_covered?.max?.toFixed(decimalList.decimal_q_covered)) || value < rangeQ_covered.min || value <= 0) {
                     setIsCanSave(false)
                 } else {
@@ -922,7 +923,9 @@ const InsuranceFrom = () => {
 
                 break
             case 'margin':
-                percentMargin.current = 0
+                if (value == 0 || state.margin.toString().length > value.toString().length) {
+                    percentMargin.current = 0
+                }
                 setState({ ...state, margin: value, percent_margin: 0 })
                 if (value < Number(rangeMargin.min) || value > Number(rangeMargin.max) || value <= 0) {
                     setIsCanSave(false)
