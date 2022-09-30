@@ -20,7 +20,6 @@ import { API_GET_INFO_USER } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { screens } from 'utils/constants'
 import { getModalSubscribeStorage, removeLocalStorage, setModalSubscribeStorage } from 'utils/utils'
-import { contractAddress } from 'components/web3/constants/contractAddress'
 
 const Header = () => {
     const { t } = useTranslation()
