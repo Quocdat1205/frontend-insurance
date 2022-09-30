@@ -84,7 +84,7 @@ const GlossaryModal = ({ visible, onClose }: GlossaryModal) => {
             onBackdropCb={onClose}
             wrapClassName="!p-6"
             className={'lg:max-w-[600px]'}
-            containerClassName="z-[1]"
+            containerClassName="z-[999]"
         >
             <div className="text-xl font-medium mb-6 sm:mb-8 sm:text-center">{t('insurance:guild:the_glossary')}</div>
 

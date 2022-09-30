@@ -23,7 +23,7 @@ const Statistics = ({ unitConfig, hasInsurance, account }: Statistics) => {
     const { t } = useTranslation()
 
     useEffect(() => {
-        if (account && hasInsurance) getIndividualContract(30)
+        if (account && hasInsurance) getIndividualContract(day)
     }, [account, hasInsurance])
 
     const onChangeDay = (_day: number) => {

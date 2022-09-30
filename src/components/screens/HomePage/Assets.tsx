@@ -54,17 +54,10 @@ const Assets = () => {
             })
         } else {
             const newSymbol = {
-                id: item._id,
-                name: item.name,
-                icon: item.attachment,
-                symbol: `${item.symbol}USDT`,
                 type: item.symbol,
-                disable: !item.isActive,
             }
             localStorage.setItem('buy_covered_state', JSON.stringify({ ...newSymbol }))
-            setTimeout(() => {
-                router.push('/buy-covered')
-            }, 2000)
+            router.push('/buy-covered')
         }
     }
 
