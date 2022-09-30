@@ -390,71 +390,30 @@ const InsuranceFrom = () => {
         }
     }
 
-    useEffect(() => {
-        let list = listCoin
-        assetsToken?.map(async (token: any) => {
-            const tmp = {
-                id: token._id,
-                name: token.name,
-                icon: token.attachment,
-                symbol: `${token.symbol}USDT`,
-                type: token.symbol,
-                disable: token.disable,
+    const setDataIcon = async () => {
+        const res: any = await getStorage()
+        const tokenFilter = assetsToken.map((rs: any) => {
+            return {
+                icon: rs?.attachment,
+                id: rs?._id,
+                name: rs?.name,
+                symbol: `${rs.symbol}USDT`,
+                type: rs?.symbol,
+                disable: rs?.disable,
             }
-
-            const res = await getStorage()
-            if (res?.type) {
-                if (tmp.type == res?.type) {
-                    setSelectedCoin({
-                        icon: res?.icon,
-                        id: res?.id,
-                        name: res?.name,
-                        symbol: res?.symbol,
-                        type: res?.type,
-                        disable: res?.disable,
-                    })
-                    setState({
-                        ...state,
-                        symbol: {
-                            icon: res?.icon,
-                            id: res?.id,
-                            name: res?.name,
-                            symbol: res?.symbol,
-                            type: res?.type,
-                            disable: res?.disable,
-                        },
-                    })
-                }
-            } else if (tmp.type == 'BNB') {
-                setSelectedCoin({
-                    id: token._id,
-                    name: token.name,
-                    icon: token.attachment,
-                    symbol: `${token.symbol}USDT`,
-                    type: token.symbol,
-                    disable: token.disable,
-                })
-                setState({
-                    ...state,
-                    symbol: {
-                        id: token._id,
-                        name: token.name,
-                        icon: token.attachment,
-                        symbol: `${token.symbol}USDT`,
-                        type: token.symbol,
-                        disable: token.disable,
-                    },
-                })
-            }
-
-            list.push(tmp)
         })
+        const itemFilter = tokenFilter.find((rs: any) => rs.type === (res?.type || 'BNB'))
+        setSelectedCoin(itemFilter)
+        setState({
+            ...state,
+            symbol: itemFilter,
+        })
+        setListCoin(tokenFilter)
+    }
 
-        if (list.length > 0) {
-            list.sort((a: any, b: any) => {
-                return b.name - a.name
-            })
-            setListCoin(list)
+    useEffect(() => {
+        if (assetsToken) {
+            setDataIcon()
         }
     }, [assetsToken])
 
@@ -478,23 +437,14 @@ const InsuranceFrom = () => {
     }, [selectTime, selectCoin])
 
     useEffect(() => {
-        if (selectCoin.symbol != '') {
+        if (selectCoin?.symbol != '') {
             getPrice(selectCoin.symbol, state, setState)
-            setState({ ...state, symbol: { ...selectCoin }, q_covered: 0, margin: 0, p_claim: 0, period: 2 })
+            setState({ ...state, symbol: { ...selectCoin } })
             getConfig(selectCoin.type)
             getBalaneToken(selectCoin.type)
-
-            let res = {
-                icon: selectCoin.icon,
-                id: selectCoin.id,
-                name: selectCoin.name,
-                symbol: selectCoin.symbol,
-                type: selectCoin.type,
-                disable: selectCoin.disable,
-            }
-
-            localStorage.setItem('buy_covered_state', JSON.stringify(res))
+            localStorage.setItem('buy_covered_state', JSON.stringify(selectCoin))
         }
+        setState({ ...state, q_covered: 0, margin: 0, p_claim: 0, period: 2 })
     }, [selectCoin])
 
     const createSaved = async () => {
@@ -969,16 +919,17 @@ const InsuranceFrom = () => {
                 break
             case 'p_claim':
                 setState({ ...state, [key]: value })
+
+                break
+            case 'margin':
+                percentMargin.current = 0
+                setState({ ...state, margin: value, percent_margin: 0 })
                 if (value < Number(rangeMargin.min) || value > Number(rangeMargin.max) || value <= 0) {
                     setIsCanSave(false)
                 } else {
                     setIsCanSave(true)
                 }
 
-                break
-            case 'margin':
-                percentMargin.current = 0
-                setState({ ...state, margin: value, percent_margin: 0 })
                 break
             default:
                 break
@@ -1000,6 +951,8 @@ const InsuranceFrom = () => {
     useEffect(() => {
         clear.current = handleCheckFinal()
     }, [state])
+
+    console.log(state)
 
     return (
         <>
@@ -1529,7 +1482,7 @@ const InsuranceFrom = () => {
                                     <Modal
                                         portalId="modal"
                                         isVisible={true}
-                                        className={`!sticky !bottom-0 !left-0 !rounded-none !translate-x-0 !translate-y-0 h-1/2 `}
+                                        className={`!sticky !bottom-0 !left-0 !rounded-none !translate-x-0 !translate-y-0 h-1/2 !max-w-full`}
                                         onBackdropCb={() => {
                                             setShowInput({ ...showInput, isShow: false, name: '' })
                                             if (showInput.name == 'q_covered') {
@@ -1629,14 +1582,6 @@ const InsuranceFrom = () => {
                                                     !isCanSave ? 'bg-hover' : 'bg-red'
                                                 } h-[40.5rem] w-full flex justify-center items-center text-white rounded-[0.5rem] py-[12px]`}
                                                 onClick={() => {
-                                                    // if (showInput.name === 'q_covered') {
-                                                    //     onHandleChange('q_covered', tmp_q_covered.current)
-                                                    //     return setShowInput({ ...showInput, isShow: false, name: '' })
-                                                    // }
-                                                    // if (showInput.name === 'margin') {
-                                                    //     onHandleChange('margin', tmp_margin.current)
-                                                    //     return setShowInput({ ...showInput, isShow: false, name: '' })
-                                                    // }
                                                     setShowInput({ ...showInput, isShow: false, name: '' })
                                                 }}
                                             >
@@ -1647,9 +1592,11 @@ const InsuranceFrom = () => {
                                 )}
                                 {openChangeToken && (
                                     <Modal
+                                        wrapClassName="!w-full"
+                                        containerClassName="!w-full"
                                         portalId="modal"
                                         isVisible={true}
-                                        className=" bg-white !sticky !bottom-0 !left-0 !rounded-none !translate-x-0 !translate-y-0 h-1/2"
+                                        className=" bg-white !max-w-full !w-full !sticky !bottom-0 !left-0 !rounded-none !translate-x-0 !translate-y-0 h-1/2"
                                         onBackdropCb={() => {
                                             setShowInput({ isShow: true, name: 'q_covered' })
                                             setOpenChangeToken(false)

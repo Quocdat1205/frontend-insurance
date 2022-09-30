@@ -101,8 +101,8 @@ const Modal = ({
                     <div
                         ref={wrapperRef}
                         className={classnames(
-                            'w-full absolute bg-white overflow-auto max-h-full',
-                            { 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl': !isMobile || (width && width >= screens.drawer) },
+                            'w-full absolute bg-white overflow-auto max-h-[90%]',
+                            { 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl max-w-[90%] min-w-[390px]': !isMobile || (width && width >= screens.drawer) },
                             className,
                         )}
                     >
