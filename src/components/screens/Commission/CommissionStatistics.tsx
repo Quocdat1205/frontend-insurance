@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { CalendarIcon, FilterIcon } from 'components/common/Svg/SvgIcon'
 import colors from 'styles/colors'
-import { formatNumber } from 'utils/utils'
+import { formatNumber, formatTime } from 'utils/utils'
 import DateRangePicker from 'components/common/DatePicker/DateRangePicker'
 
 interface CommissionStatistics {
@@ -66,7 +66,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2 }: CommissionStat
         i18n: { language },
     } = useTranslation()
 
-    const [filter, setFilter] = useState({
+    const [filter, setFilter] = useState<any>({
         ...days[0],
     })
 
@@ -77,7 +77,19 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2 }: CommissionStat
     })
 
     const onChangePicker = (e: any) => {
-        console.log(e)
+        const from = startOfDay(e?.startDate).valueOf()
+        const to = endOfDay(e?.endDate).valueOf()
+        setPicker(e)
+        setFilter({ from: from, to: to })
+    }
+
+    const onReset = () => {
+        setFilter(days[0])
+        setPicker({
+            startDate: null,
+            endDate: new Date(''),
+            key: 'selection',
+        })
     }
 
     return (
@@ -101,13 +113,21 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2 }: CommissionStat
                             value={picker}
                             onChange={onChangePicker}
                             customLabel={() => (
-                                <div className="px-4 py-2 rounded-full bg-hover cursor-pointer flex items-center space-x-2">
-                                    <CalendarIcon color={colors.gray.gray} size={16} />
-                                    <span>Tuỳ chỉnh</span>
+                                <div
+                                    className={`px-4 py-2 rounded-full bg-hover cursor-pointer flex items-center space-x-2 ${
+                                        !filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
+                                    }`}
+                                >
+                                    <CalendarIcon color={!filter?.id ? colors.red.red : colors.gray.gray} size={16} />
+                                    <span>
+                                        {picker?.startDate
+                                            ? formatTime(picker?.startDate, 'dd.MM.yyyy') + ' - ' + formatTime(picker?.endDate, 'dd.MM.yyyy')
+                                            : 'Tuỳ chỉnh'}
+                                    </span>
                                 </div>
                             )}
                         />
-                        <div onClick={() => setFilter(days[0])} className="px-4 py-2 rounded-full bg-hover cursor-pointer flex items-center text-red">
+                        <div onClick={onReset} className="px-4 py-2 rounded-full bg-hover cursor-pointer flex items-center text-red">
                             Đặt lại
                         </div>
                     </div>

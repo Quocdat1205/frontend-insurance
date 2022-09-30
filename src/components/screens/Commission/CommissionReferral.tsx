@@ -64,16 +64,16 @@ const CommissionReferral = ({ account, decimal = 2, commissionConfig, userInfo }
         <>
             <div className="flex flex-col mb:flex-row items-center justify-between relative">
                 <div className="flex flex-col items-center text-center sm:text-left sm:items-start  max-w-[600px]">
-                    <div className="text-4xl mb:text-[3rem] mb:leading-[4rem] font-semibold">Giới thiệu bạn mới Thưởng lợi nhuận vô hạn</div>
+                    <div className="text-4xl mb:text-[3rem] mb:leading-[4rem] font-semibold">Giới thiệu thêm bạn Nhận lợi nhuận vô hạn</div>
                     <div className="mt-4 text-sm sm:text-base">Thưởng đến 10% hoa hồng mỗi khi bạn bè của bạn ký quỹ hợp đồng bảo hiểm thành công</div>
-                    {!account && <Button className="px-6 py-3 w-full sm:w-max mt-8">{t('home:home:connect_wallet')}</Button>}
+                    {!account?.address && <Button className="px-6 py-3 w-max mt-8">{t('home:home:connect_wallet')}</Button>}
                 </div>
                 <div className="w-full h-full max-w-[554px] lg:h-[492px] mt-12 mb:mt-0">
                     <img src="/images/screens/commission/bg_commission.png" className="w-full h-full" />
                 </div>
             </div>
             {account?.address && (
-                <div className="border border-red shadow-dropdown rounded-xl p-6 flex flex-col md:flex-row flex-wrap lg:flex-nowrap md:items-center mt-8">
+                <div className="border border-red shadow-dropdown rounded-xl p-4 sm:p-6 flex flex-col md:flex-row flex-wrap lg:flex-nowrap md:items-center mt-8">
                     <div className="flex flex-col space-y-2 mr-8">
                         <div className="text-txtSecondary text-sm sm:text-base">Mã giới thiệu</div>
                         <div className="flex items-center space-x-4">
@@ -94,18 +94,18 @@ const CommissionReferral = ({ account, decimal = 2, commissionConfig, userInfo }
                             />
                         </div>
                     </div>
-                    <div className="bg-hover rounded-xl p-4 mt-6 lg:mt-0 lg:ml-20 min-w-[390px] w-full">
-                        <div className="text-txtSecondary text-sm sm:text-base mb-2">Phần trăm hoa hồng hiện tại</div>
+                    <div className="bg-hover rounded-xl p-4 mt-6 lg:mt-0 lg:ml-20 sm:min-w-[390px] w-full">
+                        <div className="text-txtSecondary text-sm sm:text-base mb-2">Mức hoa hồng hiện tại</div>
                         <div className="flex items-center space-x-4 md:space-x-8">
                             <div className="text-xl sm:text-5xl font-medium sm:font-semibold text-red">
                                 {general.percent < 10 ? `0${general.percent || ''}` : general.percent}%
                             </div>
                             <div className="w-full flex flex-col space-y-2">
-                                <div className="flex items-center justify-between text-xs">
-                                    <div>
+                                <div className="flex items-center justify-between text-xs font-medium">
+                                    <div className="">
                                         ${formatNumber(userInfo?.totalMarginChildren, decimal)}/${formatNumber(general?.limit, decimal)}
                                     </div>
-                                    <div className="text-red">Phần trăm tiếp theo: {general.next < 10 ? `0${general.next || ''}` : general.next}%</div>
+                                    <div className="text-red">Tiếp theo: {general.next < 10 ? `0${general.next || ''}` : general.next}%</div>
                                 </div>
                                 <Progressbar percent={general.progress} height={width && width < 640 ? 4 : 10} />
                             </div>

@@ -1,9 +1,12 @@
 import Tabs, { TabItem } from 'components/common/Tabs/Tabs'
-import React, { useState } from 'react'
-import FriendsTab from './FriendsTab'
+import React, { useEffect, useState } from 'react'
 import TransactionsTab from './TransactionsTab'
-import { formatNumber } from '../../../utils/utils'
+import { formatNumber } from 'utils/utils'
 import { UnitConfig } from 'types/types'
+import dynamic from 'next/dynamic'
+const FriendsTab = dynamic(() => import('components/screens/Commission/FriendsTab'), {
+    ssr: false,
+})
 
 const tabs = {
     Friends: 'Friends',
@@ -19,6 +22,10 @@ const CommissionTable = ({ account, unitConfig }: CommissionTable) => {
     const [tab, setTab] = useState<String>(tabs.Friends)
     const [friends, setFriends] = useState({ total: 0, totalDeposit: 0 })
 
+    useEffect(() => {
+        setFriends({ total: 0, totalDeposit: 0 })
+    }, [tab])
+
     return (
         <div>
             <Tabs tab={tab}>
@@ -29,6 +36,7 @@ const CommissionTable = ({ account, unitConfig }: CommissionTable) => {
                     Lịch sử giao dịch
                 </TabItem>
             </Tabs>
+            <div className="font-semibold mt-6 flex sm:hidden">{tabs.Friends === tab ? 'Danh sách bạn bè' : 'Lịch sử giao dịch'}</div>
             {tabs.Friends === tab && account?.address && (
                 <div className="mt-6 flex flex-col sm:flex-row items-center">
                     <div className="flex items-center shadow-table p-4 sm:p-6 bg-white rounded-xl w-full">
@@ -53,7 +61,7 @@ const CommissionTable = ({ account, unitConfig }: CommissionTable) => {
                     </div>
                 </div>
             )}
-            <div className="shadow-table rounded-xl mt-6 p-8">
+            <div className="sm:shadow-table sm:rounded-xl mt-6 sm:p-8">
                 {tabs.Friends === tab && <FriendsTab unitConfig={unitConfig} account={account} setFriends={setFriends} />}
                 {tabs.Transactions === tab && <TransactionsTab unitConfig={unitConfig} account={account} />}
             </div>

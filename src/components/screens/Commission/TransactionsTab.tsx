@@ -1,12 +1,14 @@
+import Spinner from 'components/common/Loader/Spinner'
 import NoData from 'components/common/NoData/NoData'
 import DataTable from 'components/common/Table/DataTable'
 import useWindowSize from 'hooks/useWindowSize'
+import { useTranslation } from 'next-i18next'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { isMobile as mobile } from 'react-device-detect'
 import { API_GET_COMMISSION_HISTORY } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { UnitConfig } from 'types/types'
-import { formatCurrency, formatTime } from 'utils/utils'
+import { formatAddress, formatCurrency, formatTime } from 'utils/utils'
 
 interface TransactionsTab {
     account: any
@@ -14,6 +16,7 @@ interface TransactionsTab {
 }
 
 const TransactionsTab = ({ account, unitConfig }: TransactionsTab) => {
+    const { t } = useTranslation()
     const { width } = useWindowSize()
     const isMobile = (width && width <= 640) || mobile
     const [loading, setLoading] = useState<boolean>(true)
@@ -72,8 +75,8 @@ const TransactionsTab = ({ account, unitConfig }: TransactionsTab) => {
         setFilter({ ...filter, skip: (page - 1) * filter.limit })
     }
 
-    const renderType = (e: any) => {
-        return e.value === 'in' ? 'Nhận hoa hồng' : 'Rút hoa hồng'
+    const renderType = ({ type }: any) => {
+        return type === 'in' ? 'Nhận hoa hồng' : 'Rút hoa hồng'
     }
 
     const columns = useMemo(
@@ -88,7 +91,7 @@ const TransactionsTab = ({ account, unitConfig }: TransactionsTab) => {
                 Header: 'Loại giao dịch',
                 accessor: 'type',
                 minWidth: 200,
-                Cell: (e: any) => renderType(e),
+                Cell: (e: any) => renderType(e?.row?.original),
             },
             {
                 Header: 'Số tiền',
@@ -100,21 +103,36 @@ const TransactionsTab = ({ account, unitConfig }: TransactionsTab) => {
                 Header: 'Địa chỉ ví',
                 accessor: 'walletAddress',
                 minWidth: 200,
-                Cell: (e: any) => <div>{e.value?.length > 10 ? String(e.value).substr(0, 10) + '...' + String(e.value).substr(-4) : e.value}</div>,
+                Cell: (e: any) => <div>{formatAddress(e.value)}</div>,
             },
         ],
         [unitConfig],
     )
+
+    const totalPage = useMemo(() => {
+        return Math.ceil(dataSource?.count / filter?.limit)
+    }, [dataSource?.count, filter])
+
+    const hasNext = useMemo(() => {
+        return Math.ceil(filter.skip / filter?.limit) + 1 < totalPage || loading
+    }, [filter, totalPage, loading])
+
+    const onLoadMore = () => {
+        if (loading) return
+        setLoading(true)
+        setFilter({ ...filter, skip: filter.limit + filter.skip })
+    }
+
     return (
         <>
-            <div className="text-xl font-medium mb-6">Lịch sử giao dịch</div>
+            <div className="text-xl font-medium mb-6 hidden sm:flex">Lịch sử giao dịch</div>
             {(dataSource?.listHistory.length <= 0 || !account.address) && !loading ? (
                 <NoData
                     className="py-20"
                     showButton={!account.address}
                     textContent={!account.address ? `Vui lòng kết nối ví để xem danh sách bạn bè` : 'Không có dữ liệu để hiển thị'}
                 />
-            ) : (
+            ) : !isMobile ? (
                 <DataTable
                     data={dataSource?.listHistory ?? []}
                     total={dataSource?.count ?? 0}
@@ -124,6 +142,40 @@ const TransactionsTab = ({ account, unitConfig }: TransactionsTab) => {
                     loading={loading}
                     onChangePage={onChangePage}
                 />
+            ) : (
+                <div className="flex flex-col space-y-6">
+                    {dataSource?.listHistory?.map((item: any, index: number) => {
+                        return (
+                            <div key={index} className="rounded-xl bg-hover p-4">
+                                <div className="font-medium">Ngày phát sinh: {formatTime(item?.createdAt, 'dd.MM.yyyy')}</div>
+                                <div className="flex flex-col text-sm w-full divide-y divide-divider mt-6">
+                                    <div className="flex items-center pb-2 justify-between">
+                                        <div className="text-txtSecondary">Loại giao dịch</div>
+                                        <div className="font-semibold">{renderType(item)}</div>
+                                    </div>
+                                    <div className="flex items-center py-2 justify-between">
+                                        <div className="text-txtSecondary">Số tiền</div>
+                                        <div className="font-semibold">
+                                            {formatCurrency(item?.amount, unitConfig.assetDigit ?? 2) + ` ${unitConfig.assetCode}`}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center py-2 justify-between">
+                                        <div className="text-txtSecondary">Địa chỉ ví</div>
+                                        <div className="font-semibold">
+                                            {item?.type === 'in' ? 'Từ' : 'Đến'}&nbsp;
+                                            {formatAddress(item?.walletAddress)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
+                    {totalPage > 1 && hasNext && (
+                        <div onClick={onLoadMore} className="text-red underline text-sm mt-6 flex text-center justify-center cursor-pointer">
+                            {loading ? <Spinner /> : t('common:load_more')}
+                        </div>
+                    )}
+                </div>
             )}
         </>
     )

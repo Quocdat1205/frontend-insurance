@@ -3,7 +3,6 @@ import React, { ReactNode, useEffect, useMemo, useRef, useState, Fragment } from
 import styled from 'styled-components'
 import colors from 'styles/colors'
 import { isMobile } from 'react-device-detect'
-import Config from 'config/config'
 
 interface Tabs {
     children: any

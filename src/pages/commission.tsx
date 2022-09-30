@@ -47,7 +47,7 @@ const Commission = () => {
     return (
         <LayoutWeb3 sponsor={false}>
             <div className="px-4 mb:px-10 lg:px-20">
-                <div className="pt-10 max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
+                <div className="pt-20 sm:pt-10 max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
                     <CommissionReferral account={account} decimal={unitConfig?.assetDigit} commissionConfig={commissionConfig} userInfo={userInfo} />
                 </div>
             </div>

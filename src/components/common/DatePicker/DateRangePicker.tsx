@@ -5,7 +5,7 @@ import colors from 'styles/colors'
 import { CalendarIcon } from 'components/common/Svg/SvgIcon'
 import vi from 'date-fns/locale/vi'
 import en from 'date-fns/locale/en-US'
-import { DateRangePicker } from 'react-date-range'
+import { Calendar, DateRangePicker } from 'react-date-range'
 import 'react-date-range/dist/styles.css' // main css file
 import 'react-date-range/dist/theme/default.css' // theme css file
 import { formatTime } from 'utils/utils'
@@ -31,7 +31,7 @@ interface ReactDateRangePicker {
     renderContent?: any
     prefix?: string
     isClearable?: boolean
-    isRange?: boolean
+    range?: boolean
     customLabel?: any
 }
 const ReactDateRangePicker = (props: ReactDateRangePicker) => {
@@ -54,7 +54,7 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
         renderContent,
         prefix,
         isClearable = false,
-        isRange = true,
+        range = true,
         customLabel,
     } = props
 
@@ -72,7 +72,7 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
         setDate(value)
     }, [value, showPicker])
 
-    const navigatorRenderer = (focusedDate: any, changeShownDate: any, props: any) => {
+    const navigatorRenderer: any = (focusedDate: any, changeShownDate: any, props: any) => {
         return (
             <div className="flex items-center justify-between absolute px-4 w-full top-[1.375rem]">
                 <div className="cursor-pointer" onClick={() => changeShownDate(-1, 'monthOffset')}>
@@ -86,7 +86,7 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
     }
 
     const _onChange = (e: any) => {
-        if (isRange) {
+        if (range) {
             setDate(e[date.key])
         } else {
             setDate({
@@ -157,27 +157,41 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
                     leaveTo="opacity-0 translate-y-1"
                 >
                     <div className={`${className} right-0 absolute z-10 top-[3.5rem] bg-white`}>
-                        <div className="rounded-xl shadow-subMenu overflow-hidden">
+                        <div className="rounded-xl shadow-subMenu overflow-hidden pt-6">
                             {renderContent && renderContent()}
-                            <DateRangePicker
-                                className={`relative h-full ${!isRange ? 'single-select' : ''}`}
-                                date={date.startDate}
-                                ranges={[date]}
-                                months={2}
-                                onChange={_onChange}
-                                moveRangeOnFirstSelection={!isRange}
-                                direction="horizontal"
-                                locale={language === 'vi' ? vi : en}
-                                staticRanges={[]}
-                                inputRanges={[]}
-                                weekStartsOn={0}
-                                rangeColors={[colors.red.red]}
-                                editableDateInputs={true}
-                                retainEndDateOnFirstSelection
-                                navigatorRenderer={navigatorRenderer}
-                            />
+                            {range ? (
+                                <DateRangePicker
+                                    className={`relative h-full`}
+                                    ranges={[date]}
+                                    months={2}
+                                    onChange={_onChange}
+                                    moveRangeOnFirstSelection={false}
+                                    direction="horizontal"
+                                    locale={language === 'vi' ? vi : en}
+                                    staticRanges={[]}
+                                    inputRanges={[]}
+                                    weekStartsOn={0}
+                                    rangeColors={[colors.red.red]}
+                                    editableDateInputs={true}
+                                    retainEndDateOnFirstSelection
+                                    navigatorRenderer={navigatorRenderer}
+                                />
+                            ) : (
+                                <Calendar
+                                    className={`relative h-full single-select`}
+                                    date={date.startDate}
+                                    months={2}
+                                    onChange={_onChange}
+                                    direction="horizontal"
+                                    locale={language === 'vi' ? vi : en}
+                                    weekStartsOn={0}
+                                    rangeColors={[colors.red.red]}
+                                    editableDateInputs={true}
+                                    navigatorRenderer={navigatorRenderer}
+                                />
+                            )}
                             <div className="mx-6 mt-3 mb-8">
-                                <Button onClick={() => onConfirm(close)} variants="primary" className="w-full text-sm h-[3rem]">
+                                <Button disabled={!date?.startDate} onClick={() => onConfirm(close)} variants="primary" className="w-full text-sm h-[3rem]">
                                     {t('common:confirm')}
                                 </Button>
                             </div>

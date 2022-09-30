@@ -5,8 +5,10 @@ import fetchApi from 'services/fetch-api'
 import { isMobile as mobile } from 'react-device-detect'
 import DataTable from 'components/common/Table/DataTable'
 import useWindowSize from 'hooks/useWindowSize'
-import { formatCurrency, formatTime } from 'utils/utils'
+import { formatAddress, formatCurrency, formatTime } from 'utils/utils'
 import { UnitConfig } from 'types/types'
+import Spinner from 'components/common/Loader/Spinner'
+import { useTranslation } from 'next-i18next'
 
 interface FriendsTab {
     account: any
@@ -15,6 +17,7 @@ interface FriendsTab {
 }
 
 const FriendsTab = ({ account, setFriends, unitConfig }: FriendsTab) => {
+    const { t } = useTranslation()
     const { width } = useWindowSize()
     const isMobile = (width && width <= 640) || mobile
     const [loading, setLoading] = useState<boolean>(true)
@@ -80,7 +83,7 @@ const FriendsTab = ({ account, setFriends, unitConfig }: FriendsTab) => {
                 Header: 'Địa chỉ ví',
                 accessor: 'child',
                 minWidth: 200,
-                Cell: (e: any) => <div>{e.value?.length > 10 ? String(e.value).substr(0, 10) + '...' + String(e.value).substr(-4) : e.value}</div>,
+                Cell: (e: any) => <div>{formatAddress(e.value)}</div>,
             },
             {
                 Header: 'Thời gian gắn',
@@ -110,16 +113,30 @@ const FriendsTab = ({ account, setFriends, unitConfig }: FriendsTab) => {
         [unitConfig],
     )
 
+    const totalPage = useMemo(() => {
+        return Math.ceil(dataSource?.count / filter?.limit)
+    }, [dataSource?.count, filter])
+
+    const hasNext = useMemo(() => {
+        return Math.ceil(filter.skip / filter?.limit) + 1 < totalPage || loading
+    }, [filter, totalPage, loading])
+
+    const onLoadMore = () => {
+        if (loading) return
+        setLoading(true)
+        setFilter({ ...filter, skip: filter.limit + filter.skip })
+    }
+
     return (
         <>
-            <div className="text-xl font-medium mb-6">Danh sách bạn bè</div>
+            <div className="text-xl font-medium mb-6 hidden sm:flex">Danh sách bạn bè</div>
             {(dataSource.listFriends.length <= 0 || !account.address) && !loading ? (
                 <NoData
                     className="py-20"
                     showButton={!account.address}
                     textContent={!account.address ? `Vui lòng kết nối ví để xem danh sách bạn bè` : 'Không có dữ liệu để hiển thị'}
                 />
-            ) : (
+            ) : !isMobile ? (
                 <DataTable
                     data={dataSource?.listFriends ?? []}
                     total={dataSource?.count ?? 0}
@@ -129,6 +146,43 @@ const FriendsTab = ({ account, setFriends, unitConfig }: FriendsTab) => {
                     loading={loading}
                     onChangePage={onChangePage}
                 />
+            ) : (
+                <div className="flex flex-col space-y-6">
+                    {dataSource?.listFriends?.map((item: any, index: number) => {
+                        return (
+                            <div key={index} className="rounded-xl bg-hover p-4">
+                                <div className="font-medium">Ví: {formatAddress(item.child)}</div>
+                                <div className="flex flex-col text-sm w-full divide-y divide-divider mt-6">
+                                    <div className="flex items-center pb-2 justify-between">
+                                        <div className="text-txtSecondary">Thời gian gắn</div>
+                                        <div className="font-semibold">{formatTime(item.createdAt, 'dd.MM.yyyy')}</div>
+                                    </div>
+                                    <div className="flex items-center py-2 justify-between">
+                                        <div className="text-txtSecondary">Tổng HĐBH</div>
+                                        <div className="font-semibold">{formatCurrency(item.totalInsurance)}</div>
+                                    </div>
+                                    <div className="flex items-center py-2 justify-between">
+                                        <div className="text-txtSecondary">Tổng margin</div>
+                                        <div className="font-semibold">
+                                            {formatCurrency(item.totalMargin, unitConfig.assetDigit ?? 2)} {unitConfig.assetCode}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center pt-2 justify-between">
+                                        <div className="text-txtSecondary">Tổng hoa hồng</div>
+                                        <div className="font-semibold">
+                                            {formatCurrency(item.totalCommission, unitConfig.assetDigit ?? 2)} {unitConfig.assetCode}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
+                    {totalPage > 1 && hasNext && (
+                        <div onClick={onLoadMore} className="text-red underline text-sm mt-6 flex text-center justify-center cursor-pointer">
+                            {loading ? <Spinner /> : t('common:load_more')}
+                        </div>
+                    )}
+                </div>
             )}
         </>
     )
