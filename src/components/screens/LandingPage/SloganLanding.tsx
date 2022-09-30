@@ -38,9 +38,9 @@ const SloganLanding = () => {
                 </div>
                 {/*  */}
                 <img
-                    src={`/images/screens/landing-page/bg_home.png`}
-                    className="m-auto absolute h-full bottom-[196px] right-0 mx-auto left-0 lg:bottom-[15.75rem]
-                        insurance:max-h-[506px] 3xl:max-h-[800px] 2xl:max-h-[663px]  md:max-h-[420px] max-h-[220px] lg:left-auto "
+                    srcSet={`/images/screens/landing-page/bg_home.png 2x`}
+                    className="w-full sm:w-auto m-auto absolute h-full bottom-[196px] right-0 mx-auto  lg:left-auto  left-0 lg:bottom-[15.75rem]
+                     max-h-[220px] 1xs:!max-h-[300px] tiny:max-h-[240px] sm:!max-h-[400px] mb:!max-h-[406px] xl:1max-h-[463px] 2xl:!max-h-[663px] homeNav:!max-h-[406px]"
                 />
             </div>
         </Background>

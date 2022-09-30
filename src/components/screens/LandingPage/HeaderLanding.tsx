@@ -76,7 +76,7 @@ const HeaderLanding = () => {
                 <ContactModal visible={isShowContactModal} onClose={handleCloseContactModal} />
 
                 {!loading_account && (
-                    <div className="flex items-center py-3 space-x-6 text-sm font-semibold mb:py-0">
+                    <div className="flex items-center py-3 space-x-4 !ml-6 text-sm font-semibold mb:py-0">
                         {!isMobile ? (
                             <>
                                 <ButtonLanguage />
