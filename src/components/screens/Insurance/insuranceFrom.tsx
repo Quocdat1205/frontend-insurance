@@ -261,8 +261,6 @@ const InsuranceFrom = () => {
 
                         return Number(ethers.utils.formatEther(balanceUsdt))
                     } else {
-                        console.log('null USDT')
-
                         setUserBalance(0)
                         return 0
                     }
@@ -279,8 +277,6 @@ const InsuranceFrom = () => {
                         setUserBalance(Number(Number(ethers.utils.formatEther(balanceETH)).toFixed(decimalList.decimal_q_covered)))
                         return Number(ethers.utils.formatEther(balanceETH))
                     } else {
-                        console.log('null ETH')
-
                         setUserBalance(0)
                         return 0
                     }
@@ -297,7 +293,6 @@ const InsuranceFrom = () => {
                         console.log(Number(Number(state.p_market)), 'balance')
                         return Number(ethers.utils.formatEther(balanceBTC))
                     } else {
-                        console.log('null BTC')
                         setUserBalance(0)
                         return 0
                     }
@@ -513,13 +508,9 @@ const InsuranceFrom = () => {
         if (state.p_claim < state.p_market) {
             setSaved(state.q_claim + y - state.margin + z)
         } else {
-            console.log(state.q_claim + y - state.margin, 'saved')
-
             setSaved(state.q_claim + y - state.margin)
         }
     }
-
-    console.log(tab)
 
     useEffect(() => {
         const res_q_covered = validator('p_claim')
@@ -619,8 +610,50 @@ const InsuranceFrom = () => {
             }
         }
 
-        if (res_q_covered.isValid) {
-            if (state.q_covered && state.p_claim && tab != 6 && tab != 1) {
+        if (state.q_covered > 0 && state.p_claim > 0 && tab != 6 && tab != 1) {
+            const margin = Number((8 * state.q_covered * state.p_market) / 100)
+            const userCapital = margin
+            const systemCapital = userCapital
+            const hedge_capital = userCapital + systemCapital
+            const hedge = Number(margin / (state.q_covered * state.p_market))
+            const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
+            const laverage = Leverage(state.p_market, p_stop)
+            const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
+            const q_claim = Number((ratio_profit / 2) * hedge_capital * laverage) * (1 - 0.05) + margin
+            setState({
+                ...state,
+                q_claim: Number(q_claim.toFixed(decimalList.decimal_q_covered)),
+                r_claim: Number((Number(q_claim / margin) * 100).toFixed(decimalList.decimal_q_covered)),
+                p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
+                margin: Number(margin.toFixed(decimalList.decimal_margin)),
+            })
+        }
+
+        if (state.q_covered > 0 && state.p_claim > 0 && state.margin > 0 && tab != 0) {
+            const userCapital = state.margin
+            const systemCapital = userCapital
+            const hedge_capital = userCapital + systemCapital
+            const hedge = Number(state.margin / (state.q_covered * state.p_market))
+            const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
+            const laverage = Leverage(state.p_market, p_stop)
+            const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
+            const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + state.margin
+            setState({
+                ...state,
+                q_claim: Number(q_claim.toFixed(decimalList.decimal_q_covered)),
+                r_claim: Number((Number(q_claim / state.margin) * 100).toFixed(decimalList.decimal_q_covered)),
+                p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
+            })
+        }
+    }, [state.q_covered, state.margin, state.p_claim])
+
+    useEffect(() => {
+        createSaved()
+    }, [state])
+
+    useEffect(() => {
+        if (tab === 0 || tab === 3) {
+            if (state.q_covered && state.p_claim) {
                 const margin = Number((8 * state.q_covered * state.p_market) / 100)
                 const userCapital = margin
                 const systemCapital = userCapital
@@ -629,63 +662,17 @@ const InsuranceFrom = () => {
                 const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
                 const laverage = Leverage(state.p_market, p_stop)
                 const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-                const q_claim = Number((ratio_profit / 2) * hedge_capital * laverage) * (1 - 0.05) + margin
+                const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
                 setState({
                     ...state,
-                    q_claim: Number(q_claim.toFixed(decimalList.decimal_q_covered)),
+                    q_claim: Number(q_claim.toFixed(2)),
                     r_claim: Number((Number(q_claim / margin) * 100).toFixed(decimalList.decimal_q_covered)),
                     p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
                     margin: Number(margin.toFixed(decimalList.decimal_margin)),
                 })
             }
-
-            if (state.q_covered && state.p_claim && state.margin) {
-                const userCapital = state.margin
-                const systemCapital = userCapital
-                const hedge_capital = userCapital + systemCapital
-                const hedge = Number(state.margin / (state.q_covered * state.p_market))
-                const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
-                const laverage = Leverage(state.p_market, p_stop)
-                const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-                const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + state.margin
-                setState({
-                    ...state,
-                    q_claim: Number(q_claim.toFixed(decimalList.decimal_q_covered)),
-                    r_claim: Number((Number(q_claim / state.margin) * 100).toFixed(decimalList.decimal_q_covered)),
-                    p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
-                })
-            }
-        } else {
-            setSaved(0)
         }
-    }, [state.q_covered, state.margin, state.p_claim])
-
-    useEffect(() => {
-        createSaved()
-    }, [state])
-
-    // useEffect(() => {
-    //     if (tab === 0 || tab === 3) {
-    //         if (state.q_covered && state.p_claim) {
-    //             const margin = Number((8 * state.q_covered * state.p_market) / 100)
-    //             const userCapital = margin
-    //             const systemCapital = userCapital
-    //             const hedge_capital = userCapital + systemCapital
-    //             const hedge = Number(margin / (state.q_covered * state.p_market))
-    //             const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
-    //             const laverage = Leverage(state.p_market, p_stop)
-    //             const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-    //             const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
-    //             setState({
-    //                 ...state,
-    //                 q_claim: Number(q_claim.toFixed(2)),
-    //                 r_claim: Number((Number(q_claim / margin) * 100).toFixed(decimalList.decimal_q_covered)),
-    //                 p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
-    //                 margin: Number(margin.toFixed(decimalList.decimal_margin)),
-    //             })
-    //         }
-    //     }
-    // }, [tab])
+    }, [tab])
 
     useEffect(() => {
         const defaultQ_covered = pair_configs?.filters?.find((e: any) => {
@@ -749,7 +736,6 @@ const InsuranceFrom = () => {
             if (item?.filterType === 'PRICE_FILTER') {
                 setPriceFilter({ ...item })
                 const decimal_p_claim = countDecimals(Number(item.tickSize))
-                console.log(item.tickSize, 'decimal p-claim')
 
                 _decimalList.decimal_p_claim = +decimal_p_claim
 
@@ -1006,8 +992,6 @@ const InsuranceFrom = () => {
         } else if (state.q_covered <= 0 || state.margin <= 0 || state.p_claim <= 0) {
             return false
         } else if (userBalance == null || userBalance == 0) {
-            console.log('userBalance = 0 | null')
-
             return false
         } else {
             return true
@@ -1017,8 +1001,6 @@ const InsuranceFrom = () => {
     useEffect(() => {
         clear.current = handleCheckFinal()
     }, [state])
-
-    console.log(clear.current, userBalance)
 
     return (
         <>
@@ -1046,29 +1028,6 @@ const InsuranceFrom = () => {
                                         <HeaderContent state={tab} setState={setTab} props={state} setProps={setState} wallet={wallet} auth={account.address} />
                                     }
 
-                                    {
-                                        //checkAuth
-                                        account.address == null
-                                            ? !isMobile && (
-                                                  <div
-                                                      className="w-full flex flex-col justify-center items-center max-w-screen-layout 4xl:max-w-screen-3xl m-auto mb-[1rem]"
-                                                      onClick={() => {
-                                                          setChosing(false)
-                                                      }}
-                                                  >
-                                                      <Button
-                                                          variants={'primary'}
-                                                          className={`bg-red h-[40.5rem] w-[374px] flex justify-center items-center text-white rounded-[0.5rem] py-[12px]`}
-                                                          onClick={() => {
-                                                              Config.connectWallet()
-                                                          }}
-                                                      >
-                                                          {t('insurance:buy:connect_wallet')}
-                                                      </Button>
-                                                  </div>
-                                              )
-                                            : ''
-                                    }
                                     <div className="  flex flex-row mb-[8rem] overflow-hidden">
                                         <div className="w-8/12">
                                             {
