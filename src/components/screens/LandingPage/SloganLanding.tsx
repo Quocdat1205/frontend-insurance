@@ -17,52 +17,45 @@ const SloganLanding = () => {
 
     return (
         <Background>
-            {/* <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto slider-landing flex flex-col space-y-6 sm:space-y-0 sm:flex-row items-center justify-between mt-[4.25rem] sm:mt-9 mt-[4.25rem] sm:mt-9 h-[calc(100vh-300px)] sm:h-auto"> */}
-            {/* <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto slider-landing flex flex-col space-y-6 lg:space-y-0 lg:flex-row items-center justify-between max-h-[calc(100vh-68px)] lg:h-auto"> */}
-            <div
-                className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto slider-landing flex flex-col space-y-6 lg:space-y-0 lg:flex-row items-center md:justify-between
-                h-full"
-            >
-                <div className="flex flex-col space-y-6 lg:space-y-9 w-full">
-                    <div className="flex flex-col space-y-2 pt-[4.25rem] lg:pt-0 text-center lg:text-left font-semibold">
-                        <span className="text-[2rem] leading-[2.75rem] lg:text-[3.625rem] lg:leading-[5rem]">{t('common:slogan_first')}</span>
-                        <span className="leading-[3.75rem] text-gradient text-5xl lg:text-[4.875rem] lg:leading-[6rem]">{t('common:slogan_second')}</span>
+            <div className={' max-w-screen-insurance 4xl:max-w-screen-3xl mx-auto relative h-screen '}>
+                {/*  */}
+                <div className="relative flex flex-col space-y-6 lg:space-y-9 w-full xl:justify-between lg:items-start
+                items-center pt-[48px] lg:pt-[68px] 2xl:pt-[200px] xl:max-w-[600px] max-h-[200px] lg:h-full ">
+                    <div className="flex flex-col space-y-2 pt-0 lg:pt-[4.25rem] lg:pt-0  text-center lg:text-left font-semibold">
+                        <span className="text-[2rem] leading-[2.75rem] lg:text-[3.625rem] lg:text-left text-center lg:leading-[5rem]">
+                            {t('common:slogan_first')}
+                        </span>
+                        <span className="leading-[3.75rem] text-gradient text-[3rem] lg:text-[4.875rem] lg:leading-[6rem]">{t('common:slogan_second')}</span>
                     </div>
-                    <div className="flex items-center justify-center lg:justify-start space-x-4 text-sm font-semibold">
+                    <div className="flex items-center justify-center space-x-4 text-sm font-semibold lg:justify-start">
                         <Button
                             onClick={handleClickBuyCover}
                             className=" w-max h-12 text-base lg:text-xl lg:h-full whitespace-nowrap !rounded-xl px-9 py-4 lg:px-[3rem] leading-6"
                         >
                             {t('home:landing:buy_covered')}
                         </Button>
-                        {/* <Button
-                            variants="outlined"
-                            className="w-full lg:w-max h-12 lg:text-base lg:h-full px-6 py-[0.875rem] leading-6 whitespace-nowrap !rounded-xl"
-                        >
-                            {t('home:landing:buy_nain')}
-                        </Button> */}
                     </div>
                 </div>
-                {/* <div className="max-w-[848px] 3xl:max-w-[75rem] w-full flex justify-end"> */}
-                <div className="max-w-[848px] 3xl:max-w-[75rem] pb-0 w-full flex justify-end lg:h-full h-[calc(100vh-490px)]">
-                    <img
-                        src={`/images/screens/landing-page/bg_home${isMobile ? '_mobile' : ''}.png`}
-                        className="m-auto lg:mx-auto lg:max-w-[380px] lg:max-h-[380px]  xl:max-w-[580px] xl:max-h-[480px] h-full max-w-[350px] max-h-[294px]  md:max-w-[400px] md:max-h-[384px] "
-                    />
-                </div>
+                {/*  */}
+                <img
+                    src={`/images/screens/landing-page/bg_home.png`}
+                    className="m-auto absolute h-full bottom-[196px] right-0 mx-auto left-0 lg:bottom-[15.75rem]
+                        insurance:max-h-[506px] 3xl:max-h-[800px] 2xl:max-h-[663px]  md:max-h-[420px] max-h-[220px] lg:left-auto "
+                />
             </div>
         </Background>
     )
 }
 
 const Background = styled.section.attrs<any>({
-    className: 'px-4 lg:px-20 h-full h-screen pb-[206px] lg:-mt-[68px] mt-0 lg:pt-[68px]',
+    className: 'px-4 lg:px-20 h-auto lg:overflow-hidden overflow-visible h-screen',
     // className: 'px-4 pt-[4.25rem] pb-20',
 })<any>`
     background-image: ${({ isMobile }) => `url(${`/images/screens/landing-page/background_nested.png`})`};
     background-position: bottom;
     background-repeat: no-repeat;
     background-size: cover;
+    height: calc(100vh - 68px);
 `
 
 export default SloganLanding

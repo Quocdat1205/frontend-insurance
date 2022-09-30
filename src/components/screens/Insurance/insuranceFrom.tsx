@@ -6,7 +6,7 @@ import axios from 'axios'
 import { Menu, Popover, Switch, Tab } from '@headlessui/react'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CheckCircle, InfoCircle, XMark, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp, ArrowLeft } from 'react-feather'
 import { useTranslation } from 'next-i18next'
@@ -45,9 +45,11 @@ const InsuranceFrom = () => {
     const pairConfigs = useAppSelector((state: RootStore) => state.setting.pairConfigs)
     const account = useAppSelector((state: RootStore) => state.setting.account)
 
-    const [percentInsurance, setPercentInsurance] = useState<number>(0)
     const [selectTime, setSelectTime] = useState<string>('ALL')
     const clear = useRef<boolean>(false)
+    const percentInsurance = useRef<number>(0)
+    const percentMargin = useRef<number>(8)
+
     const [index, setIndex] = useState<1 | 2>(1)
     const [tab, setTab] = useState<number>(0)
     const [loadings, setLoadings] = useState(true)
@@ -108,6 +110,8 @@ const InsuranceFrom = () => {
         t_market: new Date(),
         p_expired: 0,
     })
+    const tmp_q_covered = useRef(0)
+    const tmp_margin = useRef(0)
 
     const [dataChart, setDataChart] = useState()
     const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', `${language === 'vi' ? 'Tất cả' : 'All'}`]
@@ -129,7 +133,7 @@ const InsuranceFrom = () => {
     ]
 
     const Leverage = (p_market: number, p_stop: number) => {
-        const leverage = Number(p_market / Math.abs(p_market - p_stop))
+        const leverage = Math.floor(p_market / Math.abs(p_market - p_stop))
         return leverage < 1 ? 1 : leverage
     }
 
@@ -138,12 +142,11 @@ const InsuranceFrom = () => {
         const ratio_min_profit = Math.abs(p_claim - p_market) / p_market / 2
 
         if (p_claim > p_market) {
-            const p_stop = ((p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2)
-
-            return Math.abs(Number(p_stop)) / 100
+            const p_stop = p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)
+            return Math.abs(Number(p_stop))
         } else {
-            const p_stop = ((p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)) * 100).toFixed(2)
-            return Math.abs(Number(p_stop)) / 100
+            const p_stop = p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)
+            return Math.abs(Number(p_stop))
         }
     }
 
@@ -158,6 +161,7 @@ const InsuranceFrom = () => {
                             className="z-1 !w-max text-redPrimary"
                             onClick={() => {
                                 setOpenChangeToken(true)
+                                tmp_q_covered.current = state.q_covered
                             }}
                         >
                             {' '}
@@ -169,6 +173,7 @@ const InsuranceFrom = () => {
                         className="text-redPrimary z-1"
                         onClick={() => {
                             setOpenChangeToken(true)
+                            tmp_q_covered.current = state.q_covered
                         }}
                     >
                         {selectCoin.type}{' '}
@@ -187,6 +192,7 @@ const InsuranceFrom = () => {
                                     <span
                                         onClick={() => {
                                             setShowInput({ isShow: true, name: 'margin' })
+                                            tmp_margin.current = state.margin
                                         }}
                                     >
                                         {state.margin && state.margin}{' '}
@@ -194,6 +200,7 @@ const InsuranceFrom = () => {
                                     <span
                                         onClick={() => {
                                             setShowInput({ isShow: true, name: 'margin' })
+                                            tmp_margin.current = state.margin
                                             // setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:margin')}` })
                                         }}
                                     >
@@ -274,17 +281,32 @@ const InsuranceFrom = () => {
                 return false
             }
         }
-    }
-    const setStorage = (value: any) => {
-        localStorage.setItem('buy_covered_state', JSON.stringify(value))
-        setThisFisrt(false)
-    }
 
-    const [percentMargin, setPercentMargin] = useState(8)
+        if (symbol === 'BTC') {
+            const balanceBTC = await wallet.contractCaller?.btcContract.contract.balanceOf(account.address)
+            if (balanceBTC) {
+                console.log(Number(ethers.utils.formatEther(balanceBTC)))
+
+                if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
+                    setUserBalance(Number((Number(ethers.utils.formatEther(balanceBTC)) / Number(state.p_market)).toFixed(decimalList.decimal_q_covered)))
+                    return Number(ethers.utils.formatEther(balanceBTC))
+                } else {
+                    setUserBalance(0)
+                    return 0
+                }
+            } else {
+                return false
+            }
+        }
+    }
+    // const setStorage = (value: any) => {
+    //     localStorage.setItem('buy_covered_state', JSON.stringify(value))
+    //     setThisFisrt(false)
+    // }
 
     const updateFormPercentMargin = (value: number) => {
         if (state.q_covered > 0) {
-            setPercentMargin(value)
+            percentMargin.current = value
             setState({
                 ...state,
                 percent_margin: value,
@@ -304,57 +326,16 @@ const InsuranceFrom = () => {
     }
 
     const getStorage = async () => {
-        setLoadings(true)
-
         const data = await localStorage.getItem('buy_covered_state')
         if (data) {
             const res = JSON.parse(data)
-            setState({
-                ...state,
-                symbol: {
-                    icon: res.icon,
-                    id: res.id,
-                    name: res.name,
-                    symbol: res.symbol,
-                    type: res.type,
-                    disable: res.disable,
-                },
-            })
-            if (res.symbol != '') {
-                setSelectedCoin({
-                    icon: res.icon,
-                    id: res.id,
-                    name: res.name,
-                    symbol: res.symbol,
-                    type: res.type,
-                    disable: res.disable,
-                })
-
-                setState({
-                    ...state,
-                    symbol: {
-                        icon: res.icon,
-                        id: res.id,
-                        name: res.name,
-                        symbol: res.symbol,
-                        type: res.type,
-                        disable: res.disable,
-                    },
-                })
+            if (res) {
+                return res
             } else {
-                if (listCoin.length > 0) {
-                }
+                return false
             }
-
-            setTab(res.tab)
-            setUnitMoney(res.unitMoney)
-            setIndex(res.index)
-            setThisFisrt(true)
-            refreshApi(selectTime, selectCoin)
-        } else {
-            setThisFisrt(false)
-            setStorage(state)
         }
+        return false
     }
 
     const refreshApi = (
@@ -366,16 +347,7 @@ const InsuranceFrom = () => {
         setLoadings(true)
         try {
             if (selectCoin.symbol !== '') {
-                if (selectTime == '1H' || selectTime == '1D') {
-                    timeBegin.setDate(timeEnd.getDate() - 10)
-                    fetchApiNami(
-                        `${selectCoin.type && selectCoin.type}${unitMoney}`,
-                        `${Math.floor(timeBegin.getTime() / 1000)}`,
-                        `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                        '1m',
-                        setDataChart,
-                    )
-                } else if (selectTime == '1W') {
+                if (selectTime == '1H') {
                     timeBegin.setDate(timeEnd.getDate() - 10)
                     fetchApiNami(
                         `${selectCoin.type && selectCoin.type}${unitMoney}`,
@@ -383,6 +355,17 @@ const InsuranceFrom = () => {
                         `${Math.ceil(timeEnd.getTime() / 1000)}`,
                         '1h',
                         setDataChart,
+                        120,
+                    )
+                } else if (selectTime == '1W' || selectTime == '1D') {
+                    timeBegin.setDate(timeEnd.getDate() - 10)
+                    fetchApiNami(
+                        `${selectCoin.type && selectCoin.type}${unitMoney}`,
+                        `${Math.floor(timeBegin.getTime() / 1000)}`,
+                        `${Math.ceil(timeEnd.getTime() / 1000)}`,
+                        '1d',
+                        setDataChart,
+                        500,
                     )
                 } else {
                     timeBegin.setDate(timeEnd.getDate() - 10)
@@ -390,8 +373,9 @@ const InsuranceFrom = () => {
                         `${selectCoin.type && selectCoin.type}${unitMoney}`,
                         `${Math.floor(timeBegin.getTime() / 1000)}`,
                         `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                        '1h',
+                        '1d',
                         setDataChart,
+                        1095,
                     )
                 }
             }
@@ -414,24 +398,47 @@ const InsuranceFrom = () => {
                 disable: token.disable,
             }
 
-            if (tmp.type == 'BNB') {
+            const res = await getStorage()
+            if (res?.type) {
+                if (tmp.type == res?.type) {
+                    setSelectedCoin({
+                        icon: res?.icon,
+                        id: res?.id,
+                        name: res?.name,
+                        symbol: res?.symbol,
+                        type: res?.type,
+                        disable: res?.disable,
+                    })
+                    setState({
+                        ...state,
+                        symbol: {
+                            icon: res?.icon,
+                            id: res?.id,
+                            name: res?.name,
+                            symbol: res?.symbol,
+                            type: res?.type,
+                            disable: res?.disable,
+                        },
+                    })
+                }
+            } else if (tmp.type == 'BNB') {
                 setSelectedCoin({
-                    icon: tmp.icon,
-                    id: tmp.id,
-                    name: tmp.name,
-                    symbol: tmp.symbol,
-                    type: tmp.type,
-                    disable: tmp.disable,
+                    id: token._id,
+                    name: token.name,
+                    icon: token.attachment,
+                    symbol: `${token.symbol}USDT`,
+                    type: token.symbol,
+                    disable: token.disable,
                 })
                 setState({
                     ...state,
                     symbol: {
-                        icon: tmp.icon,
-                        id: tmp.id,
-                        name: tmp.name,
-                        symbol: tmp.symbol,
-                        type: tmp.type,
-                        disable: tmp.disable,
+                        id: token._id,
+                        name: token.name,
+                        icon: token.attachment,
+                        symbol: `${token.symbol}USDT`,
+                        type: token.symbol,
+                        disable: token.disable,
                     },
                 })
             }
@@ -454,79 +461,6 @@ const InsuranceFrom = () => {
     }, [userBalance])
 
     useEffect(() => {
-        try {
-            if (account.address != null) {
-                getStorage()
-            }
-        } catch (error) {
-            console.log('error get USDT balance')
-        }
-    }, [account])
-
-    // useEffect(() => {
-    //     try {
-    //     } catch (error) {
-    //         setLoadings(false)
-    //         return console.log(error)
-    //     }
-    // }, [account])
-
-    useEffect(() => {
-        if (unitMoney) {
-            const data = localStorage.getItem('buy_covered_state')
-            if (data) {
-                const res = JSON.parse(data)
-                const newData = { ...res, unitMoney: unitMoney }
-                localStorage.setItem('buy_covered_state', JSON.stringify(newData))
-            }
-        }
-    }, [unitMoney])
-
-    useEffect(() => {
-        if (index) {
-            const data = localStorage.getItem('buy_covered_state')
-            if (data) {
-                const res = JSON.parse(data)
-                const newData = { ...res, index: index }
-                localStorage.setItem('buy_covered_state', JSON.stringify(newData))
-            }
-        }
-    }, [index])
-
-    useEffect(() => {
-        if (state) {
-            setTimeout(() => {
-                const data = localStorage.getItem('buy_covered_state')
-                if (data) {
-                    const res = JSON.parse(data)
-                    const newData = {
-                        ...res,
-                        disable: state.symbol.disable,
-                        icon: state.symbol.icon,
-                        id: state.symbol.id,
-                        name: state.symbol.name,
-                        symbol: state.symbol.symbol,
-                        type: state.symbol.type,
-                    }
-                    setStorage(newData)
-                }
-            }, 5000)
-        }
-        if (thisFisrt) {
-            return setThisFisrt(false)
-        }
-    }, [state])
-
-    useEffect(() => {
-        const data = localStorage.getItem('buy_covered_state')
-        if (data) {
-            const res = JSON.parse(data)
-            const newData = { ...res, tab: tab }
-            return localStorage.setItem('buy_covered_state', JSON.stringify(newData))
-        }
-    }, [tab])
-
-    useEffect(() => {
         if (listCoin.length > 0) {
             const timeEnd = new Date()
             const timeBegin = new Date()
@@ -537,18 +471,6 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         refreshApi(selectTime, selectCoin)
-
-        const data = localStorage.getItem('buy_covered_state')
-        if (data) {
-            let res = JSON.parse(data)
-            res.icon = selectCoin.icon
-            res.id = selectCoin.id
-            res.name = selectCoin.name
-            res.symbol = selectCoin.symbol
-            res.type = selectCoin.type
-            res.disable = selectCoin.disable
-            localStorage.setItem('buy_covered_state', JSON.stringify(res))
-        }
     }, [selectTime, selectCoin])
 
     useEffect(() => {
@@ -557,18 +479,31 @@ const InsuranceFrom = () => {
             setState({ ...state, symbol: { ...selectCoin } })
             getConfig(selectCoin.type)
             getBalaneToken(selectCoin.type)
+
+            let res = {
+                icon: selectCoin.icon,
+                id: selectCoin.id,
+                name: selectCoin.name,
+                symbol: selectCoin.symbol,
+                type: selectCoin.type,
+                disable: selectCoin.disable,
+            }
+
+            localStorage.setItem('buy_covered_state', JSON.stringify(res))
         }
     }, [selectCoin])
 
     const createSaved = async () => {
-        const x = state.q_claim + state.q_covered * (state.p_claim - state.p_market)
+        const y = state.q_covered * (state.p_claim - state.p_market)
+        const z = state.q_covered * Math.abs(state.p_claim - state.p_market)
+        console.log(y, 'state.q_covered * (state.p_claim - state.p_market)')
 
         if (state.p_claim < state.p_market) {
-            setSaved(x - state.margin + state.q_covered * Math.abs(state.p_claim - state.p_market))
+            setSaved(state.q_claim + y - state.margin + z)
         }
 
         if (state.p_claim > state.p_market) {
-            setSaved(x - state.margin)
+            setSaved(state.q_claim + y - state.margin)
         }
     }
 
@@ -576,6 +511,43 @@ const InsuranceFrom = () => {
         const res_q_covered = validator('p_claim')
         validator('q_covered')
         validator('margin')
+
+        if (state.q_covered > 0) {
+            if (userBalance > 0) {
+                const a = Math.ceil((state.q_covered / userBalance) * 100)
+                console.log(a)
+
+                percentInsurance.current = a >= 100 ? 100 : a
+                if (a >= 100 || state.q_covered == rangeQ_covered.max) {
+                    percentInsurance.current = 100
+                } else if (a >= 75) {
+                    percentInsurance.current = 75
+                } else if (a >= 50) {
+                    percentInsurance.current = 50
+                } else if (a >= 25) {
+                    percentInsurance.current = 25
+                } else {
+                    percentInsurance.current = a
+                }
+            }
+        }
+
+        if (state.margin > 0) {
+            if (userBalance > 0) {
+                const b = Math.ceil((state.margin / (state.q_covered * state.p_market)) * 100)
+                if (b >= 10 || state.margin == rangeMargin.max) {
+                    percentMargin.current = 10
+                } else if (b >= 7) {
+                    percentMargin.current = 7
+                } else if (b >= 5) {
+                    percentMargin.current = 5
+                } else if (b >= 2) {
+                    percentMargin.current = 2
+                } else {
+                    percentMargin.current = b
+                }
+            }
+        }
 
         if (res_q_covered.isValid) {
             if (state.q_covered && state.p_claim) {
@@ -587,10 +559,10 @@ const InsuranceFrom = () => {
                 const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
                 const laverage = Leverage(state.p_market, p_stop)
                 const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-                const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
+                const q_claim = Number((ratio_profit / 2) * hedge_capital * laverage) * (1 - 0.05) + margin
                 setState({
                     ...state,
-                    q_claim: Number(q_claim.toFixed(2)),
+                    q_claim: Number(q_claim.toFixed(decimalList.decimal_q_covered)),
                     r_claim: Number((Number(q_claim / margin) * 100).toFixed(decimalList.decimal_q_covered)),
                     p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
                     margin: Number(margin.toFixed(decimalList.decimal_margin)),
@@ -608,16 +580,19 @@ const InsuranceFrom = () => {
                 const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + state.margin
                 setState({
                     ...state,
-                    q_claim: Number(q_claim.toFixed(2)),
+                    q_claim: Number(q_claim.toFixed(decimalList.decimal_q_covered)),
                     r_claim: Number((Number(q_claim / state.margin) * 100).toFixed(decimalList.decimal_q_covered)),
                     p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
                 })
             }
-            createSaved()
         } else {
             setSaved(0)
         }
     }, [state.q_covered, state.margin, state.p_claim])
+
+    useEffect(() => {
+        createSaved()
+    }, [state.margin, state.q_claim])
 
     useEffect(() => {
         if (tab === 0 || tab === 3) {
@@ -671,19 +646,30 @@ const InsuranceFrom = () => {
 
     const [percentPrice, setPercentPrice] = useState<any>()
     const [priceFilter, setPriceFilter] = useState<any>()
+    console.log(rangeQ_covered)
+    const min_notinal = useRef(0)
 
     useEffect(() => {
         const _decimalList = { ...decimalList }
         let _percentPrice: any
         pair_configs?.filters?.map(async (item: any) => {
+            if (item?.filterType === 'MIN_NOTIONAL') {
+                min_notinal.current = item?.notional
+            }
             if (item?.filterType === 'LOT_SIZE') {
                 const tmp = await getBalaneToken(selectCoin.type)
                 const decimal = countDecimals(item.stepSize)
                 _decimalList.decimal_q_covered = +decimal
-                const min_Market = +(10 / state.p_market).toFixed(+decimal)
-                const min = Number(item?.minQty) > min_Market ? Number(item?.minQty) : min_Market
-                const max = Number(item?.maxQty) < tmp ? Number(item?.maxQty) : tmp
-                setRangeQ_covered({ ...rangeQ_covered, min: min, max: max })
+                const min_Market = +(min_notinal.current / state.p_market).toFixed(+decimal)
+                if (min_Market == Infinity) {
+                    const min = Number(item?.minQty)
+                    const max = Number(item?.maxQty) < tmp ? Number(item?.maxQty) : tmp
+                    setRangeQ_covered({ ...rangeQ_covered, min: min, max: max })
+                } else {
+                    const min = Number(item?.minQty) > min_Market ? Number(item?.minQty) : min_Market
+                    const max = Number(item?.maxQty) < tmp ? Number(item?.maxQty) : tmp
+                    setRangeQ_covered({ ...rangeQ_covered, min: min, max: max })
+                }
             }
             if (item?.filterType === 'PERCENT_PRICE') {
                 _percentPrice = item
@@ -911,22 +897,28 @@ const InsuranceFrom = () => {
     const onHandleChange = (key: string, e: any) => {
         const value = +e.value
 
-        if (value == 0) {
-            setIsCanSave(false)
-        } else {
-            setIsCanSave(true)
-        }
-
         switch (key) {
             case 'q_covered':
                 setState({ ...state, [key]: value })
-                setPercentInsurance(0)
+                percentInsurance.current = 0
+                if (value > Number(rangeQ_covered?.max?.toFixed(decimalList.decimal_q_covered)) || value < rangeQ_covered.min || value <= 0) {
+                    setIsCanSave(false)
+                } else {
+                    setIsCanSave(true)
+                }
+
                 break
             case 'p_claim':
                 setState({ ...state, [key]: value })
+                if (value < Number(rangeMargin.min) || value > Number(rangeMargin.max) || value <= 0) {
+                    setIsCanSave(false)
+                } else {
+                    setIsCanSave(true)
+                }
+
                 break
             case 'margin':
-                setPercentMargin(0)
+                percentMargin.current = 0
                 setState({ ...state, margin: value, percent_margin: 0 })
                 break
             default:
@@ -938,6 +930,8 @@ const InsuranceFrom = () => {
         if (account.address == null) {
             return false
         } else if (state.q_covered <= 0 || state.margin <= 0 || state.p_claim <= 0) {
+            return false
+        } else if (userBalance == null || userBalance == 0) {
             return false
         } else {
             return true
@@ -1037,23 +1031,27 @@ const InsuranceFrom = () => {
                                                                             key={data}
                                                                             className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                                             onClick={() => {
-                                                                                setState({
-                                                                                    ...state,
-                                                                                    q_covered: Number(
-                                                                                        ((data / 100) * rangeQ_covered.max).toFixed(
-                                                                                            decimalList.decimal_q_covered,
+                                                                                if (userBalance > 0) {
+                                                                                    setState({
+                                                                                        ...state,
+                                                                                        q_covered: Number(
+                                                                                            ((data / 100) * rangeQ_covered.max).toFixed(
+                                                                                                decimalList.decimal_q_covered,
+                                                                                            ),
                                                                                         ),
-                                                                                    ),
-                                                                                })
-                                                                                setPercentInsurance(data)
+                                                                                    })
+                                                                                    percentInsurance.current = data
+                                                                                }
                                                                             }}
                                                                         >
                                                                             <div
                                                                                 className={`${
-                                                                                    percentInsurance == data ? 'bg-red' : 'bg-gray-1'
+                                                                                    percentInsurance.current == data ? 'bg-red' : 'bg-gray-1'
                                                                                 } h-1 w-full rounded-sm`}
                                                                             ></div>
-                                                                            <div className={percentInsurance === data ? 'text-red' : 'text-gray'}>{data}%</div>
+                                                                            <div className={percentInsurance.current === data ? 'text-red' : 'text-gray'}>
+                                                                                {data}%
+                                                                            </div>
                                                                         </div>
                                                                     )
                                                                 })}
@@ -1309,10 +1307,10 @@ const InsuranceFrom = () => {
                                                                             >
                                                                                 <div
                                                                                     className={`${
-                                                                                        percentMargin == item ? 'bg-red' : 'bg-gray-1'
+                                                                                        percentMargin.current == item ? 'bg-red' : 'bg-gray-1'
                                                                                     } h-1 w-full rounded-sm`}
                                                                                 ></div>
-                                                                                <span className={percentMargin == item ? 'text-red' : 'text-gray'}>
+                                                                                <span className={percentMargin.current == item ? 'text-red' : 'text-gray'}>
                                                                                     {item}%
                                                                                 </span>
                                                                             </div>
@@ -1494,7 +1492,15 @@ const InsuranceFrom = () => {
                                         portalId="modal"
                                         isVisible={true}
                                         className={`!sticky !bottom-0 !left-0 !rounded-none !translate-x-0 !translate-y-0 h-1/2 `}
-                                        onBackdropCb={() => setShowInput({ ...showInput, isShow: false, name: '' })}
+                                        onBackdropCb={() => {
+                                            setShowInput({ ...showInput, isShow: false, name: '' })
+                                            if (showInput.name == 'q_covered') {
+                                                setState({ ...state, q_covered: tmp_q_covered.current })
+                                            }
+                                            if (showInput.name == 'margin') {
+                                                setState({ ...state, margin: tmp_margin.current })
+                                            }
+                                        }}
                                     >
                                         <div className="bg-white  !sticky !bottom-0 !left-0">
                                             <div className="text-txtPrimary text-xl font-semibold mb-[1.5rem]">{t(`insurance:buy:${showInput.name}`)}</div>
@@ -1538,19 +1544,23 @@ const InsuranceFrom = () => {
                                                                 key={data}
                                                                 className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                                 onClick={() => {
-                                                                    setState({
-                                                                        ...state,
-                                                                        q_covered: Number(
-                                                                            ((data / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
-                                                                        ),
-                                                                    })
-                                                                    setPercentInsurance(data)
+                                                                    if (userBalance > 0) {
+                                                                        setState({
+                                                                            ...state,
+                                                                            q_covered: Number(
+                                                                                ((data / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
+                                                                            ),
+                                                                        })
+                                                                        percentInsurance.current = data
+                                                                    }
                                                                 }}
                                                             >
                                                                 <div
-                                                                    className={`${percentInsurance == data ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}
+                                                                    className={`${
+                                                                        percentInsurance.current == data ? 'bg-red' : 'bg-gray-1'
+                                                                    } h-1 w-full rounded-sm`}
                                                                 ></div>
-                                                                <div className={percentInsurance === data ? 'text-red' : 'text-gray'}>{data}%</div>
+                                                                <div className={percentInsurance.current == data ? 'text-red' : 'text-gray'}>{data}%</div>
                                                             </div>
                                                         )
                                                     })}
@@ -1565,9 +1575,11 @@ const InsuranceFrom = () => {
                                                                 }}
                                                             >
                                                                 <div
-                                                                    className={`${percentMargin == data ? 'bg-red' : 'bg-gray-1'} h-1 w-full rounded-sm`}
+                                                                    className={`${
+                                                                        percentMargin.current == data ? 'bg-red' : 'bg-gray-1'
+                                                                    } h-1 w-full rounded-sm`}
                                                                 ></div>
-                                                                <div className={percentMargin === data ? 'text-red' : 'text-gray'}>{data}%</div>
+                                                                <div className={percentMargin.current === data ? 'text-red' : 'text-gray'}>{data}%</div>
                                                             </div>
                                                         )
                                                     })}
@@ -1578,7 +1590,17 @@ const InsuranceFrom = () => {
                                                 className={`${
                                                     !isCanSave ? 'bg-hover' : 'bg-red'
                                                 } h-[48px] w-full flex justify-center items-center text-white rounded-[8px] py-[12px]`}
-                                                onClick={() => setShowInput({ ...showInput, isShow: false, name: '' })}
+                                                onClick={() => {
+                                                    // if (showInput.name === 'q_covered') {
+                                                    //     onHandleChange('q_covered', tmp_q_covered.current)
+                                                    //     return setShowInput({ ...showInput, isShow: false, name: '' })
+                                                    // }
+                                                    // if (showInput.name === 'margin') {
+                                                    //     onHandleChange('margin', tmp_margin.current)
+                                                    //     return setShowInput({ ...showInput, isShow: false, name: '' })
+                                                    // }
+                                                    setShowInput({ ...showInput, isShow: false, name: '' })
+                                                }}
                                             >
                                                 {t('insurance:buy:save')}
                                             </Button>
@@ -1897,9 +1919,9 @@ const InsuranceFrom = () => {
                                                     {state.q_claim > 0 ? Number(state.q_claim.toFixed(decimalList.decimal_q_covered)) : 0}
                                                     <span
                                                         className={'text-red pl-[8px]'}
-                                                        onClick={() =>
+                                                        onClick={() => {
                                                             setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:q_claim')}` })
-                                                        }
+                                                        }}
                                                     >
                                                         {unitMoney}
                                                     </span>
@@ -1959,10 +1981,10 @@ const InsuranceFrom = () => {
     )
 }
 
-export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any) => {
+export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any, timeLine: number) => {
     try {
         const ts = Math.round(new Date().getTime() / 1000)
-        const tsYesterday = ts - 7 * (24 * 3600)
+        const tsYesterday = ts - timeLine * (24 * 3600)
         const params = {
             broker: 'NAMI_SPOT',
             symbol: symbol,

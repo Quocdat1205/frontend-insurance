@@ -12,7 +12,7 @@ import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatPriceToWeiValue, formatWeiValueToPrice } from 'utils/format'
 import { contractAddress } from 'components/web3/constants/contractAddress'
-import { Popover } from '@headlessui/react'
+import { Menu, Popover } from '@headlessui/react'
 import { ChevronDown } from 'react-feather'
 import Modal from 'components/common/Modal/Modal'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
@@ -22,6 +22,7 @@ import { isString } from 'lodash'
 import { useWeb3React } from '@web3-react/core'
 import fetchApi from 'services/fetch-api'
 import { API_GET_BUY_INSURANCE } from 'services/apis'
+import { ethers } from 'ethers'
 
 export type IBuyInsurance = {
     createInsurance: number
@@ -82,6 +83,7 @@ const AcceptBuyInsurance = () => {
     const [networkError, setNetworkError] = useState<boolean>(false)
     const [isVisible, setVisible] = useState(false)
     const isReload = useRef<boolean>(false)
+    const unitMoney = useRef<string>('USDT')
 
     useEffect(() => {
         fetch()
@@ -222,42 +224,61 @@ const AcceptBuyInsurance = () => {
                     }
                     const token = await Config.web3.contractCaller.sign(account.address)
 
-                    if (!token) {
-                        lostConnection()
-                        return
-                    }
-                    if (token?.message || token?.code) {
-                        connectionError(token)
-                    } else {
-                        const allowance = await Config.web3.contractCaller.usdtContract.contract.allowance(account.address, contractAddress)
-                        const parseAllowance = formatWeiValueToPrice(allowance)
-                        if (parseAllowance < state.margin) {
-                            await Config.web3.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(1000), {
-                                from: account.address,
-                            })
+                    setTimeout(async () => {
+                        if (!token) {
+                            lostConnection()
+                            Config.toast.show(
+                                'error',
+                                `${language === 'vi' ? 'Giao dịch không thành công, vui lòng thử lại' : 'Transaction fail, try again please'}`,
+                            )
+                            return setActive(false)
                         }
-                        const buy = await Config.web3.contractCaller.insuranceContract.contract.createInsurance(
-                            dataPost.buyer,
-                            dataPost.asset,
-                            dataPost.margin,
-                            dataPost.q_covered,
-                            dataPost.p_market,
-                            dataPost.p_claim,
-                            dataPost.period,
-                            dataPost.isUseNain,
-                            { value: 0 },
-                        )
-                        await buy.wait()
+                        if (token?.message || token?.code) {
+                            connectionError(token)
+                            Config.toast.show(
+                                'error',
+                                `${language === 'vi' ? 'Giao dịch không thành công, vui lòng thử lại' : 'Transaction fail, try again please'}`,
+                            )
+                            return setActive(false)
+                        } else {
+                            const allowance = await Config.web3.contractCaller.usdtContract.contract.allowance(account.address, contractAddress)
+                            const parseAllowance = formatWeiValueToPrice(allowance)
+                            if (parseAllowance < state.margin) {
+                                await Config.web3.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(1000), {
+                                    from: account.address,
+                                })
+                            }
+                            const buy = await Config.web3.contractCaller.insuranceContract.contract
+                                .createInsurance(
+                                    dataPost.buyer,
+                                    dataPost.asset,
+                                    dataPost.margin,
+                                    dataPost.q_covered,
+                                    dataPost.p_market,
+                                    dataPost.p_claim,
+                                    dataPost.period,
+                                    dataPost.isUseNain,
+                                    { value: 0 },
+                                )
+                                .then(async (res: any) => {
+                                    const id_sc = await res.wait()
 
-                        const id_sc = await buy.wait()
-                        if (buy && id_sc.events[2].args[0]) {
-                            handlePostInsurance(buy, dataPost, state, Number(id_sc.events[2].args[0]), token)
+                                    if (res && id_sc.events[2].args[0]) {
+                                        handlePostInsurance(res, dataPost, state, Number(id_sc.events[2].args[0]), token)
+                                    }
+                                })
+                                .catch((result: any) => {
+                                    if (result.code === 4001) {
+                                        Config.toast.show('error', `${language === 'vi' ? 'Bạn đã hủy giao dịch' : 'You rejected transaction'}`)
+                                    }
+                                    return setActive(false)
+                                })
                         }
-                    }
+                    }, 1000)
                 }
             }
         } catch (err) {
-            console.log(err)
+            console.log(err, 'Transaction fail, try again please')
             setNoti('')
             setActive(false)
         }
@@ -328,11 +349,13 @@ const AcceptBuyInsurance = () => {
 
     useEffect(() => {
         setTimeout(() => {
-            if (count > 0) {
-                setCount(count - 1)
-            }
-            if (count == 0) {
-                return setUpdated(false)
+            if (isUpdated) {
+                if (count > 0) {
+                    setCount(count - 1)
+                }
+                if (count == 0) {
+                    return setUpdated(false)
+                }
             }
         }, 1000)
     }, [count])
@@ -349,14 +372,16 @@ const AcceptBuyInsurance = () => {
                 </span>
             )
         }
-        return ''
     }
 
     return !loading && state != undefined ? (
         <>
             <Modal
+                canBlur={false}
+                isMobile={isMobile == true && true}
                 portalId="modal"
                 isVisible={active}
+                closeButton={Noti == 'loading' && false}
                 onBackdropCb={() => {
                     if (Noti == 'email' || Noti == 'loading') {
                         setActive(false)
@@ -365,7 +390,7 @@ const AcceptBuyInsurance = () => {
                         setNoti('email')
                     }
                 }}
-                className={`${!isMobile ? 'w-max' : 'rounded-none !sticky !bottom-0 !left-0 !translate-y-0 !translate-x-0 !h-1/2'} `}
+                className={`${!isMobile ? 'w-max' : 'rounded-none !sticky !bottom-0 !left-0 !translate-y-0 !translate-x-0'} ${Noti === 'loading' && ''}`}
             >
                 <NotificationInsurance id={res ? res : ''} name={`${Noti}`} state={state} active={active} setActive={() => setActive(false)} isMobile={false} />
             </Modal>
@@ -453,14 +478,49 @@ const AcceptBuyInsurance = () => {
                                                 <Tooltip className="max-w-[200px] !left-[120px] !top-[179px]" id={'q_claim'} placement="right" />
                                             </div>
                                         </div>
-                                        <div className={'font-semibold flex flex-row items-center'}>
+                                        <div className={'font-semibold flex flex-row items-center '}>
                                             <span className={`${checkUpgrade ? 'line-through text-txtSecondary pr-[8px] text-xs' : 'pr-[8px]'}`}>
                                                 {(state?.q_claim).toFixed(state?.decimalList?.decimal_q_covered)}
                                             </span>{' '}
                                             <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
                                                 {(state?.q_claim + (state?.q_claim * 5) / 100).toFixed(state?.decimalList?.decimal_q_covered)}
                                             </span>{' '}
-                                            <span className={''}>{state?.unit}</span>
+                                            <div className="relative">
+                                                <Menu>
+                                                    <Menu.Button className={' text-blue underline hover:cursor-pointer'}>
+                                                        <span className={'text-redPrimary decoration-white underline'}>{unitMoney.current}</span>
+                                                    </Menu.Button>
+                                                    <Menu.Items
+                                                        className={'flex flex-col text-txtPrimary  bg-white absolute w-max right-0 text-base'}
+                                                        style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                                                    >
+                                                        <Menu.Item>
+                                                            {({ active }) => (
+                                                                <a
+                                                                    className={`${active && 'bg-blue-500'} py-[0.5rem] px-[1rem] w-max hover:bg-hover`}
+                                                                    onClick={() => {
+                                                                        unitMoney.current = 'USDT'
+                                                                    }}
+                                                                >
+                                                                    <span>{'USDT'}</span>
+                                                                </a>
+                                                            )}
+                                                        </Menu.Item>
+                                                        <Menu.Item>
+                                                            {({ active }) => (
+                                                                <a
+                                                                    className={`${active && 'bg-blue-500'} py-[0.5rem] px-[1rem] w-max hover:bg-hover`}
+                                                                    onClick={() => {
+                                                                        unitMoney.current = state.symbol
+                                                                    }}
+                                                                >
+                                                                    <span>{state.symbol}</span>
+                                                                </a>
+                                                            )}
+                                                        </Menu.Item>
+                                                    </Menu.Items>
+                                                </Menu>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
@@ -538,6 +598,7 @@ const AcceptBuyInsurance = () => {
                                                         id="test1"
                                                         checked={checkUpgrade}
                                                         onClick={() => setCheckUpgrade(!checkUpgrade)}
+                                                        onChange={() => {}}
                                                     />
                                                     <CheckBoxIcon
                                                         bgColor="#F7F8FA"
@@ -550,6 +611,7 @@ const AcceptBuyInsurance = () => {
                                                         checkBorderColor="#EB2B3E"
                                                         className="hover:cursor-pointer mr-[8px]"
                                                         onClick={() => setCheckUpgrade(!checkUpgrade)}
+                                                        onChange={() => {}}
                                                     />
                                                     <label htmlFor="test1" className="select-none font-semibold text-base text-txtPrimary">
                                                         {t('insurance:buy:upgrade')}
@@ -582,10 +644,12 @@ const AcceptBuyInsurance = () => {
                                         createContract()
                                     }
                                     if (!isUpdated) {
-                                        getPrice(`${state.symbol}${state?.unit}`, setPrice)
-                                        setUpdated(true)
-                                        setCanBuy(true)
-                                        setCount(10)
+                                        getPrice(`${state.symbol}${state?.unit}`, setPrice).then(() => {
+                                            setUpdated(true)
+                                            setCanBuy(true)
+                                            setCount(10)
+                                        })
+
                                         Config.toast.show('success', `${t('insurance:buy:price_had_update')}`)
                                     }
                                 }}
@@ -675,7 +739,43 @@ const AcceptBuyInsurance = () => {
                                         <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold pr-[8px]' : 'hidden'}`}>
                                             {(state?.q_claim + (state?.q_claim * 5) / 100).toFixed(state?.decimalList?.decimal_q_covered)}
                                         </span>{' '}
-                                        <span className={'pl-[8px]'}>{state?.unit}</span>
+                                        {/* <span className={'pl-[8px]'}>{state?.unit}</span> */}
+                                        <div className="relative pl-[0.5rem]">
+                                            <Menu>
+                                                <Menu.Button className={' text-blue underline hover:cursor-pointer min-w-[2.5rem]'}>
+                                                    <span className={'text-redPrimary decoration-white underline '}>{unitMoney.current}</span>
+                                                </Menu.Button>
+                                                <Menu.Items
+                                                    className={'flex flex-col text-txtPrimary  bg-white absolute w-max right-0 text-base'}
+                                                    style={{ boxShadow: '0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31)' }}
+                                                >
+                                                    <Menu.Item>
+                                                        {({ active }) => (
+                                                            <a
+                                                                className={`${active && 'bg-blue-500'} py-[0.5rem] px-[1rem] w-max hover:bg-hover`}
+                                                                onClick={() => {
+                                                                    unitMoney.current = 'USDT'
+                                                                }}
+                                                            >
+                                                                <span>{'USDT'}</span>
+                                                            </a>
+                                                        )}
+                                                    </Menu.Item>
+                                                    <Menu.Item>
+                                                        {({ active }) => (
+                                                            <a
+                                                                className={`${active && 'bg-blue-500'} py-[0.5rem] px-[1rem] w-max hover:bg-hover`}
+                                                                onClick={() => {
+                                                                    unitMoney.current = state.symbol
+                                                                }}
+                                                            >
+                                                                <span>{state.symbol}</span>
+                                                            </a>
+                                                        )}
+                                                    </Menu.Item>
+                                                </Menu.Items>
+                                            </Menu>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
@@ -726,7 +826,7 @@ const AcceptBuyInsurance = () => {
                                     </div>
                                 </div>
                                 <div className="text-[#B2B7BC] text-xs py-[16px]">
-                                    *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')}
+                                    *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')} {timeEnd()}
                                 </div>
                                 <div
                                     //flex
@@ -750,7 +850,7 @@ const AcceptBuyInsurance = () => {
                                                     type="radio"
                                                     id="test1"
                                                     checked={checkUpgrade}
-                                                    onChange={(e) => {}}
+                                                    onChange={() => {}}
                                                     onClick={() => setCheckUpgrade(!checkUpgrade)}
                                                 />
                                                 <CheckBoxIcon
@@ -764,7 +864,7 @@ const AcceptBuyInsurance = () => {
                                                     checkBorderColor="#EB2B3E"
                                                     className="hover:cursor-pointer mr-[8px]"
                                                     onClick={() => setCheckUpgrade(!checkUpgrade)}
-                                                    onChange={(e: any) => {}}
+                                                    onChange={() => {}}
                                                 />
                                                 <label htmlFor="test1" className="select-none text-sm text-txtPrimary font-semibold">
                                                     {t('insurance:buy:upgrade')}
@@ -823,10 +923,12 @@ const AcceptBuyInsurance = () => {
                                     createContract()
                                 }
                                 if (!isUpdated) {
-                                    getPrice(`${state.symbol}${state?.unit}`, setPrice)
-                                    setUpdated(true)
-                                    setCanBuy(true)
-                                    setCount(10)
+                                    getPrice(`${state.symbol}${state?.unit}`, setPrice).then(() => {
+                                        setUpdated(true)
+                                        setCanBuy(true)
+                                        setCount(10)
+                                    })
+
                                     Config.toast.show('success', `${t('insurance:buy:price_had_update')}`)
                                 }
                             }}

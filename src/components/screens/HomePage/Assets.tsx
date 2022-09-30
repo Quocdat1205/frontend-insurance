@@ -1,11 +1,10 @@
 import { useTranslation } from 'next-i18next'
 import React, { useMemo, useState, useEffect } from 'react'
-import { Autoplay, Pagination } from 'swiper'
+import { Pagination } from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import Button from 'components/common/Button/Button'
 import CardShadow from 'components/common/Card/CardShadow'
 import Config from 'config/config'
-import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import useWindowSize from 'hooks/useWindowSize'
 import 'swiper/css'
 import 'swiper/css/pagination'
@@ -55,26 +54,12 @@ const Assets = () => {
             })
         } else {
             const newSymbol = {
-                timeframe: 'ALL',
-                margin: 0,
-                percent_margin: 0,
-                symbol: {
-                    id: item._id,
-                    name: item.name,
-                    icon: item.attachment,
-                    symbol: `${item.symbol}USDT`,
-                    type: item.symbol,
-                    disable: !item.isActive,
-                },
-                period: 2,
-                p_claim: 0,
-                q_claim: 0,
-                r_claim: 0,
-                q_covered: 0,
-                p_market: 0,
-                t_market: 0,
-                p_expired: 0,
-                index: 1,
+                id: item._id,
+                name: item.name,
+                icon: item.attachment,
+                symbol: `${item.symbol}USDT`,
+                type: item.symbol,
+                disable: !item.isActive,
             }
             localStorage.setItem('buy_covered_state', JSON.stringify({ ...newSymbol }))
             setTimeout(() => {
@@ -119,7 +104,7 @@ const Assets = () => {
     const renderAssets = () => (
         <div className="d-flex">
             {assetsToken.map((asset: any, index: number) => {
-                const _marketWatch = marketWatch.find((m: any) => m.b === asset?.symbol)
+                const _marketWatch = marketWatch.find((m: any) => m.b === asset?.symbol && m.q === 'USDT')
                 const pairPrice = FuturesMarketWatch.create(_marketWatch)
                 const _24hChange = pairPrice?.priceChangePercent * 100 || 0
                 const negative = _24hChange < 0

@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { getConfigAsset, getConfigUnit, getListAssetToken, setting } from 'redux/actions/setting'
 import { useAppDispatch } from 'redux/store'
 import Toast from 'components/layout/Toast'

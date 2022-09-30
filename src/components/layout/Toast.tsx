@@ -1,6 +1,6 @@
 import { SuccessCircleIcon, ErrorIcon } from 'components/common/Svg/SvgIcon'
-import React, { forwardRef, useImperativeHandle } from 'react'
-import { toast, Toaster, ToastBar, resolveValue } from 'react-hot-toast'
+import { forwardRef, useImperativeHandle } from 'react'
+import { toast, Toaster } from 'react-hot-toast'
 import colors from 'styles/colors'
 import { OptionNotify } from 'types/types'
 import { Transition } from '@headlessui/react'

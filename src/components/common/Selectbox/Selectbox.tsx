@@ -1,4 +1,4 @@
-import React, { useMemo, CSSProperties } from 'react'
+import React, { useMemo } from 'react'
 import Select, { ClearIndicatorProps } from 'react-select'
 import colors from 'styles/colors'
 import { isMobile } from 'react-device-detect'
