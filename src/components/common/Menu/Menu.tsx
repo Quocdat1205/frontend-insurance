@@ -161,15 +161,15 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                     </div>
                 ) : (
                     <div
-                        className={classnames('flex items-center justify-between sm:justify-start space-x-2 cursor-pointer text-sm px-4', {
-                            'pb-3': _active && isMobile,
+                        className={classnames('flex items-center justify-between mb:justify-start space-x-2 cursor-pointer text-sm px-4', {
+                            'pb-3 mb:pb-0': _active && isMobile,
                         })}
                     >
                         <div className="flex items-center space-x-4">
                             {menu?.icon && <Icon isIconSvg={menu?.isIconSvg} icon={menu.icon} />}
                             <Name name={menu.name} {...menu?.nameComponentProps} />
                         </div>
-                        {isMobile && (!_active ? <ChevronDown size={18} /> : <ChevronUp size={18} />)}
+                        {!menu?.hideArrowIcon && isMobile && (!_active ? <ChevronDown size={18} /> : <ChevronUp size={18} />)}
                         {/* {!isHover || ( isMobile && !active  ) ? <ChevronDown size={18} /> : <ChevronUp size={18} />} */}
                         {!menu?.hideArrowIcon && !isMobile && (!isHover ? <ChevronDown size={18} /> : <ChevronUp size={18} />)}
                     </div>
