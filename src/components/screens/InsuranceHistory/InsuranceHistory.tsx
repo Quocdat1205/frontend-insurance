@@ -127,7 +127,7 @@ const InsuranceHistory = () => {
                     {((account?.address && hasInsurance) || showGuide) && (
                         <Statistics account={account?.address} hasInsurance={hasInsurance} unitConfig={unitConfig} />
                     )}
-                    <CardShadow mobileNoShadow className="sm:mt-12 sm:p-8">
+                    <CardShadow mobileNoShadow className="lg:mt-12 lg:p-8">
                         <InsuranceContract
                             hasInsurance={hasInsurance}
                             setHasInsurance={setHasInsurance}
@@ -137,7 +137,7 @@ const InsuranceHistory = () => {
                         />
                     </CardShadow>
                     <div className="pt-[30px] sm:pt-12">
-                        <div className="sm:text-2xl font-medium">{t('insurance_history:new_cover_assets')}</div>
+                        <div className="sm:text-xl font-medium">{t('insurance_history:new_cover_assets')}</div>
                         <Assets />
                     </div>
                 </div>
@@ -148,7 +148,7 @@ const InsuranceHistory = () => {
 
 const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, onShowGuildline }: any) => {
     return (
-        <Modal isMobile containerClassName="flex-col justify-end" isVisible={visible} onBackdropCb={onClose}>
+        <Modal isMobile containerClassName="flex-col justify-end" isVisible={visible} onBackdropCb={onClose} className={'sm:max-w-[390px]'}>
             <div className="text-xl leading-8 font-semibold mb-6">{t('insurance_history:guidelines:title')}</div>
             <div className="flex flex-col text-sm divide-solid divide-y divide-divider">
                 <div onClick={onShowGuildline} className="py-4">

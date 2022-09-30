@@ -8,7 +8,7 @@ import { useTranslation } from 'next-i18next'
 import React, { useEffect, useMemo, useState, useRef } from 'react'
 import { API_GET_INSURANCE_BY_ADDRESS } from 'services/apis'
 import fetchApi from 'services/fetch-api'
-import { stateInsurance } from 'utils/constants'
+import { screens, stateInsurance } from 'utils/constants'
 import { formatCurrency, formatNumber, formatTime, getDecimalPrice } from 'utils/utils'
 import InsuranceContractMobile from './InsuranceContractMobile'
 import { useAppSelector, RootStore } from 'redux/store'
@@ -84,6 +84,18 @@ const renderReason = (data: any, t: any) => {
 }
 
 export const renderContentStatus = (data: any, t: any) => {
+    const router = useRouter()
+    const onBuyBack = () => {
+        const state = {
+            type: data.asset_covered,
+            p_claim: data?.p_claim,
+            q_coverd: data?.q_coverd,
+            period: data?.period,
+            margin: data?.margin,
+        }
+        localStorage.setItem('buy_covered_state', JSON.stringify({ ...state }))
+        router.push('buy-covered')
+    }
     return (
         <div className="overflow-hidden font-normal ">
             <div className="sm:p-6 flex flex-col">
@@ -128,7 +140,7 @@ export const renderContentStatus = (data: any, t: any) => {
                         <div className="font-semibold">{formatNumber(data?.q_claim / data?.margin, 2)}%</div>
                     </div>
                 </div>
-                <Button variants="primary" className="py-3 mt-8">
+                <Button onClick={onBuyBack} variants="primary" className="py-3 mt-8">
                     {t('common:buy_back')}
                 </Button>
             </div>
@@ -140,7 +152,7 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
     const { t } = useTranslation()
     const { width } = useWindowSize()
     const router = useRouter()
-    const isMobile = (width && width <= 640) || mobile
+    const isMobile = (width && width <= screens.drawer) || mobile
     const assetsToken = useAppSelector((state: RootStore) => state.setting.assetsToken)
     const allPairConfigs = useAppSelector((state: RootStore) => state.setting.pairConfigs)
     const [loading, setLoading] = useState<boolean>(true)
@@ -164,6 +176,10 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
     const firstTime = useRef<boolean>(true)
     const checkInsurance = useRef<boolean>(true)
     const timer = useRef<any>(null)
+
+    useEffect(() => {
+        checkInsurance.current = true
+    }, [account])
 
     useEffect(() => {
         if (!mobile && !firstTime.current) setFilter({ ...filter, skip: 0 })
@@ -503,9 +519,7 @@ const NoData = ({ hasInsurance, onBuyInsurance, t, account }: any) => {
                 <img className="max-w-[230px] sm:max-w-[310px]" src="/images/icons/bg_noData.png" />
             </div>
             <div className="mt-4 pb-6">
-                {account
-                    ? t(`insurance_history:you_have_no_insurance${hasInsurance ? '_filter' : ''}`)
-                    : t('insurance_history:connecting_wallet_to_buy')}
+                {account ? t(`insurance_history:you_have_no_insurance${hasInsurance ? '_filter' : ''}`) : t('insurance_history:connecting_wallet_to_buy')}
             </div>
             <Button onClick={onBuyInsurance} className="py-3 px-6 sm:px-20 sm:font-semibold rounded-xl text-sm sm:text-base">
                 {account ? t('common:header:buy_covered') : t('home:home:connect_wallet')}
