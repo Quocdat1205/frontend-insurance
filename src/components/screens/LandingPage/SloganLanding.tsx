@@ -19,8 +19,10 @@ const SloganLanding = () => {
         <Background>
             <div className={' max-w-screen-insurance 4xl:max-w-screen-3xl mx-auto relative h-screen '}>
                 {/*  */}
-                <div className="relative flex flex-col space-y-6 lg:space-y-9 w-full xl:justify-between lg:items-start
-                items-center pt-[48px] lg:pt-[68px] 2xl:pt-[200px] xl:max-w-[600px] max-h-[200px] lg:h-full ">
+                <div
+                    className="relative flex flex-col space-y-6 lg:space-y-9 w-full xl:justify-between lg:items-start
+                items-center pt-[30px] sm:pt-[48px] lg:pt-[68px] 2xl:pt-[200px] xl:max-w-[600px] max-h-[200px] lg:h-full "
+                >
                     <div className="flex flex-col space-y-2 pt-0 lg:pt-[4.25rem] lg:pt-0  text-center lg:text-left font-semibold">
                         <span className="text-[2rem] leading-[2.75rem] lg:text-[3.625rem] lg:text-left text-center lg:leading-[5rem]">
                             {t('common:slogan_first')}
@@ -40,7 +42,7 @@ const SloganLanding = () => {
                 <img
                     srcSet={`/images/screens/landing-page/bg_home.png 2x`}
                     className="w-full sm:w-auto m-auto absolute h-full bottom-[196px] right-0 mx-auto  lg:left-auto  left-0 lg:bottom-[15.75rem]
-                     max-h-[220px] 1xs:!max-h-[300px] tiny:max-h-[240px] sm:!max-h-[400px] mb:!max-h-[406px] xl:1max-h-[463px] 2xl:!max-h-[663px] homeNav:!max-h-[406px]"
+                     max-h-[200px] sm:!max-h-[506px] 1xs:max-h-[300px] tiny:max-h-[240px] sm:!max-h-[400px] xl:1max-h-[463px] 2xl:!max-h-[663px] homeNav:!max-h-[406px]"
                 />
             </div>
         </Background>
