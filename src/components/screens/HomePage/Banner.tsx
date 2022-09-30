@@ -85,8 +85,8 @@ const Banner = () => {
     }, [])
 
     return (
-        <section className="pt-20 sm:pt-[7.5rem]">
-            <div className="px-4 lg:px-20 ">
+        <section className="pt-10 sm:pt-[7.5rem]">
+            <div className="px-4 mb:px-10 lg:px-20">
                 <div className="text-2xl sm:text-5xl font-semibold mb-6 max-w-screen-insurance m-auto">{t('home:home:statistics')}</div>
             </div>
             <Background isMobile={isMobile}>
@@ -104,9 +104,9 @@ const Banner = () => {
                     </div>
 
                     <div className="grid grid-rows-4 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-4 grid-flow-col gap-x-6 lg:gap-6">
-                        <Tooltip className="max-w-[200px]" id={'common:terminology:q_covered'} placement="bottom" />
-                        <Tooltip className="max-w-[200px]" id={'common:terminology:margin'} placement="bottom" />
-                        <Tooltip className="max-w-[200px]" id={'common:terminology:r_claim'} placement="bottom" />
+                        <Tooltip className="max-w-[200px]" id={'common:terminology:q_covered'} placement="top" />
+                        <Tooltip className="max-w-[200px]" id={'common:terminology:margin'} placement="top" />
+                        <Tooltip className="max-w-[200px]" id={'common:terminology:r_claim'} placement="top" />
                         {list.map((item: any, index: number) => (
                             <Item key={index} className=" border-transparent-red lg:border-gradient-red">
                                 <div className="max-h-[54px]">
@@ -146,7 +146,7 @@ const Item = styled.div.attrs<any>({
     border-bottom: 0;
 `
 const Background = styled.div.attrs({
-    className: 'pt-8 px-4 lg:px-20 ',
+    className: 'pt-8 px-4 mb:px-10 lg:px-20',
 })<any>`
     background-image: ${({ isMobile }) => `url(${`/images/screens/home/banner_alt${isMobile ? '_mobile' : ''}.png`})`};
     background-position: top;

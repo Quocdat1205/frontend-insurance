@@ -11,7 +11,7 @@ const NetworkError = () => {
     }
 
     const onCopy = (text: string) => {
-        navigator.clipboard.writeText(text)
+        if (navigator) navigator?.clipboard?.writeText(text)
     }
 
     return (
@@ -30,10 +30,12 @@ const NetworkError = () => {
                     </div>
                 </div>
                 <div className="flex items-center justify-between">
-                    <div className="text-txtSecondary">{t('common:not_found_network:new_rpc_url')}</div>
-                    <div onClick={() => onCopy('https://bsc-dataseed.binance.org/')} className="font-semibold flex items-center space-x-1">
+                    <div className="text-txtSecondary whitespace-nowrap">{t('common:not_found_network:new_rpc_url')}</div>
+                    <div onClick={() => onCopy('https://bsc-dataseed.binance.org/')} className="font-semibold flex items-center text-right space-x-1">
                         <span>https://bsc-dataseed.binance.org/</span>
-                        <CopyIcon size={18} />
+                        <span>
+                            <CopyIcon size={18} />
+                        </span>
                     </div>
                 </div>
                 <div className="flex items-center justify-between">

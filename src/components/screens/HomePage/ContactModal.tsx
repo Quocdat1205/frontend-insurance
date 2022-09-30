@@ -44,6 +44,9 @@ const initialState = {
     request: '',
 }
 
+const successModalClassName = 'lg:max-w-[408px] lg:max-h-[312px]'
+const contactModalClassName = 'lg:max-w-[524px] lg:max-h-[609px]'
+
 const ContactModal = ({ visible, onClose }: ContactModal) => {
     const { t } = useTranslation()
     const [reqDetail, setReqDetail] = useState(initialState)
@@ -128,7 +131,7 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
             isVisible={visible}
             onBackdropCb={handleOnClose}
             wrapClassName="!p-6"
-            className={'lg:max-w-[600px]'}
+            className={isSuccess ? successModalClassName : contactModalClassName}
             containerClassName="z-1"
         >
             {isSuccess ? (
@@ -176,10 +179,10 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
                                 disabled={!reqDetail?.request || !reqDetail?.email || !validator('email')?.isValid}
                             >
                                 {isLoading ? (
-                                    <>
+                                    <div className={"flex items-center"}>
                                         <CircleSpinner />
                                         {t('common:modal:contact:sending_request')}
-                                    </>
+                                    </div>
                                 ) : (
                                     t('common:modal:contact:send_request')
                                 )}
