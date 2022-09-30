@@ -9,8 +9,8 @@ import { MenuIcon } from 'components/common/Svg/SvgIcon'
 import Drawer from 'components/layout/Drawer'
 import Notifications from 'components/layout/Notifications'
 import EmailSubscriptionModal from 'components/screens/HomePage/EmailRegisterModal'
-import UpdateEmailSubscriptionModal from 'components/screens/HomePage/EmailRegisterUpdateModal'
 import { ChainDataList } from 'components/web3/constants/chains'
+import { contractAddress } from 'components/web3/constants/contractAddress'
 import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import useWindowSize from 'hooks/useWindowSize'
@@ -20,7 +20,6 @@ import { API_GET_INFO_USER } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { screens } from 'utils/constants'
 import { getModalSubscribeStorage, removeLocalStorage, setModalSubscribeStorage } from 'utils/utils'
-import { contractAddress } from 'components/web3/constants/contractAddress';
 
 const Header = () => {
     const { t } = useTranslation()
@@ -36,10 +35,7 @@ const Header = () => {
     const [userInfo, setUserInfo] = useState<any>(null)
 
     // check modal subscribe able to show first time - local storage
-    const [visibleModal, setVisibleModal] = useState({
-        [Config.MODAL_REGISTER_EMAIL]: false,
-        [Config.MODAL_UPDATE_EMAIL]: false,
-    })
+    const [showModalSubscribe, setShowModalSubscribe] = useState<boolean>(false)
 
     const onConnect = async () => {
         Config.connectWallet()
@@ -55,7 +51,6 @@ const Header = () => {
     }
 
     const onClickMenuAddress = async (e: any) => {
-        const isShownModal = getModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL)
         let data = null
         switch (e?.menuId) {
             case 'disconnect':
@@ -67,12 +62,7 @@ const Header = () => {
             case Config.MODAL_UPDATE_EMAIL:
                 // check update or register new email
                 data = await getInfo()
-                if (!data?.email) {
-                    setVisibleModal({
-                        ...visibleModal,
-                        [Config.MODAL_REGISTER_EMAIL]: true,
-                    })
-                } else setVisibleModal({ ...visibleModal, [Config.MODAL_UPDATE_EMAIL]: true })
+                setShowModalSubscribe(true)
                 break
             case 'recent-transaction':
                 window.open(`https://bscscan.com/address/${account?.address}?fromaddress=${contractAddress}`, '_blank')
@@ -116,11 +106,9 @@ const Header = () => {
 
         const isShownModal = getModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL)
 
-        // handle email subscription modal
         if (!data?.email && !isShownModal) {
-            setVisibleModal({ ...visibleModal, [Config.MODAL_REGISTER_EMAIL]: true })
+            setShowModalSubscribe(true)
         } else {
-            setVisibleModal({ ...visibleModal, [Config.MODAL_REGISTER_EMAIL]: false })
             setModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL, 'true')
         }
         return data
@@ -146,8 +134,8 @@ const Header = () => {
         ...Config.subMenu,
     ]
 
-    const handleCloseModal = (modalType: string) => {
-        setVisibleModal((prev) => ({ ...prev, [modalType]: false }))
+    const handleCloseModal = () => {
+        setShowModalSubscribe(false)
     }
 
     const MenuFilter = useMemo(() => {
@@ -157,6 +145,8 @@ const Header = () => {
         return account?.address ? [...menuAddress, ...baseMenu] : baseMenu
     }, [isMobile, account])
 
+    console.log(userInfo, account)
+
     return (
         <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 homeNav:px-10 border-b border-divider sticky top-0 bg-white z-[50]">
             <div className="flex items-center justify-between w-full m-auto space-x-4 max-w-screen-layout 4xl:max-w-screen-4xl sm:space-x-12">
@@ -165,17 +155,8 @@ const Header = () => {
                 </div>
                 <div className="flex items-center justify-end w-full py-3 text-sm font-semibold  xl:justify-between homeNav:py-0">
                     {/* Modal */}
-                    {account?.address && visibleModal[Config.MODAL_REGISTER_EMAIL] && (
-                        <EmailSubscriptionModal
-                            visible={visibleModal[Config.MODAL_REGISTER_EMAIL]}
-                            onClose={() => handleCloseModal(Config.MODAL_REGISTER_EMAIL)}
-                        />
-                    )}
-                    {account?.address && visibleModal[Config.MODAL_UPDATE_EMAIL] && (
-                        <UpdateEmailSubscriptionModal
-                            visible={visibleModal[Config.MODAL_UPDATE_EMAIL]}
-                            onClose={() => handleCloseModal(Config.MODAL_UPDATE_EMAIL)}
-                        />
+                    {account?.address && showModalSubscribe && (
+                        <EmailSubscriptionModal isUpdate={userInfo?.email} visible={showModalSubscribe} onClose={handleCloseModal} />
                     )}
 
                     {!isMobile && (
