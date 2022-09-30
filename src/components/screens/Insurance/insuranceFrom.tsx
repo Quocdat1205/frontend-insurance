@@ -290,7 +290,6 @@ const InsuranceFrom = () => {
                 if (balanceBTC) {
                     if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
                         setUserBalance(Number(Number(ethers.utils.formatEther(balanceBTC)).toFixed(decimalList.decimal_q_covered)))
-                        console.log(Number(Number(state.p_market)), 'balance')
                         return Number(ethers.utils.formatEther(balanceBTC))
                     } else {
                         setUserBalance(0)
@@ -558,11 +557,11 @@ const InsuranceFrom = () => {
         if (state.q_covered > 0) {
             if (userBalance > 0) {
                 const a = Math.ceil((state.q_covered / userBalance) * 100)
+                console.log(a)
 
-                percentInsurance.current = a >= 100 ? 100 : a
-                if (a == 100 || state.q_covered == rangeQ_covered.max) {
+                if ((a >= 99 && a <= 101) || state.q_covered == rangeQ_covered.max) {
                     percentInsurance.current = 100
-                } else if (a == 75) {
+                } else if (a >= 74 && a <= 76) {
                     percentInsurance.current = 75
                 } else if (a == 50) {
                     percentInsurance.current = 50
@@ -594,13 +593,13 @@ const InsuranceFrom = () => {
         if (state.margin > 0) {
             if (userBalance > 0) {
                 const b = Math.ceil((state.margin / (state.q_covered * state.p_market)) * 100)
-                if (b == 10 || state.margin == rangeMargin.max) {
+                if ((b >= 9.5 && b <= 10.5) || state.margin == rangeMargin.max) {
                     percentMargin.current = 10
-                } else if (b == 7) {
+                } else if (b >= 6.5 && b <= 7.5) {
                     percentMargin.current = 7
-                } else if (b == 5) {
+                } else if (b >= 4.5 && b <= 5.5) {
                     percentMargin.current = 5
-                } else if (b == 2) {
+                } else if (b >= 1.5 && b <= 2.5) {
                     percentMargin.current = 2
                 } else {
                     percentMargin.current = b
