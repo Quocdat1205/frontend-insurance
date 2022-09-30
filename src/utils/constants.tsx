@@ -3,7 +3,7 @@ import { StateInsurance } from 'types/types'
 export const PORTAL_MODAL_ID: string = 'PORTAL_MODAL'
 
 export const screens = {
-    drawer: 820,
+    drawer: 819,
     drawerHome: 1280,
 }
 

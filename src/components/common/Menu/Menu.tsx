@@ -42,7 +42,7 @@ interface Menu {
 const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
     const { width } = useWindowSize()
     const { t } = useTranslation()
-    const isMobile = (width && width < screens.drawerHome) || mobile
+    const isMobile = (width && width < screens.drawer) || mobile
     const [active, setActive] = useState<any>(null)
     const [isHover, setIsHover] = useState(false)
     const router = useRouter()
@@ -176,7 +176,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                 )}
                 {hasChildren && (
                     <ul
-                        className={`menu-${level} w-full lg:w-max bg-hover lg:bg-white lg:-mx-8 lg:absolute relative flex flex-col lg:py-4 lg:space-y-2 lg:rounded-b-xl lg:shadow-subMenu lg:top-full h-max lg:left-12 lg:min-w-[244px]`}
+                        className={`menu-${level} w-full mb:w-max bg-hover mb:bg-white mb:-mx-8 mb:absolute relative flex flex-col mb:py-4 mb:space-y-2 mb:rounded-b-xl mb:shadow-subMenu mb:top-full h-max mb:left-12 mb:min-w-[244px]`}
                     >
                         {menu.children.map((menu: any, idx: number) => renderMenu(menu, idx, true))}
                     </ul>
@@ -186,7 +186,7 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
     }
 
     return (
-        <ul onMouseOver={handleOnMouseOver} onMouseOut={handleOnMouseOut} className="flex flex-col sidebar-menu lg:items-center lg:flex-row">
+        <ul onMouseOver={handleOnMouseOver} onMouseOut={handleOnMouseOut} className="flex flex-col sidebar-menu mb:items-center mb:flex-row">
             {dataFilter.map((menu: any, index: number) => renderMenu(menu, index))}
         </ul>
     )
@@ -199,10 +199,10 @@ interface Item {
 }
 
 const ItemMenu = styled.li.attrs<Item>(({ isChild, isDropdown, active }) => ({
-    className: classnames('cursor-pointer text-sm py-3 relative lg:hover:active-menu', {
+    className: classnames('cursor-pointer text-sm py-3 relative mb:hover:active-menu', {
         'mb:hover:text-red': !isChild && !isDropdown,
-        'lg:py-3': !isChild,
-        'lg:!py-[10px] pl-4 font-normal lg:text-txtPrimary lg:hover:bg-hover lg:hover:rounded-[3px]': isChild,
+        'mb:py-3': !isChild,
+        'mb:!py-[10px] pl-4 font-normal mb:text-txtPrimary mb:hover:bg-hover mb:hover:rounded-[3px]': isChild,
         'text-red': active,
     }),
 }))<Item>``

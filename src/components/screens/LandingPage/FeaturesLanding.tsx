@@ -41,7 +41,7 @@ const FeaturesLanding = () => {
     }
 
     return (
-        <section className="px-4 lg:px-20">
+        <section className="px-4 mb:px-10 lg:px-20">
             <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto text-center flex flex-col justify-center items-center pt-20 sm:pt-[7.5rem]">
                 <div className="mb-4 text-2xl font-semibold sm:text-5xl leading-8">{t('home:landing:unique_features')}</div>
                 <div className="max-w-[632px] text-[0.875rem] lg:text-[1rem]">{t('home:landing:unique_features_content')}</div>

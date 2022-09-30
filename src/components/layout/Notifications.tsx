@@ -192,7 +192,7 @@ const Notifications = () => {
     return (
         <div ref={wrapperRef} className="relative">
             <NotiDetailModal isMobile={isMobile} data={rowData.current} visible={showNotiDetail} onClose={() => setShowNotiDetail(false)} t={t} />
-            <div onClick={() => setVisible(true)} className="sm:p-2 hover:bg-hover rounded-[3px] relative">
+            <div onClick={() => setVisible(true)} className="p-2 sm:p-0 hover:bg-hover rounded-[3px] relative">
                 <NotificationsIcon />
                 {hasNotice && <div className="bg-red w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[50%] absolute top-[30%] right-[20%] sm:right-[30%]" />}
             </div>
