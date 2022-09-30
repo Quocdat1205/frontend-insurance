@@ -78,7 +78,7 @@
     "installer": {
         "metamask_title": "Install Metamask Extension",
         "metamask_content": "Please add Metamask Extension to continue the wallet connection process with Nami Insurance.",
-        "metamask_guide": "Having trouble installing the wallet? Read more <span class='text-blue underline cursor-pointer'>how to Install Metamask Extension</span> now.",
+        "metamask_guide": "Having trouble installing the wallet? Read more <span class='text-blue underline cursor-pointer'>How to Install Metamask Extension</span> now.",
         "coinbase_title": "Cài đặt Coinbase Wallet Extension",
         "coinbase_content": "Vui lòng cài đặt Coinbase Wallet Extension để tiếp tục quá trình kết nối ví đến Nami Insurance.",
         "coinbase_guide": "Chưa biết cách cài đặt ví? Đọc <span class='text-blue underline cursor-pointer'>Hướng dẫn cài đặt Coinbase Wallet Extension</span> ngay.",

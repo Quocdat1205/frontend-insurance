@@ -14,11 +14,9 @@ import { setAccount, setting } from 'redux/actions/setting'
 const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorId; name: string; connector: Connector }>) => {
     const { connector, account, chainId, isActive, error, provider, isActivating } = useWeb3React()
     const connected = useAppSelector((state: RootStore) => state.setting.account)
-    const loading = useAppSelector((state: RootStore) => state.setting.loading_account)
-    const dispatch = useAppDispatch()
 
     const activate = async (connectorId: ConnectorId, _chainId?: number) => {
-        const wallet = localStorage.getItem('PUBLIC_WALLET')
+        const wallet = sessionStorage.getItem('PUBLIC_WALLET')
         const { connector: _connector } = connectorsData[connectorId ?? connected?.wallet ?? wallet]
         _connector.deactivate()
         _connector instanceof WalletConnect

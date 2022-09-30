@@ -162,6 +162,10 @@ const Assets = () => {
                     slidesPerView: 1.05,
                     spaceBetween: 16,
                 },
+                500: {
+                    slidesPerView: 2.05,
+                    spaceBetween: 16,
+                },
                 820: {
                     slidesPerView: 2.5,
                     spaceBetween: 16,

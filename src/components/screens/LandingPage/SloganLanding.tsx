@@ -48,7 +48,7 @@ const SloganLanding = () => {
 }
 
 const Background = styled.section.attrs<any>({
-    className: 'px-4 lg:px-20 h-auto lg:overflow-hidden overflow-visible h-screen',
+    className: 'px-4 mb:px-10 lg:px-20 h-auto lg:overflow-hidden overflow-visible h-screen',
     // className: 'px-4 pt-[4.25rem] pb-20',
 })<any>`
     background-image: ${({ isMobile }) => `url(${`/images/screens/landing-page/background_nested.png`})`};

@@ -17,8 +17,8 @@ export const onLoading = (data: boolean) => async (dispatch: Dispatch) => {
 
 export const setting = () => async (dispatch: Dispatch) => {
     try {
-        const address = localStorage.getItem('PUBLIC_ADDRESS')
-        const wallet = localStorage.getItem('PUBLIC_WALLET')
+        const address = sessionStorage.getItem('PUBLIC_ADDRESS')
+        const wallet = sessionStorage.getItem('PUBLIC_WALLET')
         if (address && wallet) {
             dispatch({
                 type: types.SET_ACCOUNT,

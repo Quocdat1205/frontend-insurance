@@ -20,14 +20,14 @@ import { API_GET_INFO_USER } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { screens } from 'utils/constants'
 import { getModalSubscribeStorage, removeLocalStorage, setModalSubscribeStorage } from 'utils/utils'
-import { contractAddress } from 'components/web3/constants/contractAddress';
+import { contractAddress } from 'components/web3/constants/contractAddress'
 
 const Header = () => {
     const { t } = useTranslation()
     const { chain } = useWeb3Wallet()
     const { width } = useWindowSize()
     const router = useRouter()
-    const isMobile = width && width <= screens.drawerHome
+    const isMobile = width && width <= screens.drawer
     const [visible, setVisible] = useState<boolean>(false)
     const [isHover, setIsHover] = useState<boolean>(false)
     const dispatch = useAppDispatch()
@@ -87,10 +87,10 @@ const Header = () => {
     }
 
     const NameComponent = ({ network, accounnt, isMobile }: any) => (
-        <div className="p-2 homeNav:py-2 bg-hover rounded-[5px] flex items-center space-x-2">
+        <div className="sm:px-3 p-2 mb:py-2 bg-hover rounded-[5px] flex items-center space-x-2">
             {network && <img src={network?.icon} width={24} height={24} />}
             {network && <div>{network?.chain}</div>}
-            <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-4 homeNav:py-0">{`${account?.address?.substr(
+            <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1">{`${account?.address?.substr(
                 0,
                 isMobile ? 2 : 4,
             )}...${account?.address?.substr(-4)}`}</div>
@@ -163,7 +163,7 @@ const Header = () => {
                 <div className="min-w-[67px] w-[75px] cursor-pointer" onClick={() => router.push('/')}>
                     <img src="/images/ic_logo.png" />
                 </div>
-                <div className="flex items-center justify-end w-full py-3 text-sm font-semibold  xl:justify-between homeNav:py-0">
+                <div className="flex items-center justify-end w-full py-3 text-sm font-semibold  mb:justify-between mb:py-0">
                     {/* Modal */}
                     {account?.address && visibleModal[Config.MODAL_REGISTER_EMAIL] && (
                         <EmailSubscriptionModal
@@ -185,31 +185,22 @@ const Header = () => {
                         </div>
                     )}
                     {!loading_account && (
-                        <div className="flex items-center space-x-5 cursor-pointer sm:space-x-2">
+                        <div className="flex items-center space-x-2 cursor-pointer">
                             <>
                                 {account?.address && <Notifications />}
                                 {account?.address && !isMobile && (
                                     <Menu data={menuAddress} cbOnMouseOut={handleMouseHover} cbOnMouseOver={handleMouseHover} onChange={onChangeMenu} />
-                                    // <div className="p-1 bg-hover rounded-[5px] flex items-center space-x-2">
-                                    //     <img src={network.icon} width={24} height={24} />
-                                    //     <div>{network.chain}</div>
-                                    //     <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1">
-                                    //         {`${account.substr(0, isMobile ? 2 : 4)}...${account.substr(-4)}`}
-                                    //     </div>
-                                    // </div>
                                 )}
                                 {account?.address && network && isMobile && (
-                                    // <Menu data={menuConfig} network={network} acount={account} isMobile={isMobile}/>
-                                    <div className="p-1 insurance:p-0 bg-hover rounded-[5px] flex items-center space-x-2">
+                                    <div className="p-1 py-[6px] bg-hover rounded-[5px] flex items-center space-x-2">
                                         <img src={network.icon} width={24} height={24} />
                                         <div>{network.chain}</div>
-                                        <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 my-1">
+                                        <div className="rounded-[5px] bg-white overflow-hidden py-1 px-2 leading-[14px]">
                                             {`${account?.address.substr(0, isMobile ? 2 : 4)}...${account?.address.substr(-4)}`}
                                         </div>
                                     </div>
                                 )}
                             </>
-                            {/* {network && isMobile && <Notifications />} */}
                             {!isMobile && <ButtonLanguage />}
                             {!account?.address && (
                                 <Button onClick={onConnect} className="px-4 py-2 space-x-2 font-semibold">

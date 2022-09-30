@@ -47,6 +47,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     const isReload = useRef<boolean>(false)
     const textErrorButton = useRef<string>(t(`common:reconnect`))
     const showIconReload = useRef<boolean>(true)
+    const logged = useRef<boolean>(false)
 
     const loading_account = useAppSelector((state: RootStore) => state.setting.loading_account)
     const account = useAppSelector((state: RootStore) => state.setting.account)
@@ -62,6 +63,15 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     }, [error, isVisible, isActive])
 
     const timer = useRef<any>(null)
+    useEffect(() => {
+        if (address && !account?.address && isActive && logged.current) {
+            clearTimeout(timer.current)
+            timer.current = setTimeout(() => {
+                onConfirm()
+            }, 500)
+        }
+    }, [account, address, isActive, loading_account])
+
     useEffect(() => {
         if (loading_account) {
             clearTimeout(timer.current)
@@ -101,7 +111,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
 
     const connectionError = (error: any) => {
         let isNotFoundNetWork = false
-        const code = isString(error?.code) ? error?.code : Math.abs(error?.code)
+        const code = error?.data ? error?.data?.originalError?.code : isString(error?.code) ? error?.code : Math.abs(error?.code)
         switch (code) {
             case 32600:
             case 32601:
@@ -118,6 +128,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
             case errorsWallet.Not_found:
                 isNotFoundNetWork = true
                 setNetworkError(true)
+                setSwitchNetwork(false)
                 break
             case errorsWallet.Success:
                 Config.toast.show('success', t('common:connect_successful'))
@@ -167,6 +178,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
 
     const onConfirm = async () => {
         firstTime.current = false
+        logged.current = true
         oldAddress.current = !oldAddress.current ? address : oldAddress.current
         switch (wallet?.wallet) {
             case wallets.metaMask:
@@ -194,11 +206,13 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
             default:
                 break
         }
+        if (wallet?.wallet) sessionStorage.setItem('PUBLIC_WALLET', wallet?.wallet)
         if (!isMobile) Config.web3?.activate(wallet?.wallet)
         if (!oldAddress.current) return
         setErrorConnect(false)
         setLoading(true)
         try {
+            logged.current = false
             const token = await Config.web3.contractCaller?.sign(oldAddress.current)
             if (!token) {
                 lostConnection()
@@ -210,9 +224,8 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 if (chainId && Config.chains.includes(chainId)) {
                     Config.toast.show('success', t('common:connect_successful'))
                 }
-                localStorage.setItem('PUBLIC_ADDRESS', oldAddress.current)
-                localStorage.setItem('PUBLIC_TOKEN', token)
-                if (wallet?.wallet) localStorage.setItem('PUBLIC_WALLET', wallet?.wallet)
+                sessionStorage.setItem('PUBLIC_ADDRESS', oldAddress.current)
+                sessionStorage.setItem('PUBLIC_TOKEN', token)
                 dispatch(setAccount({ address: oldAddress.current, wallet: wallet?.wallet }))
                 setVisible(false)
             }
