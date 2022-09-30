@@ -437,13 +437,14 @@ const InsuranceFrom = () => {
     }, [selectTime, selectCoin])
 
     useEffect(() => {
-        if (selectCoin?.symbol) {
+        if (selectCoin?.symbol != '') {
             getPrice(selectCoin.symbol, state, setState)
             setState({ ...state, symbol: { ...selectCoin } })
             getConfig(selectCoin.type)
             getBalaneToken(selectCoin.type)
             localStorage.setItem('buy_covered_state', JSON.stringify(selectCoin))
         }
+        setState({ ...state, q_covered: 0, margin: 0, p_claim: 0, period: 2 })
     }, [selectCoin])
 
     const createSaved = async () => {
@@ -507,7 +508,6 @@ const InsuranceFrom = () => {
             if (userBalance > 0) {
                 const a = Math.ceil((state.q_covered / userBalance) * 100)
                 console.log(a)
-
                 if ((a >= 99 && a <= 101) || state.q_covered == rangeQ_covered.max) {
                     percentInsurance.current = 100
                 } else if (a >= 74 && a <= 76) {
@@ -593,7 +593,7 @@ const InsuranceFrom = () => {
                 p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
             })
         }
-    }, [state.q_covered, state.margin, state.p_claim])
+    }, [state.q_covered, state.margin, state.p_claim, state.period])
 
     useEffect(() => {
         createSaved()
@@ -908,7 +908,9 @@ const InsuranceFrom = () => {
         switch (key) {
             case 'q_covered':
                 setState({ ...state, [key]: value })
-                percentInsurance.current = 0
+                if (value == 0 || state.q_covered.toString().length > value.toString().length) {
+                    percentInsurance.current = 0
+                }
                 if (value > Number(rangeQ_covered?.max?.toFixed(decimalList.decimal_q_covered)) || value < rangeQ_covered.min || value <= 0) {
                     setIsCanSave(false)
                 } else {
@@ -918,16 +920,19 @@ const InsuranceFrom = () => {
                 break
             case 'p_claim':
                 setState({ ...state, [key]: value })
+
+                break
+            case 'margin':
+                if (value == 0 || state.margin.toString().length > value.toString().length) {
+                    percentMargin.current = 0
+                }
+                setState({ ...state, margin: value, percent_margin: 0 })
                 if (value < Number(rangeMargin.min) || value > Number(rangeMargin.max) || value <= 0) {
                     setIsCanSave(false)
                 } else {
                     setIsCanSave(true)
                 }
 
-                break
-            case 'margin':
-                percentMargin.current = 0
-                setState({ ...state, margin: value, percent_margin: 0 })
                 break
             default:
                 break
@@ -949,6 +954,8 @@ const InsuranceFrom = () => {
     useEffect(() => {
         clear.current = handleCheckFinal()
     }, [state])
+
+    console.log(state)
 
     return (
         <>
@@ -1478,7 +1485,7 @@ const InsuranceFrom = () => {
                                     <Modal
                                         portalId="modal"
                                         isVisible={true}
-                                        className={`!sticky !bottom-0 !left-0 !rounded-none !translate-x-0 !translate-y-0 h-1/2 `}
+                                        className={`!sticky !bottom-0 !left-0 !rounded-none !translate-x-0 !translate-y-0 h-1/2 !max-w-full`}
                                         onBackdropCb={() => {
                                             setShowInput({ ...showInput, isShow: false, name: '' })
                                             if (showInput.name == 'q_covered') {
@@ -1578,14 +1585,6 @@ const InsuranceFrom = () => {
                                                     !isCanSave ? 'bg-hover' : 'bg-red'
                                                 } h-[40.5rem] w-full flex justify-center items-center text-white rounded-[0.5rem] py-[12px]`}
                                                 onClick={() => {
-                                                    // if (showInput.name === 'q_covered') {
-                                                    //     onHandleChange('q_covered', tmp_q_covered.current)
-                                                    //     return setShowInput({ ...showInput, isShow: false, name: '' })
-                                                    // }
-                                                    // if (showInput.name === 'margin') {
-                                                    //     onHandleChange('margin', tmp_margin.current)
-                                                    //     return setShowInput({ ...showInput, isShow: false, name: '' })
-                                                    // }
                                                     setShowInput({ ...showInput, isShow: false, name: '' })
                                                 }}
                                             >
@@ -1596,9 +1595,11 @@ const InsuranceFrom = () => {
                                 )}
                                 {openChangeToken && (
                                     <Modal
+                                        wrapClassName="!w-full"
+                                        containerClassName="!w-full"
                                         portalId="modal"
                                         isVisible={true}
-                                        className=" bg-white !sticky !bottom-0 !left-0 !rounded-none !translate-x-0 !translate-y-0 h-1/2"
+                                        className=" bg-white !max-w-full !w-full !sticky !bottom-0 !left-0 !rounded-none !translate-x-0 !translate-y-0 h-1/2"
                                         onBackdropCb={() => {
                                             setShowInput({ isShow: true, name: 'q_covered' })
                                             setOpenChangeToken(false)

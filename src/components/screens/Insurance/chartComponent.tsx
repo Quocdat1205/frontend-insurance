@@ -280,9 +280,13 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 }
 
                 expiredLabel.label.horizontalCenter = 'right'
-                // expiredLabel.label.dy = latitudeExpired.data[0].value > state.p_market ? 23 : -23
-                expiredLabel.label.dx = -5
-                expiredLabel.label.verticalCenter = 'middle'
+                if (isMobile) {
+                    expiredLabel.label.dx = -5
+                    expiredLabel.label.verticalCenter = 'middle'
+                } else {
+                    expiredLabel.label.dy = latitudeExpired.data[0].value > state.p_market ? 23 : -23
+                    expiredLabel.label.verticalCenter = 'bottom'
+                }
                 expiredLabel.label.fill = am4core.color('#B2B7BC')
             }
 
