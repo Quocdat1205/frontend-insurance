@@ -480,7 +480,7 @@ const InsuranceFrom = () => {
     useEffect(() => {
         if (selectCoin.symbol != '') {
             getPrice(selectCoin.symbol, state, setState)
-            setState({ ...state, symbol: { ...selectCoin } })
+            setState({ ...state, symbol: { ...selectCoin }, q_covered: 0, margin: 0, p_claim: 0, period: 2 })
             getConfig(selectCoin.type)
             getBalaneToken(selectCoin.type)
 
