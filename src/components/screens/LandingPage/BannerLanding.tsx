@@ -110,7 +110,7 @@ const BannerLanding = () => {
                                 $129,000
                             </div>
 
-                            <div className={'flex flex-row justify-center items-center text-txtSecondary text-sm'}>
+                            <div className={'flex flex-row justify-center items-center text-txtSecondary text-xs lg:text-base'}>
                                 <span className={''}>P-Claim</span>
                                 <div className={'ml-[0.375rem]'} data-tip={t('common:terminology:p_claim')} data-for={`p_claim`}>
                                     <InfoCircle size={14} color={colors.txtSecondary} />
@@ -126,7 +126,7 @@ const BannerLanding = () => {
                                 {formatCurrency(item.value, item.decimal)}
                                 {item?.suffix}
                             </div>
-                            <div className="flex items-center text-sm text-txtSecondary lg:text-base">
+                            <div className="flex items-center text-xs text-txtSecondary lg:text-base">
                                 {item.title}
                                 {item.tooltip && (
                                     <div className={'ml-[0.375rem] relative'} data-tip={t(item.tooltip)} data-for={item.tooltip}>
