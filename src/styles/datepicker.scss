@@ -112,10 +112,6 @@ $height: 32px;
 }
 
 .date-range-picker {
-    @apply bg-hover h-[2.75rem] sm:h-[3rem];
-    display: flex;
-    align-items: center;
-
     .rdrCalendarWrapper,
     .rdrDateRangeWrapper {
         @apply relative;
@@ -131,6 +127,43 @@ $height: 32px;
         @apply p-0 sm:p-5;
         .rdrMonthName {
             @apply text-txtPrimary font-semibold flex items-center justify-center text-base p-0 mb-[10px];
+        }
+    }
+
+    .single-select {
+        .rdrInRange,
+        .rdrDayInPreview {
+            background: none !important;
+        }
+        .rdrDay:not(.rdrDayPassive) .rdrInRange ~ .rdrDayNumber span,
+        .rdrDayInPreview ~ .rdrDayNumber span {
+            color: #fff !important;
+        }
+
+        .rdrDayHovered {
+            border-radius: 3px !important;
+            border: none !important;
+            @apply bg-red text-white;
+            .rdrDayNumber {
+                span {
+                    color: white !important;
+                }
+                &::after {
+                    display: none !important;
+                }
+            }
+        }
+        .rdrDayEndPreview,
+        .rdrDayInPreview,
+        .rdrDayStartPreview {
+            @apply invisible;
+            background: none !important;
+        }
+        .rdrSelected {
+            @apply inset-0 bg-red relative z-0 w-full max-w-[3rem] sm:w-[42px];
+            border-radius: 3px;
+            height: $height;
+            border: none;
         }
     }
 
@@ -203,6 +236,7 @@ $height: 32px;
             border: none;
             @apply text-red inset-0;
         }
+
         .rdrDayToday {
             .rdrDayNumber {
                 span {

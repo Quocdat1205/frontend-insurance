@@ -432,9 +432,9 @@ export const BxCaledarCheck = () => {
     )
 }
 
-export const CopyIcon = ({ size = 12, color = '#B2B7BC' }: IconSvg) => {
+export const CopyIcon = ({ size = 12, color = '#B2B7BC', className = '', onClick }: IconSvg) => {
     return (
-        <svg width={size} height={size} viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg onClick={onClick} className={className} width={size} height={size} viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g clipPath="url(#clip0_2352_5508)">
                 <path
                     d="M8 0.5H2C1.45 0.5 1 0.95 1 1.5V8.5H2V1.5H8V0.5ZM9.5 2.5H4C3.45 2.5 3 2.95 3 3.5V10.5C3 11.05 3.45 11.5 4 11.5H9.5C10.05 11.5 10.5 11.05 10.5 10.5V3.5C10.5 2.95 10.05 2.5 9.5 2.5ZM9.5 10.5H4V3.5H9.5V10.5Z"
@@ -518,17 +518,15 @@ const ReplayIcon = ({ size = 24, color = '#EB2B3E' }: IconSvg) => (
 )
 
 const TriggerErrorIconCircle = ({ size = 12, color = '#B2B7BC' }: IconSvg) => {
-    return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M11.953 2C6.465 2 2 6.486 2 12C2 17.514 6.486 22 12 22C17.514 22 22 17.514 22 12C22 6.486 17.493 2 11.953 2ZM12 20C7.589 20 4 16.411 4 12C4 7.589 7.567 4 11.953 4C16.391 4 20 7.589 20 12C20 16.411 16.411 20 12 20Z" fill="#EB2B3E"/>
-        <path d="M11 7H13V14H11V7ZM11 15H13V17H11V15Z" fill="#EB2B3E"/>
-    </svg>
+    return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M11.953 2C6.465 2 2 6.486 2 12C2 17.514 6.486 22 12 22C17.514 22 22 17.514 22 12C22 6.486 17.493 2 11.953 2ZM12 20C7.589 20 4 16.411 4 12C4 7.589 7.567 4 11.953 4C16.391 4 20 7.589 20 12C20 16.411 16.411 20 12 20Z"
+                fill="#EB2B3E"
+            />
+            <path d="M11 7H13V14H11V7ZM11 15H13V17H11V15Z" fill="#EB2B3E" />
+        </svg>
+    )
 }
 
-export {
-    HistoryIcon,
-    UserIcon,
-    EmailIcon,
-    DisconnectIcon,
-    TriggerErrorIconCircle,
-    ReplayIcon
-}
+export { HistoryIcon, UserIcon, EmailIcon, DisconnectIcon, TriggerErrorIconCircle, ReplayIcon }
