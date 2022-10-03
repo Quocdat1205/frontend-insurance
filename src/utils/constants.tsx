@@ -118,16 +118,17 @@ export const errorsWallet = {
     Connect_failed: 'CONNECT_FAILED',
 }
 
-
 export const seoConfigs: any[] = [
     {
         url: '/insurance-history.*',
         en: {
+            url: '/insurance-history',
             title: 'Change risk to payback | Cover Value for BTC, ETH, BNB and Altcoin',
             description: 'Cover your crypto asset value with 0 fee',
             keywords: 'Change risk to payback | Cover Value for BTC, ETH, BNB and Altcoin',
         },
         vi: {
+            url: '/insurance-history',
             title: 'Biến rủi ro thành lợi nhuận | Bảo chứng tài sản tiền số BTC, ETH, BNB và Altcoin',
             description: 'Cover your crypto asset value with 0 fee',
             keywords: 'Biến rủi ro thành lợi nhuận | Bảo chứng tài sản tiền số BTC, ETH, BNB và Altcoin',
@@ -136,11 +137,13 @@ export const seoConfigs: any[] = [
     {
         url: '/buy-covered.*',
         en: {
+            url: '/buy-covered',
             title: 'BTC/USDT: 30,000 | Nami Insurance',
             description: 'Cover your crypto asset value with 0 fee',
             keywords: 'BTC/USDT: 30,000 | Nami Insurance',
         },
         vi: {
+            url: '/buy-covered',
             title: 'Giá tương ứng với Tài sản BTC/USDT: 30,000 | Nami Insurance',
             description: 'Cover your crypto asset value with 0 fee',
             keywords: 'Giá tương ứng với Tài sản BTC/USDT: 30,000 | Nami Insurance',
@@ -149,11 +152,13 @@ export const seoConfigs: any[] = [
     {
         url: '/home.*',
         en: {
+            url: '/home',
             title: 'Change risk to payback | Cover Value for BTC, ETH, BNB and Altcoins',
             description: 'Cover your crypto asset value with 0 fee',
             keywords: 'Change risk to payback | Cover Value for BTC, ETH, BNB and Altcoins',
         },
         vi: {
+            url: '/home',
             title: 'Biến rủi ro thành lợi nhuận | Bảo chứng tài sản tiền số BTC, ETH, BNB và Altcoins',
             description: 'Cover your crypto asset value with 0 fee',
             keywords: 'Biến rủi ro thành lợi nhuận | Bảo chứng tài sản tiền số BTC, ETH, BNB và Altcoins',
