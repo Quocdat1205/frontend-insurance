@@ -406,12 +406,12 @@ const InsuranceFrom = () => {
         })
         console.log(tokenFilter)
 
-        const itemFilter = tokenFilter.find((rs: any) => rs.type === ((res && res?.type) || 'BNB'))
-        setSelectedCoin(itemFilter)
-        setState({
-            ...state,
-            symbol: itemFilter,
-        })
+        // const itemFilter = tokenFilter.find((rs: any) => rs.type === (res?.type ? res?.type : 'BNB'))
+        // setSelectedCoin(itemFilter)
+        // setState({
+        //     ...state,
+        //     symbol: itemFilter,
+        // })
         setListCoin(tokenFilter)
     }
 
