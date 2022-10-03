@@ -175,7 +175,8 @@ const InsuranceFrom = () => {
                             }}
                         >
                             {' '}
-                            {width && width >= 421 && <br />}
+                            {width && width >= 390 && <br />}
+                            {width && width <= 246 && <br />}
                             {state.q_covered}{' '}
                         </span>
                     </label>
@@ -225,13 +226,13 @@ const InsuranceFrom = () => {
         )
     }
 
-    // useEffect(() => {
-    //     if (loadings) {
-    //         setTimeout(() => {
-    //             setShowGuide(true)
-    //         }, 1500)
-    //     }
-    // }, [loadings])
+    useEffect(() => {
+        if (loadings && isMobile) {
+            setTimeout(() => {
+                setShowGuide(true)
+            }, 1500)
+        }
+    }, [loadings])
 
     const handleNext = () => {
         const query = {
@@ -352,8 +353,13 @@ const InsuranceFrom = () => {
         const data = localStorage.getItem('buy_covered_state')
         if (data !== 'undefined') {
             const res = JSON.parse(data as string)
-
-            return res
+            if (res.form_history !== true) {
+                return res
+            } else {
+                setState({ ...state, p_claim: res.p_claim, q_covered: res.q_covered, period: res.period, margin: res.margin })
+                setTab(isMobile ? 3 : 1)
+                return res
+            }
         } else {
             return false
         }
@@ -409,7 +415,6 @@ const InsuranceFrom = () => {
 
     const setDataIcon = async () => {
         const res = await getStorage()
-
         const tokenFilter = assetsToken.map((rs: any) => {
             return {
                 icon: rs?.attachment,
@@ -421,13 +426,30 @@ const InsuranceFrom = () => {
             }
         })
 
-        const itemFilter = tokenFilter.find((rs: any) => rs.type === (res && res.type ? res?.type : 'BNB'))
-        setSelectedCoin(itemFilter)
-        setState({
-            ...state,
-            symbol: itemFilter,
-        })
-        setListCoin(tokenFilter)
+        if (res) {
+            console.log(res)
+
+            let itemFilter = tokenFilter.find((rs: any) => rs.type === res?.type)
+            setSelectedCoin(itemFilter)
+
+            setState({
+                ...state,
+                symbol: itemFilter,
+                q_covered: res.q_covered,
+                period: res.period,
+                margin: res.margin,
+                p_claim: res.p_claim,
+            })
+            setListCoin(tokenFilter)
+        } else {
+            let itemFilter = tokenFilter.find((rs: any) => rs.type === 'BNB')
+            setSelectedCoin(itemFilter)
+            setState({
+                ...state,
+                symbol: itemFilter,
+            })
+            setListCoin(tokenFilter)
+        }
     }
 
     useEffect(() => {
@@ -858,7 +880,7 @@ const InsuranceFrom = () => {
                                         </div>
                                         <div className={'flex flex-row justify-between w-full text-sm'}>
                                             <span className={'hover:cursor-default'}>{coin.name}</span>
-                                            {coin.id === selectCoin.id ? <Check size={16} className={'text-red'}></Check> : ''}
+                                            {coin.id === selectCoin?.id ? <Check size={16} className={'text-red'}></Check> : ''}
                                         </div>
                                     </div>
                                 ) : (
@@ -973,7 +995,7 @@ const InsuranceFrom = () => {
     return (
         <>
             {<GlossaryModal visible={showDetails} onClose={() => setShowDetails(false)} />}
-            {<Guide start={showGuide} setStart={setShowGuide} />}
+            {isMobile && <Guide start={showGuide} setStart={setShowGuide} />}
             {!loadings ? (
                 !isMobile ? (
                     <>
@@ -990,13 +1012,13 @@ const InsuranceFrom = () => {
                                 </div>
                             )}
                             <div className="px-4 mb:px-10 lg:px-20">
-                                <div className="max-w-/screen-layout 4xl:max-w-screen-3xl m-auto">
+                                <div className=" max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
                                     {
                                         // head Insurance
                                         <HeaderContent state={tab} setState={setTab} props={state} setProps={setState} wallet={wallet} auth={account.address} />
                                     }
 
-                                    <div className="  flex flex-row mb-[8rem] overflow-hidden">
+                                    <div className="flex flex-row mb-[8rem] overflow-hidden">
                                         <div className="w-8/12">
                                             {
                                                 //chart
@@ -1154,7 +1176,9 @@ const InsuranceFrom = () => {
                                                         </span>
                                                         <Tab.Group>
                                                             <Tab.List
-                                                                className={`flex flex-row mt-4 justify-between`}
+                                                                className={`flex flex-row mt-4 justify-between ${
+                                                                    showCroll ? 'overflow-scroll' : ' overflow-hidden'
+                                                                }`}
                                                                 onTouchStart={() => {
                                                                     setShowCroll(true)
                                                                 }}
@@ -1168,7 +1192,9 @@ const InsuranceFrom = () => {
                                                                             key={key}
                                                                             className={`${
                                                                                 state.period == item && 'bg-pink text-red font-semibold'
-                                                                            } bg-hover rounded-[300px] px-4 py-1 flex justify-center items-center hover:cursor-pointer ${
+                                                                            } bg-hover rounded-[300px] ${
+                                                                                key != 0 ? 'ml-[0.75rem]' : ''
+                                                                            } px-4 py-1 flex justify-center items-center hover:cursor-pointer ${
                                                                                 isMobile && !(item == 15) && 'mr-[12px]'
                                                                             }`}
                                                                             onClick={() => setState({ ...state, period: item })}
@@ -1360,9 +1386,13 @@ const InsuranceFrom = () => {
                                                             <Menu.Item>
                                                                 {({ active }) => (
                                                                     <a
+                                                                        href="https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/"
                                                                         className={`${active && 'bg-blue-500'}  py-[0.5rem] pl-[1rem] w-[300px] hover:bg-hover`}
                                                                         onClick={() => {
-                                                                            setShowGuide(true)
+                                                                            router.push(
+                                                                                'https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/',
+                                                                            )
+                                                                            // setShowGuide(true)
                                                                         }}
                                                                     >
                                                                         <span>{t('insurance:buy:help1')}</span>

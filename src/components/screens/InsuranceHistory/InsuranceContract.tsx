@@ -89,9 +89,10 @@ export const renderContentStatus = (data: any, t: any) => {
         const state = {
             type: data.asset_covered,
             p_claim: data?.p_claim,
-            q_coverd: data?.q_coverd,
+            q_covered: data?.q_coverd,
             period: data?.period,
             margin: data?.margin,
+            form_history: true,
         }
         localStorage.setItem('buy_covered_state', JSON.stringify({ ...state }))
         router.push('buy-covered')

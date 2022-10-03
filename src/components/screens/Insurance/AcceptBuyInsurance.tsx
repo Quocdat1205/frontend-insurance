@@ -155,7 +155,6 @@ const AcceptBuyInsurance = () => {
         if (dataSate) {
             const res = JSON.parse(dataSate)
             setState({ ...res })
-
             if (res.p_claim < res.p_market) {
                 setSaved(res.q_claim + res.q_covered * (res.p_claim - res.p_market) - res.margin + res.q_covered * (res.p_market - res.p_claim))
             }
@@ -489,7 +488,7 @@ const AcceptBuyInsurance = () => {
                                             </span>{' '}
                                             <div className="relative">
                                                 <Menu>
-                                                    <Menu.Button className={' text-blue underline hover:cursor-pointer'}>
+                                                    <Menu.Button disabled={true} className={' text-blue underline hover:cursor-pointer'}>
                                                         <span className={'text-redPrimary decoration-white underline'}>{unitMoney.current}</span>
                                                     </Menu.Button>
                                                     <Menu.Items
