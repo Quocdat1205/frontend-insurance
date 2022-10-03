@@ -130,6 +130,18 @@ const InsuranceFrom = () => {
         { menuId: 'help', name: t('insurance:buy:help') },
     ]
 
+    const [rangeP_claim, setRangeP_claim] = useState({
+        min: 0,
+        max: 0,
+    })
+    const [rangeMargin, setRangeMargin] = useState({
+        min: 0,
+        max: 0,
+    })
+
+    const [percentPrice, setPercentPrice] = useState<any>()
+    const min_notinal = useRef(0)
+
     const Leverage = (p_market: number, p_stop: number) => {
         const leverage = Math.floor(p_market / Math.abs(p_market - p_stop))
         return leverage < 1 ? 1 : leverage
@@ -242,69 +254,79 @@ const InsuranceFrom = () => {
 
     const getBalaneToken = async (symbol: string) => {
         try {
-            if (symbol === 'BNB') {
-                const result = wallet.getBalance()
-                return result.then((balance: number) => {
-                    setUserBalance(balance)
-                    return balance
-                })
-            }
-
-            if (symbol === 'USDT') {
-                const balanceUsdt = await Config.web3.contractCaller?.usdtContract.contract.balanceOf(account.address)
-
-                if (balanceUsdt) {
-                    if (Number(ethers.utils.formatEther(balanceUsdt)) > 0) {
-                        setUserBalance(Number(Number(ethers.utils.formatEther(balanceUsdt)).toFixed(decimalList.decimal_q_covered)))
-
-                        return Number(ethers.utils.formatEther(balanceUsdt))
-                    } else {
-                        setUserBalance(0)
-                        return 0
-                    }
-                } else {
-                    return false
+            if (account.address !== null) {
+                if (symbol === 'BNB') {
+                    const result = wallet.getBalance()
+                    return result.then((balance: number) => {
+                        setUserBalance(Number(balance.toFixed(decimalList.decimal_q_covered)))
+                        return Number(balance.toFixed(decimalList.decimal_q_covered))
+                    })
                 }
-            }
 
-            if (symbol === 'ETH') {
-                const balanceETH = await Config.web3.contractCaller?.ethContract.contract.balanceOf(account.address)
+                if (symbol === 'USDT') {
+                    const balanceUsdt = await Config.web3.contractCaller?.usdtContract.contract.balanceOf(account.address)
 
-                if (balanceETH) {
-                    if (Number(ethers.utils.formatEther(balanceETH)) > 0) {
-                        setUserBalance(Number(Number(ethers.utils.formatEther(balanceETH)).toFixed(decimalList.decimal_q_covered)))
-                        return Number(ethers.utils.formatEther(balanceETH))
+                    if (balanceUsdt) {
+                        if (Number(ethers.utils.formatEther(balanceUsdt)) > 0) {
+                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceUsdt)).toFixed(decimalList.decimal_q_covered)))
+
+                            return Number(ethers.utils.formatEther(balanceUsdt))
+                        } else {
+                            setUserBalance(0)
+                            return 0
+                        }
                     } else {
-                        setUserBalance(0)
-                        return 0
+                        return false
                     }
-                } else {
-                    return false
                 }
-            }
 
-            if (symbol === 'BTC') {
-                const balanceBTC = await Config.web3.contractCaller?.btcContract.contract.balanceOf(account.address)
-                if (balanceBTC) {
-                    if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
-                        setUserBalance(Number(Number(ethers.utils.formatEther(balanceBTC)).toFixed(decimalList.decimal_q_covered)))
-                        return Number(ethers.utils.formatEther(balanceBTC))
+                if (symbol === 'ETH') {
+                    const balanceETH = await Config.web3.contractCaller?.ethContract.contract.balanceOf(account.address)
+
+                    if (balanceETH) {
+                        if (Number(ethers.utils.formatEther(balanceETH)) > 0) {
+                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceETH)).toFixed(decimalList.decimal_q_covered)))
+                            return Number(ethers.utils.formatEther(balanceETH))
+                        } else {
+                            setUserBalance(0)
+                            return 0
+                        }
                     } else {
-                        setUserBalance(0)
-                        return 0
+                        return false
                     }
-                } else {
-                    return false
                 }
+
+                if (symbol === 'BTC') {
+                    const balanceBTC = await Config.web3.contractCaller?.btcContract.contract.balanceOf(account.address)
+                    if (balanceBTC) {
+                        if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
+                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceBTC)).toFixed(decimalList.decimal_q_covered)))
+                            return Number(ethers.utils.formatEther(balanceBTC))
+                        } else {
+                            setUserBalance(0)
+                            return 0
+                        }
+                    } else {
+                        return false
+                    }
+                }
+            } else {
+                setUserBalance(0)
+                return 0
             }
         } catch (err) {
             console.log(err)
         }
     }
-    // const setStorage = (value: any) => {
-    //     localStorage.setItem('buy_covered_state', JSON.stringify(value))
-    //     setThisFisrt(false)
-    // }
+
+    useEffect(() => {
+        if (account.address == null) {
+            setUserBalance(0)
+        } else {
+            getBalaneToken(selectCoin?.type)
+            setState({ ...state, q_covered: 0 })
+        }
+    }, [account.address])
 
     const updateFormPercentMargin = (value: number) => {
         if (state.q_covered > 0) {
@@ -461,7 +483,7 @@ const InsuranceFrom = () => {
     }
 
     useEffect(() => {
-        const res_q_covered = validator('p_claim')
+        validator('p_claim')
         validator('q_covered')
         validator('margin')
 
@@ -539,7 +561,9 @@ const InsuranceFrom = () => {
 
         if (state.margin > 0) {
             if (userBalance > 0) {
-                const b = Math.ceil((state.margin / (state.q_covered * state.p_market)) * 100)
+                const percent = (state.margin / (state.q_covered * state.p_market)) * 100
+
+                const b = Number(percent.toFixed(decimalList.decimal_margin))
                 if ((b >= 9.5 && b <= 10.5) || state.margin == rangeMargin.max) {
                     percentMargin.current = 10
                 } else if (b >= 6.5 && b <= 7.5) {
@@ -621,12 +645,6 @@ const InsuranceFrom = () => {
     }, [tab])
 
     useEffect(() => {
-        const defaultQ_covered = pair_configs?.filters?.find((e: any) => {
-            return e.filterType === 'LOT_SIZE'
-        })
-    }, [percentInsurance, state.margin, state.q_covered])
-
-    useEffect(() => {
         validator('p_claim')
     }, [state.p_claim])
 
@@ -638,19 +656,6 @@ const InsuranceFrom = () => {
         }
     }, [showGuide])
 
-    const [rangeP_claim, setRangeP_claim] = useState({
-        min: 0,
-        max: 0,
-    })
-    const [rangeMargin, setRangeMargin] = useState({
-        min: 0,
-        max: 0,
-    })
-
-    const [percentPrice, setPercentPrice] = useState<any>()
-    const [priceFilter, setPriceFilter] = useState<any>()
-    const min_notinal = useRef(0)
-
     useEffect(() => {
         const _decimalList = { ...decimalList }
         let _percentPrice: any
@@ -660,27 +665,28 @@ const InsuranceFrom = () => {
             }
             if (item?.filterType === 'LOT_SIZE') {
                 const tmp = await getBalaneToken(selectCoin?.type)
-                const decimal = countDecimals(item.stepSize)
-                _decimalList.decimal_q_covered = +decimal
-                const min_Market = +(min_notinal.current / state.p_market).toFixed(+decimal)
+                if (tmp >= 0) {
+                    const decimal = countDecimals(item.stepSize)
+                    _decimalList.decimal_q_covered = +decimal
+                    const min_Market = +(min_notinal.current / state.p_market).toFixed(+decimal)
 
-                const max = Number(item?.maxQty) < tmp ? Number(item?.maxQty) : tmp
+                    const max = Number(item?.maxQty) < tmp ? Number(item?.maxQty) : tmp
 
-                if (min_Market == Infinity) {
-                    const min = Number(item?.minQty)
+                    if (min_Market == Infinity) {
+                        const min = Number(item?.minQty)
 
-                    setRangeQ_covered({ ...rangeQ_covered, min: min, max: max })
-                } else {
-                    const min = Number(item?.minQty) > min_Market ? Number(item?.minQty) : min_Market
+                        setRangeQ_covered({ ...rangeQ_covered, min: min, max: max })
+                    } else {
+                        const min = Number(item?.minQty) > min_Market ? Number(item?.minQty) : min_Market
 
-                    setRangeQ_covered({ ...rangeQ_covered, min: min, max: max })
+                        setRangeQ_covered({ ...rangeQ_covered, min: min, max: max })
+                    }
                 }
             }
             if (item?.filterType === 'PERCENT_PRICE') {
                 _percentPrice = item
             }
             if (item?.filterType === 'PRICE_FILTER') {
-                setPriceFilter({ ...item })
                 const decimal_p_claim = countDecimals(Number(item.tickSize))
 
                 _decimalList.decimal_p_claim = +decimal_p_claim
@@ -807,7 +813,7 @@ const InsuranceFrom = () => {
 
         setTimeout(() => {
             router.reload()
-        }, 10)
+        }, 1500)
     }
 
     const renderPopoverQCover = () => (
