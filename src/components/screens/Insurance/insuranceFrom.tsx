@@ -327,22 +327,13 @@ const InsuranceFrom = () => {
         }
     }
 
-    const getStorage = async () => {
+    const getStorage = () => {
         const data = localStorage.getItem('buy_covered_state')
         if (data !== 'undefined') {
-            console.log('TRUE')
-
             const res = JSON.parse(data as string)
 
             return res
-            // if (res) {
-            //     return res
-            // } else {
-            //     return false
-            // }
         } else {
-            console.log('FALSE')
-
             return false
         }
     }
@@ -396,7 +387,7 @@ const InsuranceFrom = () => {
     }
 
     const setDataIcon = async () => {
-        const res: any = await getStorage()
+        const res = await getStorage()
         // console.log(assetsToken)
 
         const tokenFilter = assetsToken.map((rs: any) => {
@@ -410,7 +401,7 @@ const InsuranceFrom = () => {
             }
         })
 
-        const itemFilter = tokenFilter.find((rs: any) => rs.type === (res?.type ? res?.type : 'BNB'))
+        const itemFilter = tokenFilter.find((rs: any) => rs.type === (res && res.type ? res?.type : 'BNB'))
         setSelectedCoin(itemFilter)
         setState({
             ...state,
