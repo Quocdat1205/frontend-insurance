@@ -19,7 +19,7 @@ interface Tag {
 }
 
 const socialTags = (props: Meta) => {
-    const { url, title, description, image, createdAt, updatedAt } = props
+    const { url = '', title, description, image, createdAt, updatedAt } = props
     return [
         { name: 'twitter:card', content: 'summary' },
         { name: 'twitter:site', content: '@Nami' },
@@ -39,30 +39,19 @@ const socialTags = (props: Meta) => {
 }
 
 function Meta(props: Meta) {
-    const {
-        title = 'Nami Insurance',
-        description,
-        keywords,
-        image,
-        icon = '/favicon.png',
-    } = props
+    const { title = 'Nami Insurance', description, keywords, image, icon = '/favicon.png' } = props
     return (
         <Head>
             <title>{title}</title>
             <meta key="name" itemProp="name" content={title} />
             <meta key="description" name="description" content={description} />
             <meta key="image" itemProp="image" content={image} />
-            <meta
-                name="viewport"
-                content="width=device-width, initial-scale=1"
-            />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
             {/* <link rel="manifest" href="/site.webmanifest" key="site-manifest" /> */}
             <link rel="icon" type="image/x-icon" href={icon} />
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-            {keywords && (
-                <meta key="keywords" name="keywords" content={keywords} />
-            )}
+            {keywords && <meta key="keywords" name="keywords" content={keywords} />}
             {socialTags(props).map(({ name, content }: Tag) => (
                 <meta key={name} name={name} content={content} />
             ))}

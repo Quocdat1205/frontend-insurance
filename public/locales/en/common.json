@@ -78,7 +78,7 @@
     "installer": {
         "metamask_title": "Install Metamask Extension",
         "metamask_content": "Please add Metamask Extension to continue the wallet connection process with Nami Insurance.",
-        "metamask_guide": "Having trouble installing the wallet? Read more <span class='text-blue underline cursor-pointer'>how to Install Metamask Extension</span> now.",
+        "metamask_guide": "Having trouble installing the wallet? Read more <span class='text-blue underline cursor-pointer'>How to Install Metamask Extension</span> now.",
         "coinbase_title": "Cài đặt Coinbase Wallet Extension",
         "coinbase_content": "Vui lòng cài đặt Coinbase Wallet Extension để tiếp tục quá trình kết nối ví đến Nami Insurance.",
         "coinbase_guide": "Chưa biết cách cài đặt ví? Đọc <span class='text-blue underline cursor-pointer'>Hướng dẫn cài đặt Coinbase Wallet Extension</span> ngay.",
@@ -119,13 +119,16 @@
         "email_placeholder": "Enter Email",
         "error_format_email": "Incorrect Email format. Ex: xxx@gmail.com",
         "success_update_email": "Update Email successfully",
+        "error_duplicate_email": "Email was registered",
+        "label_email": "Enter your email ",
         "email_subscription": {
+            "update_description": "Your Insurance Contract status will be updated the soonest possible",
             "subscribe_later": "Skip! I will update later",
             "update_email": "Update Email",
             "input_email": "Enter Email",
             "current_email": "Current Email",
             "new_email": "New Email",
-            "ignore_description": "Skip and update later by clicking\"Update Email\" at My Wallet",
+            "ignore_description": "Skip and update later by clicking \"Update Email\" at My Wallet",
             "description": "Enter Email to get latest about your Insurance Contract status"
         },
         "contact": {
@@ -138,5 +141,18 @@
             "send_success_title": "Your request was sent",
             "send_success_desc": "We will respond within 2-3 working days. Please check your mail box regularly"
         }
+    },
+    "terminology": {
+        "q_covered": "Quanity of covered asset",
+        "p_market": "The current price of the covered asset",
+        "p_claim": "Price activates receiving cover payout",
+        "p_expired": "Price triggers the insurance contract to expire",
+        "p_refund": "Price is within the margin refund terms",
+        "period": "Period of the insurance contract",
+        "t_start": "Time triggers the start of insurance contract",
+        "t_expired": "Time triggers the expiration of insurance contract",
+        "r_claim": "Ratio of  cover payout to Margin ",
+        "q_claim": "Quantity of cover payout when reaching P-Claim",
+        "margin": "Margin of insurance contract"
     }
 }

@@ -1,14 +1,14 @@
-import { useTranslation } from 'next-i18next';
-import React, { useCallback, useState } from 'react';
-import { isMobile } from 'react-device-detect';
-import Button from 'components/common/Button/Button';
-import InputField from 'components/common/Input/InputField';
-import CircleSpinner from 'components/common/Loader/CircleSpinner';
-import Modal from 'components/common/Modal/Modal';
-import Config from 'config/config';
-import { API_SUBSCRIBE } from 'services/apis';
-import fetchApi from 'services/fetch-api';
-import { capitalizeFirstLetter } from 'utils/utils';
+import { useTranslation } from 'next-i18next'
+import React, { useCallback, useState } from 'react'
+import { isMobile } from 'react-device-detect'
+import Button from 'components/common/Button/Button'
+import InputField from 'components/common/Input/InputField'
+import CircleSpinner from 'components/common/Loader/CircleSpinner'
+import Modal from 'components/common/Modal/Modal'
+import Config from 'config/config'
+import { API_CONTACT, API_SUBSCRIBE } from 'services/apis'
+import fetchApi from 'services/fetch-api'
+import { capitalizeFirstLetter } from 'utils/utils'
 
 interface ContactModal {
     visible: boolean
@@ -16,9 +16,7 @@ interface ContactModal {
 }
 
 const Success = () => {
-    const {
-        t,
-    } = useTranslation()
+    const { t } = useTranslation()
     return (
         <>
             <div className="flex flex-col items-center justify-center pb-4 text-xl font-medium">
@@ -46,6 +44,9 @@ const initialState = {
     request: '',
 }
 
+const successModalClassName = 'lg:max-w-[408px] lg:max-h-[312px]'
+const contactModalClassName = 'lg:max-w-[524px] lg:max-h-[609px]'
+
 const ContactModal = ({ visible, onClose }: ContactModal) => {
     const { t } = useTranslation()
     const [reqDetail, setReqDetail] = useState(initialState)
@@ -57,15 +58,22 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
         setReqDetail({ ...reqDetail, [name]: event.target.value })
     }
 
-    const validator = (key: string) => {
+    const handlePaste = (name: string, event: any) => {
+        event.preventDefault()
+        const pastedValue = event.clipboardData.getData('text')
+        setReqDetail({ ...reqDetail, [name]: pastedValue })
+        validator(name, pastedValue)
+    }
+
+    const validator = (key: string, value?: '') => {
         const rs = { isValid: false, message: '' }
         switch (key) {
             case 'email':
-                rs.isValid = isValidEmail(reqDetail?.email)
+                rs.isValid = isValidEmail(value || reqDetail?.email)
                 rs.message = t('common:modal:error_format_email')
                 break
             case 'request':
-                rs.isValid = !isNotEmptyString(reqDetail?.request)
+                rs.isValid = !isNotEmptyString(value || reqDetail?.request)
                 break
             default:
                 return rs
@@ -79,17 +87,17 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
             const { email, request } = reqDetail
 
             const { data, error, message, statusCode } = await fetchApi({
-                url: API_SUBSCRIBE,
+                url: API_CONTACT,
                 options: {
                     method: 'POST',
                 },
                 params: {
                     email,
-                    // request,
+                    content: request,
                 },
             })
             setIsLoading(false)
-            if (statusCode !== 201) {
+            if (statusCode !== 200) {
                 Config.toast.show('error', capitalizeFirstLetter(t(`errors:${message}`)))
             }
             if (data) {
@@ -101,7 +109,7 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
                 position: 'top-right',
             })
         }
-    },[reqDetail])
+    }, [reqDetail])
 
     const handleSubscribe = async () => {
         if (isLoading) return
@@ -123,7 +131,7 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
             isVisible={visible}
             onBackdropCb={handleOnClose}
             wrapClassName="!p-6"
-            className={'lg:max-w-[600px]'}
+            className={isSuccess ? successModalClassName : contactModalClassName}
             containerClassName="z-1"
         >
             {isSuccess ? (
@@ -144,6 +152,7 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
                         label={t('common:email')}
                         value={reqDetail?.email || ''}
                         onChange={(e: any) => handleChange('email', e)}
+                        onPaste={(e: any) => handlePaste('email', e)}
                         validator={validator('email')}
                         placeholder={`${t('common:modal:email_placeholder')}`}
                     />
@@ -155,10 +164,11 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
                         label={t('common:modal:contact:request')}
                         value={reqDetail?.request || ''}
                         onChange={(e: any) => handleChange('request', e)}
+                        onPaste={(e: any) => handlePaste('request', e)}
                         validator={validator('request')}
                         placeholder={`${t('common:modal:contact:request_placeholder')}`}
                     />
-                    <div className="flex flex-col px-6 -mx-6 mt-8 overflow-auto text-sm">
+                    <div className="flex flex-col px-6 mt-8 -mx-6 overflow-auto text-sm">
                         <div className="flex items-center justify-center text-base">
                             <Button
                                 variants={'primary'}
@@ -169,10 +179,10 @@ const ContactModal = ({ visible, onClose }: ContactModal) => {
                                 disabled={!reqDetail?.request || !reqDetail?.email || !validator('email')?.isValid}
                             >
                                 {isLoading ? (
-                                    <>
+                                    <div className={"flex items-center"}>
                                         <CircleSpinner />
                                         {t('common:modal:contact:sending_request')}
-                                    </>
+                                    </div>
                                 ) : (
                                     t('common:modal:contact:send_request')
                                 )}

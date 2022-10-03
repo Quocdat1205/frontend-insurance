@@ -71,7 +71,7 @@ const InsuranceContractMobile = ({
     }
 
     return (
-        <div id="filter-contract" className="bg-hover -mx-4 px-4 sm:px-0 sm:mx-0 pb-8 pt-4">
+        <div id="filter-contract" className="bg-hover -mx-4 px-4 sm:mx-0 pb-8 pt-4">
             <StatusModal
                 data={rowData.current}
                 visible={showStatusModal}
@@ -176,7 +176,7 @@ const InsuranceContractMobile = ({
                                 </div>
                                 <div className="flex justify-between flex-wrap">
                                     <Item>
-                                        <div className="text-txtSecondary text-xs whitespace-nowrap">{t('common:insurance')}</div>
+                                        <div className="text-txtSecondary text-xs">{t('common:insurance')}</div>
                                         <span className="text-xs font-semibold text-red underline">
                                             <Link href={Config.env.BSC + '/' + item?.transaction_hash}>
                                                 <a target="_blank">

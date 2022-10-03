@@ -21,6 +21,7 @@ export const API_LOGIN = 'v1/log-in'
 export const API_GET_TOKEN_COOKIES = 'v1/get-token-cookies'
 export const API_GET_INFO_USER = '/v1/get-info-user'
 export const API_UPDATE_USER_INFO = '/v1/update-info-user'
+export const API_CONTACT = '/v1/contact-user-email'
 
 // commission
 export const API_GET_FRIENDS = '/v1/get-friends'

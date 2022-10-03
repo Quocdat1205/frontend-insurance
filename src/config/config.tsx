@@ -64,9 +64,9 @@ class Config {
     }
 
     static logout = () => {
-        localStorage.removeItem('PUBLIC_ADDRESS')
-        localStorage.removeItem('PUBLIC_TOKEN')
-        localStorage.removeItem('PUBLIC_WALLET')
+        sessionStorage.removeItem('PUBLIC_ADDRESS')
+        sessionStorage.removeItem('PUBLIC_TOKEN')
+        sessionStorage.removeItem('PUBLIC_WALLET')
     }
 
     static MODAL_REGISTER_EMAIL = 'registerEmail'

@@ -240,7 +240,7 @@ module.exports = {
                 tiny: '355px',
                 xs: '320px',
                 '1xs': '391px',
-                homeNav: '1024px',
+                homeNav: '1024px'
             },
             spacing: {
                 128: '32rem',

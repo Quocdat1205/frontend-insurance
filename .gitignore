@@ -31,6 +31,7 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 .env.development
+.env.production
 # vercel
 .vercel
 
@@ -38,5 +39,5 @@ yarn-error.log*
 *.tsbuildinfo
 .idea
 
-deploy.sh
-ecosystem.config.js
+# deploy.sh
+# ecosystem.config.js
