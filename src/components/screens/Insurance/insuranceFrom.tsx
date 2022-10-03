@@ -425,7 +425,7 @@ const InsuranceFrom = () => {
             }
         })
 
-        if (res && res.form_history === true) {
+        if (res) {
             let itemFilter = tokenFilter.find((rs: any) => rs.type === res?.type)
             setSelectedCoin(itemFilter)
 
@@ -478,6 +478,9 @@ const InsuranceFrom = () => {
         if (selectCoin?.symbol != '') {
             getPrice(selectCoin?.symbol, state, setState)
             setState({ ...state, symbol: { ...selectCoin }, q_covered: 0, p_claim: 0, period: 2, margin: 0, r_claim: 0, q_claim: 0 })
+            onHandleChange('q_covered', { floatValue: 0, formattedValue: '0', value: '0' })
+            onHandleChange('p_claim', { floatValue: 0, formattedValue: '0', value: '0' })
+            onHandleChange('margin', { floatValue: 0, formattedValue: '0', value: '0' })
             getConfig(selectCoin?.type)
             getBalaneToken(selectCoin?.type)
             localStorage.setItem('buy_covered_state', JSON.stringify(selectCoin))
@@ -934,6 +937,8 @@ const InsuranceFrom = () => {
 
     const [isCanSave, setIsCanSave] = useState<boolean>(false)
     const onHandleChange = (key: string, e: any) => {
+        console.log(e)
+
         const value = +e.value
 
         switch (key) {
@@ -1664,6 +1669,7 @@ const InsuranceFrom = () => {
                                                                         q_claim: 0,
                                                                         margin: 0,
                                                                         r_claim: 0,
+                                                                        p_expired: 0,
                                                                     })
                                                                     setOpenChangeToken(false)
                                                                     setShowInput({ isShow: true, name: 'q_covered' })
@@ -1859,7 +1865,7 @@ const InsuranceFrom = () => {
                                         </span>
                                         <Tab.Group>
                                             <Tab.List
-                                                className={`flex flex-row justify-between mt-[1rem]  ${isMobile ? 'w-full' : 'w-[85%]'} ${
+                                                className={` flex flex-row justify-between mt-[1rem]  ${isMobile ? 'w-full' : 'w-[85%]'} ${
                                                     isMobile && showCroll ? 'overflow-scroll' : ' overflow-hidden'
                                                 }`}
                                                 onTouchStart={() => {
