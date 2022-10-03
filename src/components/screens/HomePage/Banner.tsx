@@ -87,7 +87,7 @@ const Banner = () => {
     return (
         <section className="pt-10 sm:pt-[7.5rem]">
             <div className="px-4 mb:px-10 lg:px-20">
-                <div className="text-2xl sm:text-5xl font-semibold mb-6 max-w-screen-insurance m-auto">{t('home:home:statistics')}</div>
+                <div className="text-2xl sm:text-5xl font-semibold mb-6 max-w-screen-insurance 4xl:max-w-screen-3xl m-auto">{t('home:home:statistics')}</div>
             </div>
             <Background isMobile={isMobile}>
                 <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto text-center flex flex-col space-y-8 sm:space-y-6">
