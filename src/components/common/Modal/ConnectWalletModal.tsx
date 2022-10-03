@@ -83,7 +83,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
 
     useEffect(() => {
         if (address && account.address && account.address !== address) {
-            localStorage.setItem('PUBLIC_ADDRESS', address)
+            sessionStorage.setItem('PUBLIC_ADDRESS', address)
             dispatch(setAccount({ address: address }))
         }
     }, [account, address])
