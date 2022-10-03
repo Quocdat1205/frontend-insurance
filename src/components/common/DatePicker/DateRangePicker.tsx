@@ -5,13 +5,14 @@ import colors from 'styles/colors'
 import { CalendarIcon } from 'components/common/Svg/SvgIcon'
 import vi from 'date-fns/locale/vi'
 import en from 'date-fns/locale/en-US'
-import { DateRangePicker } from 'react-date-range'
+import { Calendar, DateRangePicker } from 'react-date-range'
 import 'react-date-range/dist/styles.css' // main css file
 import 'react-date-range/dist/theme/default.css' // theme css file
 import { formatTime } from 'utils/utils'
 import Button from 'components/common/Button/Button'
 import { Transition } from '@headlessui/react'
 import useOutsideAlerter from 'hooks/useOutsideAlerter'
+import classNames from 'classnames'
 
 interface ReactDateRangePicker {
     placeholder?: string
@@ -30,6 +31,8 @@ interface ReactDateRangePicker {
     renderContent?: any
     prefix?: string
     isClearable?: boolean
+    range?: boolean
+    customLabel?: any
 }
 const ReactDateRangePicker = (props: ReactDateRangePicker) => {
     const {
@@ -51,6 +54,8 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
         renderContent,
         prefix,
         isClearable = false,
+        range = true,
+        customLabel,
     } = props
 
     const wrapperRef = useRef<any>(null)
@@ -67,7 +72,7 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
         setDate(value)
     }, [value, showPicker])
 
-    const navigatorRenderer = (focusedDate: any, changeShownDate: any, props: any) => {
+    const navigatorRenderer: any = (focusedDate: any, changeShownDate: any, props: any) => {
         return (
             <div className="flex items-center justify-between absolute px-4 w-full top-[1.375rem]">
                 <div className="cursor-pointer" onClick={() => changeShownDate(-1, 'monthOffset')}>
@@ -81,7 +86,15 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
     }
 
     const _onChange = (e: any) => {
-        setDate(e[value.key])
+        if (range) {
+            setDate(e[date.key])
+        } else {
+            setDate({
+                key: date.key,
+                startDate: e,
+                endDate: e,
+            })
+        }
     }
 
     const onConfirm = (close: any) => {
@@ -106,24 +119,30 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
     }
 
     return (
-        <div className={`flex flex-col space-y-2 ${className}`}>
-            <div className="text-sm text-txtSecondary">{label}</div>
-            <div ref={wrapperRef} className="date-range-picker relative px-4 rounded-[3px]">
+        <div className={classNames('flex flex-col', { 'space-y-2': label }, className)}>
+            {label && <div className="text-sm text-txtSecondary">{label}</div>}
+            <div ref={wrapperRef} className={classNames('date-range-picker relative', { '': !customLabel })}>
                 <div onClick={() => onAction('open')} className="flex items-center w-full space-x-2 relative">
-                    <div className="w-full h-full flex items-center">
-                        <span>
-                            {prefix} {value?.startDate ? formatTime(value?.startDate, dateFormat) + ' - ' + formatTime(value?.endDate, dateFormat) : ''}
-                        </span>
-                    </div>
-                    {isClearable && value?.startDate && (
-                        <div className="min-w-[1rem]" onClick={() => onAction('clear')}>
-                            <X size={16} />
-                        </div>
-                    )}
+                    {customLabel ? (
+                        customLabel()
+                    ) : (
+                        <div className="px-4 rounded-[3px] bg-hover h-[2.75rem] sm:h-[3rem] flex items-center">
+                            <div className="w-full h-full flex items-center">
+                                <span>
+                                    {prefix} {value?.startDate ? formatTime(value?.startDate, dateFormat) + ' - ' + formatTime(value?.endDate, dateFormat) : ''}
+                                </span>
+                            </div>
+                            {isClearable && value?.startDate && (
+                                <div className="min-w-[1rem]" onClick={() => onAction('clear')}>
+                                    <X size={16} />
+                                </div>
+                            )}
 
-                    {showIcon && (
-                        <div className="cursor-pointer">
-                            <CalendarIcon />
+                            {showIcon && (
+                                <div className="cursor-pointer">
+                                    <CalendarIcon />
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -138,26 +157,41 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
                     leaveTo="opacity-0 translate-y-1"
                 >
                     <div className={`${className} right-0 absolute z-10 top-[3.5rem] bg-white`}>
-                        <div className="rounded-xl shadow-subMenu overflow-hidden">
+                        <div className="rounded-xl shadow-subMenu overflow-hidden pt-6">
                             {renderContent && renderContent()}
-                            <DateRangePicker
-                                className="relative"
-                                ranges={[date]}
-                                months={2}
-                                onChange={_onChange}
-                                moveRangeOnFirstSelection={false}
-                                direction="horizontal"
-                                locale={language === 'vi' ? vi : en}
-                                staticRanges={[]}
-                                inputRanges={[]}
-                                weekStartsOn={0}
-                                rangeColors={[colors.red.red]}
-                                editableDateInputs={true}
-                                retainEndDateOnFirstSelection
-                                navigatorRenderer={navigatorRenderer}
-                            />
+                            {range ? (
+                                <DateRangePicker
+                                    className={`relative h-full`}
+                                    ranges={[date]}
+                                    months={2}
+                                    onChange={_onChange}
+                                    moveRangeOnFirstSelection={false}
+                                    direction="horizontal"
+                                    locale={language === 'vi' ? vi : en}
+                                    staticRanges={[]}
+                                    inputRanges={[]}
+                                    weekStartsOn={0}
+                                    rangeColors={[colors.red.red]}
+                                    editableDateInputs={true}
+                                    retainEndDateOnFirstSelection
+                                    navigatorRenderer={navigatorRenderer}
+                                />
+                            ) : (
+                                <Calendar
+                                    className={`relative h-full single-select`}
+                                    date={date.startDate}
+                                    months={2}
+                                    onChange={_onChange}
+                                    direction="horizontal"
+                                    locale={language === 'vi' ? vi : en}
+                                    weekStartsOn={0}
+                                    rangeColors={[colors.red.red]}
+                                    editableDateInputs={true}
+                                    navigatorRenderer={navigatorRenderer}
+                                />
+                            )}
                             <div className="mx-6 mt-3 mb-8">
-                                <Button onClick={() => onConfirm(close)} variants="primary" className="w-full text-sm h-[3rem]">
+                                <Button disabled={!date?.startDate} onClick={() => onConfirm(close)} variants="primary" className="w-full text-sm h-[3rem]">
                                     {t('common:confirm')}
                                 </Button>
                             </div>
