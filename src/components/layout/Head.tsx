@@ -48,10 +48,10 @@ const Seo = ({ icon = '/favicon.png', ...props }: Meta) => {
 }
 
 const Meta = (props: Meta) => {
-    const { title = 'Nami Insurance', description, keywords, image = '/images/bg_featured.png' } = props
+    const { title = 'Nami Insurance', description, keywords, image = Config.env.APP_URL + '/images/bg_featured.png' } = props
 
     const socialTags = (props: Meta) => {
-        const { url = '', title, description, image = '/images/bg_featured.png', createdAt, updatedAt } = props
+        const { url = '', title, description, image = Config.env.APP_URL + '/images/bg_featured.png', createdAt, updatedAt } = props
         return [
             { name: 'twitter:card', content: 'summary' },
             { name: 'twitter:site', content: '@Nami' },
@@ -63,7 +63,7 @@ const Meta = (props: Meta) => {
             { name: 'og:title', content: title },
             { name: 'og:url', content: Config.env.APP_URL + url },
             { name: 'og:image', content: image },
-            { name: 'og:site_name', content: 'Nami Exchange' },
+            { name: 'og:site_name', content: 'Nami Insurance' },
             { name: 'og:description', content: description },
             { name: 'og:published_time', content: createdAt },
             { name: 'og:modified_time', content: updatedAt },
