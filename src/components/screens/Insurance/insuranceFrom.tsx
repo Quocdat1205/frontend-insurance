@@ -328,7 +328,8 @@ const InsuranceFrom = () => {
     }
 
     const getStorage = async () => {
-        const data = await localStorage.getItem('buy_covered_state')
+        const data = localStorage.getItem('buy_covered_state')
+        console.log(data, 'DATA')
 
         if (data) {
             const res = JSON.parse(data.toString())
