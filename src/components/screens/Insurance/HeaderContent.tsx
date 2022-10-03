@@ -25,16 +25,14 @@ const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) 
                 setDrop(false)
             }}
         >
-            <div className="flex items-center font-semibold col-span-4">
+            <div
+                className="flex items-center font-semibold col-span-4"
+                onClick={() => {
+                    return router.push('/home')
+                }}
+            >
                 <LeftArrow />
-                <span
-                    className={'hover:cursor-pointer ml-2'}
-                    onClick={() => {
-                        return router.push('/home')
-                    }}
-                >
-                    {t('insurance:buy:back_to_home')}
-                </span>
+                <span className={'hover:cursor-pointer ml-2'}>{t('insurance:buy:back_to_home')}</span>
             </div>
 
             <div

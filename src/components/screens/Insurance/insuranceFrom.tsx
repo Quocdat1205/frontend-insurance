@@ -427,8 +427,6 @@ const InsuranceFrom = () => {
         })
 
         if (res) {
-            console.log(res)
-
             let itemFilter = tokenFilter.find((rs: any) => rs.type === res?.type)
             setSelectedCoin(itemFilter)
 

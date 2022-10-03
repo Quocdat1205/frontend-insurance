@@ -401,16 +401,14 @@ const AcceptBuyInsurance = () => {
                         {
                             // head Insurance
                             <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto mt-[4rem] mb-[3rem] grid grid-cols-12 content-center items-center justify-between">
-                                <div className="flex items-center font-semibold text-base col-span-4">
+                                <div
+                                    className="flex items-center font-semibold text-base col-span-4"
+                                    onClick={() => {
+                                        return router.push('/buy-covered')
+                                    }}
+                                >
                                     <LeftArrow></LeftArrow>
-                                    <span
-                                        className={' text-txtPrimary hover:cursor-pointer ml-[8px]'}
-                                        onClick={() => {
-                                            return router.push('/buy-covered')
-                                        }}
-                                    >
-                                        {language == 'en' ? 'Back' : 'Quay về'}
-                                    </span>
+                                    <span className={' text-txtPrimary hover:cursor-pointer ml-[8px]'}>{language == 'en' ? 'Back' : 'Quay về'}</span>
                                 </div>
 
                                 <div className={'flex flex-col justify-center items-center col-span-4'}>
