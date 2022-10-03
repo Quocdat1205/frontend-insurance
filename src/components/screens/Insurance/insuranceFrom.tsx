@@ -332,13 +332,17 @@ const InsuranceFrom = () => {
         console.log(data, 'DATA')
 
         if (data) {
+            console.log('TRUE')
+
             const res = JSON.parse(data.toString())
-            if (res) {
-                return res
-            } else {
-                return false
-            }
+            // if (res) {
+            //     return res
+            // } else {
+            //     return false
+            // }
         } else {
+            console.log('FALSE')
+
             return false
         }
     }
@@ -393,7 +397,7 @@ const InsuranceFrom = () => {
 
     const setDataIcon = async () => {
         const res: any = await getStorage()
-        console.log(assetsToken)
+        // console.log(assetsToken)
 
         const tokenFilter = assetsToken.map((rs: any) => {
             return {
@@ -405,14 +409,13 @@ const InsuranceFrom = () => {
                 disable: !rs?.isActive,
             }
         })
-        console.log(tokenFilter)
 
-        // const itemFilter = tokenFilter.find((rs: any) => rs.type === (res?.type ? res?.type : 'BNB'))
-        // setSelectedCoin(itemFilter)
-        // setState({
-        //     ...state,
-        //     symbol: itemFilter,
-        // })
+        const itemFilter = tokenFilter.find((rs: any) => rs.type === (res?.type ? res?.type : 'BNB'))
+        setSelectedCoin(itemFilter)
+        setState({
+            ...state,
+            symbol: itemFilter,
+        })
         setListCoin(tokenFilter)
     }
 
