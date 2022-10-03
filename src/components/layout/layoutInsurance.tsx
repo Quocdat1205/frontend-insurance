@@ -17,6 +17,7 @@ const LayoutInsurance = ({ children, handleClick, hiddenHeader }: layoutInsuranc
     return !isMobile ? (
         <div className="relative" onClick={handleClick}>
             {!hiddenHeader && <Header />}
+
             {children}
         </div>
     ) : (

@@ -175,8 +175,7 @@ const InsuranceFrom = () => {
                             }}
                         >
                             {' '}
-                            {width && width >= 390 && <br />}
-                            {width && width <= 246 && <br />}
+                            {width && width < 513 && width >= 437 && <br />}
                             {state.q_covered}{' '}
                         </span>
                     </label>
@@ -356,7 +355,7 @@ const InsuranceFrom = () => {
             if (res.form_history !== true) {
                 return res
             } else {
-                setState({ ...state, p_claim: res.p_claim, q_covered: res.q_covered, period: res.period, margin: res.margin })
+                // setState({ ...state, p_claim: res.p_claim, q_covered: res.q_covered, period: res.period, margin: res.margin })
                 setTab(isMobile ? 3 : 1)
                 return res
             }
@@ -426,17 +425,17 @@ const InsuranceFrom = () => {
             }
         })
 
-        if (res) {
+        if (res && res.form_history === true) {
             let itemFilter = tokenFilter.find((rs: any) => rs.type === res?.type)
             setSelectedCoin(itemFilter)
 
             setState({
                 ...state,
                 symbol: itemFilter,
-                q_covered: res.q_covered,
-                period: res.period,
-                margin: res.margin,
-                p_claim: res.p_claim,
+                q_covered: Number(res.q_covered),
+                period: Number(res.period),
+                margin: Number(res.margin),
+                p_claim: Number(res.p_claim),
             })
             setListCoin(tokenFilter)
         } else {
@@ -1004,13 +1003,13 @@ const InsuranceFrom = () => {
                                 setChangeUnit2(false)
                             }}
                         >
-                            {account?.address != null && (
-                                <div className="w-full bg-[#E5E7E8]  h-[0.25rem] sticky top-[4.1875rem] z-[50]">
-                                    <div className="bg-red h-[0.25rem] w-1/2"></div>
-                                </div>
-                            )}
                             <div className="px-4 mb:px-10 lg:px-20">
-                                <div className=" max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
+                                <div className="max-w-7xl 4xl:max-w-screen-3xl m-auto">
+                                    {account?.address != null && (
+                                        <div className="w-full bg-[#E5E7E8]  h-[0.25rem] sticky top-[4.1875rem] z-[50]">
+                                            <div className="bg-red h-[0.25rem] w-1/2"></div>
+                                        </div>
+                                    )}
                                     {
                                         // head Insurance
                                         <HeaderContent state={tab} setState={setTab} props={state} setProps={setState} wallet={wallet} auth={account.address} />
@@ -1215,7 +1214,7 @@ const InsuranceFrom = () => {
                                                     saved > 0 && (
                                                         <div
                                                             className={
-                                                                'flex flex-col justify-center items-center mb-[2.5rem] max-w-screen-layout 4xl:max-w-screen-3xl m-auto'
+                                                                'flex flex-col justify-center items-center mb-[2.5rem] max-w-7xl 4xl:max-w-screen-3xl m-auto'
                                                             }
                                                             onClick={() => {
                                                                 setChosing(false)
@@ -1435,7 +1434,7 @@ const InsuranceFrom = () => {
                                 </div>
                                 <div className="flex flex-col items-center pt-[1rem] text-txtPrimary">
                                     <span className="text-xl font-semibold ">Nami Insurance</span>
-                                    <span className="text-center text-sm pt-[0.75rem]">
+                                    <span className="text-center text-sm pt-[0.75rem] w-[342px] h-[40px]">
                                         {t('insurance:mobile_login:sub_title1')} - {t('insurance:mobile_login:sub_title2')}
                                     </span>
                                 </div>

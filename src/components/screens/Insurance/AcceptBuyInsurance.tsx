@@ -397,10 +397,13 @@ const AcceptBuyInsurance = () => {
             </Modal>
             {!isMobile ? (
                 <div className="px-4 mb:px-10 lg:px-20">
-                    <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
+                    <div className="max-w-7xl 4xl:max-w-screen-3xl m-auto">
+                        <div className="w-full bg-[#E5E7E8] h-[0.25rem] sticky top-0 z-[50]">
+                            <div className="bg-red h-[0.25rem] w-full"></div>
+                        </div>
                         {
                             // head Insurance
-                            <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto mt-[4rem] mb-[3rem] grid grid-cols-12 content-center items-center justify-between">
+                            <div className="max-w-7xl 4xl:max-w-screen-3xl m-auto mt-[4rem] mb-[3rem] grid grid-cols-12 content-center items-center justify-between">
                                 <div
                                     className="flex items-center font-semibold text-base col-span-4"
                                     onClick={() => {
