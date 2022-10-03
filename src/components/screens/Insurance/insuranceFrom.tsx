@@ -65,7 +65,7 @@ const InsuranceFrom = () => {
     const [saved, setSaved] = useState<number>(0)
     const [rangeQ_covered, setRangeQ_covered] = useState({
         min: 0,
-        max: 100,
+        max: 0,
     })
     const [showInput, setShowInput] = useState<{ isShow: boolean; name: string }>({ isShow: false, name: '' })
 
@@ -350,7 +350,7 @@ const InsuranceFrom = () => {
         const timeBegin = new Date()
         setLoadings(true)
         try {
-            if (selectCoin.symbol !== '') {
+            if (selectCoin?.symbol !== '') {
                 if (selectTime == '1H') {
                     timeBegin.setDate(timeEnd.getDate() - 10)
                     fetchApiNami(
@@ -391,24 +391,28 @@ const InsuranceFrom = () => {
     }
 
     const setDataIcon = async () => {
-        const res: any = await getStorage()
-        const tokenFilter = assetsToken.map((rs: any) => {
-            return {
-                icon: rs?.attachment,
-                id: rs?._id,
-                name: rs?.name,
-                symbol: `${rs.symbol}USDT`,
-                type: rs?.symbol,
-                disable: rs?.disable,
-            }
-        })
-        const itemFilter = tokenFilter.find((rs: any) => rs.type === (res?.type || 'BNB'))
-        setSelectedCoin(itemFilter)
-        setState({
-            ...state,
-            symbol: itemFilter,
-        })
-        setListCoin(tokenFilter)
+        try {
+            const res: any = await getStorage()
+            const tokenFilter = assetsToken.map((rs: any) => {
+                return {
+                    icon: rs?.attachment,
+                    id: rs?._id,
+                    name: rs?.name,
+                    symbol: `${rs?.symbol}USDT`,
+                    type: rs?.symbol,
+                    disable: rs?.disable,
+                }
+            })
+            const itemFilter = tokenFilter.find((rs: any) => rs.type === (res?.type || 'BNB'))
+            setSelectedCoin(itemFilter)
+            setState({
+                ...state,
+                symbol: itemFilter,
+            })
+            setListCoin(tokenFilter)
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     useEffect(() => {
@@ -438,10 +442,10 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         if (selectCoin?.symbol != '') {
-            getPrice(selectCoin.symbol, state, setState)
+            getPrice(selectCoin?.symbol, state, setState)
             setState({ ...state, symbol: { ...selectCoin } })
-            getConfig(selectCoin.type)
-            getBalaneToken(selectCoin.type)
+            getConfig(selectCoin?.type)
+            getBalaneToken(selectCoin?.type)
             localStorage.setItem('buy_covered_state', JSON.stringify(selectCoin))
         }
         setState({ ...state, q_covered: 0, margin: 0, p_claim: 0, period: 2 })
@@ -507,7 +511,6 @@ const InsuranceFrom = () => {
         if (state.q_covered > 0) {
             if (userBalance > 0) {
                 const a = Math.ceil((state.q_covered / userBalance) * 100)
-                console.log(a)
                 if ((a >= 99 && a <= 101) || state.q_covered == rangeQ_covered.max) {
                     percentInsurance.current = 100
                 } else if (a >= 74 && a <= 76) {
@@ -642,11 +645,11 @@ const InsuranceFrom = () => {
 
     const [rangeP_claim, setRangeP_claim] = useState({
         min: 0,
-        max: 100,
+        max: 0,
     })
     const [rangeMargin, setRangeMargin] = useState({
         min: 0,
-        max: 100,
+        max: 0,
     })
 
     const [percentPrice, setPercentPrice] = useState<any>()
@@ -954,8 +957,6 @@ const InsuranceFrom = () => {
     useEffect(() => {
         clear.current = handleCheckFinal()
     }, [state])
-
-    console.log(state)
 
     return (
         <>
