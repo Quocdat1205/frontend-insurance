@@ -48,10 +48,10 @@ const Seo = ({ icon = '/favicon.png', ...props }: Meta) => {
 }
 
 const Meta = (props: Meta) => {
-    const { title = 'Nami Insurance', description, keywords, image } = props
+    const { title = 'Nami Insurance', description, keywords, image = '/images/bg_featured.png' } = props
 
     const socialTags = (props: Meta) => {
-        const { url = '', title, description, image, createdAt, updatedAt } = props
+        const { url = '', title, description, image = '/images/bg_featured.png', createdAt, updatedAt } = props
         return [
             { name: 'twitter:card', content: 'summary' },
             { name: 'twitter:site', content: '@Nami' },
