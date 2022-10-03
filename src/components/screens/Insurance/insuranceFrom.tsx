@@ -825,12 +825,12 @@ const InsuranceFrom = () => {
 
     const handleUpdateToken = (coin: ICoin) => {
         setSelectedCoin(coin)
-        setState({ ...state, symbol: { ...coin }, period: 2, r_claim: 0, q_claim: 0 })
+        setState({ ...state, symbol: { ...coin }, period: 2, r_claim: 0, q_claim: 0, q_covered: 0, margin: 0, p_claim: 0, p_expired: 0 })
         setChosing(false)
 
-        setTimeout(() => {
-            router.reload()
-        }, 1500)
+        // setTimeout(() => {
+        //     router.reload()
+        // }, 1500)
     }
 
     const renderPopoverQCover = () => (
@@ -864,9 +864,6 @@ const InsuranceFrom = () => {
                                         onClick={() => {
                                             close()
                                             handleUpdateToken(coin)
-                                            onHandleChange('q_covered', 0)
-                                            onHandleChange('p_claim', 0)
-                                            onHandleChange('margin', 0)
                                         }}
                                         className={`${
                                             isPress ? 'bg-gray-1' : 'hover:bg-hover'
