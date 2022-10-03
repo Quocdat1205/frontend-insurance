@@ -293,3 +293,7 @@ input[type="number"] {
         background: #e5e7e8 !important;
     }
 }
+
+.tab-active {
+    @apply text-red font-semibold;
+}

@@ -213,3 +213,7 @@ export const removeLocalStorage = (name: string) => localStorage.removeItem(name
 export const getMessageSign = (nonce: number) => `Sign message with nonce: ${nonce}`
 
 export const capitalizeFirstLetter = (string: string) => string.charAt(0).toUpperCase() + string.slice(1)
+
+export const formatAddress = (wallet: string, start: number = 10, end: number = -4) => {
+    return wallet.length > 10 ? String(wallet).substr(0, start) + '...' + String(wallet).substr(end) : wallet
+}
