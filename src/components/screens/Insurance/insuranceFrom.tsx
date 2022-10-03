@@ -327,17 +327,12 @@ const InsuranceFrom = () => {
         }
     }
 
-    const getStorage = async () => {
-        const data = await localStorage.getItem('buy_covered_state')
-        if (data === 'undefined' || data === '' || data === null) {
-            return false
-        } else if (data) {
-            const res = JSON.parse(data)
-            if (res) {
-                return res
-            } else {
-                return false
-            }
+    const getStorage = () => {
+        const data = localStorage.getItem('buy_covered_state')
+        if (data !== 'undefined') {
+            const res = JSON.parse(data as string)
+
+            return res
         } else {
             return false
         }
@@ -392,7 +387,8 @@ const InsuranceFrom = () => {
     }
 
     const setDataIcon = async () => {
-        const res: any = await getStorage()
+        const res = await getStorage()
+        // console.log(assetsToken)
 
         const tokenFilter = assetsToken.map((rs: any) => {
             return {
@@ -405,23 +401,13 @@ const InsuranceFrom = () => {
             }
         })
 
-        if (res === false) {
-            const itemFilter = tokenFilter.find((rs: any) => rs.type === 'BNB')
-            setSelectedCoin(itemFilter)
-            setState({
-                ...state,
-                symbol: itemFilter,
-            })
-            setListCoin(tokenFilter)
-        } else {
-            const itemFilter = tokenFilter.find((rs: any) => rs.type === res?.type)
-            setSelectedCoin(itemFilter)
-            setState({
-                ...state,
-                symbol: itemFilter,
-            })
-            setListCoin(tokenFilter)
-        }
+        const itemFilter = tokenFilter.find((rs: any) => rs.type === (res && res.type ? res?.type : 'BNB'))
+        setSelectedCoin(itemFilter)
+        setState({
+            ...state,
+            symbol: itemFilter,
+        })
+        setListCoin(tokenFilter)
     }
 
     useEffect(() => {
@@ -452,12 +438,12 @@ const InsuranceFrom = () => {
     useEffect(() => {
         if (selectCoin?.symbol != '') {
             getPrice(selectCoin?.symbol, state, setState)
-            setState({ ...state, symbol: { ...selectCoin } })
+            setState({ ...state, symbol: { ...selectCoin }, q_covered: 0, p_claim: 0, period: 2, margin: 0, r_claim: 0, q_claim: 0 })
             getConfig(selectCoin?.type)
             getBalaneToken(selectCoin?.type)
             localStorage.setItem('buy_covered_state', JSON.stringify(selectCoin))
         }
-        setState({ ...state, q_covered: 0, margin: 0, p_claim: 0, period: 2 })
+        setState({ ...state, q_covered: 0, p_claim: 0, period: 2, margin: 0, r_claim: 0, q_claim: 0 })
     }, [selectCoin])
 
     const createSaved = async () => {
@@ -814,6 +800,16 @@ const InsuranceFrom = () => {
         return rs
     }
 
+    const handleUpdateToken = (coin: ICoin) => {
+        setSelectedCoin(coin)
+        setState({ ...state, symbol: { ...coin }, period: 2, r_claim: 0, q_claim: 0 })
+        setChosing(false)
+
+        setTimeout(() => {
+            router.reload()
+        }, 10)
+    }
+
     const renderPopoverQCover = () => (
         <Popover className="relative outline-none bg-hover focus:ring-0 flex items-center justify-center">
             <Popover.Button
@@ -841,11 +837,14 @@ const InsuranceFrom = () => {
                                         onMouseDown={() => (isPress = true)}
                                         onMouseUp={() => {
                                             isPress = false
-                                            setSelectedCoin(coin)
-                                            setState({ ...state, symbol: { ...coin }, q_covered: 0, p_claim: 0, q_claim: 0, margin: 0, r_claim: 0 })
-                                            setChosing(false)
                                         }}
-                                        onClick={() => close()}
+                                        onClick={() => {
+                                            close()
+                                            handleUpdateToken(coin)
+                                            onHandleChange('q_covered', 0)
+                                            onHandleChange('p_claim', 0)
+                                            onHandleChange('margin', 0)
+                                        }}
                                         className={`${
                                             isPress ? 'bg-gray-1' : 'hover:bg-hover'
                                         } flex flex-row justify-start w-full items-center p-3 font-medium`}
