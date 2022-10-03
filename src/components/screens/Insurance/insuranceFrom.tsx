@@ -211,7 +211,6 @@ const InsuranceFrom = () => {
                                         onClick={() => {
                                             setShowInput({ isShow: true, name: 'margin' })
                                             tmp_margin.current = state.margin
-                                            // setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:margin')}` })
                                         }}
                                     >
                                         {unitMoney}

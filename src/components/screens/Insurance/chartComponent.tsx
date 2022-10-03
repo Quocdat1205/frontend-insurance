@@ -151,10 +151,6 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             chart.cursor.fullWidthLineY = true
             chart.cursor.lineX.fillOpacity = 0.05
             chart.cursor.lineY.fillOpacity = 0.05
-            // chart.events.on('ready', function (event: any) {
-            //     valueAxis.min = valueAxis.minZoomed
-            //     valueAxis.max = valueAxis.maxZoomed
-            // })
 
             let dateAxis = chart.xAxes.push(new am4charts.DateAxis())
             dateAxis.renderer.grid.template.location = 0
@@ -182,13 +178,8 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             valueAxis.renderer.maxLabelPosition = 0.95
             valueAxis.renderer.axisFills.template.disabled = true
             valueAxis.renderer.ticks.template.disabled = true
-            valueAxis.hidden = true
+            valueAxis.hidden = false
             valueAxis.tooltip.disabled = true
-
-            // let gradient = new am4core.LinearGradient()
-            // gradient.addColor(am4core.color('#EB2B3E'), 0.15, 0)
-            // gradient.addColor(am4core.color('#EB2B3E'), 1, 1)
-            // gradient.rotation = 270
 
             let series = chart.series.push(new am4charts.LineSeries())
             series.dataFields.dateX = 'date'
@@ -205,11 +196,9 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
 
             // series.fillOpacity = 1
             let gradient = new am4core.LinearGradient()
-            gradient.addColor(am4core.color('#EB2B3E'), 1, 1)
-            gradient.addColor(am4core.color('#EB2B3E'), 0, 0)
-            gradient.addColor(am4core.color('#EB2B3E'), 1, 1)
-            gradient.addColor(am4core.color('#EB2B3E'), 0, 0)
-            gradient.rotation = 90
+            gradient.addColor(am4core.color({ r: 235, g: 43, b: 62, a: 0 }), 1, 0)
+            gradient.addColor(am4core.color({ r: 235, g: 43, b: 62, a: 1 }), 1, 1)
+            gradient.rotation = -90
             series.fill = gradient
 
             //chart sub
