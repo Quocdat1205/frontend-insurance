@@ -39,5 +39,5 @@ yarn-error.log*
 *.tsbuildinfo
 .idea
 
-# deploy.sh
-# ecosystem.config.js
+deploy.sh
+ecosystem.config.js
