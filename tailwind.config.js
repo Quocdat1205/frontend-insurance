@@ -54,7 +54,7 @@ const commonColors = {
     pink: {
         pink: '#FFF1F2',
         1: '#FFF5F6',
-        2: '#FFF4F6'
+        2: '#FFF4F6',
     },
     gray: {
         gray: '#B2B7BC',
@@ -238,9 +238,12 @@ module.exports = {
                 layout: '1360px',
                 mb: '820px',
                 tiny: '355px',
-                xs: '320px',
+                xs: '319px',
                 '1xs': '391px',
-                homeNav: '1024px'
+                // this responsive is for handle complex layout
+                homeNav: '1023px',
+                mobileMedium: '374px',
+                mobileLarge: '424px',
             },
             spacing: {
                 128: '32rem',
