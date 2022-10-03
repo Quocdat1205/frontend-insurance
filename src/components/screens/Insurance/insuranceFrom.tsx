@@ -329,11 +329,7 @@ const InsuranceFrom = () => {
 
     const getStorage = async () => {
         const data = localStorage.getItem('buy_covered_state')
-        console.log(data, 'DATA')
-
-        if (data !== undefined) {
-            console.log(data !== undefined, typeof data)
-
+        if (data !== 'undefined') {
             console.log('TRUE')
 
             const res = JSON.parse(data as string)
