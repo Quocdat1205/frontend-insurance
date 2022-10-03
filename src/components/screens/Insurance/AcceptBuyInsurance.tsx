@@ -77,10 +77,6 @@ const AcceptBuyInsurance = () => {
     const reason = useRef<any>(null)
     const textErrorButton = useRef<string>(t(`common:reconnect`))
     const showIconReload = useRef<boolean>(true)
-    const [errorConnect, setErrorConnect] = useState<boolean>(false)
-    const [switchNetwork, setSwitchNetwork] = useState<boolean>(false)
-    const [networkError, setNetworkError] = useState<boolean>(false)
-    const [isVisible, setVisible] = useState(false)
     const isReload = useRef<boolean>(false)
     const unitMoney = useRef<string>('USDT')
 
@@ -110,42 +106,34 @@ const AcceptBuyInsurance = () => {
                     reason.current = t('errors:40001')
                     textErrorButton.current = t(`common:reconnect`)
                     showIconReload.current = true
-                    setErrorConnect(true)
                 }
                 break
             case errorsWallet.Not_found:
                 isNotFoundNetWork = true
-                setNetworkError(true)
                 break
             case errorsWallet.Success:
                 Config.toast.show('success', t('common:connect_successful'))
-                setVisible(false)
                 break
             case errorsWallet.NetWork_error:
                 showIconReload.current = true
                 reason.current = t('common:network_error')
-                setErrorConnect(true)
                 break
             case errorsWallet.Connect_failed:
                 reason.current = t('errors:CONNECT_FAILED')
                 textErrorButton.current = t(`common:refresh`)
                 isReload.current = true
-                setErrorConnect(true)
                 break
             case errorsWallet.Already_opened:
                 reason.current = t('common:user_not_login')
                 showIconReload.current = false
                 textErrorButton.current = t('common:got_it')
-                setErrorConnect(true)
                 break
             default:
                 showIconReload.current = true
                 reason.current = t('errors:CONNECT_FAILED')
-                setErrorConnect(true)
                 break
         }
         setLoading(false)
-        if (!isNotFoundNetWork) setSwitchNetwork(code !== errorsWallet.Success ? !inValidNetword : false)
     }
 
     const getData = async () => {
