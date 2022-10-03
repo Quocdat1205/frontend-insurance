@@ -352,13 +352,7 @@ const InsuranceFrom = () => {
         const data = localStorage.getItem('buy_covered_state')
         if (data !== 'undefined') {
             const res = JSON.parse(data as string)
-            if (res.form_history !== true) {
-                return res
-            } else {
-                // setState({ ...state, p_claim: res.p_claim, q_covered: res.q_covered, period: res.period, margin: res.margin })
-                setTab(isMobile ? 3 : 1)
-                return res
-            }
+            return res
         } else {
             return false
         }
@@ -424,20 +418,26 @@ const InsuranceFrom = () => {
                 disable: !rs?.isActive,
             }
         })
-
         if (res) {
-            let itemFilter = tokenFilter.find((rs: any) => rs.type === res?.type)
-            setSelectedCoin(itemFilter)
-
-            setState({
-                ...state,
-                symbol: itemFilter,
-                q_covered: Number(res.q_covered),
-                period: Number(res.period),
-                margin: Number(res.margin),
-                p_claim: Number(res.p_claim),
-            })
-            setListCoin(tokenFilter)
+            if (res.form_history) {
+                let itemFilter = tokenFilter.find((rs: any) => rs.type === res?.type)
+                setSelectedCoin(itemFilter)
+                setState({
+                    ...state,
+                    symbol: itemFilter,
+                    q_covered: res?.q_covered,
+                    period: res?.period,
+                    p_claim: res?.p_claim,
+                })
+                clear.current = false
+            } else {
+                let itemFilter = tokenFilter.find((rs: any) => rs.type === res?.type)
+                setSelectedCoin(itemFilter)
+                setState({
+                    ...state,
+                    symbol: itemFilter,
+                })
+            }
         } else {
             let itemFilter = tokenFilter.find((rs: any) => rs.type === 'BNB')
             setSelectedCoin(itemFilter)
@@ -445,8 +445,8 @@ const InsuranceFrom = () => {
                 ...state,
                 symbol: itemFilter,
             })
-            setListCoin(tokenFilter)
         }
+        setListCoin(tokenFilter)
     }
 
     useEffect(() => {
@@ -477,7 +477,7 @@ const InsuranceFrom = () => {
     useEffect(() => {
         if (selectCoin?.symbol != '') {
             getPrice(selectCoin?.symbol, state, setState)
-            setState({ ...state, symbol: { ...selectCoin }, q_covered: 0, p_claim: 0, period: 2, margin: 0, r_claim: 0, q_claim: 0 })
+            setState({ ...state, symbol: { ...selectCoin } })
             onHandleChange('q_covered', { floatValue: 0, formattedValue: '0', value: '0' })
             onHandleChange('p_claim', { floatValue: 0, formattedValue: '0', value: '0' })
             onHandleChange('margin', { floatValue: 0, formattedValue: '0', value: '0' })
@@ -485,7 +485,7 @@ const InsuranceFrom = () => {
             getBalaneToken(selectCoin?.type)
             localStorage.setItem('buy_covered_state', JSON.stringify(selectCoin))
         }
-        setState({ ...state, q_covered: 0, p_claim: 0, period: 2, margin: 0, r_claim: 0, q_claim: 0 })
+        setState({ ...state })
     }, [selectCoin])
 
     const createSaved = async () => {
@@ -503,10 +503,6 @@ const InsuranceFrom = () => {
     }
 
     useEffect(() => {
-        validator('p_claim')
-        validator('q_covered')
-        validator('margin')
-
         if (!(state.p_claim > 0)) {
             if (tab == 0) {
                 setState({
@@ -600,7 +596,7 @@ const InsuranceFrom = () => {
             }
         }
 
-        if (state.q_covered > 0 && state.p_claim > 0 && tab != 6 && tab != 1) {
+        if (state.q_covered > 0 && state.p_claim > 0 && tab == 0) {
             const margin = Number((8 * state.q_covered * state.p_market) / 100)
             const userCapital = margin
             const systemCapital = userCapital
@@ -635,14 +631,18 @@ const InsuranceFrom = () => {
                 p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
             })
         }
-    }, [state.q_covered, state.margin, state.p_claim, state.period])
+
+        validator('p_claim')
+        validator('q_covered')
+        validator('margin')
+    }, [state.q_covered, state.margin, state.p_claim, state.period, state.p_market])
 
     useEffect(() => {
         createSaved()
     }, [state])
 
     useEffect(() => {
-        if (tab === 0 || tab === 3) {
+        if (tab === 0 || tab === 6) {
             if (state.q_covered && state.p_claim) {
                 const margin = Number((8 * state.q_covered * state.p_market) / 100)
                 const userCapital = margin
@@ -663,10 +663,6 @@ const InsuranceFrom = () => {
             }
         }
     }, [tab])
-
-    useEffect(() => {
-        validator('p_claim')
-    }, [state.p_claim])
 
     useEffect(() => {
         if (showGuide) {
@@ -798,6 +794,7 @@ const InsuranceFrom = () => {
             case 'p_claim':
                 rs.isValid = !(state.p_claim < rangeP_claim.min || state.p_claim > rangeP_claim.max)
                 rs.message = `<div class="flex items-center">
+                ${state.p_claim < state.p_market ? 'P-Claim < P-Market: ' : 'P-Claim > P-Market: '}
                   ${
                       state.p_claim > Number(rangeP_claim.max)
                           ? t('common:max', { value: `${Number(rangeP_claim.max)}` })
@@ -830,10 +827,6 @@ const InsuranceFrom = () => {
         setSelectedCoin(coin)
         setState({ ...state, symbol: { ...coin }, period: 2, r_claim: 0, q_claim: 0, q_covered: 0, margin: 0, p_claim: 0, p_expired: 0 })
         setChosing(false)
-
-        // setTimeout(() => {
-        //     router.reload()
-        // }, 1500)
     }
 
     const renderPopoverQCover = () => (
@@ -937,8 +930,6 @@ const InsuranceFrom = () => {
 
     const [isCanSave, setIsCanSave] = useState<boolean>(false)
     const onHandleChange = (key: string, e: any) => {
-        console.log(e)
-
         const value = +e.value
 
         switch (key) {
@@ -990,6 +981,31 @@ const InsuranceFrom = () => {
     useEffect(() => {
         clear.current = handleCheckFinal()
     }, [state])
+
+    const table = useRef<any>(null)
+    const container = useRef<any>(null)
+    const mouseDown = useRef(false)
+    const startX = useRef<any>(null)
+    const scrollLeft = useRef<any>(null)
+    const startY = useRef<any>(null)
+    const scrollTop = useRef<any>(null)
+    const handleClick = useRef(true)
+
+    const startDragging = (e: any) => {
+        container.current.classList.add('cursor-grabbing')
+        mouseDown.current = true
+        startX.current = e.pageX - table.current.offsetLeft
+        scrollLeft.current = table.current.scrollLeft
+
+        startY.current = e.pageY - table.current.offsetTop
+        scrollTop.current = table.current.scrollTop
+        handleClick.current = true
+    }
+
+    const stopDragging = (event: any) => {
+        container.current.classList.remove('cursor-grabbing')
+        mouseDown.current = false
+    }
 
     return (
         <>
@@ -1863,35 +1879,28 @@ const InsuranceFrom = () => {
                                                 <Tooltip className="max-w-[200px]" id={'period'} placement="right" />
                                             </div>
                                         </span>
-                                        <Tab.Group>
-                                            <Tab.List
-                                                className={` flex flex-row justify-between mt-[1rem]  ${isMobile ? 'w-full' : 'w-[85%]'} ${
-                                                    isMobile && showCroll ? 'overflow-scroll' : ' overflow-hidden'
-                                                }`}
-                                                onTouchStart={() => {
-                                                    setShowCroll(true)
-                                                }}
-                                                onTouchEnd={() => {
-                                                    setShowCroll(false)
-                                                }}
-                                            >
+                                        <div ref={table} className="overflow-auto scroll-table">
+                                            <div ref={container} className={` flex flex-row justify-between mt-[1rem]  ${isMobile ? 'w-full' : 'w-[85%]'} `}>
                                                 {listTabPeriod.map((item, key) => {
-                                                    return (
-                                                        <div
-                                                            key={key}
-                                                            className={`${
-                                                                state.period == item && 'bg-[#FFF1F2] text-red'
-                                                            } bg-hover rounded-[300px] p-3 h-[32px] w-[49px] flex justify-center items-center hover:cursor-pointer ${
-                                                                isMobile && !(item == 15) && 'mr-[12px]'
-                                                            }`}
-                                                            onClick={() => setState({ ...state, period: item })}
-                                                        >
-                                                            {item}
-                                                        </div>
-                                                    )
+                                                    if (item === state.period || item <= item + 6)
+                                                        return (
+                                                            <div
+                                                                key={key}
+                                                                className={`${
+                                                                    state.period == item && 'bg-[#FFF1F2] text-red'
+                                                                } bg-hover rounded-[300px] p-3 h-[32px] w-[49px] flex justify-center items-center hover:cursor-pointer ${
+                                                                    isMobile && !(item == 15) && 'mr-[12px]'
+                                                                }`}
+                                                                onClick={() => {
+                                                                    setState({ ...state, period: item })
+                                                                }}
+                                                            >
+                                                                {item}
+                                                            </div>
+                                                        )
                                                 })}
-                                            </Tab.List>
-                                        </Tab.Group>
+                                            </div>
+                                        </div>
                                     </div>
                                 }
 
