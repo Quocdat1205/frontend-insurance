@@ -562,13 +562,13 @@ const InsuranceFrom = () => {
                 const percent = (state.margin / (state.q_covered * state.p_market)) * 100
 
                 const b = Number(percent.toFixed(decimalList.decimal_margin))
-                if ((b >= 9.5 && b <= 10.5) || state.margin == rangeMargin.max) {
+                if (b == 10 || state.margin == rangeMargin.max) {
                     percentMargin.current = 10
-                } else if (b >= 6.5 && b <= 7.5) {
+                } else if (b == 7) {
                     percentMargin.current = 7
-                } else if (b >= 4.5 && b <= 5.5) {
+                } else if (b == 5) {
                     percentMargin.current = 5
-                } else if (b >= 1.5 && b <= 2.5) {
+                } else if (b == 2) {
                     percentMargin.current = 2
                 } else {
                     percentMargin.current = b
