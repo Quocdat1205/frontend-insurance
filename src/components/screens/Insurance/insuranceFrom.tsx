@@ -331,21 +331,21 @@ const InsuranceFrom = () => {
         const data = localStorage.getItem('buy_covered_state')
         console.log(data, 'DATA')
 
-        if (!data) {
-            console.log('FALSE')
+        if (data !== undefined) {
+            console.log('TRUE')
 
-            return false
+            const res = JSON.parse(data as string)
 
+            return res
             // if (res) {
             //     return res
             // } else {
             //     return false
             // }
         } else {
-            console.log('TRUE')
+            console.log('FALSE')
 
-            const res = JSON.parse(data.toString())
-            return res
+            return false
         }
     }
 
