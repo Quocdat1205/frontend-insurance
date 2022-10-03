@@ -332,6 +332,8 @@ const InsuranceFrom = () => {
         console.log(data, 'DATA')
 
         if (data !== undefined) {
+            console.log(data !== undefined, typeof data)
+
             console.log('TRUE')
 
             const res = JSON.parse(data as string)
