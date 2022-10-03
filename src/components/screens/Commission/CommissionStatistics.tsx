@@ -2,17 +2,19 @@ import { addMonths, addWeeks, endOfDay, startOfDay, subDays } from 'date-fns'
 import { useTranslation } from 'next-i18next'
 import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
+import DateRangePicker from 'components/common/DatePicker/DateRangePicker'
 import { CalendarIcon, FilterIcon } from 'components/common/Svg/SvgIcon'
 import colors from 'styles/colors'
 import { formatNumber, formatTime } from 'utils/utils'
-import DateRangePicker from 'components/common/DatePicker/DateRangePicker'
 
 interface CommissionStatistics {
     account: string
     userInfo: any
     decimal: number
+    setShowWithDrawCommission: React.Dispatch<React.SetStateAction<boolean>>
 }
-const CommissionStatistics = ({ account, userInfo, decimal = 2 }: CommissionStatistics) => {
+const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawCommission }: CommissionStatistics) => {
+
     const days = useMemo(() => {
         const now = new Date()
         return [
@@ -80,7 +82,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2 }: CommissionStat
         const from = startOfDay(e?.startDate).valueOf()
         const to = endOfDay(e?.endDate).valueOf()
         setPicker(e)
-        setFilter({ from: from, to: to })
+        setFilter({ from, to })
     }
 
     const onReset = () => {
@@ -102,8 +104,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2 }: CommissionStat
                             <div
                                 key={index}
                                 onClick={() => setFilter(day)}
-                                className={`px-4 py-2 rounded-full bg-hover cursor-pointer ${
-                                    day.id === filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
+                                className={`px-4 py-2 rounded-full bg-hover cursor-pointer ${day.id === filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
                                 }`}
                             >
                                 {day[language]}
@@ -114,14 +115,13 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2 }: CommissionStat
                             onChange={onChangePicker}
                             customLabel={() => (
                                 <div
-                                    className={`px-4 py-2 rounded-full bg-hover cursor-pointer flex items-center space-x-2 ${
-                                        !filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
+                                    className={`px-4 py-2 rounded-full bg-hover cursor-pointer flex items-center space-x-2 ${!filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
                                     }`}
                                 >
                                     <CalendarIcon color={!filter?.id ? colors.red.red : colors.gray.gray} size={16} />
                                     <span>
                                         {picker?.startDate
-                                            ? formatTime(picker?.startDate, 'dd.MM.yyyy') + ' - ' + formatTime(picker?.endDate, 'dd.MM.yyyy')
+                                            ? `${formatTime(picker?.startDate, 'dd.MM.yyyy')} - ${formatTime(picker?.endDate, 'dd.MM.yyyy')}`
                                             : 'Tuỳ chỉnh'}
                                     </span>
                                 </div>
@@ -172,7 +172,10 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2 }: CommissionStat
                             </div>
                             <div className="flex items-center justify-between mt-4">
                                 <div className="text-xl sm:text-2xl font-semibold sm:font-medium">{formatNumber(userInfo?.userInfo, decimal)}</div>
-                                <div className="flex items-center space-x-1 text-sm sm:text-base font-semibold text-red">
+                                <div
+                                    className="flex items-center space-x-1 text-sm sm:text-base font-semibold text-red cursor-pointer"
+                                    onClick={() => setShowWithDrawCommission(true)}
+                                >
                                     <span>Rút hoa hồng</span>
                                     <img src="/images/icons/ic_withdraw.png" className="w-4 h-4 sm:w-6 sm:h-6" />
                                 </div>
