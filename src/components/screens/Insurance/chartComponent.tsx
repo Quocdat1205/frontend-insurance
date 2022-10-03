@@ -178,7 +178,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             valueAxis.renderer.maxLabelPosition = 0.95
             valueAxis.renderer.axisFills.template.disabled = true
             valueAxis.renderer.ticks.template.disabled = true
-            valueAxis.hidden = false
+            valueAxis.hidden = true
             valueAxis.tooltip.disabled = true
 
             let series = chart.series.push(new am4charts.LineSeries())
