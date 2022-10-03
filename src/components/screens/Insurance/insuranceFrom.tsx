@@ -392,7 +392,8 @@ const InsuranceFrom = () => {
     }
 
     const setDataIcon = async () => {
-        const res: any = await getStorage()
+        const res = await getStorage()
+        // console.log(assetsToken)
 
         const tokenFilter = assetsToken.map((rs: any) => {
             return {
