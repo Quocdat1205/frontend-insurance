@@ -145,8 +145,6 @@ const Header = () => {
         return account?.address ? [...menuAddress, ...baseMenu] : baseMenu
     }, [isMobile, account])
 
-    console.log(userInfo, account)
-
     return (
         <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 homeNav:px-10 border-b border-divider sticky top-0 bg-white z-[50]">
             <div className="flex items-center justify-between w-full m-auto space-x-4 max-w-screen-layout 4xl:max-w-screen-4xl sm:space-x-12">

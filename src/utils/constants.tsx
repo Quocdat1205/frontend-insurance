@@ -117,3 +117,59 @@ export const errorsWallet = {
     NetWork_error: 'ERR_NETWORK',
     Connect_failed: 'CONNECT_FAILED',
 }
+
+
+export const seoConfigs: any[] = [
+    {
+        url: '/insurance-history.*',
+        en: {
+            title: 'Change risk to payback | Cover Value for BTC, ETH, BNB and Altcoin',
+            description: 'Cover your crypto asset value with 0 fee',
+            keywords: 'Change risk to payback | Cover Value for BTC, ETH, BNB and Altcoin',
+        },
+        vi: {
+            title: 'Biến rủi ro thành lợi nhuận | Bảo chứng tài sản tiền số BTC, ETH, BNB và Altcoin',
+            description: 'Cover your crypto asset value with 0 fee',
+            keywords: 'Biến rủi ro thành lợi nhuận | Bảo chứng tài sản tiền số BTC, ETH, BNB và Altcoin',
+        },
+    },
+    {
+        url: '/buy-covered.*',
+        en: {
+            title: 'BTC/USDT: 30,000 | Nami Insurance',
+            description: 'Cover your crypto asset value with 0 fee',
+            keywords: 'BTC/USDT: 30,000 | Nami Insurance',
+        },
+        vi: {
+            title: 'Giá tương ứng với Tài sản BTC/USDT: 30,000 | Nami Insurance',
+            description: 'Cover your crypto asset value with 0 fee',
+            keywords: 'Giá tương ứng với Tài sản BTC/USDT: 30,000 | Nami Insurance',
+        },
+    },
+    {
+        url: '/home.*',
+        en: {
+            title: 'Change risk to payback | Cover Value for BTC, ETH, BNB and Altcoins',
+            description: 'Cover your crypto asset value with 0 fee',
+            keywords: 'Change risk to payback | Cover Value for BTC, ETH, BNB and Altcoins',
+        },
+        vi: {
+            title: 'Biến rủi ro thành lợi nhuận | Bảo chứng tài sản tiền số BTC, ETH, BNB và Altcoins',
+            description: 'Cover your crypto asset value with 0 fee',
+            keywords: 'Biến rủi ro thành lợi nhuận | Bảo chứng tài sản tiền số BTC, ETH, BNB và Altcoins',
+        },
+    },
+    {
+        url: '.*',
+        en: {
+            title: 'Nami Insurance | The first Blockchain-based insurance protocol for asset value',
+            description: 'Cover your crypto asset value with 0 fee',
+            keywords: 'Nami Insurance | The first Blockchain-based insurance protocol for asset value',
+        },
+        vi: {
+            title: 'Nami Insurance | Giao thức bảo hiểm giá trị tài sản đầu tiên ứng dụng công nghệ Blockchain',
+            description: 'Cover your crypto asset value with 0 fee',
+            keywords: 'Nami Insurance | Giao thức bảo hiểm giá trị tài sản đầu tiên ứng dụng công nghệ Blockchain',
+        },
+    },
+]
