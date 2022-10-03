@@ -373,17 +373,17 @@ const InsuranceFrom = () => {
                         `${selectCoin.type && selectCoin.type}${unitMoney}`,
                         `${Math.floor(timeBegin.getTime() / 1000)}`,
                         `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                        '1h',
+                        '1m',
                         setDataChart,
                         120,
                     )
-                } else if (selectTime == '1W' || selectTime == '1D') {
+                } else if (selectTime == '1D') {
                     timeBegin.setDate(timeEnd.getDate() - 10)
                     fetchApiNami(
                         `${selectCoin.type && selectCoin.type}${unitMoney}`,
                         `${Math.floor(timeBegin.getTime() / 1000)}`,
                         `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                        '1d',
+                        '1h',
                         setDataChart,
                         500,
                     )
