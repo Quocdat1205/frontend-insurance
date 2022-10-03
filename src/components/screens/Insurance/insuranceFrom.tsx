@@ -1850,7 +1850,6 @@ const InsuranceFrom = () => {
                                         </div>
                                     </div>
                                 }
-
                                 {/* Period */}
                                 {
                                     <div data-tut="tour_period" id="tour_period" className={'mt-5 pl-[32px] pr-[32px] pb-[32px] text-sm text-txtSecondary'}>
@@ -1893,109 +1892,119 @@ const InsuranceFrom = () => {
                                     </div>
                                 }
 
-                                {
-                                    <div
-                                        onClick={() => {
-                                            setChosing(false)
-                                        }}
-                                        className={`${clear ? 'visible' : 'invisible'} items-center w-[300px] xs:w-full`}
-                                    >
-                                        {saved > 0 && (
-                                            <div className={'flex justify-center items-center mt-[24px] mx-[1rem]'}>
-                                                <CheckCircle></CheckCircle>
-                                                <span className={'text-sm text-txtPrimary w-[230px] xs:w-full px-[4px] font-semibold'}>
-                                                    {t('insurance:buy:saved')}{' '}
-                                                    <span className={'text-red'}>
-                                                        {saved.toFixed(4)} {unitMoney}
-                                                    </span>{' '}
-                                                    {t('insurance:buy:sub_saved')}
-                                                </span>
-                                            </div>
-                                        )}
-                                        <div className={'flex flex-col mt-[24px] hover:cursor-default'}>
+                                {clear.current && (
+                                    <>
+                                        {
                                             <div
-                                                className={`${
-                                                    tab == 4 ? 'hidden' : ''
-                                                } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[1rem] mx-[12px]`}
-                                            >
-                                                <div className={'text-txtSecondary flex flex-row items-center'}>
-                                                    <span className={'mr-[0.5rem]'}>R-Claim</span>
-                                                    <div data-tip={t('insurance:terminology:r_claim')} data-for={`r_claim`}>
-                                                        <InfoCircle size={14} color={colors.txtSecondary} />
-                                                        <Tooltip className="max-w-[200px]" id={'r_claim'} placement="right" />
-                                                    </div>
-                                                </div>
-                                                <div className={'font-semibold'}>
-                                                    <span>{state?.r_claim > 0 ? Number(state?.r_claim.toFixed(decimalList.decimal_q_covered)) : 0}%</span>
-                                                </div>
-                                            </div>
-                                            <div
-                                                className={`${
-                                                    tab == 5 ? 'hidden' : ''
-                                                } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[1rem] mx-[12px]`}
-                                            >
-                                                <div className={'text-txtSecondary flex flex-row items-center'}>
-                                                    <span className={'mr-[0.5rem]'}>Q-Claim</span>
-                                                    <div data-tip={t('insurance:terminology:q_claim')} data-for={`q_claim`}>
-                                                        <InfoCircle size={14} color={colors.txtSecondary} />
-                                                        <Tooltip className="max-w-[200px]" id={'q_claim'} placement="right" />
-                                                    </div>
-                                                </div>
-                                                <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
-                                                    {state.q_claim > 0 ? Number(state.q_claim.toFixed(decimalList.decimal_q_covered)) : 0}
-                                                    <span
-                                                        className={'text-red pl-[0.5rem]'}
-                                                        onClick={() => {
-                                                            setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:q_claim')}` })
-                                                        }}
-                                                    >
-                                                        {unitMoney}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div
-                                                className={`${
-                                                    tab == 6 ? 'hidden' : ''
-                                                } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[1rem] mx-[12px]`}
-                                            >
-                                                <div className={'text-txtSecondary flex flex-row items-center'}>
-                                                    <span className={'mr-[0.5rem]'}>Margin</span>
-                                                    <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
-                                                        <InfoCircle size={14} color={colors.txtSecondary} />
-                                                        <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
-                                                    </div>
-                                                </div>
-                                                <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                                    {state.margin > 0 ? Number(state.margin.toFixed(decimalList.decimal_margin)) : 0}
-
-                                                    <span
-                                                        className={'text-red pl-[0.5rem]'}
-                                                        onClick={() => {
-                                                            // setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:margin')}` })
-                                                        }}
-                                                    >
-                                                        {unitMoney}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className={`flex flex-col justify-center items-center mb-[32px] mx-[1rem]`}>
-                                            <button
-                                                className={`${
-                                                    clear.current == true
-                                                        ? 'bg-red text-white border border-red'
-                                                        : 'text-white bg-divider border border-divider'
-                                                }flex items-center justify-center rounded-lg px-auto py-auto font-semibold py-[12px] !px-[100px] xs:px-[140.5rem]`}
                                                 onClick={() => {
-                                                    handleNext()
+                                                    setChosing(false)
                                                 }}
-                                                disabled={!clear.current}
+                                                className={`${clear ? 'visible' : 'invisible'} items-center w-[300px] xs:w-full`}
                                             >
-                                                {menu[11].name}
-                                            </button>
-                                        </div>
-                                    </div>
-                                }
+                                                {saved > 0 && (
+                                                    <div className={'flex justify-center items-center mt-[24px] mx-[1rem]'}>
+                                                        <CheckCircle></CheckCircle>
+                                                        <span className={'text-sm text-txtPrimary w-[230px] xs:w-full px-[4px] font-semibold'}>
+                                                            {t('insurance:buy:saved')}{' '}
+                                                            <span className={'text-red'}>
+                                                                {saved.toFixed(4)} {unitMoney}
+                                                            </span>{' '}
+                                                            {t('insurance:buy:sub_saved')}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <div className={'flex flex-col mt-[24px] hover:cursor-default'}>
+                                                    <div
+                                                        className={`${
+                                                            tab == 4 ? 'hidden' : ''
+                                                        } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[1rem] mx-[12px]`}
+                                                    >
+                                                        <div className={'text-txtSecondary flex flex-row items-center'}>
+                                                            <span className={'mr-[0.5rem]'}>R-Claim</span>
+                                                            <div data-tip={t('insurance:terminology:r_claim')} data-for={`r_claim`}>
+                                                                <InfoCircle size={14} color={colors.txtSecondary} />
+                                                                <Tooltip className="max-w-[200px]" id={'r_claim'} placement="right" />
+                                                            </div>
+                                                        </div>
+                                                        <div className={'font-semibold'}>
+                                                            <span>
+                                                                {state?.r_claim > 0 ? Number(state?.r_claim.toFixed(decimalList.decimal_q_covered)) : 0}%
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        className={`${
+                                                            tab == 5 ? 'hidden' : ''
+                                                        } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[1rem] mx-[12px]`}
+                                                    >
+                                                        <div className={'text-txtSecondary flex flex-row items-center'}>
+                                                            <span className={'mr-[0.5rem]'}>Q-Claim</span>
+                                                            <div data-tip={t('insurance:terminology:q_claim')} data-for={`q_claim`}>
+                                                                <InfoCircle size={14} color={colors.txtSecondary} />
+                                                                <Tooltip className="max-w-[200px]" id={'q_claim'} placement="right" />
+                                                            </div>
+                                                        </div>
+                                                        <div className={'font-semibold flex flex-row hover:cursor-pointer relative'}>
+                                                            {state.q_claim > 0 ? Number(state.q_claim.toFixed(decimalList.decimal_q_covered)) : 0}
+                                                            <span
+                                                                className={'text-red pl-[0.5rem]'}
+                                                                onClick={() => {
+                                                                    setShowChangeUnit({
+                                                                        ...showChangeUnit,
+                                                                        isShow: true,
+                                                                        name: `${t('insurance:unit:q_claim')}`,
+                                                                    })
+                                                                }}
+                                                            >
+                                                                {unitMoney}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        className={`${
+                                                            tab == 6 ? 'hidden' : ''
+                                                        } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[1rem] mx-[12px]`}
+                                                    >
+                                                        <div className={'text-txtSecondary flex flex-row items-center'}>
+                                                            <span className={'mr-[0.5rem]'}>Margin</span>
+                                                            <div data-tip={t('insurance:terminology:margin')} data-for={`margin`}>
+                                                                <InfoCircle size={14} color={colors.txtSecondary} />
+                                                                <Tooltip className="max-w-[200px]" id={'margin'} placement="right" />
+                                                            </div>
+                                                        </div>
+                                                        <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
+                                                            {state.margin > 0 ? Number(state.margin.toFixed(decimalList.decimal_margin)) : 0}
+
+                                                            <span
+                                                                className={'text-red pl-[0.5rem]'}
+                                                                onClick={() => {
+                                                                    // setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:margin')}` })
+                                                                }}
+                                                            >
+                                                                {unitMoney}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className={`flex flex-col justify-center items-center mb-[32px] mx-[1rem]`}>
+                                                    <button
+                                                        className={`${
+                                                            clear.current == true
+                                                                ? 'bg-red text-white border border-red'
+                                                                : 'text-white bg-divider border border-divider'
+                                                        }flex items-center justify-center rounded-lg px-auto py-auto font-semibold py-[12px] !px-[100px] xs:px-[140.5rem]`}
+                                                        onClick={() => {
+                                                            handleNext()
+                                                        }}
+                                                        disabled={!clear.current}
+                                                    >
+                                                        {menu[11].name}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        }
+                                    </>
+                                )}
                             </>
                         )}
                     </>

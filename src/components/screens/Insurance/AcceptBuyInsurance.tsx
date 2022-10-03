@@ -64,7 +64,6 @@ const AcceptBuyInsurance = () => {
     const { account: address, error, chainId, isActive } = useWeb3React()
     const account = useAppSelector((state: RootStore) => state.setting.account)
     const [Noti, setNoti] = useState<string>('')
-    const [price, setPrice] = useState<number>(0)
     const [checkUpgrade, setCheckUpgrade] = useState<boolean>(false)
     const [state, setState] = useState<IState>()
     const [isUpdated, setUpdated] = useState<boolean>(true)
@@ -203,7 +202,7 @@ const AcceptBuyInsurance = () => {
                 if (data.data.length > 0) {
                     const min = data.data[0].p - data.data[0].p * 0.05
                     const max = data.data[0].p + data.data[0].p * 0.05
-                    if (price > max || price < min) {
+                    if (state.p_market > max || state.p_market < min) {
                         setUpdated(false)
                         Config.toast.show('error', t('insurance:buy:price_had_update'))
                         return setActive(false)
@@ -646,7 +645,7 @@ const AcceptBuyInsurance = () => {
                                         createContract()
                                     }
                                     if (!isUpdated) {
-                                        getPrice(`${state.symbol}${state?.unit}`, setPrice).then(() => {
+                                        getPrice(`${state.symbol}${state?.unit}`, state, setState).then(() => {
                                             setUpdated(true)
                                             setCanBuy(true)
                                             setCount(10)
@@ -925,7 +924,7 @@ const AcceptBuyInsurance = () => {
                                     createContract()
                                 }
                                 if (!isUpdated) {
-                                    getPrice(`${state.symbol}${state?.unit}`, setPrice).then(() => {
+                                    getPrice(`${state.symbol}${state?.unit}`, state, setState).then(() => {
                                         setUpdated(true)
                                         setCanBuy(true)
                                         setCount(10)
@@ -947,13 +946,13 @@ const AcceptBuyInsurance = () => {
     )
 }
 
-export const getPrice = async (symbol: string, setState: any) => {
+export const getPrice = async (symbol: string, state: any, setState: any) => {
     try {
         const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${symbol}`)
 
         if (data) {
             if (data.data[0]) {
-                return setState(data.data[0]?.p)
+                return setState({ ...state, p_market: data.data[0]?.p })
             }
         }
     } catch (err) {
