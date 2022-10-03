@@ -156,6 +156,10 @@ class Config {
             parentId: 0,
         },
     ]
+
+    static copy = (text: string) => {
+        navigator.clipboard.writeText(text)
+    }
 }
 
 export default Config

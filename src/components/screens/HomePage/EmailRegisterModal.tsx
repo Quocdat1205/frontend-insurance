@@ -7,10 +7,11 @@ import CircleSpinner from 'components/common/Loader/CircleSpinner'
 import Modal from 'components/common/Modal/Modal'
 import Config from 'config/config'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
-import { RootStore, useAppSelector } from 'redux/store'
+import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
 import { API_GET_INFO_USER, API_UPDATE_USER_INFO } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { setModalSubscribeStorage } from 'utils/utils'
+import { setAccount } from 'redux/actions/setting'
 
 interface EmailRegisterModal {
     visible: boolean
@@ -35,7 +36,8 @@ const isDuplicateEmail = (oldEmail: any, newEmail: any) => newEmail?.toLowerCase
 const EmailSubscriptionModal = ({ visible, onClose, isUpdate }: EmailRegisterModal) => {
     const { t } = useTranslation()
     const [isLoading, setIsLoading] = useState(false)
-    const { account, chain } = useWeb3Wallet()
+    const account = useAppSelector((state: RootStore) => state.setting.account)
+    const dispatch = useAppDispatch()
 
     const updateEmail = async (email: any) => {
         try {
@@ -46,7 +48,7 @@ const EmailSubscriptionModal = ({ visible, onClose, isUpdate }: EmailRegisterMod
                     method: 'PUT',
                 },
                 params: {
-                    owner: account,
+                    owner: account?.address,
                     email,
                 },
             })
@@ -55,6 +57,7 @@ const EmailSubscriptionModal = ({ visible, onClose, isUpdate }: EmailRegisterMod
             }
             if (statusCode === 200) {
                 // update local storage
+                dispatch(setAccount({ ...data }))
                 setModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL, 'true')
                 Config.toast.show('success', t('common:modal:success_update_email'))
                 onClose()
