@@ -301,6 +301,7 @@ const AcceptBuyInsurance = () => {
                         p_claim: Number(state.p_claim),
                         period: Number(state.period),
                         isUseNain: dataPost.isUseNain,
+                        p_market: state.p_market,
                     }
 
                     await fetchApi({
@@ -319,6 +320,7 @@ const AcceptBuyInsurance = () => {
                             p_claim: Number(data.p_claim),
                             period: Number(data.period),
                             isUseNain: data.isUseNain,
+                            p_market: data.p_market,
                         },
                         token: authToken,
                     })
