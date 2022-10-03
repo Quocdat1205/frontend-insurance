@@ -24,7 +24,8 @@ export type InputProps = {
     label?: string
     onKeyDown?: (e: any) => void
     id?: string
-    disabled?: boolean
+    disabled?: boolean,
+    onPaste?: (e?: any) => void
 }
 
 const defaultInputCls = 'bg-hover w-full py-[12px] px-[16px] h-11 sm:h-12 rounded-[3px] ' + 'px-3 py-3 placeholder-gray-400 text-sm focus:outline-none '
@@ -62,7 +63,9 @@ const InputField = ({
 
     const _onFocus = (e: any) => {
         setFocus(true)
-        if (onFocus) onFocus(e)
+        if (onFocus) {
+            onFocus(e)
+        }
     }
 
     const _onBlur = (e: any) => {
@@ -86,7 +89,8 @@ const InputField = ({
                         type={'text'}
                         className={cx([
                             className,
-                            { 'border border-error': isError, 'text-txtSecondary bg-[#EFF0F2]': disabled },
+                            { ' text-sm lg:text-base border border-error': isError,
+                                'text-gray bg-[#EFF0F2]': disabled },
                             defaultInputCls,
                             animationCls,
                         ])}
@@ -141,7 +145,7 @@ const InputField = ({
 
 export const ErrorSectionNote = ({ content }: { content: any }) => (
     <div className={'w-full bg-hover mb-5 py-2 font-normal px-4'}>
-        <div className="text-xs text-error text-sm md:text-base">
+        <div className="text-xs text-red text-sm md:text-base">
             <div className="flex items-start space-x-2">
                 <TriggerErrorIconCircle />
                 <div

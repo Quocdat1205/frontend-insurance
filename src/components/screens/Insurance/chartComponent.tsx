@@ -110,6 +110,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
     }, [data])
 
     useEffect(() => {
+        chart?.dispose()
         InitChart(dataChart)
     }, [dataChart])
 
@@ -117,13 +118,14 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
     useEffect(() => {
         clearTimeout(timer.current)
         timer.current = setTimeout(() => {
+            chart?.dispose()
             InitChart(dataChart)
         }, 500)
         if (chart) {
             setP_Market(chart.data[chart.data.length - 1]?.value)
-            setPClaim(PClaim)
+            setPClaim(p_claim)
         }
-    }, [dataChart, p_claim, p_expired, state.period])
+    }, [dataChart, p_claim, p_expired, state.period, state.q_covered, state.margin])
 
     // useEffect(() => {
     //     InitChart(dataChart)
@@ -149,10 +151,10 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             chart.cursor.fullWidthLineY = true
             chart.cursor.lineX.fillOpacity = 0.05
             chart.cursor.lineY.fillOpacity = 0.05
-            chart.events.on('ready', function (event: any) {
-                valueAxis.min = valueAxis.minZoomed
-                valueAxis.max = valueAxis.maxZoomed
-            })
+            // chart.events.on('ready', function (event: any) {
+            //     valueAxis.min = valueAxis.minZoomed
+            //     valueAxis.max = valueAxis.maxZoomed
+            // })
 
             let dateAxis = chart.xAxes.push(new am4charts.DateAxis())
             dateAxis.renderer.grid.template.location = 0
@@ -182,10 +184,6 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             valueAxis.renderer.ticks.template.disabled = true
             valueAxis.hidden = true
             valueAxis.tooltip.disabled = true
-
-            chart.events.on('datavalidated', function () {
-                dateAxis.zoom({ start: 1 / 500, end: 1.1 }, false, true)
-            })
 
             // let gradient = new am4core.LinearGradient()
             // gradient.addColor(am4core.color('#EB2B3E'), 0.15, 0)
@@ -236,21 +234,18 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             bullet.circle.strokeWidth = 2
             bullet.circle.propertyFields.radius = '1'
 
-            if (
-                (p_claim > state.p_market * 1 + (2 * state.p_market) / 100 && p_claim < state.p_market * 1 + (70 * state.p_market) / 100) ||
-                (p_claim > state.p_market * 1 - (70 * state.p_market) / 100 && p_claim < state.p_market * 1 - (2 * state.p_market) / 100)
-            ) {
+            if (p_claim > 0) {
                 handleTrendLine(chart, p_claim, state)
             } else {
-                handleTrendLine(chart, 0, state)
+                // handleTrendLine(chart, 0, state)
             }
 
             // //Label bullet main
             let latitudeLabel = subSeries.bullets.push(new am4charts.LabelBullet())
             latitudeLabel.label.html = `<div class="text-xs">P-Market: $${chart.data[chart.data.length - 1]?.value}</div>`
             latitudeLabel.label.horizontalCenter = 'right'
-            latitudeLabel.label.dx = 100
-            latitudeLabel.label.dy = -5
+            latitudeLabel.label.dx = -10
+            // latitudeLabel.label.dy = -5
             latitudeLabel.label.verticalCenter = 'bottom'
             latitudeLabel.label.fill = am4core.color('#B2B7BC')
             if (p_expired) {
@@ -284,9 +279,14 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                     bulletExpired.disabled = true
                 }
 
-                expiredLabel.label.horizontalCenter = 'middle'
-                expiredLabel.label.dy = latitudeExpired.data[0].value > state.p_market ? 23 : -23
-                expiredLabel.label.verticalCenter = 'bottom'
+                expiredLabel.label.horizontalCenter = 'right'
+                if (isMobile) {
+                    expiredLabel.label.dx = -5
+                    expiredLabel.label.verticalCenter = 'middle'
+                } else {
+                    expiredLabel.label.dy = latitudeExpired.data[0].value > state.p_market ? 23 : -23
+                    expiredLabel.label.verticalCenter = 'bottom'
+                }
                 expiredLabel.label.fill = am4core.color('#B2B7BC')
             }
 
@@ -340,6 +340,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 claimLabel.label.draggable = false
                 claimLabel.label.position = [0, 0]
                 claimLabel.label.dy = latitudeClaim.data[0].value > state.p_market ? 20 : -20
+                claimLabel.label.dx = -90
                 if (isMobile) {
                     claimLabel.label.dx = -90
                 }
@@ -348,7 +349,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
 
                 if (p_claim > 0) {
                     if (isMobile) {
-                        claimLabel.label.html = `<div id="claimLabel" class="justify-end mt-[0.25rem] hover:cursor-pointer items-center flex text-xs h-[24px] text-[${
+                        claimLabel.label.html = `<div id="claimLabel" class="z-[9999] justify-end mt-[0.25rem] hover:cursor-pointer items-center flex text-xs h-[24px] text-[${
                             latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : '#52CC74'
                         }] "><span>P-Claim: $${
                             latitudeClaim.data[0].value

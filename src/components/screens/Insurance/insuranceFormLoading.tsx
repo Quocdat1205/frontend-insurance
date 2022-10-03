@@ -114,7 +114,7 @@ export const InsuranceFormLoading = ({ isMobile }: any) => {
             </div>
         </>
     ) : (
-        <div className="px-4 sm:px-10 lg:px-20">
+        <div className="px-4 mb:px-10 lg:px-20">
             <div className="pt-12 sm:pt-[4.25rem] max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
                 <div className="flex items-center justify-between">
                     <Skeleton className="h-6 w-1/5" />

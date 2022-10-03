@@ -4,13 +4,16 @@ import { useTranslation } from 'next-i18next'
 import React, { useEffect, useMemo, useState } from 'react'
 import InlineSVG from 'react-inlinesvg'
 import styled from 'styled-components'
+import { InfoCircle } from 'components/common/Svg/SvgIcon'
+import Tooltip from 'components/common/Tooltip/Tooltip'
 import useWindowSize from 'hooks/useWindowSize'
+import { RootStore, useAppSelector } from 'redux/store'
 import { API_GET_INFO_GENERAL } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { DURATION_AOS } from 'utils/constants'
 import { formatNumber, getUnit } from 'utils/utils'
 import 'aos/dist/aos.css'
-import { RootStore, useAppSelector } from 'redux/store'
+import colors from 'styles/colors'
 
 const Banner = () => {
     const unitConfig = useAppSelector((state: RootStore) => getUnit(state, 'USDT'))
@@ -36,14 +39,15 @@ const Banner = () => {
         }
     }
 
-    const list = useMemo(() => {
-        return [
+    const list = useMemo(
+        () => [
             {
                 title: t('home:landing:total_q_covered'),
                 icon: '/images/screens/home/ic_banner_1.svg',
                 // value: general?.q_coverd ?? 0,
                 value: 119059000,
                 decimal: unitConfig?.assetDigit ?? 2,
+                tooltip: 'common:terminology:q_covered',
             },
             {
                 title: t('home:landing:total_margin'),
@@ -51,6 +55,7 @@ const Banner = () => {
                 // value: general?.q_margin ?? 0,
                 value: 79000,
                 decimal: unitConfig?.assetDigit ?? 2,
+                tooltip: 'common:terminology:margin',
             },
             {
                 title: t('home:landing:users'),
@@ -66,9 +71,11 @@ const Banner = () => {
                 value: 139,
                 suffix: '%',
                 decimal: 2,
+                tooltip: 'common:terminology:r_claim',
             },
-        ]
-    }, [general, unitConfig])
+        ],
+        [general, unitConfig],
+    )
 
     useEffect(() => {
         AOS.init({
@@ -78,8 +85,8 @@ const Banner = () => {
     }, [])
 
     return (
-        <section className="pt-20 sm:pt-[7.5rem]">
-            <div className="px-4 lg:px-20 ">
+        <section className="pt-10 sm:pt-[7.5rem]">
+            <div className="px-4 mb:px-10 lg:px-20">
                 <div className="text-2xl sm:text-5xl font-semibold mb-6 max-w-screen-insurance m-auto">{t('home:home:statistics')}</div>
             </div>
             <Background isMobile={isMobile}>
@@ -95,14 +102,25 @@ const Banner = () => {
                             129,000
                         </div>
                     </div>
+
                     <div className="grid grid-rows-4 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-4 grid-flow-col gap-x-6 lg:gap-6">
+                        <Tooltip className="max-w-[200px]" id={'common:terminology:q_covered'} placement="top" />
+                        <Tooltip className="max-w-[200px]" id={'common:terminology:margin'} placement="top" />
+                        <Tooltip className="max-w-[200px]" id={'common:terminology:r_claim'} placement="top" />
                         {list.map((item: any, index: number) => (
                             <Item key={index} className=" border-transparent-red lg:border-gradient-red">
                                 <div className="max-h-[54px]">
                                     <InlineSVG src={item.icon} />
                                 </div>
                                 <div className="flex flex-col space-y-[2px] sm:space-y-2">
-                                    <div className="text-txtSecondary text-sm sm:text-base">{item.title}</div>
+                                    <div className="text-txtSecondary flex items-center text-sm sm:text-base">
+                                        {item.title}
+                                        {item.tooltip && (
+                                            <div className={'ml-[0.375rem]'} data-tip={t(item.tooltip)} data-for={item.tooltip}>
+                                                <InfoCircle className={''} size={14} color={colors.txtSecondary} />
+                                            </div>
+                                        )}
+                                    </div>
                                     <div className="font-semibold text-2xl" data-aos="fade-up" data-aos-delay={DURATION_AOS} data-aos-offset="50">
                                         {formatNumber(item.value, item.decimal)}
                                         {item.suffix}
@@ -128,7 +146,7 @@ const Item = styled.div.attrs<any>({
     border-bottom: 0;
 `
 const Background = styled.div.attrs({
-    className: 'pt-8 px-4 lg:px-20 ',
+    className: 'pt-8 px-4 mb:px-10 lg:px-20',
 })<any>`
     background-image: ${({ isMobile }) => `url(${`/images/screens/home/banner_alt${isMobile ? '_mobile' : ''}.png`})`};
     background-position: top;

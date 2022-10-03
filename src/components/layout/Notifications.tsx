@@ -8,7 +8,7 @@ import React, { Fragment, useEffect, useRef, useState, useMemo } from 'react'
 import { API_CHECK_NOTICE, API_GET_NOTICE, API_UPDATE_NOTICE } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { getTimeAgo, getUnit } from 'utils/utils'
-import { isMobile } from 'react-device-detect'
+import { isMobile as mobile } from 'react-device-detect'
 import { renderContentStatus } from 'components/screens/InsuranceHistory/InsuranceContract'
 import { X } from 'react-feather'
 import Spinner from 'components/common/Loader/Spinner'
@@ -22,6 +22,7 @@ const Notifications = () => {
     const unitConfig: UnitConfig = useAppSelector((state: RootStore) => getUnit(state, 'USDT'))
     const { t } = useTranslation()
     const { width } = useWindowSize()
+    const isMobile = (width && width < screens.drawer) && mobile
     const [visible, setVisible] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(true)
     const [isLoadMore, setIsLoadMore] = useState<boolean>(false)
@@ -192,7 +193,7 @@ const Notifications = () => {
     return (
         <div ref={wrapperRef} className="relative">
             <NotiDetailModal isMobile={isMobile} data={rowData.current} visible={showNotiDetail} onClose={() => setShowNotiDetail(false)} t={t} />
-            <div onClick={() => setVisible(true)} className="sm:p-2 hover:bg-hover rounded-[3px] relative">
+            <div onClick={() => setVisible(true)} className="p-2 sm:p-0 hover:bg-hover rounded-[3px] relative">
                 <NotificationsIcon />
                 {hasNotice && <div className="bg-red w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[50%] absolute top-[30%] right-[20%] sm:right-[30%]" />}
             </div>
@@ -233,8 +234,7 @@ const Notifications = () => {
                 >
                     <div
                         className={`absolute z-10 mt-3 ${
-                            // width && width > screens.drawer ? 'left-0' : 'right-0'
-                            width && width > screens.drawer ? '-left-[20rem]' : 'right-0'
+                            width && width > screens.drawer ? 'left-0' : 'right-0'
                         }  shadow-subMenu rounded-b-xl min-w-[360px] py-1 bg-white`}
                     >
                         <div className="font-normal sm:h-[28rem] overflow-auto px-4 sm:px-0">
