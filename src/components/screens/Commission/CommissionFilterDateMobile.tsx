@@ -13,13 +13,13 @@ import colors from 'styles/colors'
 import { formatTime } from 'utils/utils'
 
 interface InsuranceFilterMobile {
-    visible?: boolean
-    onClose?: () => void
-    date?: any
-    setDate?: (e: any) => void
-    filter?: any
-    setFilter?: (e: any) => void,
-    days?: any
+    visible: boolean
+    onClose: () => void
+    date: any
+    setDate: (e: any) => void
+    filter: any
+    setFilter: (e: any) => void,
+    days: any
 }
 
 const CommissionFilterDateMobile = (props: InsuranceFilterMobile) => {
