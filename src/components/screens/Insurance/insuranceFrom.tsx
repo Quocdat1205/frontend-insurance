@@ -331,12 +331,20 @@ const InsuranceFrom = () => {
     const updateFormPercentMargin = (value: number) => {
         if (state.q_covered > 0) {
             percentMargin.current = value
-            setState({
-                ...state,
-                percent_margin: value,
-                // margin: Number(((value / 100) * state.q_covered * state.p_market).toFixed(decimalList.decimal_margin)),
-                margin: Number(Math.floor((value / 100) * state.q_covered * state.p_market)),
-            })
+            const MathCeil = 1 / Math.pow(10, Number(decimalList.decimal_margin))
+            if (value == 2) {
+                setState({
+                    ...state,
+                    percent_margin: value,
+                    margin: Number(((value / 100) * state.q_covered * state.p_market).toFixed(decimalList.decimal_margin)) + MathCeil,
+                })
+            } else {
+                setState({
+                    ...state,
+                    percent_margin: value,
+                    margin: Number(((value / 100) * state.q_covered * state.p_market).toFixed(decimalList.decimal_margin)),
+                })
+            }
         }
     }
 
@@ -625,7 +633,7 @@ const InsuranceFrom = () => {
             }
         }
 
-        if (state.q_covered > 0 && state.p_claim > 0 && tab == 0) {
+        if (state.q_covered > 0 && state.p_claim > 0 && tab !== 6 && tab !== 1) {
             const margin = Number((8 * state.q_covered * state.p_market) / 100)
             const userCapital = margin
             const systemCapital = userCapital
@@ -644,7 +652,7 @@ const InsuranceFrom = () => {
             })
         }
 
-        if (state.q_covered > 0 && state.p_claim > 0 && state.margin > 0 && tab != 0) {
+        if (state.q_covered > 0 && state.p_claim > 0 && state.margin > 0 && (tab === 1 || tab === 6)) {
             const userCapital = state.margin
             const systemCapital = userCapital
             const hedge_capital = userCapital + systemCapital
@@ -760,7 +768,9 @@ const InsuranceFrom = () => {
                 const decimalMargin = countDecimals(item.stepSize)
                 _decimalList.decimal_margin = +decimalMargin
 
-                const MIN = Number(Math.floor(state.q_covered * state.p_market * item.minQtyRatio).toFixed(Number(decimalMargin)))
+                const MathCeil = 1 / Math.pow(10, Number(decimalMargin))
+
+                const MIN = Number((state.q_covered * state.p_market * item.minQtyRatio).toFixed(Number(decimalMargin))) + MathCeil
                 const MAX = Number((state.q_covered * state.p_market * item.maxQtyRatio).toFixed(Number(decimalMargin)))
                 setRangeMargin({ ...rangeP_claim, min: MIN, max: MAX })
             }
@@ -769,6 +779,8 @@ const InsuranceFrom = () => {
             validateP_Claim(state.p_claim)
         })
     }, [pair_configs, state.q_covered, selectCoin, state.p_claim, userBalance])
+
+    console.log()
 
     const validateP_Claim = (value: number) => {
         const _rangeP_claim = rangeP_claim
@@ -1623,17 +1635,17 @@ const InsuranceFrom = () => {
                                                             <div
                                                                 key={data}
                                                                 className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
-                                                                // onClick={() => {
-                                                                //     if (userBalance > 0) {
-                                                                //         setState({
-                                                                //             ...state,
-                                                                //             q_covered: Number(
-                                                                //                 ((data / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
-                                                                //             ),
-                                                                //         })
-                                                                //         percentInsurance.current = data
-                                                                //     }
-                                                                // }}
+                                                                onClick={() => {
+                                                                    if (userBalance > 0) {
+                                                                        setState({
+                                                                            ...state,
+                                                                            q_covered: Number(
+                                                                                ((data / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
+                                                                            ),
+                                                                        })
+                                                                        percentInsurance.current = data
+                                                                    }
+                                                                }}
                                                                 onTouchStart={() => {
                                                                     if (userBalance > 0) {
                                                                         setState({
@@ -1661,9 +1673,9 @@ const InsuranceFrom = () => {
                                                             <div
                                                                 key={data}
                                                                 className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
-                                                                // onClick={() => {
-                                                                //     updateFormPercentMargin(data)
-                                                                // }}
+                                                                onClick={() => {
+                                                                    updateFormPercentMargin(data)
+                                                                }}
                                                                 onTouchStart={() => {
                                                                     updateFormPercentMargin(data)
                                                                 }}
