@@ -1,4 +1,5 @@
 import classnames from 'classnames'
+import { endOfDay, startOfDay } from 'date-fns'
 import en from 'date-fns/locale/en-US'
 import vi from 'date-fns/locale/vi'
 import { useTranslation } from 'next-i18next'
@@ -10,8 +11,6 @@ import Modal from 'components/common/Modal/Modal'
 import { CalendarIcon, RightArrow } from 'components/common/Svg/SvgIcon'
 import colors from 'styles/colors'
 import { formatTime } from 'utils/utils'
-import { endOfDay, startOfDay } from 'date-fns'
-import { formatTimestampToDate } from 'utils/format'
 
 interface InsuranceFilterMobile {
     visible: boolean
