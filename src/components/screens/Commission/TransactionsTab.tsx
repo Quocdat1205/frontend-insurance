@@ -80,13 +80,18 @@ const TransactionsTab = ({ account, unitConfig, doReload }: TransactionsTab) => 
         return type === 'in' ? 'Nhận hoa hồng' : 'Rút hoa hồng'
     }
 
+    const addressTypes = {
+        in: 'Từ',
+        out: 'Đến',
+    }
+
     const columns = useMemo(
         () => [
             {
                 Header: 'Ngày phát sinh',
                 accessor: 'createdAt',
                 minWidth: 200,
-                Cell: (e: any) => formatTime(e.value, 'dd.MM.yyyy'),
+                Cell: (e: any) => formatTime(e.value, 'dd.MM.yyyy hh:mm'),
             },
             {
                 Header: 'Loại giao dịch',
@@ -104,7 +109,11 @@ const TransactionsTab = ({ account, unitConfig, doReload }: TransactionsTab) => 
                 Header: 'Địa chỉ ví',
                 accessor: 'walletAddress',
                 minWidth: 200,
-                Cell: (e: any) => <div>{formatAddress(e.value)}</div>,
+                Cell: (e: any) => (
+                    <div>
+                        {addressTypes[e?.row?.original.type]} {formatAddress(e.value)}
+                    </div>
+                ),
             },
         ],
         [unitConfig],
