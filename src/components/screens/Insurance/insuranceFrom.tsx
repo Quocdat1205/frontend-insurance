@@ -1623,7 +1623,18 @@ const InsuranceFrom = () => {
                                                             <div
                                                                 key={data}
                                                                 className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
-                                                                onClick={() => {
+                                                                // onClick={() => {
+                                                                //     if (userBalance > 0) {
+                                                                //         setState({
+                                                                //             ...state,
+                                                                //             q_covered: Number(
+                                                                //                 ((data / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
+                                                                //             ),
+                                                                //         })
+                                                                //         percentInsurance.current = data
+                                                                //     }
+                                                                // }}
+                                                                onTouchStart={() => {
                                                                     if (userBalance > 0) {
                                                                         setState({
                                                                             ...state,
@@ -1650,7 +1661,10 @@ const InsuranceFrom = () => {
                                                             <div
                                                                 key={data}
                                                                 className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
-                                                                onClick={() => {
+                                                                // onClick={() => {
+                                                                //     updateFormPercentMargin(data)
+                                                                // }}
+                                                                onTouchStart={() => {
                                                                     updateFormPercentMargin(data)
                                                                 }}
                                                             >
