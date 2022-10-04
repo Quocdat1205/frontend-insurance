@@ -510,15 +510,14 @@ const InsuranceFrom = () => {
         if (selectCoin?.symbol != '') {
             getPrice(selectCoin?.symbol, state, setState)
             setState({ ...state, symbol: { ...selectCoin } })
-            onHandleChange('q_covered', { floatValue: 0, formattedValue: '0', value: '0' })
-            onHandleChange('p_claim', { floatValue: 0, formattedValue: '0', value: '0' })
-            onHandleChange('margin', { floatValue: 0, formattedValue: '0', value: '0' })
             getConfig(selectCoin?.type)
             getBalaneToken(selectCoin?.type)
             localStorage.setItem('buy_covered_state', JSON.stringify(selectCoin))
         }
         setState({ ...state })
     }, [selectCoin])
+
+    // console.log(state)
 
     const createSaved = async () => {
         if (state.q_covered === 0 || state.p_claim === 0) {
@@ -860,7 +859,7 @@ const InsuranceFrom = () => {
 
     const handleUpdateToken = (coin: ICoin) => {
         setSelectedCoin(coin)
-        setState({ ...state, symbol: { ...coin }, period: 2, r_claim: 0, q_claim: 0, q_covered: 0, margin: 0, p_claim: 0, p_expired: 0 })
+        setState({ ...state, symbol: { ...coin }, period: 2, r_claim: 0, q_claim: 0, q_covered: -1, margin: -1, p_claim: -1, p_expired: 0 })
         setChosing(false)
     }
 
@@ -1229,7 +1228,7 @@ const InsuranceFrom = () => {
                                                             <Tab.List
                                                                 className={`flex flex-row mt-4 justify-between ${
                                                                     showCroll ? 'overflow-scroll' : ' overflow-hidden'
-                                                                }`}
+                                                                } hide-scroll`}
                                                                 onTouchStart={() => {
                                                                     setShowCroll(true)
                                                                 }}
@@ -1916,8 +1915,11 @@ const InsuranceFrom = () => {
                                                 <Tooltip className="max-w-[200px]" id={'period'} placement="right" />
                                             </div>
                                         </span>
-                                        <div ref={table} className="overflow-auto scroll-table">
-                                            <div ref={container} className={` flex flex-row justify-between mt-[1rem]  ${isMobile ? 'w-full' : 'w-[85%]'} `}>
+                                        <div ref={table} className="overflow-auto hide-scroll scroll-table">
+                                            <div
+                                                ref={container}
+                                                className={`hide-scroll flex flex-row justify-between mt-[1rem]  ${isMobile ? 'w-full' : 'w-[85%]'} `}
+                                            >
                                                 {listTabPeriod.map((item, key) => {
                                                     if (item === state.period || item <= item + 6)
                                                         return (
