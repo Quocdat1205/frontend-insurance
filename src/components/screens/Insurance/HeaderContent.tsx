@@ -26,7 +26,7 @@ const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) 
             }}
         >
             <div
-                className="flex items-center font-semibold col-span-4"
+                className="flex items-center font-semibold col-span-4 hover:cursor-pointer"
                 onClick={() => {
                     return router.push('/home')
                 }}

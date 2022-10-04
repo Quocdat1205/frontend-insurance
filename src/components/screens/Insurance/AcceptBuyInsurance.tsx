@@ -389,7 +389,7 @@ const AcceptBuyInsurance = () => {
                             // head Insurance
                             <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto mt-[4rem] mb-[3rem] grid grid-cols-12 content-center items-center justify-between">
                                 <div
-                                    className="flex items-center font-semibold text-base col-span-4"
+                                    className="flex items-center font-semibold text-base col-span-4 hover:cursor-pointer"
                                     onClick={() => {
                                         return router.push('/buy-covered')
                                     }}
