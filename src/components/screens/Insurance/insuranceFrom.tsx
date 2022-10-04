@@ -1021,13 +1021,13 @@ const InsuranceFrom = () => {
                                 setChangeUnit2(false)
                             }}
                         >
+                            {account?.address != null && (
+                                <div className="w-full bg-[#E5E7E8]  h-[0.25rem] sticky top-[4.1875rem] z-[50]">
+                                    <div className="bg-red h-[0.25rem] w-1/2"></div>
+                                </div>
+                            )}
                             <div className="px-4 mb:px-10 lg:px-20">
-                                <div className="max-w-7xl 4xl:max-w-screen-3xl m-auto">
-                                    {account?.address != null && (
-                                        <div className="w-full bg-[#E5E7E8]  h-[0.25rem] sticky top-[4.1875rem] z-[50]">
-                                            <div className="bg-red h-[0.25rem] w-1/2"></div>
-                                        </div>
-                                    )}
+                                <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
                                     {
                                         // head Insurance
                                         <HeaderContent state={tab} setState={setTab} props={state} setProps={setState} wallet={wallet} auth={account.address} />
