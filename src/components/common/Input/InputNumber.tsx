@@ -71,7 +71,7 @@ const InputNumber = ({
                     thousandSeparator
                     getInputRef={(ref: HTMLInputElement) => (reference = ref)}
                     type="text"
-                    value={value > 0 ? value : ''}
+                    value={value ? value : null}
                     className={cx('text-left bg-transparent outline-none w-full', inputClassName)}
                     onFocus={_onFocus}
                     onBlur={_onBlur}
