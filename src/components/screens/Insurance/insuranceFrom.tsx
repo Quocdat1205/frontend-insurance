@@ -25,7 +25,7 @@ import HeaderContent from './HeaderContent'
 import fetchApi from 'services/fetch-api'
 import { API_GET_PRICE_CHART } from 'services/apis'
 import { countDecimals } from 'utils/utils'
-import { getUnixTime, sub } from 'date-fns';
+import { getUnixTime, sub } from 'date-fns'
 
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
@@ -46,7 +46,7 @@ const InsuranceFrom = () => {
     const pairConfigs = useAppSelector((state: RootStore) => state.setting.pairConfigs)
     const account = useAppSelector((state: RootStore) => state.setting.account)
 
-    const [selectTime, setSelectTime] = useState<string>('1H')
+    const [selectTime, setSelectTime] = useState<string>('1Y')
     const clear = useRef<boolean>(false)
     const percentInsurance = useRef<number>(0)
     const percentMargin = useRef<number>(8)
@@ -409,14 +409,7 @@ const InsuranceFrom = () => {
                 const dateBegin = getUnixTime(sub(timeBegin, { [currentSelected.subtract]: currentSelected.subtractBy }))
 
                 if (selectTime == '1H') {
-                    fetchApiNami(
-                        `${selectCoin.type && selectCoin.type}${unitMoney}`,
-                        `${dateBegin}`,
-                        `${currentTimeStamp}`,
-                        '1m',
-                        setDataChart,
-                        120,
-                    )
+                    fetchApiNami(`${selectCoin.type && selectCoin.type}${unitMoney}`, `${dateBegin}`, `${currentTimeStamp}`, '1m', setDataChart, 120)
                 } else if (selectTime == '1W' || selectTime == '1D') {
                     timeBegin.setDate(dateBegin)
                     fetchApiNami(
@@ -1157,6 +1150,7 @@ const InsuranceFrom = () => {
                                                                     p_expired={Number(state.p_expired)}
                                                                     setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
                                                                     setP_Market={(data: number) => setState({ ...state, p_market: data })}
+                                                                    // resolution={`${selectTime}`}
                                                                 />
                                                                 <svg
                                                                     className={`absolute right-0 z-2`}
@@ -1851,6 +1845,7 @@ const InsuranceFrom = () => {
                                                     setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
                                                     setP_Market={(data: number) => setState({ ...state, p_market: data })}
                                                     isMobile={isMobile}
+                                                    // resolution={selectTime}
                                                 ></ChartComponent>
                                             </Suspense>
                                             <svg
