@@ -1,20 +1,22 @@
 import { addMonths, addWeeks, endOfDay, startOfDay, subDays } from 'date-fns'
 import { useTranslation } from 'next-i18next'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import DateRangePicker from 'components/common/DatePicker/DateRangePicker'
 import { CalendarIcon, FilterIcon } from 'components/common/Svg/SvgIcon'
+import { API_GET_FILTER_COMMISSION } from 'services/apis'
+import fetchApi from 'services/fetch-api'
 import colors from 'styles/colors'
 import { formatNumber, formatTime } from 'utils/utils'
+import CommissionFilterDateMobile from './CommissionFilterDateMobile'
 
 interface CommissionStatistics {
-    account: string
+    account: any
     userInfo: any
     decimal: number
     setShowWithDrawCommission: React.Dispatch<React.SetStateAction<boolean>>
 }
 const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawCommission }: CommissionStatistics) => {
-
     const days = useMemo(() => {
         const now = new Date()
         return [
@@ -68,9 +70,17 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
         i18n: { language },
     } = useTranslation()
 
+    const [commissionStatisticsData, setCommissionStatisticsData] = useState({
+        ref: account.myRef,
+        totalMarginIn: 0,
+        totalMarginOut: 0
+    })
+
     const [filter, setFilter] = useState<any>({
         ...days[0],
     })
+
+    const [showMobileDatePicker, setShowMobileDatePicker] = useState(false)
 
     const [picker, setPicker] = useState({
         startDate: null,
@@ -94,6 +104,36 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
         })
     }
 
+    useEffect(() => {
+        constFetchCommissionStatistics()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filter])
+
+    const constFetchCommissionStatistics = async () => {
+        try {
+            const { data, statusCode } = await fetchApi({
+                url: API_GET_FILTER_COMMISSION,
+                options: { method: 'GET' },
+                params: {
+                    myRef: account.myRef,
+                    // UNCOMMENT THIS ON PRODUCTION
+                    // amount: userInfo.commissionAvailable,
+
+                    // THIS IS FOR TEST ONLY
+                    ...filter,
+                },
+            })
+            if (statusCode === 200) {
+                setCommissionStatisticsData(data)
+            }
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error(e)
+        }
+    }
+
+    console.log(picker, filter)
+
     return (
         <Background className="">
             <div className="4xl:max-w-screen-3xl m-auto">
@@ -105,7 +145,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                                 key={index}
                                 onClick={() => setFilter(day)}
                                 className={`px-4 py-2 rounded-full bg-hover cursor-pointer ${day.id === filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
-                                }`}
+                                    }`}
                             >
                                 {day[language]}
                             </div>
@@ -116,7 +156,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                             customLabel={() => (
                                 <div
                                     className={`px-4 py-2 rounded-full bg-hover cursor-pointer flex items-center space-x-2 ${!filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
-                                    }`}
+                                        }`}
                                 >
                                     <CalendarIcon color={!filter?.id ? colors.red.red : colors.gray.gray} size={16} />
                                     <span>
@@ -132,13 +172,20 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                         </div>
                     </div>
                     <div className="flex md:hidden mt-6 space-x-4">
-                        <div className="px-4 py-[6px] rounded-full font-semibold flex items-center space-x-2 bg-hover">
+                        <div
+                            className="px-4 py-[6px] rounded-full font-semibold flex items-center space-x-2 bg-hover"
+                            onClick={() => setShowMobileDatePicker(true)}
+                        >
                             <FilterIcon />
                             <span>Lọc</span>
                         </div>
-                        <div className="px-4 py-[6px] rounded-full font-semibold text-sm text-red flex items-center space-x-2 bg-pink">
+                        <div className="px-4 py-[6px] rounded-full font-semibold text-sm text-red flex items-center gap-2 bg-pink">
                             <CalendarIcon color={colors.red.red} size={14} />
-                            <span>24/03/2022 - 30/03/2022 </span>
+                            {filter?.from ? (
+                                <span>
+                                    {formatTime(filter?.from, 'dd/MM/yyyy')} - {formatTime(filter?.to, 'dd/MM/yyyy')}
+                                </span>
+                            ) : null}
                         </div>
                     </div>
                 </div>
@@ -150,7 +197,9 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                                 <img src="/images/icons/ic_q_claim.png" className="w-6 h-6 sm:flex hidden" />
                                 <span>Tổng hoa hồng (USDT)</span>
                             </div>
-                            <div className="text-xl sm:text-2xl mt-3 sm:mt-4 font-semibold sm:font-medium">120,000.1234</div>
+                            <div className="text-xl sm:text-2xl mt-3 sm:mt-4 font-semibold sm:font-medium">
+                                {formatNumber(commissionStatisticsData?.totalMarginIn, decimal)}
+                            </div>
                         </div>
                     </div>
                     <div className="flex items-center shadow-table p-4 sm:p-6 bg-white rounded-xl col-span-4 sm:col-span-2 lg:col-span-1">
@@ -160,7 +209,9 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                                 <img src="/images/icons/ic_swap.png" className="w-6 h-6 sm:flex hidden" />
                                 <span>Tổng hoa hồng đã rút (USDT)</span>
                             </div>
-                            <div className="text-xl sm:text-2xl mt-3 sm:mt-4 font-semibold sm:font-medium">120,000.1234</div>
+                            <div className="text-xl sm:text-2xl mt-3 sm:mt-4 font-semibold sm:font-medium">
+                                {formatNumber(commissionStatisticsData?.totalMarginOut, decimal)}
+                            </div>
                         </div>
                     </div>
                     <div className="flex items-center shadow-table p-4 sm:p-6 bg-white rounded-xl col-span-4 lg:col-span-1">
@@ -171,7 +222,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                                 <span>Tổng hoa hồng khả dụng (USDT)</span>
                             </div>
                             <div className="flex items-center justify-between mt-4">
-                                <div className="text-xl sm:text-2xl font-semibold sm:font-medium">{formatNumber(userInfo?.userInfo, decimal)}</div>
+                                <div className="text-xl sm:text-2xl font-semibold sm:font-medium">{formatNumber(userInfo?.commissionAvailable, decimal)}</div>
                                 <div
                                     className="flex items-center space-x-1 text-sm sm:text-base font-semibold text-red cursor-pointer"
                                     onClick={() => setShowWithDrawCommission(true)}
@@ -184,6 +235,15 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                     </div>
                 </div>
             </div>
+            <CommissionFilterDateMobile
+                visible={showMobileDatePicker}
+                onClose={() => setShowMobileDatePicker(false)}
+                date={picker}
+                setDate={setPicker}
+                filter={filter}
+                setFilter={setFilter}
+                days={days}
+            />
         </Background>
     )
 }
@@ -193,7 +253,7 @@ const Background = styled.div.attrs<any>({
 })`
     background-image: ${() => `url(${`/images/screens/commission/bg_commission_policy.png`})`};
     background-position: top;
-    background-repeat: no-repeat;
+    background-reat: no-repeat;
     background-size: cover;
 `
 
