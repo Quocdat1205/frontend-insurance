@@ -1,13 +1,19 @@
 import Button from 'components/common/Button/Button'
 import { CopyIcon } from 'components/common/Svg/SvgIcon'
+import { getAddChainParameters } from 'components/web3/Web3Types'
+import Config from 'config/config'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
 const NetworkError = () => {
     const { t } = useTranslation()
-
-    const onAddNetwork = () => {
-        window.open('chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/home.html#settings/networks/add-network', '_blank')
+    const onAddNetwork = async () => {
+        try {
+            const wallet = sessionStorage.getItem('PUBLIC_WALLET')
+            Config.web3.activate(wallet, Config.chains[0])
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const onCopy = (text: string) => {
