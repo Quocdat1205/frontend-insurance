@@ -29,7 +29,7 @@ const Commission = () => {
     const [userInfo, setUserInfo] = useState<any>(null)
     const [showWithdrawCommission, setShowWithdrawCommission] = useState(false)
     const [isWithdrawing, setIsWithdrawing] = useState<modalType>('withdraw')
-
+    const [doReload, setDoReload] = useState(false)
     const getInfo = async () => {
         try {
             const { data } = await fetchApi({
@@ -49,7 +49,7 @@ const Commission = () => {
     useEffect(() => {
         if (account?.address) getInfo()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [account])
+    }, [account, doReload])
 
     console.log(account, userInfo)
 
@@ -64,6 +64,8 @@ const Commission = () => {
                 isShow={showWithdrawCommission}
                 setShow={setShowWithdrawCommission}
                 isMobile={isMobile}
+                doReload={doReload}
+                setDoReload={setDoReload}
             />
             <div className="px-4 mb:px-10 lg:px-20">
                 <div className="pt-20 sm:pt-10 max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
@@ -76,6 +78,7 @@ const Commission = () => {
                     userInfo={userInfo}
                     decimal={unitConfig?.assetDigit}
                     setShowWithDrawCommission={setShowWithdrawCommission}
+                    doReload={doReload}
                 />
             )}
             <div className="px-4 mb:px-10 lg:px-20">
