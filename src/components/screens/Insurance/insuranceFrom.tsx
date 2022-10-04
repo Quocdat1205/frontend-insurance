@@ -310,6 +310,21 @@ const InsuranceFrom = () => {
                         return false
                     }
                 }
+
+                if (symbol === 'DAI') {
+                    const balanceDAI = await Config.web3.contractCaller?.daiContract.contract.balanceOf(account.address)
+                    if (balanceDAI) {
+                        if (Number(ethers.utils.formatEther(balanceDAI)) > 0) {
+                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceDAI)).toFixed(decimalList.decimal_q_covered)))
+                            return Number(ethers.utils.formatEther(balanceDAI))
+                        } else {
+                            setUserBalance(0)
+                            return 0
+                        }
+                    } else {
+                        return false
+                    }
+                }
             } else {
                 setUserBalance(0)
                 return 0
