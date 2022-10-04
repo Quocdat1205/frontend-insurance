@@ -26,7 +26,7 @@ import fetchApi from 'services/fetch-api'
 import { API_GET_PRICE_CHART } from 'services/apis'
 import { countDecimals } from 'utils/utils'
 import { getUnixTime, sub } from 'date-fns'
-import { BTCaddress, DAIaddress, ETHaddress } from 'components/web3/constants/contractAddress'
+import { BTCaddress, DAIaddress, ETHaddress, USDTaddress } from 'components/web3/constants/contractAddress'
 
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
@@ -265,34 +265,73 @@ const InsuranceFrom = () => {
                         return Number(balance.toFixed(decimalList.decimal_q_covered))
                     })
                 }
+                if (symbol === 'ETH') {
+                    const result = wallet.getBalance()
+                    return result.then((balance: number) => {
+                        setUserBalance(Number(balance.toFixed(decimalList.decimal_q_covered)))
+                        return Number(balance.toFixed(decimalList.decimal_q_covered))
+                    })
+                }
 
-                if (symbol !== 'BNB') {
-                    switch (symbol) {
-                        case 'ETH':
-                            tokenAdress.current = ETHaddress
-                            break
-                        case 'BTC':
-                            tokenAdress.current = BTCaddress
-                            break
-                        case 'DAI':
-                            tokenAdress.current = DAIaddress
-                            break
-                    }
+                if (symbol === 'USDT') {
+                    const balanceUsdt = await Config.web3.contractCaller?.tokenContract(USDTaddress).contract.balanceOf(account.address)
+                    if (balanceUsdt) {
+                        if (Number(ethers.utils.formatEther(balanceUsdt)) > 0) {
+                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceUsdt)).toFixed(decimalList.decimal_q_covered)))
 
-                    if (tokenAdress.current.length > 0) {
-                        const balanceUsdt = await Config.web3.contractCaller?.tokenContract(tokenAdress.current).contract.balanceOf(account.address)
-                        if (balanceUsdt) {
-                            if (Number(ethers.utils.formatEther(balanceUsdt)) > 0) {
-                                setUserBalance(Number(Number(ethers.utils.formatEther(balanceUsdt)).toFixed(decimalList.decimal_q_covered)))
-
-                                return Number(ethers.utils.formatEther(balanceUsdt))
-                            } else {
-                                setUserBalance(0)
-                                return 0
-                            }
+                            return Number(ethers.utils.formatEther(balanceUsdt))
                         } else {
-                            return false
+                            setUserBalance(0)
+                            return 0
                         }
+                    } else {
+                        return false
+                    }
+                }
+
+                if (symbol === 'ETH') {
+                    const balanceETH = await Config.web3.contractCaller?.tokenContract(ETHaddress).contract.balanceOf(account.address)
+
+                    if (balanceETH) {
+                        if (Number(ethers.utils.formatEther(balanceETH)) > 0) {
+                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceETH)).toFixed(decimalList.decimal_q_covered)))
+                            return Number(ethers.utils.formatEther(balanceETH))
+                        } else {
+                            setUserBalance(0)
+                            return 0
+                        }
+                    } else {
+                        return false
+                    }
+                }
+
+                if (symbol === 'BTC') {
+                    const balanceBTC = await Config.web3.contractCaller?.tokenContract(BTCaddress).contract.balanceOf(account.address)
+                    if (balanceBTC) {
+                        if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
+                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceBTC)).toFixed(decimalList.decimal_q_covered)))
+                            return Number(ethers.utils.formatEther(balanceBTC))
+                        } else {
+                            setUserBalance(0)
+                            return 0
+                        }
+                    } else {
+                        return false
+                    }
+                }
+
+                if (symbol === 'DAI') {
+                    const balanceBTC = await Config.web3.contractCaller?.tokenContract(DAIaddress).contract.balanceOf(account.address)
+                    if (balanceBTC) {
+                        if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
+                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceBTC)).toFixed(decimalList.decimal_q_covered)))
+                            return Number(ethers.utils.formatEther(balanceBTC))
+                        } else {
+                            setUserBalance(0)
+                            return 0
+                        }
+                    } else {
+                        return false
                     }
                 }
             } else {
