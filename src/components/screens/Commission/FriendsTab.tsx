@@ -13,10 +13,11 @@ import { useTranslation } from 'next-i18next'
 interface FriendsTab {
     account: any
     setFriends: (e: any) => void
-    unitConfig: UnitConfig
+    unitConfig: UnitConfig,
+    doReload: boolean
 }
 
-const FriendsTab = ({ account, setFriends, unitConfig }: FriendsTab) => {
+const FriendsTab = ({ account, setFriends, unitConfig, doReload }: FriendsTab) => {
     const { t } = useTranslation()
     const { width } = useWindowSize()
     const isMobile = (width && width <= 640) || mobile
@@ -47,7 +48,7 @@ const FriendsTab = ({ account, setFriends, unitConfig }: FriendsTab) => {
                 setLoading(false)
             }, 500)
         }
-    }, [filter, account])
+    }, [filter, account, doReload])
 
     const getData = async () => {
         setLoading(true)
@@ -56,7 +57,7 @@ const FriendsTab = ({ account, setFriends, unitConfig }: FriendsTab) => {
                 url: API_GET_FRIENDS,
                 options: { method: 'GET' },
                 params: {
-                    myRef: 'xW4wXC',
+                    myRef: account.myRef,
                     ...filter,
                 },
             })

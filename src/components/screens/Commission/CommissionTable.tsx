@@ -16,9 +16,10 @@ const tabs = {
 interface CommissionTable {
     account: any
     unitConfig: UnitConfig
+    doReload: boolean
 }
 
-const CommissionTable = ({ account, unitConfig }: CommissionTable) => {
+const CommissionTable = ({ account, unitConfig, doReload }: CommissionTable) => {
     const [tab, setTab] = useState<String>(tabs.Friends)
     const [friends, setFriends] = useState({ total: 0, totalDeposit: 0 })
 
@@ -62,8 +63,8 @@ const CommissionTable = ({ account, unitConfig }: CommissionTable) => {
                 </div>
             )}
             <div className="sm:shadow-table sm:rounded-xl mt-6 sm:p-8">
-                {tabs.Friends === tab && <FriendsTab unitConfig={unitConfig} account={account} setFriends={setFriends} />}
-                {tabs.Transactions === tab && <TransactionsTab unitConfig={unitConfig} account={account} />}
+                {tabs.Friends === tab && <FriendsTab unitConfig={unitConfig} account={account} setFriends={setFriends} doReload={doReload} />}
+                {tabs.Transactions === tab && <TransactionsTab unitConfig={unitConfig} account={account} doReload={doReload} />}
             </div>
         </div>
     )

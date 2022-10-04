@@ -13,9 +13,10 @@ import { formatAddress, formatCurrency, formatTime } from 'utils/utils'
 interface TransactionsTab {
     account: any
     unitConfig: UnitConfig
+    doReload: boolean
 }
 
-const TransactionsTab = ({ account, unitConfig }: TransactionsTab) => {
+const TransactionsTab = ({ account, unitConfig, doReload }: TransactionsTab) => {
     const { t } = useTranslation()
     const { width } = useWindowSize()
     const isMobile = (width && width <= 640) || mobile
@@ -46,7 +47,7 @@ const TransactionsTab = ({ account, unitConfig }: TransactionsTab) => {
                 setLoading(false)
             }, 500)
         }
-    }, [filter, account])
+    }, [filter, account, doReload])
 
     const getData = async () => {
         setLoading(true)
@@ -55,7 +56,7 @@ const TransactionsTab = ({ account, unitConfig }: TransactionsTab) => {
                 url: API_GET_COMMISSION_HISTORY,
                 options: { method: 'GET' },
                 params: {
-                    myRef: 'xW4wXC',
+                    myRef: account.myRef,
                     ...filter,
                 },
             })

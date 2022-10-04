@@ -80,7 +80,7 @@ const CommissionReferral = ({ account, decimal = 2, commissionConfig, userInfo }
                             <span className="text-red font-medium text-xl sm:text-4xl">{account?.myRef}</span>
                             <CopyIcon
                                 onClick={() => {
-                                    _.throttle(() => Config.copy(account?.myRef), 200)
+                                    Config.copy(account?.myRef)
                                     Config.toast.show('success', 'Sao chép mã thành công')
                                 }}
                                 size={width && width < 640 ? 18 : 22}
@@ -98,7 +98,7 @@ const CommissionReferral = ({ account, decimal = 2, commissionConfig, userInfo }
                                 size={16}
                                 className="cursor-pointer min-w-[1rem]"
                                 onClick={() => {
-                                    _.throttle(() => Config.copy(`${Config.env.APP_URL}?ref=${account?.myRef}`), 200)
+                                    Config.copy(`${Config.env.APP_URL}?ref=${account?.myRef}`)
                                     Config.toast.show('success', 'Sao chép mã thành công')
                                 }}
                             />
