@@ -24,7 +24,13 @@ function MetaMaskProvider({ children, config }: Web3WalletProviderProps) {
         [config.coinbaseWallet],
     )
 
-    const connectors: [Connector, Web3ReactHooks][] = useMemo(() => [[metaMask, metaMaskHooks]], [metaMask, metaMaskHooks, coinbaseWallet, coinbaseHooks])
+    const connectors: [Connector, Web3ReactHooks][] = useMemo(
+        () => [
+            [metaMask, metaMaskHooks],
+            [coinbaseWallet, coinbaseHooks],
+        ],
+        [metaMask, metaMaskHooks, coinbaseWallet, coinbaseHooks],
+    )
     const connectorsData: any = {
         metaMask: getConnectorInfo(metaMask),
         coinbaseWallet: getConnectorInfo(coinbaseWallet),
