@@ -266,7 +266,6 @@ const InsuranceFrom = () => {
 
                 if (symbol === 'USDT') {
                     const balanceUsdt = await Config.web3.contractCaller?.usdtContract.contract.balanceOf(account.address)
-
                     if (balanceUsdt) {
                         if (Number(ethers.utils.formatEther(balanceUsdt)) > 0) {
                             setUserBalance(Number(Number(ethers.utils.formatEther(balanceUsdt)).toFixed(decimalList.decimal_q_covered)))
@@ -321,10 +320,10 @@ const InsuranceFrom = () => {
     }
 
     useEffect(() => {
-        if (account.address == null) {
+        if (!account.address) {
             setUserBalance(0)
         } else {
-            getBalaneToken(selectCoin?.type)
+            getBalaneToken(selectCoin.type)
             setState({ ...state, q_covered: 0 })
         }
     }, [account.address])
@@ -518,8 +517,6 @@ const InsuranceFrom = () => {
         setState({ ...state })
     }, [selectCoin])
 
-    // console.log(state)
-
     const createSaved = async () => {
         if (state.q_covered === 0 || state.p_claim === 0) {
             return setSaved(0)
@@ -712,7 +709,7 @@ const InsuranceFrom = () => {
                 min_notinal.current = item?.notional
             }
             if (item?.filterType === 'LOT_SIZE') {
-                const tmp = await getBalaneToken(selectCoin?.type)
+                const tmp = await getBalaneToken(selectCoin && selectCoin.type)
                 if (tmp >= 0) {
                     const decimal = countDecimals(item.stepSize)
                     _decimalList.decimal_q_covered = +decimal
@@ -771,7 +768,7 @@ const InsuranceFrom = () => {
             setPercentPrice({ ..._percentPrice })
             validateP_Claim(state.p_claim)
         })
-    }, [pair_configs, state.q_covered, selectCoin, state.p_claim])
+    }, [pair_configs, state.q_covered, selectCoin, state.p_claim, userBalance])
 
     const validateP_Claim = (value: number) => {
         const _rangeP_claim = rangeP_claim
