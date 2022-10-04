@@ -5,7 +5,7 @@ import Button from 'components/common/Button/Button'
 import { useTranslation } from 'next-i18next'
 import styled from 'styled-components'
 import classNames from 'classnames'
-import { wallets } from 'components/web3/Web3Types'
+import { getAddChainParameters, wallets } from 'components/web3/Web3Types'
 import Config from 'config/config'
 import { errorsWallet } from 'utils/constants'
 import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
@@ -103,8 +103,8 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
 
     useEffect(() => {
         if (chainId && account.address) {
-            if (!inValidNetword) {
-                setTimeout(() => {
+            if (!inValidNetword && !isVisible) {
+                timer.current = setTimeout(() => {
                     Config.toast?.show('error', t('common:error_switch_network'))
                     setVisible(true)
                     firstTime.current = false
@@ -116,9 +116,9 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 connectionError({ code: errorsWallet.Success })
             }
         }
-    }, [isActive, chainId, account, loading, inValidNetword])
+    }, [isActive, chainId, account, loading, inValidNetword, isVisible])
 
-    const connectionError = (error: any) => {
+    const connectionError = async (error: any) => {
         let isNotFoundNetWork = false
         const code = error?.data ? error?.data?.originalError?.code : isString(error?.code) ? error?.code : Math.abs(error?.code)
         switch (code) {
@@ -136,8 +136,21 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 break
             case errorsWallet.Not_found:
                 isNotFoundNetWork = true
-                setNetworkError(true)
-                setSwitchNetwork(false)
+                clearTimeout(timer.current)
+                try {
+                    const params: any = getAddChainParameters(Config.chains[0], true)
+                    await (window as any).ethereum
+                        .request({
+                            method: 'wallet_addEthereumChain',
+                            params: [params],
+                        })
+                        .then(() => {
+                            Config.toast.show('success', t('common:connect_successful'))
+                            setVisible(false)
+                        })
+                } catch (error) {
+                    setSwitchNetwork(true)
+                }
                 break
             case errorsWallet.Success:
                 Config.toast.show('success', t('common:connect_successful'))

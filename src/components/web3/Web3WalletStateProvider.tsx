@@ -11,7 +11,7 @@ import { RootStore, useAppSelector } from 'redux/store'
 import { isMobile } from 'react-device-detect'
 
 const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorId; name: string; connector: Connector }>) => {
-    const { connector, account, chainId, isActive, error, provider, isActivating } = useWeb3React()
+    const { connector, account, chainId, isActive, error, provider } = useWeb3React()
     const connected = useAppSelector((state: RootStore) => state.setting.account)
 
     const activate = async (connectorId: ConnectorId, _chainId?: number) => {
