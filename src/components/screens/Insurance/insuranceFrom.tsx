@@ -346,18 +346,18 @@ const InsuranceFrom = () => {
     const updateFormPercentMargin = (value: number) => {
         if (state.q_covered > 0) {
             percentMargin.current = value
-            const MathCeil = 1 / Math.pow(10, Number(decimalList.decimal_margin))
+
             if (value == 2) {
                 setState({
                     ...state,
                     percent_margin: value,
-                    margin: Number(((value / 100) * state.q_covered * state.p_market).toFixed(decimalList.decimal_margin)) + MathCeil,
+                    margin: rangeMargin.min,
                 })
             } else if (value == 10) {
                 setState({
                     ...state,
                     percent_margin: value,
-                    margin: Number(((value / 100) * state.q_covered * state.p_market).toFixed(decimalList.decimal_margin)) - MathCeil,
+                    margin: rangeMargin.max,
                 })
             } else {
                 setState({
@@ -366,6 +366,26 @@ const InsuranceFrom = () => {
                     margin: Number(((value / 100) * state.q_covered * state.p_market).toFixed(decimalList.decimal_margin)),
                 })
             }
+        }
+    }
+
+    const updateFormQCovered = (data: number) => {
+        percentInsurance.current = data
+        if (data === 25) {
+            setState({
+                ...state,
+                q_covered: Number(rangeQ_covered.min),
+            })
+        } else if (data === 100) {
+            setState({
+                ...state,
+                q_covered: Number(rangeQ_covered.max),
+            })
+        } else {
+            setState({
+                ...state,
+                q_covered: Number(((data / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered)),
+            })
         }
     }
 
@@ -655,12 +675,10 @@ const InsuranceFrom = () => {
 
                     if (min_Market == Infinity) {
                         const min = Number(item?.minQty)
-
-                        setRangeQ_covered({ ...rangeQ_covered, min: min, max: max })
+                        setRangeQ_covered({ ...rangeQ_covered, min: Number(min.toFixed(+decimal)), max: Number(max.toFixed(+decimal)) })
                     } else {
                         const min = Number(item?.minQty) > min_Market ? Number(item?.minQty) : min_Market
-
-                        setRangeQ_covered({ ...rangeQ_covered, min: min, max: max })
+                        setRangeQ_covered({ ...rangeQ_covered, min: Number(min.toFixed(+decimal)), max: Number(max.toFixed(+decimal)) })
                     }
                 }
             }
@@ -917,7 +935,7 @@ const InsuranceFrom = () => {
                 })
             }
         } else {
-            if (userBalance > 0) {
+            if (userBalance > 0 && key === 'margin') {
                 const percent2 = Number(
                     (state.q_covered * state.p_market * 0.02 + 1 / Math.pow(10, Number(decimalList.decimal_margin))).toFixed(decimalList.decimal_margin),
                 )
@@ -927,7 +945,7 @@ const InsuranceFrom = () => {
                     (state.q_covered * state.p_market * 0.1 - 1 / Math.pow(10, Number(decimalList.decimal_margin))).toFixed(decimalList.decimal_margin),
                 )
 
-                switch (state.margin) {
+                switch (value) {
                     case percent2:
                         percentMargin.current = 2
                         break
@@ -948,14 +966,14 @@ const InsuranceFrom = () => {
                 percentMargin.current = 0
             }
         }
-        if (state.q_covered > 0) {
+        if (key === 'q_covered') {
             if (userBalance > 0) {
-                const percent25 = Number((0.25 * userBalance).toFixed(decimalList.decimal_q_covered))
-                const percent50 = Number((0.5 * userBalance).toFixed(decimalList.decimal_q_covered))
-                const percent75 = Number((0.75 * userBalance).toFixed(decimalList.decimal_q_covered))
-                const percent100 = Number(userBalance.toFixed(decimalList.decimal_q_covered))
+                const percent25 = Number(rangeQ_covered.min)
+                const percent50 = Number((0.5 * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered))
+                const percent75 = Number((0.75 * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered))
+                const percent100 = Number(rangeQ_covered.max)
 
-                switch (state.q_covered) {
+                switch (value) {
                     case percent25:
                         percentInsurance.current = 25
                         break
@@ -1136,17 +1154,7 @@ const InsuranceFrom = () => {
                                                                         key={data}
                                                                         className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                                         onClick={() => {
-                                                                            if (userBalance > 0) {
-                                                                                setState({
-                                                                                    ...state,
-                                                                                    q_covered: Number(
-                                                                                        ((data / 100) * rangeQ_covered.max).toFixed(
-                                                                                            decimalList.decimal_q_covered,
-                                                                                        ),
-                                                                                    ),
-                                                                                })
-                                                                                percentInsurance.current = data
-                                                                            }
+                                                                            updateFormQCovered(data)
                                                                         }}
                                                                     >
                                                                         <div
@@ -1657,15 +1665,7 @@ const InsuranceFrom = () => {
                                                                 key={data}
                                                                 className={`flex flex-col space-y-3 justify-center w-1/4 items-center hover:cursor-pointer`}
                                                                 onClick={() => {
-                                                                    if (userBalance > 0) {
-                                                                        setState({
-                                                                            ...state,
-                                                                            q_covered: Number(
-                                                                                ((data / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
-                                                                            ),
-                                                                        })
-                                                                        percentInsurance.current = data
-                                                                    }
+                                                                    updateFormQCovered(data)
                                                                 }}
                                                                 onTouchStart={() => {
                                                                     if (userBalance > 0) {
