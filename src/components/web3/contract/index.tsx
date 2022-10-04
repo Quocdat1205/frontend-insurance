@@ -40,8 +40,6 @@ export class ContractCaller {
     }
 
     public async sign(address: string) {
-        console.log(this.provider, 'thuc')
-
         try {
             const nonce = await getNonce(address)
             if (!nonce?.data) return nonce

@@ -126,7 +126,7 @@ const ReactDateRangePicker = (props: ReactDateRangePicker) => {
                     {customLabel ? (
                         customLabel()
                     ) : (
-                        <div className="px-4 rounded-[3px] bg-hover h-[2.75rem] sm:h-[3rem] flex items-center">
+                        <div className="px-4 rounded-[3px] bg-hover h-[2.75rem] sm:h-[3rem] flex items-center w-full">
                             <div className="w-full h-full flex items-center">
                                 <span>
                                     {prefix} {value?.startDate ? formatTime(value?.startDate, dateFormat) + ' - ' + formatTime(value?.endDate, dateFormat) : ''}

@@ -167,6 +167,10 @@ const Assets = () => {
                     slidesPerView: 3,
                     spaceBetween: 16,
                 },
+                1600: {
+                    slidesPerView: 4,
+                    spaceBetween: 16,
+                },
             }}
             autoplay={{
                 delay: 3000,
