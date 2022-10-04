@@ -25,6 +25,7 @@ import HeaderContent from './HeaderContent'
 import fetchApi from 'services/fetch-api'
 import { API_GET_PRICE_CHART } from 'services/apis'
 import { countDecimals } from 'utils/utils'
+import { getUnixTime, sub } from 'date-fns';
 
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
@@ -45,7 +46,7 @@ const InsuranceFrom = () => {
     const pairConfigs = useAppSelector((state: RootStore) => state.setting.pairConfigs)
     const account = useAppSelector((state: RootStore) => state.setting.account)
 
-    const [selectTime, setSelectTime] = useState<string>('ALL')
+    const [selectTime, setSelectTime] = useState<string>('1H')
     const clear = useRef<boolean>(false)
     const percentInsurance = useRef<number>(0)
     const percentMargin = useRef<number>(8)
@@ -112,7 +113,8 @@ const InsuranceFrom = () => {
     const tmp_margin = useRef(0)
 
     const [dataChart, setDataChart] = useState()
-    const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', `${language === 'vi' ? 'Tất cả' : 'All'}`]
+    // const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', `${language === 'vi' ? 'Tất cả' : 'All'}`]
+    const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y']
     const listTabPeriod: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     const menu = [
         { menuId: 'home', router: 'home', name: t('insurance:buy:home'), parentId: 0 },
@@ -365,35 +367,72 @@ const InsuranceFrom = () => {
         const timeEnd = new Date()
         const timeBegin = new Date()
         setLoadings(true)
+
+        const dateTransform: any = {
+            '1H': {
+                resolution: '1m',
+                subtract: 'hours',
+                subtractBy: 1,
+            },
+            '1W': {
+                resolution: '1d',
+                subtract: 'weeks',
+                subtractBy: 1,
+            },
+            '1D': {
+                resolution: '1h',
+                subtract: 'days',
+                subtractBy: 1,
+            },
+            '1M': {
+                resolution: '1d',
+                subtract: 'months',
+                subtractBy: 1,
+            },
+            '3M': {
+                resolution: '1d',
+                subtract: 'months',
+                subtractBy: 3,
+            },
+            '1Y': {
+                resolution: '1d',
+                subtract: 'years',
+                subtractBy: 1,
+            },
+        }
+
+        // const currentTimeStamp = Math.floor(new Date().getTime() / 1000.0)
+        const currentTimeStamp = getUnixTime(new Date())
         try {
             if (selectCoin?.symbol !== '') {
+                const currentSelected = dateTransform[selectTime!]
+                const dateBegin = getUnixTime(sub(timeBegin, { [currentSelected.subtract]: currentSelected.subtractBy }))
+
                 if (selectTime == '1H') {
-                    timeBegin.setDate(timeEnd.getDate() - 10)
                     fetchApiNami(
                         `${selectCoin.type && selectCoin.type}${unitMoney}`,
-                        `${Math.floor(timeBegin.getTime() / 1000)}`,
-                        `${Math.ceil(timeEnd.getTime() / 1000)}`,
+                        `${dateBegin}`,
+                        `${currentTimeStamp}`,
                         '1m',
                         setDataChart,
                         120,
                     )
-                } else if (selectTime == '1D') {
-                    timeBegin.setDate(timeEnd.getDate() - 10)
+                } else if (selectTime == '1W' || selectTime == '1D') {
+                    timeBegin.setDate(dateBegin)
                     fetchApiNami(
                         `${selectCoin.type && selectCoin.type}${unitMoney}`,
-                        `${Math.floor(timeBegin.getTime() / 1000)}`,
-                        `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                        '1h',
+                        `${dateBegin}`,
+                        `${currentTimeStamp}`,
+                        dateTransform[selectTime].resolution,
                         setDataChart,
                         500,
                     )
                 } else {
-                    timeBegin.setDate(timeEnd.getDate() - 10)
                     fetchApiNami(
                         `${selectCoin.type && selectCoin.type}${unitMoney}`,
-                        `${Math.floor(timeBegin.getTime() / 1000)}`,
-                        `${Math.ceil(timeEnd.getTime() / 1000)}`,
-                        '1d',
+                        `${dateBegin}`,
+                        `${currentTimeStamp}`,
+                        currentSelected.resolution,
                         setDataChart,
                         1095,
                     )
@@ -2037,8 +2076,8 @@ export const fetchApiNami = async (symbol: string, from: string, to: string, res
         const tsYesterday = ts - timeLine * (24 * 3600)
         const params = {
             broker: 'NAMI_SPOT',
-            symbol: symbol,
-            from: tsYesterday,
+            symbol,
+            from,
             to: ts,
             resolution: resolution,
         }
