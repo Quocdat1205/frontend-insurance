@@ -7,8 +7,7 @@ import { BigNumber, ethers } from 'ethers'
 export interface BasicChainInformation {
     urls: string[]
     name: string
-    nativeCurrency?: AddEthereumChainParameter['nativeCurrency']
-    blockExplorerUrls?: AddEthereumChainParameter['blockExplorerUrls']
+    chainId?: string
 }
 
 export interface ProviderRpcError extends Error {
@@ -71,11 +70,11 @@ function isExtendedChainInformation(chainInformation: BasicChainInformation | Ex
     return !!(chainInformation as ExtendedChainInformation).nativeCurrency
 }
 
-export function getAddChainParameters(chainId: number): AddEthereumChainParameter | number {
+export function getAddChainParameters(chainId: number, isMobile: boolean = false): AddEthereumChainParameter | number | any {
     const chainInformation = Config.networks[chainId]
     if (isExtendedChainInformation(chainInformation)) {
         return {
-            chainId,
+            chainId: isMobile ? Config.networks[chainId]?.chainId : chainId,
             chainName: chainInformation.name,
             nativeCurrency: chainInformation.nativeCurrency,
             rpcUrls: chainInformation.urls,
