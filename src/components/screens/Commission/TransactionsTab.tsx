@@ -80,7 +80,7 @@ const TransactionsTab = ({ account, unitConfig, doReload }: TransactionsTab) => 
         return type === 'in' ? 'Nhận hoa hồng' : 'Rút hoa hồng'
     }
 
-    const addressTypes = {
+    const addressTypes: any = {
         in: 'Từ',
         out: 'Đến',
     }
