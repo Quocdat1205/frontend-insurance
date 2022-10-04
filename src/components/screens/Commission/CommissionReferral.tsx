@@ -1,12 +1,14 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import Big from 'big.js'
+import _ from 'lodash'
+import { useTranslation } from 'next-i18next'
+import React, { useEffect, useMemo, useState } from 'react'
 import Button from 'components/common/Button/Button'
 import Progressbar from 'components/common/Progressbar/Progressbar'
 import { CopyIcon } from 'components/common/Svg/SvgIcon'
 import Config from 'config/config'
 import useWindowSize from 'hooks/useWindowSize'
-import { useTranslation } from 'next-i18next'
-import React, { useEffect, useMemo, useState } from 'react'
 import { formatNumber } from 'utils/utils'
-import Big from 'big.js'
 
 interface CommissionReferral {
     account: any
@@ -56,9 +58,7 @@ const CommissionReferral = ({ account, decimal = 2, commissionConfig, userInfo }
         }
     }
 
-    const general = useMemo(() => {
-        return getCommissionRatio(userInfo?.totalMarginChildren ?? 0)
-    }, [userInfo])
+    const general = useMemo(() => getCommissionRatio(userInfo?.totalMarginChildren ?? 0), [userInfo])
 
     return (
         <>
@@ -78,7 +78,14 @@ const CommissionReferral = ({ account, decimal = 2, commissionConfig, userInfo }
                         <div className="text-txtSecondary text-sm sm:text-base">Mã giới thiệu</div>
                         <div className="flex items-center space-x-4">
                             <span className="text-red font-medium text-xl sm:text-4xl">{account?.myRef}</span>
-                            <CopyIcon onClick={() => Config.copy(account?.myRef)} size={width && width < 640 ? 18 : 22} className="cursor-pointer" />
+                            <CopyIcon
+                                onClick={() => {
+                                    _.throttle(() => Config.copy(account?.myRef), 200)
+                                    Config.toast.show('success', 'Sao chép mã thành công')
+                                }}
+                                size={width && width < 640 ? 18 : 22}
+                                className="cursor-pointer"
+                            />
                         </div>
                     </div>
                     <div className="flex flex-col space-y-2 mt-4 md:mt-0 min-w-[300px]">
@@ -90,7 +97,10 @@ const CommissionReferral = ({ account, decimal = 2, commissionConfig, userInfo }
                             <CopyIcon
                                 size={16}
                                 className="cursor-pointer min-w-[1rem]"
-                                onClick={() => Config.copy(`${Config.env.APP_URL}?ref=${account?.myRef}`)}
+                                onClick={() => {
+                                    _.throttle(() => Config.copy(`${Config.env.APP_URL}?ref=${account?.myRef}`), 200)
+                                    Config.toast.show('success', 'Sao chép mã thành công')
+                                }}
                             />
                         </div>
                     </div>
