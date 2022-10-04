@@ -14,9 +14,10 @@ interface CommissionStatistics {
     account: any
     userInfo: any
     decimal: number
-    setShowWithDrawCommission: React.Dispatch<React.SetStateAction<boolean>>
+    setShowWithDrawCommission: React.Dispatch<React.SetStateAction<boolean>>,
+    doReload: boolean
 }
-const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawCommission }: CommissionStatistics) => {
+const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawCommission, doReload }: CommissionStatistics) => {
     const days = useMemo(() => {
         const now = new Date()
         return [
@@ -104,10 +105,11 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
         })
     }
 
+
     useEffect(() => {
         constFetchCommissionStatistics()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filter])
+    }, [filter, doReload])
 
     const constFetchCommissionStatistics = async () => {
         try {
