@@ -26,6 +26,7 @@ import fetchApi from 'services/fetch-api'
 import { API_GET_PRICE_CHART } from 'services/apis'
 import { countDecimals } from 'utils/utils'
 import { getUnixTime, sub } from 'date-fns'
+import { BTCaddress, DAIaddress, ETHaddress } from 'components/web3/constants/contractAddress'
 
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
@@ -226,6 +227,7 @@ const InsuranceFrom = () => {
             </div>
         )
     }
+    const tokenAdress = useRef<string>('')
 
     useEffect(() => {
         if (loadings && isMobile) {
@@ -264,65 +266,33 @@ const InsuranceFrom = () => {
                     })
                 }
 
-                if (symbol === 'USDT') {
-                    const balanceUsdt = await Config.web3.contractCaller?.usdtContract.contract.balanceOf(account.address)
-                    if (balanceUsdt) {
-                        if (Number(ethers.utils.formatEther(balanceUsdt)) > 0) {
-                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceUsdt)).toFixed(decimalList.decimal_q_covered)))
-
-                            return Number(ethers.utils.formatEther(balanceUsdt))
-                        } else {
-                            setUserBalance(0)
-                            return 0
-                        }
-                    } else {
-                        return false
+                if (symbol !== 'BNB') {
+                    switch (symbol) {
+                        case 'ETH':
+                            tokenAdress.current = ETHaddress
+                            break
+                        case 'BTC':
+                            tokenAdress.current = BTCaddress
+                            break
+                        case 'DAI':
+                            tokenAdress.current = DAIaddress
+                            break
                     }
-                }
 
-                if (symbol === 'ETH') {
-                    const balanceETH = await Config.web3.contractCaller?.ethContract.contract.balanceOf(account.address)
+                    if (tokenAdress.current.length > 0) {
+                        const balanceUsdt = await Config.web3.contractCaller?.tokenContract(tokenAdress.current).contract.balanceOf(account.address)
+                        if (balanceUsdt) {
+                            if (Number(ethers.utils.formatEther(balanceUsdt)) > 0) {
+                                setUserBalance(Number(Number(ethers.utils.formatEther(balanceUsdt)).toFixed(decimalList.decimal_q_covered)))
 
-                    if (balanceETH) {
-                        if (Number(ethers.utils.formatEther(balanceETH)) > 0) {
-                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceETH)).toFixed(decimalList.decimal_q_covered)))
-                            return Number(ethers.utils.formatEther(balanceETH))
+                                return Number(ethers.utils.formatEther(balanceUsdt))
+                            } else {
+                                setUserBalance(0)
+                                return 0
+                            }
                         } else {
-                            setUserBalance(0)
-                            return 0
+                            return false
                         }
-                    } else {
-                        return false
-                    }
-                }
-
-                if (symbol === 'BTC') {
-                    const balanceBTC = await Config.web3.contractCaller?.btcContract.contract.balanceOf(account.address)
-                    if (balanceBTC) {
-                        if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
-                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceBTC)).toFixed(decimalList.decimal_q_covered)))
-                            return Number(ethers.utils.formatEther(balanceBTC))
-                        } else {
-                            setUserBalance(0)
-                            return 0
-                        }
-                    } else {
-                        return false
-                    }
-                }
-
-                if (symbol === 'DAI') {
-                    const balanceDAI = await Config.web3.contractCaller?.daiContract.contract.balanceOf(account.address)
-                    if (balanceDAI) {
-                        if (Number(ethers.utils.formatEther(balanceDAI)) > 0) {
-                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceDAI)).toFixed(decimalList.decimal_q_covered)))
-                            return Number(ethers.utils.formatEther(balanceDAI))
-                        } else {
-                            setUserBalance(0)
-                            return 0
-                        }
-                    } else {
-                        return false
                     }
                 }
             } else {
@@ -374,17 +344,17 @@ const InsuranceFrom = () => {
         if (data === 25) {
             setState({
                 ...state,
-                q_covered: Number(rangeQ_covered.min),
+                q_covered: Number((0.25 * userBalance).toFixed(decimalList.decimal_q_covered)),
             })
         } else if (data === 100) {
             setState({
                 ...state,
-                q_covered: Number(rangeQ_covered.max),
+                q_covered: userBalance,
             })
         } else {
             setState({
                 ...state,
-                q_covered: Number(((data / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered)),
+                q_covered: Number(((data / 100) * userBalance).toFixed(decimalList.decimal_q_covered)),
             })
         }
     }
@@ -916,62 +886,38 @@ const InsuranceFrom = () => {
     const [isCanSave, setIsCanSave] = useState<boolean>(false)
     const onHandleChange = (key: string, e: any) => {
         const value = +e.value
-
-        if (state.margin <= 0) {
-            if (tab == 0) {
-                setState({
-                    ...state,
-                    q_claim: 0,
-                    r_claim: 0,
-                    p_expired: 0,
-                    margin: 0,
-                })
-            } else {
-                setState({
-                    ...state,
-                    q_claim: 0,
-                    r_claim: 0,
-                    p_expired: 0,
-                })
+        if (userBalance > 0 && key === 'margin') {
+            const percent2 = Number(rangeMargin.min)
+            const percent5 = Number((state.q_covered * state.p_market * 0.05).toFixed(decimalList.decimal_margin))
+            const percent7 = Number((state.q_covered * state.p_market * 0.07).toFixed(decimalList.decimal_margin))
+            const percent10 = Number(rangeMargin.max)
+            switch (value) {
+                case percent2:
+                    percentMargin.current = 2
+                    break
+                case percent5:
+                    percentMargin.current = 5
+                    break
+                case percent7:
+                    percentMargin.current = 7
+                    break
+                case percent10:
+                    percentMargin.current = 10
+                    break
+                default:
+                    percentMargin.current = 0
+                    break
             }
         } else {
-            if (userBalance > 0 && key === 'margin') {
-                const percent2 = Number(
-                    (state.q_covered * state.p_market * 0.02 + 1 / Math.pow(10, Number(decimalList.decimal_margin))).toFixed(decimalList.decimal_margin),
-                )
-                const percent5 = Number((state.q_covered * state.p_market * 0.05).toFixed(decimalList.decimal_margin))
-                const percent7 = Number((state.q_covered * state.p_market * 0.07).toFixed(decimalList.decimal_margin))
-                const percent10 = Number(
-                    (state.q_covered * state.p_market * 0.1 - 1 / Math.pow(10, Number(decimalList.decimal_margin))).toFixed(decimalList.decimal_margin),
-                )
-
-                switch (value) {
-                    case percent2:
-                        percentMargin.current = 2
-                        break
-                    case percent5:
-                        percentMargin.current = 5
-                        break
-                    case percent7:
-                        percentMargin.current = 7
-                        break
-                    case percent10:
-                        percentMargin.current = 10
-                        break
-                    default:
-                        percentMargin.current = 0
-                        break
-                }
-            } else {
-                percentMargin.current = 0
-            }
+            percentMargin.current = 0
         }
+
         if (key === 'q_covered') {
             if (userBalance > 0) {
-                const percent25 = Number(rangeQ_covered.min)
-                const percent50 = Number((0.5 * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered))
-                const percent75 = Number((0.75 * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered))
-                const percent100 = Number(rangeQ_covered.max)
+                const percent25 = Number((0.25 * userBalance).toFixed(decimalList.decimal_q_covered))
+                const percent50 = Number((0.5 * userBalance).toFixed(decimalList.decimal_q_covered))
+                const percent75 = Number((0.75 * userBalance).toFixed(decimalList.decimal_q_covered))
+                const percent100 = Number(userBalance)
 
                 switch (value) {
                     case percent25:
@@ -992,23 +938,6 @@ const InsuranceFrom = () => {
                 }
             } else {
                 percentInsurance.current = 0
-            }
-        } else {
-            if (tab == 0) {
-                setState({
-                    ...state,
-                    q_claim: 0,
-                    r_claim: 0,
-                    p_expired: 0,
-                    margin: 0,
-                })
-            } else {
-                setState({
-                    ...state,
-                    q_claim: 0,
-                    r_claim: 0,
-                    p_expired: 0,
-                })
             }
         }
 
