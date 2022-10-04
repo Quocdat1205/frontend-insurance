@@ -111,7 +111,7 @@ const Modal = ({
                                 {customHeader
                                     ? customHeader()
                                     : closeButton && (
-                                          <div className="flex items-center justify-end pb-6 sm:pb-2">
+                                          <div className="flex items-center justify-end pb-6 sm:pb-2 cursor-pointer">
                                               <X onClick={handleOutside} size={20} className="cursor-pointer" />
                                           </div>
                                       )}
