@@ -11,7 +11,7 @@ import { useRouter } from 'next/router'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatPriceToWeiValue, formatWeiValueToPrice } from 'utils/format'
-import { contractAddress } from 'components/web3/constants/contractAddress'
+import { contractAddress, USDTaddress } from 'components/web3/constants/contractAddress'
 import { Menu, Popover } from '@headlessui/react'
 import { ChevronDown } from 'react-feather'
 import Modal from 'components/common/Modal/Modal'
@@ -227,7 +227,7 @@ const AcceptBuyInsurance = () => {
                             )
                             return setActive(false)
                         } else {
-                            const allowance = await Config.web3.contractCaller.usdtContract.contract.allowance(account.address, contractAddress)
+                            const allowance = await Config.web3.contractCaller.tokenContract(USDTaddress).contract.allowance(account.address, contractAddress)
                             const parseAllowance = formatWeiValueToPrice(allowance)
                             if (parseAllowance < state.margin) {
                                 await Config.web3.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(1000), {
