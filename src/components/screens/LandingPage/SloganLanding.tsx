@@ -44,9 +44,10 @@ const SloganLanding = () => {
                      left-0
                      homeNav:left-auto
                      homeNav:bottom-[15.75rem]
-                     max-h-[100px]
-                     mobileMedium:max-h-[calc(100%-30rem)]
-                     homeNav:!max-h-[calc(100%-25rem)]
+                     max-h-[150px]
+                     xs:max-h-[calc(100%-28rem)]
+                     tiny:max-h-[calc(100%-35rem)]
+                     homeNav:max-h-[calc(100%-22rem)]
                     "
                 />
             </div>
