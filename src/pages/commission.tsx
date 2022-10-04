@@ -83,7 +83,7 @@ const Commission = () => {
             )}
             <div className="px-4 mb:px-10 lg:px-20">
                 <div className="pt-10 max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
-                    <CommissionTable unitConfig={unitConfig} account={account} />
+                    <CommissionTable unitConfig={unitConfig} account={account} doReload={doReload} />
                 </div>
             </div>
             <CommissionPolicy commissionConfig={commissionConfig} />
