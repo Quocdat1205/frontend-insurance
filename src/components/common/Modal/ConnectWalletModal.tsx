@@ -105,7 +105,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         if (chainId && account.address) {
             if (!inValidNetword) {
                 setTimeout(() => {
-                    Config.toast.show('error', t('common:error_switch_network'))
+                    Config.toast?.show('error', t('common:error_switch_network'))
                     setVisible(true)
                     firstTime.current = false
                     oldAddress.current = account.address

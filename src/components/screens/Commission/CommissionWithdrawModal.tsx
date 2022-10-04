@@ -18,7 +18,7 @@ import { formatNumber } from 'utils/utils'
 //     setShow
 // }
 
-const CommissionWithdrawModal = ({ isWithdrawing, setIsWithdrawing, userInfo, unitConfig, account, isShow, isMobile, setShow }: any) => {
+const CommissionWithdrawModal = ({ isWithdrawing, setIsWithdrawing, userInfo, unitConfig, account, isShow, isMobile, setShow, doReload, setDoReload }: any) => {
     const handleWithDrawCommissionShare = async () => {
         if (!account?.address || !userInfo?.commissionAvailable) return
         setIsWithdrawing('withdrawing')
@@ -38,6 +38,8 @@ const CommissionWithdrawModal = ({ isWithdrawing, setIsWithdrawing, userInfo, un
             })
             if (statusCode === 200) {
                 setIsWithdrawing('withdraw')
+                setShow(false)
+                setDoReload(!doReload)
                 Config.toast.show('success', 'Rút hoa hồng về ví thành công')
             } else setIsWithdrawing('error')
         } catch (e) {

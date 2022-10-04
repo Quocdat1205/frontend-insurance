@@ -7,6 +7,8 @@ import { BigNumber, ethers } from 'ethers'
 export interface BasicChainInformation {
     urls: string[]
     name: string
+    nativeCurrency?: AddEthereumChainParameter['nativeCurrency']
+    blockExplorerUrls?: AddEthereumChainParameter['blockExplorerUrls']
 }
 
 export interface ProviderRpcError extends Error {
