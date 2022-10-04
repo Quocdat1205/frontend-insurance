@@ -409,11 +409,11 @@ const InsuranceFrom = () => {
                 const dateBegin = getUnixTime(sub(timeBegin, { [currentSelected.subtract]: currentSelected.subtractBy }))
 
                 if (selectTime == '1H') {
-                    fetchApiNami(`${selectCoin.type && selectCoin.type}${unitMoney}`, `${dateBegin}`, `${currentTimeStamp}`, '1m', setDataChart, 120)
+                    fetchApiNami(`${selectCoin?.type && selectCoin?.type}${unitMoney}`, `${dateBegin}`, `${currentTimeStamp}`, '1m', setDataChart, 120)
                 } else if (selectTime == '1W' || selectTime == '1D') {
                     timeBegin.setDate(dateBegin)
                     fetchApiNami(
-                        `${selectCoin.type && selectCoin.type}${unitMoney}`,
+                        `${selectCoin?.type && selectCoin?.type}${unitMoney}`,
                         `${dateBegin}`,
                         `${currentTimeStamp}`,
                         dateTransform[selectTime].resolution,
@@ -422,7 +422,7 @@ const InsuranceFrom = () => {
                     )
                 } else {
                     fetchApiNami(
-                        `${selectCoin.type && selectCoin.type}${unitMoney}`,
+                        `${selectCoin?.type && selectCoin?.type}${unitMoney}`,
                         `${dateBegin}`,
                         `${currentTimeStamp}`,
                         currentSelected.resolution,
@@ -762,11 +762,11 @@ const InsuranceFrom = () => {
                 const decimalMargin = countDecimals(item.stepSize)
                 _decimalList.decimal_margin = +decimalMargin
 
-                // const MIN = Number((state.q_covered * state.p_market * item.minQtyRatio).toFixed(Number(decimalMargin)))
-                // const MAX = Number((state.q_covered * state.p_market * item.maxQtyRatio).toFixed(Number(decimalMargin)))
+                const MIN = Number((state.q_covered * state.p_market * item.minQtyRatio).toFixed(Number(decimalMargin)))
+                const MAX = Number((state.q_covered * state.p_market * item.maxQtyRatio).toFixed(Number(decimalMargin)))
 
-                const MIN = Number((state.q_covered * state.p_market).toFixed(Number(decimalMargin)))
-                const MAX = Number((state.q_covered * state.p_market).toFixed(Number(decimalMargin)))
+                // const MIN = Number((state.q_covered * state.p_market).toFixed(Number(decimalMargin)))
+                // const MAX = Number((state.q_covered * state.p_market).toFixed(Number(decimalMargin)))
                 setRangeMargin({ ...rangeP_claim, min: MIN, max: MAX })
             }
             setDecimalList({ ..._decimalList })
@@ -1149,7 +1149,7 @@ const InsuranceFrom = () => {
                                                                     p_expired={Number(state.p_expired)}
                                                                     setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
                                                                     setP_Market={(data: number) => setState({ ...state, p_market: data })}
-                                                                    // resolution={`${selectTime}`}
+                                                                    resolution={`${selectTime}`}
                                                                 />
                                                                 <svg
                                                                     className={`absolute right-0 z-2`}
@@ -1844,7 +1844,7 @@ const InsuranceFrom = () => {
                                                     setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
                                                     setP_Market={(data: number) => setState({ ...state, p_market: data })}
                                                     isMobile={isMobile}
-                                                    // resolution={selectTime}
+                                                    resolution={selectTime}
                                                 ></ChartComponent>
                                             </Suspense>
                                             <svg

@@ -55,8 +55,6 @@ const InputNumber = ({
     }
 
     const showValue = (value: any) => {
-        console.log(value)
-
         if (value == -1) return ''
         if (!value) {
             return null
