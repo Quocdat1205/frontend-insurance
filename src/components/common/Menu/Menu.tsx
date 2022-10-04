@@ -1,6 +1,7 @@
 import classnames from 'classnames'
 import { useTranslation } from 'next-i18next'
-import React, { useMemo, useState } from 'react'
+import { useRouter } from 'next/router'
+import React, { memo, useCallback, useMemo, useRef, useState } from 'react'
 import { isMobile as mobile } from 'react-device-detect'
 import { ChevronDown, ChevronUp } from 'react-feather'
 import styled from 'styled-components'
@@ -8,11 +9,11 @@ import Modal from 'components/common/Modal/Modal'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
 import ContactModal from 'components/screens/HomePage/ContactModal'
 import EmailSubscriptionModal from 'components/screens/HomePage/EmailRegisterModal'
+import useOutsideAlerter from 'hooks/useOutsideAlerter'
 import useWindowSize from 'hooks/useWindowSize'
 import { IconSvg } from 'types/types'
 import { screens } from 'utils/constants'
 import { isFunction } from 'utils/utils'
-import { useRouter } from 'next/router'
 
 interface MenuItem {
     name?: any
@@ -37,20 +38,24 @@ interface Menu {
     onChange?: (menu: any) => void
     cbOnMouseOver?: (state: any) => void
     cbOnMouseOut?: (state: any) => void
+    isClickedMenu?: boolean
+    handleClickOutside?: (isClick: boolean) => void
 }
 
-const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
+const Menu = ({ data, onChange, cbOnMouseOut, handleClickOutside, isClickedMenu = false }: Menu) => {
     const { width } = useWindowSize()
     const { t } = useTranslation()
     const isMobile = (width && width < screens.drawer) || mobile
     const [active, setActive] = useState<any>(null)
-    const [isHover, setIsHover] = useState(false)
+    const [isShowMenu, setIsShowMenu] = useState(false)
     const router = useRouter()
+    const wrapperRef = useRef<any>(null)
 
     const onToggleMenu = (e: any, menu: any) => {
         const _active = !menu.parentId && (active?.parentId === menu.menuId || active?.menuId === menu.menuId) ? null : menu
         e.stopPropagation()
         setActive(_active)
+        setIsShowMenu(!isShowMenu)
         if (onChange) onChange(menu)
     }
 
@@ -73,42 +78,16 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
         return _children
     }
 
-    const handleOnMouseOut = (e: any) => {
-        e.stopPropagation()
-
-        if (isMobile) {
-            return
-        }
+    const handleOutside = () => {
         setActive(false)
-        setIsHover(false)
-        if (cbOnMouseOut) {
-            if (isFunction(cbOnMouseOut)) cbOnMouseOut(false)
+        if (handleClickOutside && isFunction(handleClickOutside)) {
+            handleClickOutside(false)
         }
     }
 
-    const handleOnMouseOver = (e: any) => {
-        e.stopPropagation()
-        if (isMobile) return
-        setIsHover(true)
-
-        // cb mouse leave
-        if (cbOnMouseOver) {
-            if (isFunction(cbOnMouseOver)) cbOnMouseOver(true)
-        }
-    }
+    useOutsideAlerter(wrapperRef, handleOutside)
 
     const dataFilter = useMemo(() => recursiveData(data), [data])
-
-    // const [isShowEmailModal, setIsShowEmailModal] = useState(false)
-
-    const handleOpenModal = () => {
-        // console.log("handleOpenModal")
-        // setIsShowEmailModal(true);
-    }
-
-    const handleCloseModal = () => {
-        // setIsShowEmailModal(false);
-    }
 
     const renderMenu = (menu: any, index: number, child = false) => {
         const isActive = router.pathname === menu?.router
@@ -130,12 +109,12 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
         }
 
         const Name = ({ name, ...nameProps }: any) => {
-            if (typeof name === 'string' || name instanceof String) return <span>{t(menu.name)}</span>
+            if (typeof name === 'string' || name instanceof String) return <span>{t(name.toString())}</span>
             // custom name component
             const Component = name
             return (
                 <>
-                    <Component {...nameProps} />
+                    <Component isClickedMenu={isClickedMenu} {...nameProps} />
                 </>
             )
         }
@@ -144,7 +123,6 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
             <ItemMenu
                 key={index}
                 onClick={(e) => onToggleMenu(e, menu)}
-                // onMouseOut={handleOnMouseOut}
                 className={classnames('', {
                     'sub-menu': hasChildren,
                     'active-menu': _active,
@@ -170,8 +148,8 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
                             <Name name={menu.name} {...menu?.nameComponentProps} />
                         </div>
                         {!menu?.hideArrowIcon && isMobile && (!_active ? <ChevronDown size={18} /> : <ChevronUp size={18} />)}
-                        {/* {!isHover || ( isMobile && !active  ) ? <ChevronDown size={18} /> : <ChevronUp size={18} />} */}
-                        {!menu?.hideArrowIcon && !isMobile && (!isHover ? <ChevronDown size={18} /> : <ChevronUp size={18} />)}
+                        {/* {!isClickedMenu || ( isMobile && !active  ) ? <ChevronDown size={18} /> : <ChevronUp size={18} />} */}
+                        {/* {!menu?.hideArrowIcon && !isMobile && (!isClickedMenu ? <ChevronDown size={18} /> : <ChevronUp size={18} />)} */}
                     </div>
                 )}
                 {hasChildren && (
@@ -186,7 +164,10 @@ const Menu = ({ data, onChange, cbOnMouseOut, cbOnMouseOver }: Menu) => {
     }
 
     return (
-        <ul onMouseOver={handleOnMouseOver} onMouseOut={handleOnMouseOut} className="flex flex-col sidebar-menu mb:items-center mb:flex-row">
+        <ul
+            ref={wrapperRef}
+            className="flex flex-col sidebar-menu mb:items-center mb:flex-row"
+        >
             {dataFilter.map((menu: any, index: number) => renderMenu(menu, index))}
         </ul>
     )
@@ -199,11 +180,11 @@ interface Item {
 }
 
 const ItemMenu = styled.li.attrs<Item>(({ isChild, isDropdown, active }) => ({
-    className: classnames('cursor-pointer text-sm py-3 relative mb:hover:active-menu', {
+    className: classnames('cursor-pointer text-sm py-3 relative', {
         'mb:hover:text-red': !isChild && !isDropdown,
         'mb:py-3': !isChild,
         'mb:!py-[10px] pl-4 font-normal mb:text-txtPrimary mb:hover:bg-hover mb:hover:rounded-[3px]': isChild,
         'text-red': active,
     }),
 }))<Item>``
-export default Menu
+export default memo(Menu)

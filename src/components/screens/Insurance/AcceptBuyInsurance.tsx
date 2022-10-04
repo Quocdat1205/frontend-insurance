@@ -64,7 +64,6 @@ const AcceptBuyInsurance = () => {
     const { account: address, error, chainId, isActive } = useWeb3React()
     const account = useAppSelector((state: RootStore) => state.setting.account)
     const [Noti, setNoti] = useState<string>('')
-    const [price, setPrice] = useState<number>(0)
     const [checkUpgrade, setCheckUpgrade] = useState<boolean>(false)
     const [state, setState] = useState<IState>()
     const [isUpdated, setUpdated] = useState<boolean>(true)
@@ -78,10 +77,6 @@ const AcceptBuyInsurance = () => {
     const reason = useRef<any>(null)
     const textErrorButton = useRef<string>(t(`common:reconnect`))
     const showIconReload = useRef<boolean>(true)
-    const [errorConnect, setErrorConnect] = useState<boolean>(false)
-    const [switchNetwork, setSwitchNetwork] = useState<boolean>(false)
-    const [networkError, setNetworkError] = useState<boolean>(false)
-    const [isVisible, setVisible] = useState(false)
     const isReload = useRef<boolean>(false)
     const unitMoney = useRef<string>('USDT')
 
@@ -111,42 +106,34 @@ const AcceptBuyInsurance = () => {
                     reason.current = t('errors:40001')
                     textErrorButton.current = t(`common:reconnect`)
                     showIconReload.current = true
-                    setErrorConnect(true)
                 }
                 break
             case errorsWallet.Not_found:
                 isNotFoundNetWork = true
-                setNetworkError(true)
                 break
             case errorsWallet.Success:
                 Config.toast.show('success', t('common:connect_successful'))
-                setVisible(false)
                 break
             case errorsWallet.NetWork_error:
                 showIconReload.current = true
                 reason.current = t('common:network_error')
-                setErrorConnect(true)
                 break
             case errorsWallet.Connect_failed:
                 reason.current = t('errors:CONNECT_FAILED')
                 textErrorButton.current = t(`common:refresh`)
                 isReload.current = true
-                setErrorConnect(true)
                 break
             case errorsWallet.Already_opened:
                 reason.current = t('common:user_not_login')
                 showIconReload.current = false
                 textErrorButton.current = t('common:got_it')
-                setErrorConnect(true)
                 break
             default:
                 showIconReload.current = true
                 reason.current = t('errors:CONNECT_FAILED')
-                setErrorConnect(true)
                 break
         }
         setLoading(false)
-        if (!isNotFoundNetWork) setSwitchNetwork(code !== errorsWallet.Success ? !inValidNetword : false)
     }
 
     const getData = async () => {
@@ -155,7 +142,6 @@ const AcceptBuyInsurance = () => {
         if (dataSate) {
             const res = JSON.parse(dataSate)
             setState({ ...res })
-
             if (res.p_claim < res.p_market) {
                 setSaved(res.q_claim + res.q_covered * (res.p_claim - res.p_market) - res.margin + res.q_covered * (res.p_market - res.p_claim))
             }
@@ -204,7 +190,7 @@ const AcceptBuyInsurance = () => {
                 if (data.data.length > 0) {
                     const min = data.data[0].p - data.data[0].p * 0.05
                     const max = data.data[0].p + data.data[0].p * 0.05
-                    if (price > max || price < min) {
+                    if (state.p_market > max || state.p_market < min) {
                         setUpdated(false)
                         Config.toast.show('error', t('insurance:buy:price_had_update'))
                         return setActive(false)
@@ -301,6 +287,7 @@ const AcceptBuyInsurance = () => {
                         p_claim: Number(state.p_claim),
                         period: Number(state.period),
                         isUseNain: dataPost.isUseNain,
+                        p_market: state.p_market,
                     }
 
                     await fetchApi({
@@ -319,6 +306,7 @@ const AcceptBuyInsurance = () => {
                             p_claim: Number(data.p_claim),
                             period: Number(data.period),
                             isUseNain: data.isUseNain,
+                            p_market: data.p_market,
                         },
                         token: authToken,
                     })
@@ -400,16 +388,14 @@ const AcceptBuyInsurance = () => {
                         {
                             // head Insurance
                             <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto mt-[4rem] mb-[3rem] grid grid-cols-12 content-center items-center justify-between">
-                                <div className="flex items-center font-semibold text-base col-span-4">
+                                <div
+                                    className="flex items-center font-semibold text-base col-span-4"
+                                    onClick={() => {
+                                        return router.push('/buy-covered')
+                                    }}
+                                >
                                     <LeftArrow></LeftArrow>
-                                    <span
-                                        className={' text-txtPrimary hover:cursor-pointer ml-[8px]'}
-                                        onClick={() => {
-                                            return router.push('/buy-covered')
-                                        }}
-                                    >
-                                        {language == 'en' ? 'Back' : 'Quay về'}
-                                    </span>
+                                    <span className={' text-txtPrimary hover:cursor-pointer ml-[8px]'}>{language == 'en' ? 'Back' : 'Quay về'}</span>
                                 </div>
 
                                 <div className={'flex flex-col justify-center items-center col-span-4'}>
@@ -487,7 +473,7 @@ const AcceptBuyInsurance = () => {
                                             </span>{' '}
                                             <div className="relative">
                                                 <Menu>
-                                                    <Menu.Button className={' text-blue underline hover:cursor-pointer'}>
+                                                    <Menu.Button disabled={true} className={' text-blue underline hover:cursor-pointer'}>
                                                         <span className={'text-redPrimary decoration-white underline'}>{unitMoney.current}</span>
                                                     </Menu.Button>
                                                     <Menu.Items
@@ -644,7 +630,7 @@ const AcceptBuyInsurance = () => {
                                         createContract()
                                     }
                                     if (!isUpdated) {
-                                        getPrice(`${state.symbol}${state?.unit}`, setPrice).then(() => {
+                                        getPrice(`${state.symbol}${state?.unit}`, state, setState).then(() => {
                                             setUpdated(true)
                                             setCanBuy(true)
                                             setCount(10)
@@ -923,7 +909,7 @@ const AcceptBuyInsurance = () => {
                                     createContract()
                                 }
                                 if (!isUpdated) {
-                                    getPrice(`${state.symbol}${state?.unit}`, setPrice).then(() => {
+                                    getPrice(`${state.symbol}${state?.unit}`, state, setState).then(() => {
                                         setUpdated(true)
                                         setCanBuy(true)
                                         setCount(10)
@@ -945,13 +931,13 @@ const AcceptBuyInsurance = () => {
     )
 }
 
-export const getPrice = async (symbol: string, setState: any) => {
+export const getPrice = async (symbol: string, state: any, setState: any) => {
     try {
         const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${symbol}`)
 
         if (data) {
             if (data.data[0]) {
-                return setState(data.data[0]?.p)
+                return setState({ ...state, p_market: data.data[0]?.p })
             }
         }
     } catch (err) {

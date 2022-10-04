@@ -143,7 +143,7 @@
         }
     },
     "terminology": {
-        "q_covered": "Quanity of covered asset",
+        "q_covered": "Quantity of covered asset",
         "p_market": "The current price of the covered asset",
         "p_claim": "Price activates receiving cover payout",
         "p_expired": "Price triggers the insurance contract to expire",
