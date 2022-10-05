@@ -22,7 +22,6 @@ import { isString } from 'lodash'
 import { useWeb3React } from '@web3-react/core'
 import fetchApi from 'services/fetch-api'
 import { API_GET_BUY_INSURANCE } from 'services/apis'
-import { ethers } from 'ethers'
 
 export type IBuyInsurance = {
     createInsurance: number
