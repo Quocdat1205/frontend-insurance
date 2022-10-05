@@ -11,7 +11,7 @@ import { useRouter } from 'next/router'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatPriceToWeiValue, formatWeiValueToPrice } from 'utils/format'
-import { contractAddress } from 'components/web3/constants/contractAddress'
+import { contractAddress, USDTaddress } from 'components/web3/constants/contractAddress'
 import { Menu, Popover } from '@headlessui/react'
 import { ChevronDown } from 'react-feather'
 import Modal from 'components/common/Modal/Modal'
@@ -227,7 +227,7 @@ const AcceptBuyInsurance = () => {
                             )
                             return setActive(false)
                         } else {
-                            const allowance = await Config.web3.contractCaller.usdtContract.contract.allowance(account.address, contractAddress)
+                            const allowance = await Config.web3.contractCaller.tokenContract(USDTaddress).contract.allowance(account.address, contractAddress)
                             const parseAllowance = formatWeiValueToPrice(allowance)
                             if (parseAllowance < state.margin) {
                                 await Config.web3.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(1000), {
@@ -325,12 +325,15 @@ const AcceptBuyInsurance = () => {
 
     const rangeOfRefund = () => {
         if (state) {
-            const p_refund = 0.05 * state.p_market
-            if (p_refund > state.p_claim) {
-                return ` $${state.p_claim.toFixed(state?.decimalList?.decimal_p_claim)} - $${p_refund.toFixed(state?.decimalList?.decimal_p_claim)} `
+            if (state.p_claim > state.p_market) {
+                return ` $${(state.p_market + (0.05 / 100) * state.p_market).toFixed(state?.decimalList?.decimal_p_claim)} - $${state.p_claim.toFixed(
+                    state?.decimalList?.decimal_p_claim,
+                )}`
             }
-            if (p_refund < state.p_claim) {
-                return ` $${p_refund.toFixed(state?.decimalList?.decimal_p_claim)} - $${state.p_claim.toFixed(state?.decimalList?.decimal_p_claim)} `
+            if (state.p_claim < state.p_market) {
+                return ` $${(state.p_market - (0.05 / 100) * state.p_market).toFixed(state?.decimalList?.decimal_p_claim)} - $${state.p_claim.toFixed(
+                    state?.decimalList?.decimal_p_claim,
+                )} `
             }
         }
     }
@@ -355,8 +358,8 @@ const AcceptBuyInsurance = () => {
 
             return (
                 <span>
-                    {time.getDate()}/{time.getMonth()}/{time.getFullYear()} - {time.getHours()}:
-                    {time.getMinutes() < 10 ? '0' + time.getMinutes() : time.getMinutes()}
+                    {time.getHours() < 10 ? '0' + time.getHours() : time.getHours()}:{time.getMinutes() < 10 ? '0' + time.getMinutes() : time.getMinutes()} -{' '}
+                    {time.getDate()}/{time.getMonth()}/{time.getFullYear()}
                 </span>
             )
         }

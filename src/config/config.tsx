@@ -159,10 +159,10 @@ class Config {
         },
         {
             menuId: 'faq_section',
-            router: '#faq-section',
+            // router: '#faq-section',
             name: 'home:landing:faq_title',
             parentId: 0,
-            section: 'faq_section',
+            section: 'faq-section',
         },
         {
             menuId: 'modal_contact',

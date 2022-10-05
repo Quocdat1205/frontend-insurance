@@ -232,18 +232,20 @@ module.exports = {
                 1: '1 auto',
             },
             screens: {
-                '3xl': '1600px',
-                '4xl': '1920px',
-                insurance: '1280px',
-                layout: '1360px',
-                mb: '820px',
-                tiny: '355px',
+                // !TODO ordering must be from small to large because of the min-width
+                // refer: https://tailwindcss.com/docs/screens#adding-smaller-breakpoints
                 xs: '319px',
-                '1xs': '391px',
-                // this responsive is for handle complex layout
-                homeNav: '1023px',
+                tiny: '355px',
                 mobileMedium: '374px',
                 mobileLarge: '424px',
+                '1xs': '391px',
+                tablet: '767px',
+                mb: '820px',
+                homeNav: '1023px',
+                insurance: '1280px',
+                layout: '1360px',
+                '3xl': '1600px',
+                '4xl': '1920px',
             },
             spacing: {
                 128: '32rem',
