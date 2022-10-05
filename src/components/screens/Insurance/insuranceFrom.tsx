@@ -164,6 +164,9 @@ const InsuranceFrom = () => {
     useEffect(() => {
         if (!account.address) {
             setUserBalance(0)
+            setState({ ...state, q_covered: -1, margin: -1, p_claim: -1, q_claim: 0, r_claim: 0, period: 2, p_expired: 0 })
+            percentInsurance.current = 0
+            percentMargin.current = 0
         } else {
             getBalaneToken(selectCoin?.type)
             setState({ ...state, q_covered: 0 })
@@ -343,8 +346,6 @@ const InsuranceFrom = () => {
                 const decimalMargin = countDecimals(item.stepSize)
                 _decimalList.decimal_margin = +decimalMargin
 
-                const MathCeil = 1 / Math.pow(10, Number(decimalMargin))
-
                 const MIN = Number((state.q_covered * state.p_market * item.minQtyRatio).toFixed(Number(decimalMargin)))
                 const MAX = Number((state.q_covered * state.p_market * item.maxQtyRatio).toFixed(Number(decimalMargin)))
                 setRangeMargin({ ...rangeP_claim, min: MIN, max: MAX })
@@ -484,29 +485,14 @@ const InsuranceFrom = () => {
             if (selectCoin?.symbol !== '') {
                 const currentSelected = dateTransform[selectTime!]
                 const dateBegin = getUnixTime(sub(timeBegin, { [currentSelected.subtract]: currentSelected.subtractBy }))
-
-                if (selectTime == '1H') {
-                    fetchApiNami(`${selectCoin?.type && selectCoin?.type}${unitMoney}`, `${dateBegin}`, `${currentTimeStamp}`, '1m', setDataChart, 120)
-                } else if (selectTime == '1W' || selectTime == '1D') {
-                    timeBegin.setDate(dateBegin)
-                    fetchApiNami(
-                        `${selectCoin?.type && selectCoin?.type}${unitMoney}`,
-                        `${dateBegin}`,
-                        `${currentTimeStamp}`,
-                        dateTransform[selectTime].resolution,
-                        setDataChart,
-                        500,
-                    )
-                } else {
-                    fetchApiNami(
-                        `${selectCoin?.type && selectCoin?.type}${unitMoney}`,
-                        `${dateBegin}`,
-                        `${currentTimeStamp}`,
-                        currentSelected.resolution,
-                        setDataChart,
-                        1095,
-                    )
-                }
+                timeBegin.setDate(dateBegin)
+                fetchApiNami(
+                    `${selectCoin?.type && selectCoin?.type}${unitMoney}`,
+                    `${dateBegin}`,
+                    `${currentTimeStamp}`,
+                    dateTransform[selectTime!].resolution,
+                    setDataChart,
+                )
             }
         } catch (err) {
             console.log(err)
@@ -1143,7 +1129,7 @@ const InsuranceFrom = () => {
                                                                     p_expired={Number(state.p_expired)}
                                                                     setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
                                                                     setP_Market={(data: number) => setState({ ...state, p_market: data })}
-                                                                    resolution={`${selectTime}`}
+                                                                    resolution={state.period}
                                                                 />
                                                                 <svg
                                                                     className={`absolute right-0 z-2`}
@@ -1832,7 +1818,7 @@ const InsuranceFrom = () => {
                                                     setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
                                                     setP_Market={(data: number) => setState({ ...state, p_market: data })}
                                                     isMobile={isMobile}
-                                                    resolution={selectTime}
+                                                    resolution={state.period}
                                                 ></ChartComponent>
                                             </Suspense>
                                             <svg
@@ -2056,15 +2042,13 @@ const InsuranceFrom = () => {
     )
 }
 
-export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any, timeLine: number) => {
+export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any) => {
     try {
-        const ts = Math.round(new Date().getTime() / 1000)
-        const tsYesterday = ts - timeLine * (24 * 3600)
         const params = {
             broker: 'NAMI_SPOT',
             symbol,
             from,
-            to: ts,
+            to,
             resolution: resolution,
         }
         const test = await fetchApi({ url: API_GET_PRICE_CHART, baseURL: '', params: params })
