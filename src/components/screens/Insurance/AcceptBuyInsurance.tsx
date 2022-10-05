@@ -22,7 +22,6 @@ import { isString } from 'lodash'
 import { useWeb3React } from '@web3-react/core'
 import fetchApi from 'services/fetch-api'
 import { API_GET_BUY_INSURANCE } from 'services/apis'
-import { ethers } from 'ethers'
 
 export type IBuyInsurance = {
     createInsurance: number
@@ -155,8 +154,8 @@ const AcceptBuyInsurance = () => {
 
     const fetch = async () => {
         try {
-            const e = await wallet.contractCaller.insuranceContract.contract.filters.EBuyInsurance()
-            const filter = await wallet.contractCaller.insuranceContract.contract.queryFilter(e, 22658137, 22658137 + 1000)
+            const e = await Config.web3.contractCaller.insuranceContract.contract.filters.EBuyInsurance()
+            await wallet.contractCaller.insuranceContract.contract.queryFilter(e, 22658137, 22658137 + 1000)
         } catch (err) {
             console.log(err)
         }
@@ -228,13 +227,17 @@ const AcceptBuyInsurance = () => {
                             return setActive(false)
                         } else {
                             const allowance = await Config.web3.contractCaller.tokenContract(USDTaddress).contract.allowance(account.address, contractAddress)
+
                             const parseAllowance = formatWeiValueToPrice(allowance)
+
                             if (parseAllowance < state.margin) {
-                                await Config.web3.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(1000), {
-                                    from: account.address,
-                                })
+                                const approve = await Config.web3.contractCaller
+                                    .tokenContract(USDTaddress)
+                                    .contract.approve(contractAddress, formatPriceToWeiValue(state.margin), {
+                                        from: account.address,
+                                    })
                             }
-                            const buy = await Config.web3.contractCaller.insuranceContract.contract
+                            await Config.web3.contractCaller.insuranceContract.contract
                                 .createInsurance(
                                     dataPost.buyer,
                                     dataPost.asset,
@@ -254,10 +257,22 @@ const AcceptBuyInsurance = () => {
                                     }
                                 })
                                 .catch((result: any) => {
+                                    if (result?.error?.code === -32603) {
+                                        Config.toast.show(
+                                            'error',
+                                            `${
+                                                language === 'vi'
+                                                    ? 'Giao dịch không thành công, số dư USDT của bạn không đủ'
+                                                    : 'Transaction fail, your balance USTD not enough'
+                                            }`,
+                                        )
+                                        return setActive(false)
+                                    }
+
                                     if (result.code === 4001) {
                                         Config.toast.show('error', `${language === 'vi' ? 'Bạn đã hủy giao dịch' : 'You rejected transaction'}`)
+                                        return setActive(false)
                                     }
-                                    return setActive(false)
                                 })
                         }
                     }, 1000)

@@ -51,7 +51,7 @@ const Commission = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [account, doReload])
 
-    console.log(account, userInfo)
+    // console.log(account, userInfo)
 
     return (
         <LayoutWeb3 sponsor={false}>
@@ -98,4 +98,3 @@ export const getServerSideProps = async ({ locale }: any) => ({
 })
 
 export default Commission
-

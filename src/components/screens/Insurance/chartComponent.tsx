@@ -3,6 +3,7 @@ import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themes_animated from '@amcharts/amcharts4/themes/animated'
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
+import { add, getUnixTime } from 'date-fns'
 
 export type iProps = {
     p_expired?: any
@@ -17,7 +18,7 @@ export type iProps = {
     isMobile?: boolean
     width: number
     height: number
-    resolution: string
+    resolution: number
 }
 
 export type Idata = {
@@ -25,11 +26,46 @@ export type Idata = {
     date: any
 }
 
-export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number, state: any) => {
+export const dateTransform: any = {
+    '1H': {
+        resolution: '1m',
+        subtract: 'hours',
+        subtractBy: 1,
+    },
+    '1W': {
+        resolution: '1d',
+        subtract: 'weeks',
+        subtractBy: 1,
+    },
+    '1D': {
+        resolution: '1h',
+        subtract: 'days',
+        subtractBy: 1,
+    },
+    '1M': {
+        resolution: '1d',
+        subtract: 'months',
+        subtractBy: 1,
+    },
+    '3M': {
+        resolution: '1d',
+        subtract: 'months',
+        subtractBy: 3,
+    },
+    '1Y': {
+        resolution: '1d',
+        subtract: 'years',
+        subtractBy: 1,
+    },
+}
+
+export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number, state: any, resolution: number) => {
     let trend = chart.series.push(new am4charts.LineSeries())
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
     trend.strokeWidth = 1.5
+    trend.strokeDasharray = '3,3'
+    trend.defaultState.transitionDuration = 1
     if (state.p_claim < state.p_market) {
         trend.stroke = am4core.color('#EB2B3E')
     } else {
@@ -42,21 +78,7 @@ export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number, state
     trend.strokeDasharray = '3,3'
     trend.defaultState.transitionDuration = 1
 
-    let endPoint = new Date(chart.data[chart.data.length - 1]?.date)
-    endPoint.setDate(endPoint.getDate() + 8)
-
-    if (!p_claim) {
-        trend.data = [
-            {
-                date: chart.data[0]?.date,
-                value: chart.data[chart.data.length - 1]?.value,
-            },
-            {
-                date: endPoint,
-                value: chart.data[chart.data.length - 1]?.value,
-            },
-        ]
-    }
+    let endPoint = chart.data[chart.data.length - 1]?.date
 
     if (p_claim) {
         trend.data = [
@@ -65,14 +87,14 @@ export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number, state
                 value: p_claim,
             },
             {
-                date: endPoint,
+                date: endPoint + (resolution + 8) * 1000 * 3600 * 24 + 4 * 3600 * 24,
                 value: p_claim,
             },
         ]
     }
 }
 
-export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number, state: any) => {
+export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number, state: any, resolution: number) => {
     let trend = chart.series.push(new am4charts.LineSeries())
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
@@ -82,9 +104,7 @@ export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number,
     trend.defaultState.transitionDuration = 1
 
     if (p_claim) {
-        // const timeBegin = new Date(chart.data[chart.data.length - 1].date)
-        const timeEnd = new Date()
-        timeEnd.setDate(timeEnd.getDate() + 4)
+        let endPoint = chart.data[chart.data.length - 1]?.date
 
         trend.data = [
             {
@@ -92,7 +112,7 @@ export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number,
                 value: chart.data[chart.data.length - 1]?.value,
             },
             {
-                date: timeEnd,
+                date: endPoint + resolution * 1000 * 3600 * 24,
                 value: p_claim,
             },
         ]
@@ -101,7 +121,6 @@ export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number,
 
 const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, state, isMobile, width, height, resolution }: iProps) => {
     const [dataChart, setDataChart] = useState([])
-    const [PClaim, setPClaim] = useState(p_claim)
     const router = useRouter()
     let chart: any
     // const ref = useRef<any>(null)
@@ -124,7 +143,6 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
         }, 500)
         if (chart) {
             setP_Market(chart.data[chart.data.length - 1]?.value)
-            setPClaim(p_claim)
         }
     }, [dataChart, p_claim, p_expired, state.period, state.q_covered, state.margin])
 
@@ -225,7 +243,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             bullet.circle.propertyFields.radius = '1'
 
             if (p_claim > 0) {
-                handleTrendLine(chart, p_claim, state)
+                handleTrendLine(chart, p_claim, state, resolution)
             } else {
                 // handleTrendLine(chart, 0, state)
             }
@@ -247,10 +265,9 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 subSeries.interpolationDuration = 0
 
                 // load data for chart sub
-                const t_expired = new Date()
-                t_expired.setDate(state.t_market.getDate() + 4)
+                const t_expired = chart.data[chart.data.length - 1]?.date
                 latitudeExpired.data.push({
-                    date: t_expired,
+                    date: t_expired + resolution * 1000 * 3600 * 24,
                     value: p_expired,
                 })
 
@@ -284,16 +301,15 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 (p_claim > state.p_market * 1 + (2 * state.p_market) / 100 && p_claim < state.p_market * 1 + (70 * state.p_market) / 100) ||
                 (p_claim > state.p_market * 1 - (70 * state.p_market) / 100 && p_claim < state.p_market * 1 - (2 * state.p_market) / 100)
             ) {
-                const timeEnd = new Date()
-                timeEnd.setDate(timeEnd.getDate() + 4)
+                const timeEnd = chart.data[chart.data.length - 1]?.date
 
                 let latitudeClaim = chart.series.push(new am4charts.LineSeries())
                 latitudeClaim.dataFields.valueY = 'value'
                 latitudeClaim.dataFields.dateX = 'date'
                 latitudeClaim.data = [
                     {
-                        date: timeEnd,
-                        value: p_claim > 0 ? p_claim : state.p_market,
+                        date: timeEnd + resolution * 1000 * 3600 * 24,
+                        value: p_claim,
                     },
                 ]
 
@@ -309,7 +325,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 subLatitudeClaim.data = [
                     ...dataChart,
                     {
-                        date: timeEnd,
+                        date: timeEnd + resolution * 1000 * 3600 * 24,
                         value: p_claim > 0 ? p_claim : state.p_market,
                     },
                 ]
@@ -411,7 +427,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 //     })
                 // }
 
-                handleTrendLineStatus(chart, p_claim, state)
+                handleTrendLineStatus(chart, p_claim, state, resolution)
             }
         }
     }

@@ -43,15 +43,27 @@ const InsuranceFrom = () => {
     const router = useRouter()
     const { width, height } = useWindowSize()
     const isMobile = width && width <= screens.drawer
+
     const assetsToken = useAppSelector((state: RootStore) => state.setting.assetsToken)
     const pairConfigs = useAppSelector((state: RootStore) => state.setting.pairConfigs)
     const account = useAppSelector((state: RootStore) => state.setting.account)
 
-    const [selectTime, setSelectTime] = useState<string>('1Y')
+    const min_notinal = useRef(0)
     const clear = useRef<boolean>(false)
     const percentInsurance = useRef<number>(0)
     const percentMargin = useRef<number>(8)
+    const table = useRef<any>(null)
+    const container = useRef<any>(null)
+    const mouseDown = useRef(false)
+    const startX = useRef<any>(null)
+    const scrollLeft = useRef<any>(null)
+    const startY = useRef<any>(null)
+    const scrollTop = useRef<any>(null)
+    const handleClick = useRef(true)
+    const tmp_q_covered = useRef(0)
+    const tmp_margin = useRef(0)
 
+    const [selectTime, setSelectTime] = useState<string>('1Y')
     const [tab, setTab] = useState<number>(0)
     const [loadings, setLoadings] = useState(true)
     const [openChangeToken, setOpenChangeToken] = useState(false)
@@ -63,19 +75,22 @@ const InsuranceFrom = () => {
     const [chosing, setChosing] = useState(false)
     const [showGuideModal, setShowGuideModal] = useState<boolean>(false)
     const [saved, setSaved] = useState<number>(0)
+    const [isCanSave, setIsCanSave] = useState<boolean>(false)
+    const [userBalance, setUserBalance] = useState<number>(0)
+    const [listCoin, setListCoin] = useState<ICoin[]>([])
+    const [pair_configs, setPairConfigs] = useState<any>({})
+    const [dataChart, setDataChart] = useState()
+    const [percentPrice, setPercentPrice] = useState<any>()
+
     const [rangeQ_covered, setRangeQ_covered] = useState({
         min: 0,
         max: 0,
     })
     const [showInput, setShowInput] = useState<{ isShow: boolean; name: string }>({ isShow: false, name: '' })
-
     const [showChangeUnit, setShowChangeUnit] = useState({
         isShow: false,
         name: '',
     })
-    const [userBalance, setUserBalance] = useState<number>(0)
-    const [listCoin, setListCoin] = useState<ICoin[]>([])
-    const [pair_configs, setPairConfigs] = useState<any>({})
     const [decimalList, setDecimalList] = useState({
         decimal_q_covered: 2,
         decimal_margin: 0,
@@ -110,11 +125,16 @@ const InsuranceFrom = () => {
         t_market: new Date(),
         p_expired: 0,
     })
-    const tmp_q_covered = useRef(0)
-    const tmp_margin = useRef(0)
 
-    const [dataChart, setDataChart] = useState()
-    // const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y', `${language === 'vi' ? 'Tất cả' : 'All'}`]
+    const [rangeP_claim, setRangeP_claim] = useState({
+        min: 0,
+        max: 0,
+    })
+    const [rangeMargin, setRangeMargin] = useState({
+        min: 0,
+        max: 0,
+    })
+
     const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y']
     const listTabPeriod: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     const menu = [
@@ -133,102 +153,6 @@ const InsuranceFrom = () => {
         { menuId: 'help', name: t('insurance:buy:help') },
     ]
 
-    const [rangeP_claim, setRangeP_claim] = useState({
-        min: 0,
-        max: 0,
-    })
-    const [rangeMargin, setRangeMargin] = useState({
-        min: 0,
-        max: 0,
-    })
-
-    const [percentPrice, setPercentPrice] = useState<any>()
-    const min_notinal = useRef(0)
-
-    const Leverage = (p_market: number, p_stop: number) => {
-        const leverage = Math.floor(p_market / Math.abs(p_market - p_stop))
-        return leverage < 1 ? 1 : leverage
-    }
-
-    const P_stop = (p_market: number, p_claim: number, hedge: number) => {
-        const diffStopfutures = 0 / 100
-        const ratio_min_profit = Math.abs(p_claim - p_market) / p_market / 2
-
-        if (p_claim > p_market) {
-            const p_stop = p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)
-            return Math.abs(Number(p_stop))
-        } else {
-            const p_stop = p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)
-            return Math.abs(Number(p_stop))
-        }
-    }
-
-    const componentsInputMobile = () => {
-        return (
-            <div className="mx-[1rem] relative">
-                <div>
-                    {t('insurance:buy_mobile:q_covered')}
-                    <label>
-                        <span
-                            id="label_q_coverd"
-                            className="z-1 !w-max text-redPrimary"
-                            onClick={() => {
-                                setOpenChangeToken(true)
-                                tmp_q_covered.current = state.q_covered
-                            }}
-                        >
-                            {' '}
-                            {width && width < 513 && width >= 437 && <br />}
-                            {state.q_covered}{' '}
-                        </span>
-                    </label>
-                    <span
-                        className="text-redPrimary z-1"
-                        onClick={() => {
-                            setOpenChangeToken(true)
-                            tmp_q_covered.current = state.q_covered
-                        }}
-                    >
-                        {selectCoin?.type}{' '}
-                    </span>
-                    {state.p_claim > 0 && (
-                        <>
-                            {t('insurance:buy_mobile:at')} <span className="text-redPrimary">${state.p_claim} </span>
-                            {tab != 6 && '?'}
-                        </>
-                    )}
-                    {tab == 6 && (
-                        <>
-                            {t('insurance:buy_mobile:and')} {t('insurance:buy_mobile:margin')}{' '}
-                            <label>
-                                <span className="text-redPrimary">
-                                    <span
-                                        onClick={() => {
-                                            setShowInput({ isShow: true, name: 'margin' })
-                                            tmp_margin.current = state.margin
-                                        }}
-                                    >
-                                        {state.margin && state.margin}{' '}
-                                    </span>
-                                    <span
-                                        onClick={() => {
-                                            setShowInput({ isShow: true, name: 'margin' })
-                                            tmp_margin.current = state.margin
-                                        }}
-                                    >
-                                        {unitMoney}
-                                    </span>
-                                </span>
-                            </label>
-                            ?
-                        </>
-                    )}
-                </div>
-            </div>
-        )
-    }
-    const tokenAdress = useRef<string>('')
-
     useEffect(() => {
         if (loadings && isMobile) {
             setTimeout(() => {
@@ -237,307 +161,17 @@ const InsuranceFrom = () => {
         }
     }, [loadings])
 
-    const handleNext = () => {
-        const query = {
-            r_claim: Number(state.r_claim),
-            q_claim: Number(state.q_claim),
-            margin: Number(state.margin),
-            period: Number(state.period),
-            symbol: selectCoin?.type,
-            unit: unitMoney,
-            p_claim: Number(state.p_claim),
-            tab: tab,
-            q_covered: Number(state.q_covered),
-            p_market: Number(state.p_market),
-            decimalList: { ...decimalList },
-        }
-        localStorage.setItem('info_covered_state', JSON.stringify(query))
-        return router.push('/buy-covered/info-covered')
-    }
-
-    const getBalaneToken = async (symbol: string) => {
-        try {
-            if (account.address !== null) {
-                if (symbol === 'BNB') {
-                    const result = wallet.getBalance()
-                    return result.then((balance: number) => {
-                        setUserBalance(Number(balance.toFixed(decimalList.decimal_q_covered)))
-                        return Number(balance.toFixed(decimalList.decimal_q_covered))
-                    })
-                }
-
-                if (symbol === 'USDT') {
-                    const balanceUsdt = await Config.web3.contractCaller?.tokenContract(USDTaddress).contract.balanceOf(account.address)
-                    if (balanceUsdt) {
-                        if (Number(ethers.utils.formatEther(balanceUsdt)) > 0) {
-                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceUsdt)).toFixed(decimalList.decimal_q_covered)))
-
-                            return Number(ethers.utils.formatEther(balanceUsdt))
-                        } else {
-                            setUserBalance(0)
-                            return 0
-                        }
-                    } else {
-                        return false
-                    }
-                }
-
-                if (symbol === 'ETH') {
-                    const balanceETH = await Config.web3.contractCaller?.tokenContract(ETHaddress).contract.balanceOf(account.address)
-
-                    if (balanceETH) {
-                        if (Number(ethers.utils.formatEther(balanceETH)) > 0) {
-                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceETH)).toFixed(decimalList.decimal_q_covered)))
-                            return Number(ethers.utils.formatEther(balanceETH))
-                        } else {
-                            setUserBalance(0)
-                            return 0
-                        }
-                    } else {
-                        return false
-                    }
-                }
-
-                if (symbol === 'BTC') {
-                    const balanceBTC = await Config.web3.contractCaller?.tokenContract(BTCaddress).contract.balanceOf(account.address)
-                    if (balanceBTC) {
-                        if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
-                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceBTC)).toFixed(decimalList.decimal_q_covered)))
-                            return Number(ethers.utils.formatEther(balanceBTC))
-                        } else {
-                            setUserBalance(0)
-                            return 0
-                        }
-                    } else {
-                        return false
-                    }
-                }
-
-                if (symbol === 'DAI') {
-                    const balanceBTC = await Config.web3.contractCaller?.tokenContract(DAIaddress).contract.balanceOf(account.address)
-                    if (balanceBTC) {
-                        if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
-                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceBTC)).toFixed(decimalList.decimal_q_covered)))
-                            return Number(ethers.utils.formatEther(balanceBTC))
-                        } else {
-                            setUserBalance(0)
-                            return 0
-                        }
-                    } else {
-                        return false
-                    }
-                }
-            } else {
-                setUserBalance(0)
-                return 0
-            }
-        } catch (err) {
-            console.log(err)
-        }
-    }
-
     useEffect(() => {
         if (!account.address) {
             setUserBalance(0)
+            setState({ ...state, q_covered: -1, margin: -1, p_claim: -1, q_claim: 0, r_claim: 0, period: 2, p_expired: 0 })
+            percentInsurance.current = 0
+            percentMargin.current = 0
         } else {
             getBalaneToken(selectCoin?.type)
             setState({ ...state, q_covered: 0 })
         }
     }, [account.address])
-
-    const updateFormPercentMargin = (value: number) => {
-        if (!account.address) {
-            return
-        }
-        if (state.q_covered > 0 && account.address) {
-            percentMargin.current = value
-
-            if (value == 2) {
-                setState({
-                    ...state,
-                    percent_margin: value,
-                    margin: rangeMargin.min,
-                })
-            } else if (value == 10) {
-                setState({
-                    ...state,
-                    percent_margin: value,
-                    margin: rangeMargin.max,
-                })
-            } else {
-                setState({
-                    ...state,
-                    percent_margin: value,
-                    margin: Number(((value / 100) * state.q_covered * state.p_market).toFixed(decimalList.decimal_margin)),
-                })
-            }
-        }
-    }
-
-    const updateFormQCovered = (data: number) => {
-        if (!account.address) {
-            return
-        } else {
-            percentInsurance.current = data
-            if (data === 25) {
-                setState({
-                    ...state,
-                    q_covered: Number((0.25 * userBalance).toFixed(decimalList.decimal_q_covered)),
-                })
-            } else if (data === 100) {
-                setState({
-                    ...state,
-                    q_covered: userBalance,
-                })
-            } else {
-                setState({
-                    ...state,
-                    q_covered: Number(((data / 100) * userBalance).toFixed(decimalList.decimal_q_covered)),
-                })
-            }
-        }
-    }
-
-    const getConfig = (symbol: string) => {
-        if (pairConfigs) {
-            const item = pairConfigs.find((i: any) => {
-                return i.baseAsset === symbol
-            })
-
-            return setPairConfigs({ ...item })
-        }
-    }
-
-    const getStorage = () => {
-        const data = localStorage.getItem('buy_covered_state')
-        if (data !== 'undefined') {
-            const res = JSON.parse(data as string)
-            return res
-        } else {
-            return false
-        }
-    }
-
-    const refreshApi = (
-        selectTime: string | undefined,
-        selectCoin: { id?: string; name?: string; icon?: string; disable?: boolean | undefined; symbol?: string; type: any },
-    ) => {
-        const timeEnd = new Date()
-        const timeBegin = new Date()
-        setLoadings(true)
-
-        const dateTransform: any = {
-            '1H': {
-                resolution: '1m',
-                subtract: 'hours',
-                subtractBy: 1,
-            },
-            '1W': {
-                resolution: '1d',
-                subtract: 'weeks',
-                subtractBy: 1,
-            },
-            '1D': {
-                resolution: '1h',
-                subtract: 'days',
-                subtractBy: 1,
-            },
-            '1M': {
-                resolution: '1d',
-                subtract: 'months',
-                subtractBy: 1,
-            },
-            '3M': {
-                resolution: '1d',
-                subtract: 'months',
-                subtractBy: 3,
-            },
-            '1Y': {
-                resolution: '1d',
-                subtract: 'years',
-                subtractBy: 1,
-            },
-        }
-
-        // const currentTimeStamp = Math.floor(new Date().getTime() / 1000.0)
-        const currentTimeStamp = getUnixTime(new Date())
-        try {
-            if (selectCoin?.symbol !== '') {
-                const currentSelected = dateTransform[selectTime!]
-                const dateBegin = getUnixTime(sub(timeBegin, { [currentSelected.subtract]: currentSelected.subtractBy }))
-
-                if (selectTime == '1H') {
-                    fetchApiNami(`${selectCoin?.type && selectCoin?.type}${unitMoney}`, `${dateBegin}`, `${currentTimeStamp}`, '1m', setDataChart, 120)
-                } else if (selectTime == '1W' || selectTime == '1D') {
-                    timeBegin.setDate(dateBegin)
-                    fetchApiNami(
-                        `${selectCoin?.type && selectCoin?.type}${unitMoney}`,
-                        `${dateBegin}`,
-                        `${currentTimeStamp}`,
-                        dateTransform[selectTime].resolution,
-                        setDataChart,
-                        500,
-                    )
-                } else {
-                    fetchApiNami(
-                        `${selectCoin?.type && selectCoin?.type}${unitMoney}`,
-                        `${dateBegin}`,
-                        `${currentTimeStamp}`,
-                        currentSelected.resolution,
-                        setDataChart,
-                        1095,
-                    )
-                }
-            }
-        } catch (err) {
-            console.log(err)
-        } finally {
-            setLoadings(false)
-        }
-    }
-
-    const setDataIcon = async () => {
-        const res = await getStorage()
-        const tokenFilter = assetsToken.map((rs: any) => {
-            return {
-                icon: rs?.attachment,
-                id: rs?._id,
-                name: rs?.name,
-                symbol: `${rs?.symbol}USDT`,
-                type: rs?.symbol,
-                disable: !rs?.isActive,
-            }
-        })
-        if (res) {
-            if (res.form_history) {
-                let itemFilter = tokenFilter.find((rs: any) => rs.type === res?.type)
-                setSelectedCoin(itemFilter)
-                setState({
-                    ...state,
-                    symbol: itemFilter,
-                    q_covered: res?.q_covered,
-                    period: res?.period,
-                    p_claim: res?.p_claim,
-                })
-                clear.current = false
-            } else {
-                let itemFilter = tokenFilter.find((rs: any) => rs.type === res?.type)
-                setSelectedCoin(itemFilter)
-                setState({
-                    ...state,
-                    symbol: itemFilter,
-                })
-            }
-        } else {
-            let itemFilter = tokenFilter.find((rs: any) => rs.type === 'BNB')
-            setSelectedCoin(itemFilter)
-            setState({
-                ...state,
-                symbol: itemFilter,
-            })
-        }
-        setListCoin(tokenFilter)
-    }
 
     useEffect(() => {
         if (assetsToken) {
@@ -575,21 +209,6 @@ const InsuranceFrom = () => {
         }
         setState({ ...state })
     }, [selectCoin])
-
-    const createSaved = () => {
-        if (state.q_covered <= 0 || state.p_claim <= 0) {
-            return setSaved(0)
-        } else {
-            const y = state.q_covered * (state.p_claim - state.p_market)
-            const z = state.q_covered * Math.abs(state.p_claim - state.p_market)
-
-            if (state.p_claim < state.p_market) {
-                setSaved(state.q_claim + y - state.margin + z)
-            } else {
-                setSaved(state.q_claim + y - state.margin)
-            }
-        }
-    }
 
     useEffect(() => {
         validator('p_claim')
@@ -635,6 +254,7 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         createSaved()
+        clear.current = handleCheckFinal()
     }, [state])
 
     useEffect(() => {
@@ -726,8 +346,6 @@ const InsuranceFrom = () => {
                 const decimalMargin = countDecimals(item.stepSize)
                 _decimalList.decimal_margin = +decimalMargin
 
-                const MathCeil = 1 / Math.pow(10, Number(decimalMargin))
-
                 const MIN = Number((state.q_covered * state.p_market * item.minQtyRatio).toFixed(Number(decimalMargin)))
                 const MAX = Number((state.q_covered * state.p_market * item.maxQtyRatio).toFixed(Number(decimalMargin)))
                 setRangeMargin({ ...rangeP_claim, min: MIN, max: MAX })
@@ -737,6 +355,209 @@ const InsuranceFrom = () => {
             validateP_Claim(state.p_claim)
         })
     }, [pair_configs, state.q_covered, selectCoin, state.p_claim, userBalance])
+
+    const Leverage = (p_market: number, p_stop: number) => {
+        const leverage = Math.floor(p_market / Math.abs(p_market - p_stop))
+        return leverage < 1 ? 1 : leverage
+    }
+
+    const P_stop = (p_market: number, p_claim: number, hedge: number) => {
+        const diffStopfutures = 0 / 100
+        const ratio_min_profit = Math.abs(p_claim - p_market) / p_market / 2
+
+        if (p_claim > p_market) {
+            const p_stop = p_market - p_market * (hedge + ratio_min_profit - diffStopfutures)
+            return Math.abs(Number(p_stop))
+        } else {
+            const p_stop = p_market + p_market * (hedge + ratio_min_profit - diffStopfutures)
+            return Math.abs(Number(p_stop))
+        }
+    }
+
+    const componentsInputMobile = () => {
+        return (
+            <div className="mx-[1rem] relative">
+                <div>
+                    {t('insurance:buy_mobile:q_covered')}
+                    <label>
+                        <span
+                            id="label_q_coverd"
+                            className="z-1 !w-max text-redPrimary"
+                            onClick={() => {
+                                setOpenChangeToken(true)
+                                tmp_q_covered.current = state.q_covered
+                            }}
+                        >
+                            {' '}
+                            {width && width < 513 && width >= 437 && <br />}
+                            {state.q_covered}{' '}
+                        </span>
+                    </label>
+                    <span
+                        className="text-redPrimary z-1"
+                        onClick={() => {
+                            setOpenChangeToken(true)
+                            tmp_q_covered.current = state.q_covered
+                        }}
+                    >
+                        {selectCoin?.type}{' '}
+                    </span>
+                    {state.p_claim > 0 && (
+                        <>
+                            {t('insurance:buy_mobile:at')} <span className="text-redPrimary">${state.p_claim} </span>
+                            {tab != 6 && '?'}
+                        </>
+                    )}
+                    {tab == 6 && (
+                        <>
+                            {t('insurance:buy_mobile:and')} {t('insurance:buy_mobile:margin')}{' '}
+                            <label>
+                                <span className="text-redPrimary">
+                                    <span
+                                        onClick={() => {
+                                            setShowInput({ isShow: true, name: 'margin' })
+                                            tmp_margin.current = state.margin
+                                        }}
+                                    >
+                                        {state.margin && state.margin}{' '}
+                                    </span>
+                                    <span
+                                        onClick={() => {
+                                            setShowInput({ isShow: true, name: 'margin' })
+                                            tmp_margin.current = state.margin
+                                        }}
+                                    >
+                                        {unitMoney}
+                                    </span>
+                                </span>
+                            </label>
+                            ?
+                        </>
+                    )}
+                </div>
+            </div>
+        )
+    }
+
+    const refreshApi = (
+        selectTime: string | undefined,
+        selectCoin: { id?: string; name?: string; icon?: string; disable?: boolean | undefined; symbol?: string; type: any },
+    ) => {
+        const timeEnd = new Date()
+        const timeBegin = new Date()
+        setLoadings(true)
+
+        const dateTransform: any = {
+            '1H': {
+                resolution: '1m',
+                subtract: 'hours',
+                subtractBy: 1,
+            },
+            '1W': {
+                resolution: '1d',
+                subtract: 'weeks',
+                subtractBy: 1,
+            },
+            '1D': {
+                resolution: '1h',
+                subtract: 'days',
+                subtractBy: 1,
+            },
+            '1M': {
+                resolution: '1d',
+                subtract: 'months',
+                subtractBy: 1,
+            },
+            '3M': {
+                resolution: '1d',
+                subtract: 'months',
+                subtractBy: 3,
+            },
+            '1Y': {
+                resolution: '1d',
+                subtract: 'years',
+                subtractBy: 1,
+            },
+        }
+
+        const currentTimeStamp = getUnixTime(new Date())
+        try {
+            if (selectCoin?.symbol !== '') {
+                const currentSelected = dateTransform[selectTime!]
+                const dateBegin = getUnixTime(sub(timeBegin, { [currentSelected.subtract]: currentSelected.subtractBy }))
+                timeBegin.setDate(dateBegin)
+                fetchApiNami(
+                    `${selectCoin?.type && selectCoin?.type}${unitMoney}`,
+                    `${dateBegin}`,
+                    `${currentTimeStamp}`,
+                    dateTransform[selectTime!].resolution,
+                    setDataChart,
+                )
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            setLoadings(false)
+        }
+    }
+
+    const setDataIcon = async () => {
+        const res = await getStorage()
+        const tokenFilter = assetsToken.map((rs: any) => {
+            return {
+                icon: rs?.attachment,
+                id: rs?._id,
+                name: rs?.name,
+                symbol: `${rs?.symbol}USDT`,
+                type: rs?.symbol,
+                disable: !rs?.isActive,
+            }
+        })
+        if (res) {
+            if (res.form_history) {
+                let itemFilter = tokenFilter.find((rs: any) => rs.type === res?.type)
+                setSelectedCoin(itemFilter)
+                setState({
+                    ...state,
+                    symbol: itemFilter,
+                    q_covered: res?.q_covered,
+                    period: res?.period,
+                    p_claim: res?.p_claim,
+                })
+                clear.current = false
+            } else {
+                let itemFilter = tokenFilter.find((rs: any) => rs.type === res?.type)
+                setSelectedCoin(itemFilter)
+                setState({
+                    ...state,
+                    symbol: itemFilter,
+                })
+            }
+        } else {
+            let itemFilter = tokenFilter.find((rs: any) => rs.type === 'BNB')
+            setSelectedCoin(itemFilter)
+            setState({
+                ...state,
+                symbol: itemFilter,
+            })
+        }
+        setListCoin(tokenFilter)
+    }
+
+    const createSaved = () => {
+        if (state.q_covered <= 0 || state.p_claim <= 0) {
+            return setSaved(0)
+        } else {
+            const y = state.q_covered * (state.p_claim - state.p_market)
+            const z = state.q_covered * Math.abs(state.p_claim - state.p_market)
+
+            if (state.p_claim < state.p_market) {
+                setSaved(state.q_claim + y - state.margin + z)
+            } else {
+                setSaved(state.q_claim + y - state.margin)
+            }
+        }
+    }
 
     const validateP_Claim = (value: number) => {
         const _rangeP_claim = rangeP_claim
@@ -926,7 +747,6 @@ const InsuranceFrom = () => {
         </Popover>
     )
 
-    const [isCanSave, setIsCanSave] = useState<boolean>(false)
     const onHandleChange = (key: string, e: any) => {
         const value = +e.value
         if (userBalance > 0 && key === 'margin') {
@@ -1030,19 +850,6 @@ const InsuranceFrom = () => {
         }
     }
 
-    useEffect(() => {
-        clear.current = handleCheckFinal()
-    }, [state])
-
-    const table = useRef<any>(null)
-    const container = useRef<any>(null)
-    const mouseDown = useRef(false)
-    const startX = useRef<any>(null)
-    const scrollLeft = useRef<any>(null)
-    const startY = useRef<any>(null)
-    const scrollTop = useRef<any>(null)
-    const handleClick = useRef(true)
-
     const startDragging = (e: any) => {
         container.current.classList.add('cursor-grabbing')
         mouseDown.current = true
@@ -1057,6 +864,178 @@ const InsuranceFrom = () => {
     const stopDragging = (event: any) => {
         container.current.classList.remove('cursor-grabbing')
         mouseDown.current = false
+    }
+
+    const updateFormPercentMargin = (value: number) => {
+        if (!account.address) {
+            return
+        }
+        if (state.q_covered > 0 && account.address) {
+            percentMargin.current = value
+
+            if (value == 2) {
+                setState({
+                    ...state,
+                    percent_margin: value,
+                    margin: rangeMargin.min,
+                })
+            } else if (value == 10) {
+                setState({
+                    ...state,
+                    percent_margin: value,
+                    margin: rangeMargin.max,
+                })
+            } else {
+                setState({
+                    ...state,
+                    percent_margin: value,
+                    margin: Number(((value / 100) * state.q_covered * state.p_market).toFixed(decimalList.decimal_margin)),
+                })
+            }
+        }
+    }
+
+    const updateFormQCovered = (data: number) => {
+        if (!account.address) {
+            return
+        } else {
+            percentInsurance.current = data
+            if (data === 25) {
+                setState({
+                    ...state,
+                    q_covered: Number((0.25 * userBalance).toFixed(decimalList.decimal_q_covered)),
+                })
+            } else if (data === 100) {
+                setState({
+                    ...state,
+                    q_covered: userBalance,
+                })
+            } else {
+                setState({
+                    ...state,
+                    q_covered: Number(((data / 100) * userBalance).toFixed(decimalList.decimal_q_covered)),
+                })
+            }
+        }
+    }
+
+    const getConfig = (symbol: string) => {
+        if (pairConfigs) {
+            const item = pairConfigs.find((i: any) => {
+                return i.baseAsset === symbol
+            })
+
+            return setPairConfigs({ ...item })
+        }
+    }
+
+    const getStorage = () => {
+        const data = localStorage.getItem('buy_covered_state')
+        if (data !== 'undefined') {
+            const res = JSON.parse(data as string)
+            return res
+        } else {
+            return false
+        }
+    }
+
+    const handleNext = () => {
+        const query = {
+            r_claim: Number(state.r_claim),
+            q_claim: Number(state.q_claim),
+            margin: Number(state.margin),
+            period: Number(state.period),
+            symbol: selectCoin?.type,
+            unit: unitMoney,
+            p_claim: Number(state.p_claim),
+            tab: tab,
+            q_covered: Number(state.q_covered),
+            p_market: Number(state.p_market),
+            decimalList: { ...decimalList },
+        }
+        localStorage.setItem('info_covered_state', JSON.stringify(query))
+        return router.push('/buy-covered/info-covered')
+    }
+
+    const getBalaneToken = async (symbol: string) => {
+        try {
+            if (account.address !== null) {
+                if (symbol === 'BNB') {
+                    const result = wallet.getBalance()
+                    return result.then((balance: number) => {
+                        setUserBalance(Number(balance.toFixed(decimalList.decimal_q_covered)))
+                        return Number(balance.toFixed(decimalList.decimal_q_covered))
+                    })
+                }
+
+                if (symbol === 'USDT') {
+                    const balanceUsdt = await Config.web3.contractCaller?.tokenContract(USDTaddress).contract.balanceOf(account.address)
+                    if (balanceUsdt) {
+                        if (Number(ethers.utils.formatEther(balanceUsdt)) > 0) {
+                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceUsdt)).toFixed(decimalList.decimal_q_covered)))
+
+                            return Number(ethers.utils.formatEther(balanceUsdt))
+                        } else {
+                            setUserBalance(0)
+                            return 0
+                        }
+                    } else {
+                        return false
+                    }
+                }
+
+                if (symbol === 'ETH') {
+                    const balanceETH = await Config.web3.contractCaller?.tokenContract(ETHaddress).contract.balanceOf(account.address)
+
+                    if (balanceETH) {
+                        if (Number(ethers.utils.formatEther(balanceETH)) > 0) {
+                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceETH)).toFixed(decimalList.decimal_q_covered)))
+                            return Number(ethers.utils.formatEther(balanceETH))
+                        } else {
+                            setUserBalance(0)
+                            return 0
+                        }
+                    } else {
+                        return false
+                    }
+                }
+
+                if (symbol === 'BTC') {
+                    const balanceBTC = await Config.web3.contractCaller?.tokenContract(BTCaddress).contract.balanceOf(account.address)
+                    if (balanceBTC) {
+                        if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
+                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceBTC)).toFixed(decimalList.decimal_q_covered)))
+                            return Number(ethers.utils.formatEther(balanceBTC))
+                        } else {
+                            setUserBalance(0)
+                            return 0
+                        }
+                    } else {
+                        return false
+                    }
+                }
+
+                if (symbol === 'DAI') {
+                    const balanceBTC = await Config.web3.contractCaller?.tokenContract(DAIaddress).contract.balanceOf(account.address)
+                    if (balanceBTC) {
+                        if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
+                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceBTC)).toFixed(decimalList.decimal_q_covered)))
+                            return Number(ethers.utils.formatEther(balanceBTC))
+                        } else {
+                            setUserBalance(0)
+                            return 0
+                        }
+                    } else {
+                        return false
+                    }
+                }
+            } else {
+                setUserBalance(0)
+                return 0
+            }
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     return (
@@ -1080,22 +1059,17 @@ const InsuranceFrom = () => {
                             )}
                             <div className="px-4 mb:px-10 lg:px-20">
                                 <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
-                                    {
-                                        // head Insurance
-                                        <HeaderContent state={tab} setState={setTab} props={state} setProps={setState} wallet={wallet} auth={account.address} />
-                                    }
+                                    <HeaderContent state={tab} setState={setTab} props={state} setProps={setState} wallet={wallet} auth={account.address} />
 
                                     <div className="flex flex-row mb-[8rem] overflow-hidden">
                                         <div className="w-8/12">
                                             {
-                                                //chart
                                                 <div
                                                     className={`shadow border border-1 border-divider h-auto rounded-xl  p-8`}
                                                     onClick={() => {
                                                         setChosing(false)
                                                     }}
                                                 >
-                                                    {/*head*/}
                                                     <div id="tour_statistics" data-tut="tour_statistics">
                                                         <div className={'pb-2 text-sm leading-5 text-txtSecondary flex items-center space-x-6'}>
                                                             <div className={'w-full flex flex-row items-center'}>
@@ -1143,9 +1117,7 @@ const InsuranceFrom = () => {
                                                         </div>
                                                     </div>
 
-                                                    {/*end head*/}
                                                     <div data-tut="tour_chart" id="tour_chart" className="mt-6 mb-4">
-                                                        {/*body*/}
                                                         <div className={'flex flex-row relative'}>
                                                             <Suspense fallback={`Loading...`}>
                                                                 <ChartComponent
@@ -1157,7 +1129,7 @@ const InsuranceFrom = () => {
                                                                     p_expired={Number(state.p_expired)}
                                                                     setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
                                                                     setP_Market={(data: number) => setState({ ...state, p_market: data })}
-                                                                    resolution={`${selectTime}`}
+                                                                    resolution={state.period}
                                                                 />
                                                                 <svg
                                                                     className={`absolute right-0 z-2`}
@@ -1179,10 +1151,7 @@ const InsuranceFrom = () => {
                                                                 </svg>
                                                             </Suspense>
                                                         </div>
-                                                        {/*end body*/}
 
-                                                        {/*footer*/}
-                                                        {/* fill of time */}
                                                         <div className={'flex flex-row justify-between items-center w-full mt-5'}>
                                                             {listTime.map((time, key) => {
                                                                 return (
@@ -1200,7 +1169,6 @@ const InsuranceFrom = () => {
                                                                 )
                                                             })}
                                                         </div>
-                                                        {/*P-Claim*/}
                                                         <div className={'my-6'}>
                                                             <span className={'flex flex-row items-center text-txtSecondary text-sm'}>
                                                                 <span className={'mr-2'}>P-Claim</span>
@@ -1223,7 +1191,6 @@ const InsuranceFrom = () => {
                                                         </div>
                                                     </div>
 
-                                                    {/* Period */}
                                                     <div className={'mt-5 text-sm '} data-tut="tour_period" id="tour_period">
                                                         <span className="flex flex-row items-center text-txtSecondary">
                                                             <span className={'mr-[0.5rem]'}>Period ({menu[8].name})</span>
@@ -1270,29 +1237,25 @@ const InsuranceFrom = () => {
 
                                         <div className="w-4/12 flex flex-col justify-between shadow border border-1 border-divider rounded-xl p-8 ml-[1.5rem]">
                                             <div>
-                                                {
-                                                    //description
-                                                    saved > 0 && (
-                                                        <div
-                                                            className={
-                                                                'flex flex-col justify-center items-center mb-[2.5rem] max-w-7xl 4xl:max-w-screen-3xl m-auto'
-                                                            }
-                                                            onClick={() => {
-                                                                setChosing(false)
-                                                            }}
-                                                        >
-                                                            <CheckCircle size={68}></CheckCircle>
-                                                            <span className={'font-medium text-base text-txtPrimary mt-[1rem]'}>
-                                                                {`${t('insurance:buy:saved')} `}
-                                                                <span className={'text-red'}>
-                                                                    ${saved.toFixed(4)} {unitMoney}
-                                                                </span>{' '}
-                                                                {t('insurance:buy:sub_saved')}
-                                                            </span>
-                                                        </div>
-                                                    )
-                                                }
-                                                {/*Only Show Claim And Margin*/}
+                                                {saved > 0 && (
+                                                    <div
+                                                        className={
+                                                            'flex flex-col justify-center items-center mb-[2.5rem] max-w-7xl 4xl:max-w-screen-3xl m-auto'
+                                                        }
+                                                        onClick={() => {
+                                                            setChosing(false)
+                                                        }}
+                                                    >
+                                                        <CheckCircle size={68}></CheckCircle>
+                                                        <span className={'font-medium text-base text-txtPrimary mt-[1rem]'}>
+                                                            {`${t('insurance:buy:saved')} `}
+                                                            <span className={'text-red'}>
+                                                                ${saved.toFixed(4)} {unitMoney}
+                                                            </span>{' '}
+                                                            {t('insurance:buy:sub_saved')}
+                                                        </span>
+                                                    </div>
+                                                )}
                                                 {
                                                     <div
                                                         className={'flex flex-col w-full justify-center items-center hover:cursor-default z-50'}
@@ -1412,7 +1375,6 @@ const InsuranceFrom = () => {
                                                 }
                                             </div>
 
-                                            {/* the next level*/}
                                             {
                                                 <div
                                                     className={`flex flex-col justify-center items-center mb-[2rem] `}
@@ -1450,7 +1412,6 @@ const InsuranceFrom = () => {
                                                                             router.push(
                                                                                 'https://nami.today/bao-hiem-trong-crypto-manh-dat-mau-mo-can-duoc-khai-pha/',
                                                                             )
-                                                                            // setShowGuide(true)
                                                                         }}
                                                                     >
                                                                         <span>{t('insurance:buy:help1')}</span>
@@ -1780,7 +1741,6 @@ const InsuranceFrom = () => {
                                     </Modal>
                                 )}
                                 {
-                                    //sticky
                                     <div className={`h-[32px] flex flex-row justify-between items-center mx-[1rem] mt-[24px] mb-[1rem]  top-0 bg-white z-50`}>
                                         <div
                                             onClick={() => {
@@ -1858,7 +1818,7 @@ const InsuranceFrom = () => {
                                                     setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
                                                     setP_Market={(data: number) => setState({ ...state, p_market: data })}
                                                     isMobile={isMobile}
-                                                    resolution={selectTime}
+                                                    resolution={state.period}
                                                 ></ChartComponent>
                                             </Suspense>
                                             <svg
@@ -2043,6 +2003,7 @@ const InsuranceFrom = () => {
                                                             <span
                                                                 className={'text-red pl-[0.5rem]'}
                                                                 onClick={() => {
+                                                                    // khi nào hỗ trợ đỏi đơn vị tiền thi bỏ command
                                                                     // setShowChangeUnit({ ...showChangeUnit, isShow: true, name: `${t('insurance:unit:margin')}` })
                                                                 }}
                                                             >
@@ -2081,15 +2042,13 @@ const InsuranceFrom = () => {
     )
 }
 
-export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any, timeLine: number) => {
+export const fetchApiNami = async (symbol: string, from: string, to: string, resolution: string, setDataChart: any) => {
     try {
-        const ts = Math.round(new Date().getTime() / 1000)
-        const tsYesterday = ts - timeLine * (24 * 3600)
         const params = {
             broker: 'NAMI_SPOT',
             symbol,
             from,
-            to: ts,
+            to,
             resolution: resolution,
         }
         const test = await fetchApi({ url: API_GET_PRICE_CHART, baseURL: '', params: params })
