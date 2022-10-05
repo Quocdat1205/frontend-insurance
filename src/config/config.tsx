@@ -46,11 +46,25 @@ class Config {
         },
         97: {
             urls: ['https://data-seed-prebsc-1-s1.binance.org:8545'],
-            name: 'bscTestnet',
+            name: 'Smart Chain - Testnet',
+            chainId: '0x61',
+            nativeCurrency: {
+                name: 'Binance Coin',
+                symbol: 'BNB',
+                decimals: 18,
+            },
+            blockExplorerUrls: ['https://bscscan.com'],
         },
         56: {
             urls: ['https://bsc-dataseed.binance.org'],
             name: 'mainnet',
+            chainId: '0x38',
+            nativeCurrency: {
+                name: 'Binance Coin',
+                symbol: 'BNB',
+                decimals: 18,
+            },
+            blockExplorerUrls: ['https://bscscan.com'],
         },
         69: {
             urls: ['https://kovan-optimistic.etherscan.io'],

@@ -4,7 +4,6 @@ import React from 'react'
 import styled from 'styled-components'
 import Button from 'components/common/Button/Button'
 import useWindowSize from 'hooks/useWindowSize'
-import { screens } from 'utils/constants'
 
 const SloganLanding = () => {
     const { t } = useTranslation()
@@ -38,11 +37,18 @@ const SloganLanding = () => {
                         </Button>
                     </div>
                 </div>
-                {/*  */}
                 <img
+                    alt={'slogan'}
                     srcSet={`/images/screens/landing-page/bg_home.png 2x`}
-                    className="w-full sm:w-auto m-auto absolute h-full bottom-[196px] right-0 mx-auto  lg:left-auto  left-0 lg:bottom-[15.75rem]
-                     max-h-[200px] sm:!max-h-[506px] 1xs:max-h-[300px] tiny:max-h-[240px] sm:!max-h-[400px] xl:1max-h-[463px] 2xl:!max-h-[663px] homeNav:!max-h-[406px]"
+                    className="w-full homeNav:w-auto m-auto absolute h-full bottom-[196px] right-0 mx-auto
+                     left-0
+                     homeNav:left-auto
+                     homeNav:bottom-[15.75rem]
+                     max-h-[150px]
+                     xs:max-h-[calc(100%-28rem)]
+                     tiny:max-h-[calc(100%-35rem)]
+                     homeNav:max-h-[calc(100%-22rem)]
+                    "
                 />
             </div>
         </Background>

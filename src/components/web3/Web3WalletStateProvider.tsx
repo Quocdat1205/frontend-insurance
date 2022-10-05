@@ -7,18 +7,16 @@ import { getConnectorInfo, getAddChainParameters, ConnectorId, ConnectorsData } 
 import { ContractCaller } from 'components/web3/contract/index'
 import { Web3WalletContext } from 'hooks/useWeb3Wallet'
 import Config from 'config/config'
-import { RootStore, useAppSelector, useAppDispatch } from 'redux/store'
+import { RootStore, useAppSelector } from 'redux/store'
 import { isMobile } from 'react-device-detect'
-import { setAccount, setting } from 'redux/actions/setting'
 
 const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorId; name: string; connector: Connector }>) => {
-    const { connector, account, chainId, isActive, error, provider, isActivating } = useWeb3React()
+    const { connector, account, chainId, isActive, error, provider } = useWeb3React()
     const connected = useAppSelector((state: RootStore) => state.setting.account)
 
     const activate = async (connectorId: ConnectorId, _chainId?: number) => {
         const wallet = sessionStorage.getItem('PUBLIC_WALLET')
         const { connector: _connector } = connectorsData[connectorId ?? connected?.wallet ?? wallet]
-        _connector.deactivate()
         _connector instanceof WalletConnect
             ? await _connector.activate(_chainId)
             : await _connector.activate(!_chainId ? undefined : getAddChainParameters(_chainId))
@@ -31,14 +29,6 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
     useEffect(() => {
         connector.connectEagerly && connector.connectEagerly()
     }, [connector])
-
-    // useEffect(() => {
-    //     if (!isActive && !loading && connected?.address) {
-    //         Config.logout()
-    //     } else if (isActive && !connected?.address) {
-    //         dispatch(setting())
-    //     }
-    // }, [isActive, loading, connected, isActivating])
 
     const contractCaller = useMemo(() => {
         return provider ? new ContractCaller(provider as providers.Web3Provider) : null
@@ -90,12 +80,7 @@ function Web3WalletStateProvider({ children, connectorsData }: { children: React
         }
     }, [state.account, state.contractCaller])
 
-    return (
-        // cloneElement(children, {
-        //     web3: state,
-        // })
-        <Web3WalletContext.Provider value={state}>{children}</Web3WalletContext.Provider>
-    )
+    return <Web3WalletContext.Provider value={state}>{children}</Web3WalletContext.Provider>
 }
 
 export default Web3WalletStateProvider

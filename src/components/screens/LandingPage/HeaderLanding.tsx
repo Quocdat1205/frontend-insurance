@@ -1,6 +1,6 @@
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import React, { useCallback, useState } from 'react'
+import React, { memo, useCallback, useState } from 'react';
 import { X } from 'react-feather'
 import Button from 'components/common/Button/Button'
 import ButtonLanguage from 'components/common/Button/ButtonLanguage'
@@ -122,4 +122,4 @@ const HeaderLanding = () => {
     )
 }
 
-export default HeaderLanding
+export default memo(HeaderLanding)

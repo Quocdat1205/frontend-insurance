@@ -48,6 +48,7 @@ const Banner = () => {
                 value: 119059000,
                 decimal: unitConfig?.assetDigit ?? 2,
                 tooltip: 'common:terminology:q_covered',
+                suffix: 'M',
             },
             {
                 title: t('home:landing:total_margin'),
@@ -56,6 +57,7 @@ const Banner = () => {
                 value: 79000,
                 decimal: unitConfig?.assetDigit ?? 2,
                 tooltip: 'common:terminology:margin',
+                prefix: '$',
             },
             {
                 title: t('home:landing:users'),
@@ -87,7 +89,7 @@ const Banner = () => {
     return (
         <section className="pt-10 sm:pt-[7.5rem]">
             <div className="px-4 mb:px-10 lg:px-20">
-                <div className="text-2xl sm:text-5xl font-semibold mb-6 max-w-screen-insurance m-auto">{t('home:home:statistics')}</div>
+                <div className="text-2xl sm:text-5xl font-semibold mb-6 max-w-screen-insurance 4xl:max-w-screen-3xl m-auto">{t('home:home:statistics')}</div>
             </div>
             <Background isMobile={isMobile}>
                 <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto text-center flex flex-col space-y-8 sm:space-y-6">
@@ -99,7 +101,7 @@ const Banner = () => {
                             data-aos-delay={DURATION_AOS}
                         >
                             {/* {formatNumber(general?.q_claim, 4)} */}
-                            129,000
+                            129,000M
                         </div>
                     </div>
 
@@ -122,6 +124,7 @@ const Banner = () => {
                                         )}
                                     </div>
                                     <div className="font-semibold text-2xl" data-aos="fade-up" data-aos-delay={DURATION_AOS} data-aos-offset="50">
+                                        {item?.prefix || ''}
                                         {formatNumber(item.value, item.decimal)}
                                         {item.suffix}
                                     </div>

@@ -20,21 +20,19 @@ const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) 
         <div
             className={`max-w-screen-layout 4xl:max-w-screen-3xl  mt-[2rem] ${
                 auth ? 'mb-[3rem] ' : 'mb-[1rem] '
-            } grid grid-cols-12 content-center items-center justify-between`}
+            } grid grid-cols-12 content-center items-start justify-between`}
             onClick={() => {
                 setDrop(false)
             }}
         >
-            <div className="flex items-center font-semibold col-span-4">
+            <div
+                className="flex items-center font-semibold col-span-4 hover:cursor-pointer"
+                onClick={() => {
+                    return router.push('/home')
+                }}
+            >
                 <LeftArrow />
-                <span
-                    className={'hover:cursor-pointer ml-2'}
-                    onClick={() => {
-                        return router.push('/home')
-                    }}
-                >
-                    {t('insurance:buy:back_to_home')}
-                </span>
+                <span className={'hover:cursor-pointer ml-2'}>{t('insurance:buy:back_to_home')}</span>
             </div>
 
             <div
@@ -48,7 +46,7 @@ const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) 
                 {
                     //checkAuth
                     auth == null ? (
-                        <div className="w-full flex flex-col justify-center items-center max-w-screen-layout 4xl:max-w-screen-3xl m-auto mb-[1rem]">
+                        <div className="w-full mt-[2rem] flex flex-col justify-center items-center max-w-screen-layout 4xl:max-w-screen-3xl m-auto mb-[1rem]">
                             <Button
                                 variants={'primary'}
                                 className={`bg-red h-[40.5rem] w-[374px] flex justify-center items-center text-white rounded-[0.5rem] py-[12px]`}

@@ -107,7 +107,7 @@ const BannerLanding = () => {
                                 data-aos-delay={0}
                             >
                                 {/* ${formatCurrency(general?.q_claim, unitConfig?.assetDigit ?? 2)} */}
-                                $129,000
+                                $129,000M
                             </div>
 
                             <div className={'flex flex-row justify-center items-center text-txtSecondary text-xs lg:text-base'}>

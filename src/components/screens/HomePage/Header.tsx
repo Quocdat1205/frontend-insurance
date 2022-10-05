@@ -1,6 +1,6 @@
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { ChevronDown, ChevronUp, X } from 'react-feather'
 import Button from 'components/common/Button/Button'
 import ButtonLanguage from 'components/common/Button/ButtonLanguage'
@@ -19,7 +19,7 @@ import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
 import { API_GET_INFO_USER } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { screens } from 'utils/constants'
-import { getModalSubscribeStorage, removeLocalStorage, setModalSubscribeStorage } from 'utils/utils'
+import { getModalSubscribeStorage, isFunction, removeLocalStorage, setModalSubscribeStorage } from 'utils/utils'
 
 const Header = () => {
     const { t } = useTranslation()
@@ -28,7 +28,7 @@ const Header = () => {
     const router = useRouter()
     const isMobile = width && width <= screens.drawer
     const [visible, setVisible] = useState<boolean>(false)
-    const [isHover, setIsHover] = useState<boolean>(false)
+    const [isClickedMenu, setIsClickedMenu] = useState<boolean>(false)
     const dispatch = useAppDispatch()
     const account = useAppSelector((state: RootStore) => state.setting.account)
     const loading_account = useAppSelector((state: RootStore) => state.setting.loading_account)
@@ -50,7 +50,7 @@ const Header = () => {
         if (isMobile) setVisible(false)
     }
 
-    const onClickMenuAddress = async (e: any) => {
+    const onClickMenuAddress = useCallback(async (e: any) => {
         let data = null
         switch (e?.menuId) {
             case 'disconnect':
@@ -60,6 +60,7 @@ const Header = () => {
                 removeLocalStorage(Config.MODAL_REGISTER_EMAIL)
                 break
             case Config.MODAL_UPDATE_EMAIL:
+                setIsClickedMenu(false)
                 // check update or register new email
                 data = await getInfo()
                 setShowModalSubscribe(true)
@@ -70,14 +71,14 @@ const Header = () => {
             default:
                 break
         }
+    }, [])
+
+    const handleClickMenu = (hover: boolean) => {
+        setIsClickedMenu(!hover)
     }
 
-    const handleMouseHover = (show: boolean) => {
-        setIsHover(show)
-    }
-
-    const NameComponent = ({ network, accounnt, isMobile }: any) => (
-        <div className="sm:px-3 p-2 mb:py-2 bg-hover rounded-[5px] flex items-center space-x-2">
+    const NameComponent = ({ network, accounnt, isMobile, isClickedMenu: hover }: any) => (
+        <div onClick={() => handleClickMenu(hover)} className="sm:px-3 p-2 mb:py-2 bg-hover rounded-[5px] flex items-center space-x-2">
             {network && <img src={network?.icon} width={24} height={24} />}
             {network && <div>{network?.chain}</div>}
             <div className="rounded-[5px] bg-white overflow-hidden px-2 sm:px-4 py-1">{`${account?.address?.substr(
@@ -85,7 +86,7 @@ const Header = () => {
                 isMobile ? 2 : 4,
             )}...${account?.address?.substr(-4)}`}</div>
             {/* <ChevronDown size={18} /> */}
-            {isHover ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+            {hover ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
         </div>
     )
 
@@ -93,6 +94,7 @@ const Header = () => {
         network,
         account,
         isMobile,
+        isClickedMenu,
     }
 
     const getInfo = async () => {
@@ -120,19 +122,22 @@ const Header = () => {
         getInfo()
     }, [account])
 
-    const menuAddress = [
-        isMobile
-            ? { menuId: 'account-info', name: 'common:header:account_info_title', parentId: 0 }
-            : {
-                  menuId: 'account-info',
-                  name: NameComponent,
-                  parentId: 0,
-                  hideArrowIcon: true,
-                  isDropdown: true,
-                  nameComponentProps: { ...props },
-              },
-        ...Config.subMenu,
-    ]
+    const menuAddress = useMemo(
+        () => [
+            isMobile
+                ? { menuId: 'account-info', name: 'common:header:account_info_title', parentId: 0 }
+                : {
+                    menuId: 'account-info',
+                    name: NameComponent,
+                    parentId: 0,
+                    hideArrowIcon: true,
+                    isDropdown: true,
+                    nameComponentProps: { ...props },
+                },
+            ...Config.subMenu,
+        ],
+        [account, isMobile, NameComponent, isClickedMenu],
+    )
 
     const handleCloseModal = () => {
         setShowModalSubscribe(false)
@@ -143,7 +148,7 @@ const Header = () => {
         const baseMenu = [...Config.homeMenu]
         // check wallet connected
         return account?.address ? [...menuAddress, ...baseMenu] : baseMenu
-    }, [isMobile, account])
+    }, [isMobile, account, menuAddress])
 
     return (
         <header className="header-landing h-[4rem] sm:h-[4.25rem] flex items-center px-4 homeNav:px-10 border-b border-divider sticky top-0 bg-white z-[50]">
@@ -159,8 +164,7 @@ const Header = () => {
 
                     {!isMobile && (
                         <div className="hidden mb:block">
-                            <Menu data={Config.homeMenu} onChange={onChangeMenu} />
-                            {/* <Menu data={menuConfig} onChange={onChangeMenu} network={network} acount={account} isMobile={isMobile}/> */}
+                            <Menu data={Config.homeMenu} onChange={onChangeMenu} isClickedMenu={isClickedMenu} />
                         </div>
                     )}
                     {!loading_account && (
@@ -168,7 +172,7 @@ const Header = () => {
                             <>
                                 {account?.address && <Notifications />}
                                 {account?.address && !isMobile && (
-                                    <Menu data={menuAddress} cbOnMouseOut={handleMouseHover} cbOnMouseOver={handleMouseHover} onChange={onChangeMenu} />
+                                    <Menu data={menuAddress} onChange={onChangeMenu} handleClickOutside={handleClickMenu} isClickedMenu={isClickedMenu} />
                                 )}
                                 {account?.address && network && isMobile && (
                                     <div className="p-1 py-[6px] bg-hover rounded-[5px] flex items-center space-x-2">
@@ -216,4 +220,4 @@ const Header = () => {
     )
 }
 
-export default Header
+export default memo(Header)
