@@ -48,6 +48,7 @@ const Banner = () => {
                 value: 119059000,
                 decimal: unitConfig?.assetDigit ?? 2,
                 tooltip: 'common:terminology:q_covered',
+                prefix: '$',
                 suffix: 'M',
             },
             {
@@ -58,6 +59,7 @@ const Banner = () => {
                 decimal: unitConfig?.assetDigit ?? 2,
                 tooltip: 'common:terminology:margin',
                 prefix: '$',
+                suffix: 'M',
             },
             {
                 title: t('home:landing:users'),
