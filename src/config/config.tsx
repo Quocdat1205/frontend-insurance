@@ -31,7 +31,7 @@ class Config {
         .split(',')
         .map((chain) => Number(chain))
 
-    static networks: { [chainId: number]: BasicChainInformation } = {
+    static networks: { [chainId: number]: BasicChainInformation | ExtendedChainInformation } = {
         1: {
             urls: ['https://mainnet.infura.io/v3/f87b967bc65a41c0a1a25635493fa482'],
             name: 'Mainnet',
@@ -47,16 +47,18 @@ class Config {
         97: {
             urls: ['https://data-seed-prebsc-1-s1.binance.org:8545'],
             name: 'Smart Chain - Testnet',
+            chainId: '0x61',
             nativeCurrency: {
                 name: 'Binance Coin',
                 symbol: 'BNB',
                 decimals: 18,
             },
-            blockExplorerUrls: ['https://testnet.bscscan.com'],
+            blockExplorerUrls: ['https://bscscan.com'],
         },
         56: {
             urls: ['https://bsc-dataseed.binance.org'],
             name: 'mainnet',
+            chainId: '0x38',
             nativeCurrency: {
                 name: 'Binance Coin',
                 symbol: 'BNB',

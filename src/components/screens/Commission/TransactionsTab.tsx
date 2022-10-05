@@ -13,9 +13,10 @@ import { formatAddress, formatCurrency, formatTime } from 'utils/utils'
 interface TransactionsTab {
     account: any
     unitConfig: UnitConfig
+    doReload: boolean
 }
 
-const TransactionsTab = ({ account, unitConfig }: TransactionsTab) => {
+const TransactionsTab = ({ account, unitConfig, doReload }: TransactionsTab) => {
     const { t } = useTranslation()
     const { width } = useWindowSize()
     const isMobile = (width && width <= 640) || mobile
@@ -46,7 +47,7 @@ const TransactionsTab = ({ account, unitConfig }: TransactionsTab) => {
                 setLoading(false)
             }, 500)
         }
-    }, [filter, account])
+    }, [filter, account, doReload])
 
     const getData = async () => {
         setLoading(true)
@@ -55,7 +56,7 @@ const TransactionsTab = ({ account, unitConfig }: TransactionsTab) => {
                 url: API_GET_COMMISSION_HISTORY,
                 options: { method: 'GET' },
                 params: {
-                    myRef: 'xW4wXC',
+                    myRef: account.myRef,
                     ...filter,
                 },
             })
@@ -79,13 +80,18 @@ const TransactionsTab = ({ account, unitConfig }: TransactionsTab) => {
         return type === 'in' ? 'Nhận hoa hồng' : 'Rút hoa hồng'
     }
 
+    const addressTypes: any = {
+        in: 'Từ',
+        out: 'Đến',
+    }
+
     const columns = useMemo(
         () => [
             {
                 Header: 'Ngày phát sinh',
                 accessor: 'createdAt',
                 minWidth: 200,
-                Cell: (e: any) => formatTime(e.value, 'dd.MM.yyyy'),
+                Cell: (e: any) => formatTime(e.value, 'dd.MM.yyyy hh:mm'),
             },
             {
                 Header: 'Loại giao dịch',
@@ -103,7 +109,11 @@ const TransactionsTab = ({ account, unitConfig }: TransactionsTab) => {
                 Header: 'Địa chỉ ví',
                 accessor: 'walletAddress',
                 minWidth: 200,
-                Cell: (e: any) => <div>{formatAddress(e.value)}</div>,
+                Cell: (e: any) => (
+                    <div>
+                        {addressTypes[e?.row?.original.type]} {formatAddress(e.value)}
+                    </div>
+                ),
             },
         ],
         [unitConfig],
