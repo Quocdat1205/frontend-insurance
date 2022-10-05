@@ -10,6 +10,9 @@ import fetchApi from 'services/fetch-api'
 import { UnitConfig } from 'types/types'
 import { formatAddress, formatCurrency, formatTime } from 'utils/utils'
 
+// change this to mainnet on prod
+const network = 'https://testnet.bscscan.com/address'
+const genAddressLink = (address: string) => `${network}/${address}#tokentxns`
 interface TransactionsTab {
     account: any
     unitConfig: UnitConfig
@@ -110,9 +113,9 @@ const TransactionsTab = ({ account, unitConfig, doReload }: TransactionsTab) => 
                 accessor: 'walletAddress',
                 minWidth: 200,
                 Cell: (e: any) => (
-                    <div>
+                    <a href={genAddressLink(e.value)} className="cursor-pointer hover:text-red-2 hover:underline" target="_blank">
                         {addressTypes[e?.row?.original.type]} {formatAddress(e.value)}
-                    </div>
+                    </a>
                 ),
             },
         ],
