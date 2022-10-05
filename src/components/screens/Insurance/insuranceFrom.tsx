@@ -265,13 +265,6 @@ const InsuranceFrom = () => {
                         return Number(balance.toFixed(decimalList.decimal_q_covered))
                     })
                 }
-                if (symbol === 'ETH') {
-                    const result = wallet.getBalance()
-                    return result.then((balance: number) => {
-                        setUserBalance(Number(balance.toFixed(decimalList.decimal_q_covered)))
-                        return Number(balance.toFixed(decimalList.decimal_q_covered))
-                    })
-                }
 
                 if (symbol === 'USDT') {
                     const balanceUsdt = await Config.web3.contractCaller?.tokenContract(USDTaddress).contract.balanceOf(account.address)
@@ -736,8 +729,8 @@ const InsuranceFrom = () => {
 
                 const MathCeil = 1 / Math.pow(10, Number(decimalMargin))
 
-                const MIN = Number((state.q_covered * state.p_market * item.minQtyRatio).toFixed(Number(decimalMargin))) + MathCeil
-                const MAX = Number((state.q_covered * state.p_market * item.maxQtyRatio).toFixed(Number(decimalMargin))) - MathCeil
+                const MIN = Number((state.q_covered * state.p_market * item.minQtyRatio).toFixed(Number(decimalMargin)))
+                const MAX = Number((state.q_covered * state.p_market * item.maxQtyRatio).toFixed(Number(decimalMargin)))
                 setRangeMargin({ ...rangeP_claim, min: MIN, max: MAX })
             }
             setDecimalList({ ..._decimalList })
@@ -1384,7 +1377,7 @@ const InsuranceFrom = () => {
                                                                 <div className={`flex justify-between border-collapse rounded-[3px] shadow-none w-full`}>
                                                                     <InputNumber
                                                                         validator={validator('margin')}
-                                                                        value={state.q_covered > 0 ? state.margin : 0}
+                                                                        value={state.margin}
                                                                         onChange={(e: any) => onHandleChange('margin', e)}
                                                                         customSuffix={renderPopoverMargin}
                                                                         decimal={decimalList.decimal_margin}
