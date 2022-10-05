@@ -660,6 +660,7 @@ const InsuranceFrom = () => {
                 })
             }
         }
+        percentMargin.current = 8
     }, [tab])
 
     useEffect(() => {
