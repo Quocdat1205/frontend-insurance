@@ -85,7 +85,7 @@ const FaqLanding = () => {
                 {faq_contents.map(({ question, ans, link, href }) => (
                     <div key={question}>
                         <div className="h-[1px] w-full bg-divider" />
-                        <div key={question} className="mx-auto min-w-[20rem] lg:min-w-[48rem] w-full max-w-md rounded-2xl px-6 py-4 lg:p-[1.5rem] ">
+                        <div key={question} className="mx-auto min-w-[20rem] lg:min-w-[48rem] w-full max-w-md rounded-2xl px-6 py-4 lg:p-[1.5rem] cursor-pointer ">
                             <Disclosure>
                                 {({ open }) => (
                                     <>

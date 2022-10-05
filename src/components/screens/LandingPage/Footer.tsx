@@ -2,6 +2,7 @@ import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import React from 'react'
 import styled from 'styled-components'
+import { scrollToElement } from 'utils/utils';
 
 interface Footer {
     sponsor: boolean
@@ -31,7 +32,9 @@ const Footer = ({ sponsor = true }) => {
     }
 
     const handleClickItem = (type: string) => window.open(LINKS[type][language])
-    const handleCLickFAQ = () => router.push('#faq-section')
+    const handleCLickFAQ = () =>{
+        scrollToElement('faq-section')
+    }
     const handleClickBuyCover = () => router.push('/buy-covered')
 
     return (
