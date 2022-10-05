@@ -577,8 +577,6 @@ const InsuranceFrom = () => {
     }, [selectCoin])
 
     const createSaved = () => {
-        console.log(state)
-
         if (state.q_covered <= 0 || state.p_claim <= 0) {
             return setSaved(0)
         } else {
