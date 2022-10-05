@@ -353,7 +353,10 @@ const InsuranceFrom = () => {
     }, [account.address])
 
     const updateFormPercentMargin = (value: number) => {
-        if (state.q_covered > 0) {
+        if (!account.address) {
+            return
+        }
+        if (state.q_covered > 0 && account.address) {
             percentMargin.current = value
 
             if (value == 2) {
@@ -379,22 +382,26 @@ const InsuranceFrom = () => {
     }
 
     const updateFormQCovered = (data: number) => {
-        percentInsurance.current = data
-        if (data === 25) {
-            setState({
-                ...state,
-                q_covered: Number((0.25 * userBalance).toFixed(decimalList.decimal_q_covered)),
-            })
-        } else if (data === 100) {
-            setState({
-                ...state,
-                q_covered: userBalance,
-            })
+        if (!account.address) {
+            return
         } else {
-            setState({
-                ...state,
-                q_covered: Number(((data / 100) * userBalance).toFixed(decimalList.decimal_q_covered)),
-            })
+            percentInsurance.current = data
+            if (data === 25) {
+                setState({
+                    ...state,
+                    q_covered: Number((0.25 * userBalance).toFixed(decimalList.decimal_q_covered)),
+                })
+            } else if (data === 100) {
+                setState({
+                    ...state,
+                    q_covered: userBalance,
+                })
+            } else {
+                setState({
+                    ...state,
+                    q_covered: Number(((data / 100) * userBalance).toFixed(decimalList.decimal_q_covered)),
+                })
+            }
         }
     }
 
@@ -567,7 +574,8 @@ const InsuranceFrom = () => {
     useEffect(() => {
         if (selectCoin?.symbol != '') {
             getPrice(selectCoin?.symbol, state, setState)
-            setState({ ...state, symbol: { ...selectCoin } })
+            setState({ ...state, symbol: { ...selectCoin }, q_covered: 0, margin: 0, p_claim: 0, period: 2, q_claim: 0, r_claim: 0 })
+            setSaved(0)
             getConfig(selectCoin?.type)
             getBalaneToken(selectCoin?.type)
             localStorage.setItem('buy_covered_state', JSON.stringify(selectCoin))
@@ -575,17 +583,20 @@ const InsuranceFrom = () => {
         setState({ ...state })
     }, [selectCoin])
 
-    const createSaved = async () => {
-        if (state.q_covered === 0 || state.p_claim === 0) {
-            return setSaved(0)
-        }
-        const y = state.q_covered * (state.p_claim - state.p_market)
-        const z = state.q_covered * Math.abs(state.p_claim - state.p_market)
+    const createSaved = () => {
+        console.log(state)
 
-        if (state.p_claim < state.p_market) {
-            setSaved(state.q_claim + y - state.margin + z)
+        if (state.q_covered <= 0 || state.p_claim <= 0) {
+            return setSaved(0)
         } else {
-            setSaved(state.q_claim + y - state.margin)
+            const y = state.q_covered * (state.p_claim - state.p_market)
+            const z = state.q_covered * Math.abs(state.p_claim - state.p_market)
+
+            if (state.p_claim < state.p_market) {
+                setSaved(state.q_claim + y - state.margin + z)
+            } else {
+                setSaved(state.q_claim + y - state.margin)
+            }
         }
     }
 
@@ -820,6 +831,7 @@ const InsuranceFrom = () => {
     const handleUpdateToken = (coin: ICoin) => {
         setSelectedCoin(coin)
         setState({ ...state, symbol: { ...coin }, period: 2, r_claim: 0, q_claim: 0, q_covered: -1, margin: -1, p_claim: -1, p_expired: 0 })
+        setSaved(0)
         setChosing(false)
     }
 
