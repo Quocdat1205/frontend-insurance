@@ -14,7 +14,7 @@ interface CommissionStatistics {
     account: any
     userInfo: any
     decimal: number
-    setShowWithDrawCommission: React.Dispatch<React.SetStateAction<boolean>>,
+    setShowWithDrawCommission: React.Dispatch<React.SetStateAction<boolean>>
     doReload: boolean
 }
 const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawCommission, doReload }: CommissionStatistics) => {
@@ -74,7 +74,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
     const [commissionStatisticsData, setCommissionStatisticsData] = useState({
         ref: account.myRef,
         totalMarginIn: 0,
-        totalMarginOut: 0
+        totalMarginOut: 0,
     })
 
     const [filter, setFilter] = useState<any>({
@@ -105,7 +105,6 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
         })
     }
 
-
     useEffect(() => {
         constFetchCommissionStatistics()
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -134,7 +133,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
         }
     }
 
-    console.log(picker, filter)
+    // console.log(picker, filter)
 
     return (
         <Background className="">
@@ -146,8 +145,9 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                             <div
                                 key={index}
                                 onClick={() => setFilter(day)}
-                                className={`px-4 py-2 rounded-full bg-hover cursor-pointer ${day.id === filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
-                                    }`}
+                                className={`px-4 py-2 rounded-full bg-hover cursor-pointer ${
+                                    day.id === filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
+                                }`}
                             >
                                 {day[language]}
                             </div>
@@ -157,8 +157,9 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                             onChange={onChangePicker}
                             customLabel={() => (
                                 <div
-                                    className={`px-4 py-2 rounded-full bg-hover cursor-pointer flex items-center space-x-2 ${!filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
-                                        }`}
+                                    className={`px-4 py-2 rounded-full bg-hover cursor-pointer flex items-center space-x-2 ${
+                                        !filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
+                                    }`}
                                 >
                                     <CalendarIcon color={!filter?.id ? colors.red.red : colors.gray.gray} size={16} />
                                     <span>
