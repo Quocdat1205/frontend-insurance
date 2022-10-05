@@ -301,3 +301,7 @@ input[type='number'] {
 .hide-scroll::-webkit-scrollbar {
     display: none;
 }
+
+#faq-section {
+  scroll-behavior: smooth;
+}

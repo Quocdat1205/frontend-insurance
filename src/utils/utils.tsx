@@ -217,3 +217,8 @@ export const capitalizeFirstLetter = (string: string) => string.charAt(0).toUppe
 export const formatAddress = (wallet: string, start: number = 10, end: number = -4) => {
     return wallet.length > 10 ? String(wallet).substr(0, start) + '...' + String(wallet).substr(end) : wallet
 }
+
+export const scrollToElement = (id: string) => {
+    const section = document.getElementById(`${id}`)
+    section?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
