@@ -5,6 +5,7 @@ import Toast from 'components/layout/Toast'
 import Config from 'config/config'
 import AlertModal from 'components/common/Modal/AlertModal'
 import ConnectWalletModal from 'components/common/Modal/ConnectWalletModal'
+import initPublicSocket from 'redux/actions/publicSocket'
 
 interface Container {
     children: ReactNode
@@ -24,6 +25,7 @@ const Container = ({ children }: Container) => {
         dispatch(getListAssetToken())
         dispatch(getConfigAsset())
         dispatch(getConfigUnit())
+        dispatch(initPublicSocket())
     }, [])
 
     return (

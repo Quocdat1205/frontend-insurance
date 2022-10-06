@@ -14,12 +14,12 @@ import { useRouter } from 'next/router'
 import { TendencyIcon } from 'components/common/Svg/SvgIcon'
 import colors from 'styles/colors'
 import { formatNumber, getDecimalPrice } from 'utils/utils'
-import fetchApi from 'services/fetch-api'
-import { API_GET_FUTURES_MARKET_WATCH } from 'services/apis'
 import FuturesMarketWatch from 'models/FuturesMarketWatch'
 import { roundTo } from 'round-to'
 import dynamic from 'next/dynamic'
 import { PairConfig } from 'types/types'
+import Emitter from 'socket/emitter'
+import { PublicSocketEvent } from 'socket/socketEvent'
 const LineChart = dynamic(() => import('components/common/Chart/LineChart'), {
     ssr: false,
 })
@@ -32,12 +32,13 @@ const Assets = () => {
     const { t } = useTranslation()
     const assetsToken = useAppSelector((state: RootStore) => getNewAssets(state))
     const allPairConfigs = useAppSelector((state: RootStore) => state.setting.pairConfigs)
+    const publicSocket = useAppSelector((state: RootStore) => state.socket.publicSocket)
     const account = useAppSelector((state: RootStore) => state.setting.account)
     const { width } = useWindowSize()
     const isMobile = width && width < 640
     const router = useRouter()
     const [mount, setMount] = useState(false)
-    const [marketWatch, setMarketWatch] = useState<any[]>([])
+    const [marketWatch, setMarketWatch] = useState<any>({})
 
     const onConnectWallet = () => {
         Config.connectWallet()
@@ -77,28 +78,28 @@ const Assets = () => {
 
     useEffect(() => {
         setMount(true)
-        getMarketWatch()
     }, [])
 
-    const getMarketWatch = async () => {
-        try {
-            const { data } = await fetchApi({
-                url: API_GET_FUTURES_MARKET_WATCH,
-                options: { method: 'GET' },
-                baseURL: '',
-            })
-            if (data) setMarketWatch(data)
-        } catch (e) {
-            console.log(e)
-        } finally {
+    useEffect(() => {
+        const arr = assetsToken.map((rs: any) => rs?.symbol + 'USDT')
+        if (publicSocket && assetsToken && assetsToken.length > 0) publicSocket.emit('subscribe:futures:ticker', arr)
+        arr.map((symbol: any) =>
+            Emitter.on(PublicSocketEvent.FUTURES_TICKER_UPDATE + symbol, async (data) => {
+                const pairPrice = FuturesMarketWatch.create(data)
+                marketWatch[symbol] = pairPrice
+                setMarketWatch({ ...marketWatch })
+            }),
+        )
+        return () => {
+            if (publicSocket) publicSocket?.emit('unsubscribe:futures:ticker', arr)
+            Emitter.off(PublicSocketEvent.FUTURES_TICKER_UPDATE)
         }
-    }
+    }, [assetsToken, publicSocket])
 
     const renderAssets = () => (
         <div className="d-flex">
             {assetsToken.map((asset: any, index: number) => {
-                const _marketWatch = marketWatch.find((m: any) => m.b === asset?.symbol && m.q === 'USDT')
-                const pairPrice = FuturesMarketWatch.create(_marketWatch)
+                const pairPrice = marketWatch[asset.symbol + 'USDT']
                 const _24hChange = pairPrice?.priceChangePercent * 100 || 0
                 const negative = _24hChange < 0
                 const sparkLineColor = negative ? colors.red.red : colors.success

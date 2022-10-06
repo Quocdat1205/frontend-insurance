@@ -37,7 +37,9 @@ const LineChart = ({ symbol, negative }: LineChart) => {
         }
     }
     useEffect(() => {
-        getData()
+        setInterval(() => {
+            getData()
+        }, 10000)
     }, [])
 
     const createGradient = (ctx: CanvasRenderingContext2D, area: ChartArea) => {
