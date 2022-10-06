@@ -31,16 +31,17 @@ export const setting = () => async (dispatch: Dispatch) => {
     }
 }
 
-export const setAccount = (data?: { address: string | null | undefined; wallet?: string | null | undefined }) => async (dispatch: Dispatch) => {
-    try {
-        dispatch({
-            type: types.SET_ACCOUNT,
-            payload: data,
-        })
-    } catch (error) {
-        console.log('setAccount', error)
+export const setAccount =
+    (data?: { address: string | null | undefined; wallet?: string | null | undefined; [key: string]: any }) => async (dispatch: Dispatch) => {
+        try {
+            dispatch({
+                type: types.SET_ACCOUNT,
+                payload: data,
+            })
+        } catch (error) {
+            console.log('setAccount', error)
+        }
     }
-}
 
 export const getListAssetToken = () => async (dispatch: Dispatch) => {
     try {

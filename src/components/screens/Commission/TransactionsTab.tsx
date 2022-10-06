@@ -1,6 +1,7 @@
 import Spinner from 'components/common/Loader/Spinner'
 import NoData from 'components/common/NoData/NoData'
 import DataTable from 'components/common/Table/DataTable'
+import Config from 'config/config'
 import useWindowSize from 'hooks/useWindowSize'
 import { useTranslation } from 'next-i18next'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
@@ -80,36 +81,36 @@ const TransactionsTab = ({ account, unitConfig, doReload }: TransactionsTab) => 
     }
 
     const renderType = ({ type }: any) => {
-        return type === 'in' ? 'Nhận hoa hồng' : 'Rút hoa hồng'
+        return type === 'in' ? t('commission:history:receive_reward') : t('commission:history:withdraw_reward')
     }
 
     const addressTypes: any = {
-        in: 'Từ',
-        out: 'Đến',
+        in: t('common:from'),
+        out: t('common:to'),
     }
 
     const columns = useMemo(
         () => [
             {
-                Header: 'Ngày phát sinh',
+                Header: t('common:date'),
                 accessor: 'createdAt',
                 minWidth: 200,
                 Cell: (e: any) => formatTime(e.value, 'dd.MM.yyyy hh:mm'),
             },
             {
-                Header: 'Loại giao dịch',
+                Header: t('common:type'),
                 accessor: 'type',
                 minWidth: 200,
                 Cell: (e: any) => renderType(e?.row?.original),
             },
             {
-                Header: 'Số tiền',
+                Header: t('common:amount'),
                 accessor: 'amount',
                 minWidth: 200,
                 Cell: (e: any) => formatCurrency(e.value, unitConfig.assetDigit ?? 2) + ` ${unitConfig.assetCode}`,
             },
             {
-                Header: 'Địa chỉ ví',
+                Header: t('common:address_wallet'),
                 accessor: 'walletAddress',
                 minWidth: 200,
                 Cell: (e: any) => (
@@ -143,7 +144,8 @@ const TransactionsTab = ({ account, unitConfig, doReload }: TransactionsTab) => 
                 <NoData
                     className="py-20"
                     showButton={!account.address}
-                    textContent={!account.address ? `Vui lòng kết nối ví để xem danh sách bạn bè` : 'Không có dữ liệu để hiển thị'}
+                    textContent={!account.address ? t('commisson:history:commission_history_nodata') : 'Không có dữ liệu để hiển thị'}
+                    onClick={() => Config.connectWallet()}
                 />
             ) : !isMobile ? (
                 <DataTable
@@ -160,22 +162,24 @@ const TransactionsTab = ({ account, unitConfig, doReload }: TransactionsTab) => 
                     {dataSource?.listHistory?.map((item: any, index: number) => {
                         return (
                             <div key={index} className="rounded-xl bg-hover p-4">
-                                <div className="font-medium">Ngày phát sinh: {formatTime(item?.createdAt, 'dd.MM.yyyy')}</div>
+                                <div className="font-medium">
+                                    {t('common:date')}: {formatTime(item?.createdAt, 'dd.MM.yyyy')}
+                                </div>
                                 <div className="flex flex-col text-sm w-full divide-y divide-divider mt-6">
                                     <div className="flex items-center pb-2 justify-between">
-                                        <div className="text-txtSecondary">Loại giao dịch</div>
+                                        <div className="text-txtSecondary">{t('common:type')}</div>
                                         <div className="font-semibold">{renderType(item)}</div>
                                     </div>
                                     <div className="flex items-center py-2 justify-between">
-                                        <div className="text-txtSecondary">Số tiền</div>
+                                        <div className="text-txtSecondary">{t('common:amount')}</div>
                                         <div className="font-semibold">
                                             {formatCurrency(item?.amount, unitConfig.assetDigit ?? 2) + ` ${unitConfig.assetCode}`}
                                         </div>
                                     </div>
                                     <div className="flex items-center py-2 justify-between">
-                                        <div className="text-txtSecondary">Địa chỉ ví</div>
+                                        <div className="text-txtSecondary">{t('common:address_wallet')}</div>
                                         <div className="font-semibold">
-                                            {item?.type === 'in' ? 'Từ' : 'Đến'}&nbsp;
+                                            {item?.type === 'in' ? t('common:from') : t('common:to')}&nbsp;
                                             {formatAddress(item?.walletAddress)}
                                         </div>
                                     </div>

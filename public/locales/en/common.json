@@ -41,6 +41,7 @@
     "load_more": "Load More",
     "filter_by": "Filter By",
     "undo": "Undo",
+    "reset": "Reset",
     "notification": {
         "title": "Notification",
         "notice_message": "Insurance contract <span class='text-red'>{{id}}</span> {{status}}",
@@ -154,5 +155,15 @@
         "r_claim": "Ratio of  cover payout to Margin ",
         "q_claim": "Quantity of cover payout when reaching P-Claim",
         "margin": "Margin of insurance contract"
-    }
+    },
+    "no_data": "There are no records to display",
+    "from": "From",
+    "to": "To",
+    "date": "Date",
+    "type": "Type",
+    "custom": "Custom",
+    "amount_of_money": "Amount",
+    "address_wallet": "Address Wallet",
+    "ref_code": "Ref Code",
+    "ref_link": "Ref Link"
 }

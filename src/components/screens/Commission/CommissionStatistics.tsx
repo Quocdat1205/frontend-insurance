@@ -133,13 +133,16 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
         }
     }
 
-    // console.log(picker, filter)
+    const timelLabel = useMemo(() => {
+        const day: any = days.find((rs) => rs.id === filter.id)
+        return day ? day[language] : picker.startDate ? formatTime(picker.startDate, 'dd/MM/yyyy') + '-' + formatTime(picker.endDate, 'dd/MM/yyyy') : '-'
+    }, [filter, picker])
 
     return (
         <Background className="">
-            <div className="4xl:max-w-screen-3xl m-auto">
+            <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
                 <div className="flex lg:items-center justify-between flex-col lg:flex-row">
-                    <div className="md:text-xl font-semibold md:font-medium">Thống kê hoa hồng</div>
+                    <div className="md:text-xl font-semibold md:font-medium">{t('commission:reward_stats')}</div>
                     <div className="items-center space-x-4 text-sm hidden md:flex sm:mt-6">
                         {days.map((day: any, index: number) => (
                             <div
@@ -165,13 +168,13 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                                     <span>
                                         {picker?.startDate
                                             ? `${formatTime(picker?.startDate, 'dd.MM.yyyy')} - ${formatTime(picker?.endDate, 'dd.MM.yyyy')}`
-                                            : 'Tuỳ chỉnh'}
+                                            : t('common:custom')}
                                     </span>
                                 </div>
                             )}
                         />
                         <div onClick={onReset} className="px-4 py-2 rounded-full bg-hover cursor-pointer flex items-center text-red">
-                            Đặt lại
+                            {t('common:reset')}
                         </div>
                     </div>
                     <div className="flex md:hidden mt-6 space-x-4">
@@ -180,15 +183,11 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                             onClick={() => setShowMobileDatePicker(true)}
                         >
                             <FilterIcon />
-                            <span>Lọc</span>
+                            <span>{t('common:filter')}</span>
                         </div>
                         <div className="px-4 py-[6px] rounded-full font-semibold text-sm text-red flex items-center gap-2 bg-pink">
-                            <CalendarIcon color={colors.red.red} size={14} />
-                            {filter?.from ? (
-                                <span>
-                                    {formatTime(filter?.from, 'dd/MM/yyyy')} - {formatTime(filter?.to, 'dd/MM/yyyy')}
-                                </span>
-                            ) : null}
+                            <CalendarIcon color={colors.red.red} size={16} />
+                            {timelLabel}
                         </div>
                     </div>
                 </div>
@@ -198,7 +197,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                         <div className="flex flex-col w-full">
                             <div className="flex items-center sm:space-x-2 text-sm sm:text-base">
                                 <img src="/images/icons/ic_q_claim.png" className="w-6 h-6 sm:flex hidden" />
-                                <span>Tổng hoa hồng (USDT)</span>
+                                <span>{t('commission:friends:total_reward')} (USDT)</span>
                             </div>
                             <div className="text-xl sm:text-2xl mt-3 sm:mt-4 font-semibold sm:font-medium">
                                 {formatNumber(commissionStatisticsData?.totalMarginIn, decimal)}
@@ -210,7 +209,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                         <div className="flex flex-col w-full">
                             <div className="flex items-center sm:space-x-2 text-sm sm:text-base">
                                 <img src="/images/icons/ic_swap.png" className="w-6 h-6 sm:flex hidden" />
-                                <span>Tổng hoa hồng đã rút (USDT)</span>
+                                <span>{t('commission:total_withdrawn_reward')} (USDT)</span>
                             </div>
                             <div className="text-xl sm:text-2xl mt-3 sm:mt-4 font-semibold sm:font-medium">
                                 {formatNumber(commissionStatisticsData?.totalMarginOut, decimal)}
@@ -222,7 +221,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                         <div className="flex flex-col w-full">
                             <div className="flex items-center sm:space-x-2 text-sm sm:text-base">
                                 <img src="/images/icons/ic_wallet.png" className="w-6 h-6 sm:flex hidden" />
-                                <span>Tổng hoa hồng khả dụng (USDT)</span>
+                                <span>{t('commission:total_available_reward')} (USDT)</span>
                             </div>
                             <div className="flex items-center justify-between mt-4">
                                 <div className="text-xl sm:text-2xl font-semibold sm:font-medium">{formatNumber(userInfo?.commissionAvailable, decimal)}</div>
@@ -230,7 +229,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                                     className="flex items-center space-x-1 text-sm sm:text-base font-semibold text-red cursor-pointer"
                                     onClick={() => setShowWithDrawCommission(true)}
                                 >
-                                    <span>Rút hoa hồng</span>
+                                    <span>{t('commission:withdraw')}</span>
                                     <img src="/images/icons/ic_withdraw.png" className="w-4 h-4 sm:w-6 sm:h-6" />
                                 </div>
                             </div>
