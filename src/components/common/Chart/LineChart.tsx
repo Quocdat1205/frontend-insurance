@@ -36,10 +36,16 @@ const LineChart = ({ symbol, negative }: LineChart) => {
             })
         }
     }
+
+    const timer = useRef<any>(null)
     useEffect(() => {
-        setInterval(() => {
+        getData()
+        timer.current = setInterval(() => {
             getData()
         }, 10000)
+        return () => {
+            clearInterval(timer.current)
+        }
     }, [])
 
     const createGradient = (ctx: CanvasRenderingContext2D, area: ChartArea) => {
