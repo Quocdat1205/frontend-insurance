@@ -72,7 +72,7 @@ const LineChart = ({ symbol, negative }: LineChart) => {
                 },
             ],
         }
-    }, [dataSource])
+    }, [dataSource, negative])
 
     const options = {
         responsive: true,
