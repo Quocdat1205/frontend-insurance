@@ -51,7 +51,6 @@ const Header = () => {
     }
 
     const onClickMenuAddress = useCallback(async (e: any) => {
-        let data = null
         switch (e?.menuId) {
             case 'disconnect':
                 dispatch(setAccount({ address: null, wallet: null }))
@@ -62,7 +61,6 @@ const Header = () => {
             case Config.MODAL_UPDATE_EMAIL:
                 setIsClickedMenu(false)
                 // check update or register new email
-                data = await getInfo()
                 setShowModalSubscribe(true)
                 break
             case 'recent-transaction':
@@ -97,43 +95,29 @@ const Header = () => {
         isClickedMenu,
     }
 
-    const getInfo = async () => {
-        const { data, statusCode } = await fetchApi({
-            url: API_GET_INFO_USER,
-            params: {
-                owner: account?.address,
-            },
-        })
-        setUserInfo(data)
-
+    // get info after connect wallet
+    useEffect(() => {
+        if (!account?.address) return
         const isShownModal = getModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL)
-
-        if (!data?.email && !isShownModal) {
+        if (!account?.email && !isShownModal) {
             setShowModalSubscribe(true)
         } else {
             setModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL, 'true')
         }
-        return data
-    }
-
-    // get info after connect wallet
-    useEffect(() => {
-        if (!account?.address) return
-        getInfo()
-    }, [account])
+    }, [account?.address])
 
     const menuAddress = useMemo(
         () => [
             isMobile
                 ? { menuId: 'account-info', name: 'common:header:account_info_title', parentId: 0 }
                 : {
-                    menuId: 'account-info',
-                    name: NameComponent,
-                    parentId: 0,
-                    hideArrowIcon: true,
-                    isDropdown: true,
-                    nameComponentProps: { ...props },
-                },
+                      menuId: 'account-info',
+                      name: NameComponent,
+                      parentId: 0,
+                      hideArrowIcon: true,
+                      isDropdown: true,
+                      nameComponentProps: { ...props },
+                  },
             ...Config.subMenu,
         ],
         [account, isMobile, NameComponent, isClickedMenu],
@@ -159,7 +143,7 @@ const Header = () => {
                 <div className="flex items-center justify-end w-full py-3 text-sm font-semibold  mb:justify-between mb:py-0">
                     {/* Modal */}
                     {account?.address && showModalSubscribe && (
-                        <EmailSubscriptionModal isUpdate={userInfo?.email} visible={showModalSubscribe} onClose={handleCloseModal} />
+                        <EmailSubscriptionModal email={account?.email} visible={showModalSubscribe} onClose={handleCloseModal} />
                     )}
 
                     {!isMobile && (

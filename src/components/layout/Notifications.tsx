@@ -56,7 +56,7 @@ const Notifications = () => {
 
     useEffect(() => {
         if (account?.address) checkNotice()
-    }, [account])
+    }, [account?.address])
 
     const checkNotice = async () => {
         try {
