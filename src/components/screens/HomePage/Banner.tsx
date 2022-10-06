@@ -48,7 +48,7 @@ const Banner = () => {
                 value: 119059000,
                 decimal: unitConfig?.assetDigit ?? 2,
                 tooltip: 'common:terminology:q_covered',
-                prefix: '$',
+                // prefix: '$',
                 suffix: 'M',
             },
             {
@@ -58,7 +58,7 @@ const Banner = () => {
                 value: 79000,
                 decimal: unitConfig?.assetDigit ?? 2,
                 tooltip: 'common:terminology:margin',
-                prefix: '$',
+                // prefix: '$',
                 suffix: 'M',
             },
             {
@@ -96,7 +96,13 @@ const Banner = () => {
             <Background isMobile={isMobile}>
                 <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto text-center flex flex-col space-y-8 sm:space-y-6">
                     <div className="flex flex-col space-y-2">
-                        <div className="leading-5 sm:leading-6">{t('home:landing:total_q_claim')}</div>
+                        <Tooltip className="max-w-[200px]" id={'common:terminology:q_covered'} placement="top" />
+                        <div className="leading-5 sm:leading-6 flex justify-center items-center">
+                            {t('home:landing:total_q_claim')}
+                            <div className={'ml-[0.375rem]'} data-tip={t('common:terminology:q_covered')} data-for={'common:terminology:q_covered'}>
+                                <InfoCircle className={''} size={14} color={colors.txtSecondary} />
+                            </div>
+                        </div>
                         <div
                             className="text-red text-[2.5rem] sm:text-5xl leading-[3.5rem] font-bold sm:font-semibold"
                             data-aos="fade-up"
