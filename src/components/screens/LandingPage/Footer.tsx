@@ -69,7 +69,7 @@ const Footer = ({ sponsor = true }) => {
                                         {t('home:landing:white_paper')}
                                     </div>
                                     <div className={'cursor-pointer'} onClick={handleCLickFAQ}>
-                                        {t('home:landing:faq')}
+                                        {t('home:landing:faq_title')}
                                     </div>
                                     <div className={'cursor-pointer'} onClick={() => handleClickItem(TERM)}>
                                         {t('home:landing:terms_of_service')}

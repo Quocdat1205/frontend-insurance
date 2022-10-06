@@ -48,7 +48,7 @@ const BannerLanding = () => {
                 value: 119059000,
                 decimal: unitConfig?.assetDigit ?? 2,
                 tooltip: 'common:terminology:q_covered',
-                prefix: '$',
+                // prefix: '$',
             },
             {
                 title: t('home:landing:total_margin'),
@@ -56,7 +56,7 @@ const BannerLanding = () => {
                 value: 79000,
                 // value: 29,
                 decimal: unitConfig?.assetDigit ?? 2,
-                prefix: '$',
+                // prefix: '$',
                 suffix: '',
                 tooltip: 'common:terminology:margin',
             },
@@ -105,7 +105,7 @@ const BannerLanding = () => {
                         <div className="flex flex-col space-y-2 ">
                             <p className={classNameTitle} data-aos="fade-up" data-aos-delay={0}>
                                 {/* ${formatCurrency(general?.q_claim, unitConfig?.assetDigit ?? 2)} */}
-                                $129,00M
+                                129,00M
                             </p>
 
                             <div className={'flex  flex-row justify-center items-center text-txtSecondary text-xs homeNav:text-base'}>
