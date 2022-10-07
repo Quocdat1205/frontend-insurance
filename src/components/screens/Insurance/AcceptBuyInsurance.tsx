@@ -392,7 +392,7 @@ const AcceptBuyInsurance = () => {
         try {
             const { data, message } = await fetchApi({
                 url: API_CHECK_REF,
-                params: { ref: refCode, onwer: account.address },
+                params: { ref: refCode, owner: account.address },
             })
             if (!data) {
                 setRefError({ isValid: false, message: t(`errors:${message}`) })
