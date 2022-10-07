@@ -13,26 +13,29 @@ import { setAccount, setting } from 'redux/actions/setting'
 import { Web3Provider } from "@ethersproject/providers";
 
 const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorId; name: string; connector: Connector }>) => {
-    const { connector, account, chainId, isActive, error, provider, isActivating } = useWeb3React()
+    const { connector, account, chainId, isActive, error, provider, isActivating, accounts } = useWeb3React()
     const connected = useAppSelector((state: RootStore) => state.setting.account)
     const loading = useAppSelector((state: RootStore) => state.setting.loading_account)
     const dispatch = useAppDispatch()
     const contractCaller = useRef<any>(null)
+    const [doReload, setDoReload] = useState(false)
 
     const activate = async (connectorId: ConnectorId, _chainId?: number) => {
         const wallet = localStorage.getItem('PUBLIC_WALLET')
         console.log('connectorId', connectorId)
         const _connector = connectorsData[connectorId]
         console.log('_connector', _connector.connector)
-        await _connector.connector.deactivate()
+        // await _connector.connector.deactivate()
+        await deactivate()
         _connector.connector instanceof WalletConnect
             ? await _connector.connector.activate(_chainId)
             : await _connector.connector.activate(!_chainId ? undefined : getAddChainParameters(_chainId))
         contractCaller.current = connector.provider ? new ContractCaller(new Web3Provider(_connector.connector.provider as any)) : null
+        setDoReload(!doReload)
     }
 
-    const deactivate = () => {
-        connector.deactivate()
+    const deactivate = async () => {
+        await connector.deactivate()
     }
 
     console.log('providerrrr', contractCaller)
@@ -40,7 +43,7 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
 
     useEffect(() => {
         connector.connectEagerly && connector.connectEagerly()
-    }, [connector])
+    }, [])
 
     // useEffect(() => {
     //     if (!isActive && !loading && connected?.address) {

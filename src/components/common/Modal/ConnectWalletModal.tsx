@@ -198,9 +198,9 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         if (!oldAddress.current) return
         setErrorConnect(false)
         setLoading(true)
-        console.log('Config.web3.contractCaller',Config.web3.contractCaller.current)
         try {
-            const token = await Config.web3.contractCaller?.current?.sign(oldAddress.current)
+            console.log('adderess', address)
+            const token = await Config.web3.contractCaller?.current?.sign(Config.web3?.account)
             if (!token) {
                 lostConnection()
                 return
