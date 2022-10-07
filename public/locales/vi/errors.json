@@ -1,5 +1,6 @@
 {
     "EMAIL_EXITED": "Email đã tồn tại",
     "40001": "Người dùng đã từ chối cho phép kết nối ví",
-    "CONNECT_FAILED": "Truyền kết nối thất bại, vui lòng thử lại"
+    "CONNECT_FAILED": "Truyền kết nối thất bại, vui lòng thử lại",
+    "INVALID_REF_CODE": "Mã giới thiệu không tồn tại, vui lòng thử lại!"
 }

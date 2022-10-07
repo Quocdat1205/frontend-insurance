@@ -29,6 +29,8 @@ export const API_GET_COMMISSION_HISTORY = '/v1/get-commission-history'
 export const API_GET_INFO_USER_COMMISSION = '/v1/get-info-user-commission'
 export const API_POST_WITHDRAW_COMMISSION = '/v1/withdraw-commission'
 export const API_GET_FILTER_COMMISSION = '/v1/filter-commissionn'
+export const API_CHECK_REF = '/v1/check-ref'
+
 
 // futures
 export const API_GET_UNIT_CONFIG = Config.env.NAMI_API_URL + '/api/v3/asset/config'

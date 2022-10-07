@@ -529,4 +529,12 @@ const TriggerErrorIconCircle = ({ size = 12, color = '#B2B7BC' }: IconSvg) => {
     )
 }
 
-export { HistoryIcon, UserIcon, EmailIcon, DisconnectIcon, TriggerErrorIconCircle, ReplayIcon }
+const CheckedIcon = ({ size = 24, color = '#B2B7BC', className = '' }: IconSvg) => {
+    return (
+        <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9.99997 15.586L6.70697 12.293L5.29297 13.707L9.99997 18.414L19.707 8.70697L18.293 7.29297L9.99997 15.586Z" fill={color} />
+        </svg>
+    )
+}
+
+export { HistoryIcon, UserIcon, EmailIcon, DisconnectIcon, TriggerErrorIconCircle, ReplayIcon, CheckedIcon }

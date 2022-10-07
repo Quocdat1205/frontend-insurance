@@ -108,7 +108,7 @@ class Config {
     static homeMenu = [
         { menuId: 'home', router: '/home', name: 'common:header:home', parentId: 0 },
         { menuId: 'buy-covered-parent', router: '/buy-covered', name: 'common:header:buy_covered', parentId: 0 },
-        // { menuId: 'commission_policy', router: '/buy-covered', name: 'common:header:commission_policy', parentId: 0 },
+        { menuId: 'commission_policy', router: '/commission', name: 'common:header:commission_policy', parentId: 0 },
     ]
 
     static subMenu = [
@@ -172,7 +172,7 @@ class Config {
     ]
 
     static copy = (text: string) => {
-        navigator.clipboard.writeText(text)
+        navigator?.clipboard?.writeText(text)
     }
 }
 
