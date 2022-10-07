@@ -165,5 +165,7 @@
     "amount": "Số tiền",
     "address_wallet": "Địa chỉ ví",
     "ref_code": "Mã giới thiệu",
-    "ref_link": "Link giới thiệu"
+    "ref_link": "Link giới thiệu",
+    "submit": "Submit",
+    "retry": "Rút lại"
 }

@@ -6,6 +6,7 @@ import Config from 'config/config'
 import { API_POST_WITHDRAW_COMMISSION } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { formatNumber } from 'utils/utils'
+import { useTranslation } from 'next-i18next'
 
 // interface Props {
 //     isWithdrawing: any
@@ -19,6 +20,8 @@ import { formatNumber } from 'utils/utils'
 // }
 
 const CommissionWithdrawModal = ({ isWithdrawing, setIsWithdrawing, userInfo, unitConfig, account, isShow, isMobile, setShow, doReload, setDoReload }: any) => {
+    const { t } = useTranslation()
+
     const handleWithDrawCommissionShare = async () => {
         if (!account?.address || !userInfo?.commissionAvailable) return
         setIsWithdrawing('withdrawing')
@@ -40,7 +43,7 @@ const CommissionWithdrawModal = ({ isWithdrawing, setIsWithdrawing, userInfo, un
                 setIsWithdrawing('withdraw')
                 setShow(false)
                 setDoReload(!doReload)
-                Config.toast.show('success', 'Rút hoa hồng về ví thành công')
+                Config.toast.show('success', t('commission:withdraw_reward:withdraw_successful'))
             } else setIsWithdrawing('error')
         } catch (e) {
             // eslint-disable-next-line no-console
@@ -55,11 +58,15 @@ const CommissionWithdrawModal = ({ isWithdrawing, setIsWithdrawing, userInfo, un
             case 'withdraw':
                 modal = (
                     <>
-                        <img src="/images/screens/commission/success_illus.png" />
+                        <div className="max-w-[100px]">
+                            <img src="/images/screens/commission/success_illus.png" />
+                        </div>
                         <div className="mt-6 w-full text-center">
-                            <div className="font-semibold text-xl leading-6">Xác nhận rút hoa hồng về ví?</div>
+                            <div className="font-semibold text-xl leading-6">{t('commission:withdraw_reward:confirm_withdraw')}?</div>
                             <div className="mt-2 font-medium text-sm leading-5 text-txtSecondary">
-                                Số lượng: {formatNumber(userInfo?.commissionAvailable, unitConfig?.assetDigit)} USDT
+                                {t('commission:withdraw_reward:are_you_sure', {
+                                    value: `$${formatNumber(userInfo?.commissionAvailable, unitConfig?.assetDigit)} USDT?`,
+                                })}
                             </div>
                         </div>
                         <div className="w-full mt-8">
@@ -69,7 +76,7 @@ const CommissionWithdrawModal = ({ isWithdrawing, setIsWithdrawing, userInfo, un
                                 className="w-full py-[14px] px-6 leading-5 font-bold text-sm"
                                 onClick={handleWithDrawCommissionShare}
                             >
-                                Rút hoa hồng
+                                {t('common:submit')}
                             </Button>
                         </div>
                     </>
@@ -97,8 +104,10 @@ const CommissionWithdrawModal = ({ isWithdrawing, setIsWithdrawing, userInfo, un
                     <>
                         <img src="/images/icons/ic_failed.png" height="65px" width="65px" />
                         <div className="mt-6 w-full text-center">
-                            <div className="font-semibold text-xl leading-6">Rút hoa hồng về ví thất bại</div>
-                            <div className="mt-2 font-medium text-sm leading-5 text-txtSecondary">Lý do: Lỗi kết nối mạng</div>
+                            <div className="font-semibold text-xl leading-6">{t('commission:withdraw_reward:withdraw_failed')}</div>
+                            <div className="mt-2 font-medium text-sm leading-5 text-txtSecondary">
+                                {t('common:reason')}: {t('errors:NETWORK_ERROR')}
+                            </div>
                         </div>
                         <div className="w-full mt-8">
                             <Button
@@ -106,7 +115,7 @@ const CommissionWithdrawModal = ({ isWithdrawing, setIsWithdrawing, userInfo, un
                                 className="w-full py-[14px] px-6 leading-5 font-bold text-sm"
                                 onClick={() => setIsWithdrawing('withdraw')}
                             >
-                                Rút lại
+                                {t('common:retry')}
                             </Button>
                         </div>
                     </>
@@ -140,13 +149,13 @@ const Loading = styled.div.attrs({
     className:
         'gradient-spin after:!w-[15px] after:!h-[15px] sm:after:!w-5 sm:after:!h-5 w-[5rem] h-[5rem] sm:w-[7rem] sm:h-[7rem] animate-spin-reverse flex items-center justify-center rounded-full relative',
 })`
-  &:after {
-      content: '';
-      position: absolute;
-      background: #eb2b3e;
-      width: 20px;
-      height: 20px;
-      bottom: 0;
+    &:after {
+        content: '';
+        position: absolute;
+        background: #eb2b3e;
+        width: 20px;
+        height: 20px;
+        bottom: 0;
         border-radius: 50%;
     }
 `
