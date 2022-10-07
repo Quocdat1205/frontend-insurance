@@ -1,42 +1,30 @@
 import { BigNumber, ethers, providers } from 'ethers'
 import { weiToEther } from 'components/web3/Web3Types'
 import { INSURANCE_ABI } from 'components/web3/constants/abi/INSURANCE_ABI'
-import { BTCaddress, contractAddress, ETHaddress, USDTaddress } from 'components/web3/constants/contractAddress'
+import { contractAddress } from 'components/web3/constants/contractAddress'
 import ContractInterface from 'components/web3/contract/Insurance'
-import { TOKEN_ABI } from '../constants/abi/TOKEN_ABI'
 import { getMessageSign } from 'utils/utils'
 import fetchApi from 'services/fetch-api'
 import { API_GET_NONCE, API_LOGIN } from 'services/apis'
 import Config from 'config/config'
+import { TOKEN_ABI } from '../constants/abi/TOKEN_ABI'
 
 export class ContractCaller {
     public provider: providers.Web3Provider
     public insuranceContract: ContractInterface
-    public usdtContract: ContractInterface
-    public ethContract: ContractInterface
-    public btcContract: ContractInterface
 
     constructor(provider: providers.Web3Provider) {
         this.provider = provider
         this.insuranceContract = new ContractInterface(this.provider, contractAddress, INSURANCE_ABI)
-        this.usdtContract = new ContractInterface(this.provider, USDTaddress, TOKEN_ABI)
-        this.ethContract = new ContractInterface(this.provider, ETHaddress, TOKEN_ABI)
-        this.btcContract = new ContractInterface(this.provider, BTCaddress, TOKEN_ABI)
+    }
+
+    public tokenContract = (address: string) => {
+        return new ContractInterface(this.provider, address, TOKEN_ABI)
     }
 
     public async getEtherBalance(from: string) {
         const balance: BigNumber = await this.provider.getBalance(from)
         return weiToEther(balance.toString())
-    }
-
-    public async getBalanceUsdt(address: string) {
-        const balance = await this.usdtContract.getBalance(address)
-        return balance
-    }
-
-    public async getBalanceETH(address: string) {
-        const balance = await this.ethContract.getBalance(address)
-        return balance
     }
 
     public async sign(address: string) {

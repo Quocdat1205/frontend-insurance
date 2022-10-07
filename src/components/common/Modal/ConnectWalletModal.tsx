@@ -5,7 +5,7 @@ import Button from 'components/common/Button/Button'
 import { useTranslation } from 'next-i18next'
 import styled from 'styled-components'
 import classNames from 'classnames'
-import { wallets } from 'components/web3/Web3Types'
+import { getAddChainParameters, wallets } from 'components/web3/Web3Types'
 import Config from 'config/config'
 import { errorsWallet } from 'utils/constants'
 import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
@@ -16,6 +16,8 @@ import NetworkError from 'components/screens/ConnectWallet/NetworkError'
 import SwitchNetwok from 'components/screens/ConnectWallet/SwitchNetwok'
 import { useWeb3React } from '@web3-react/core'
 import { isString } from 'lodash'
+import { API_GET_INFO_USER, API_UPDATE_USER_INFO } from 'services/apis'
+import fetchApi from 'services/fetch-api'
 
 interface ConnectWalletModal {}
 
@@ -47,6 +49,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     const isReload = useRef<boolean>(false)
     const textErrorButton = useRef<string>(t(`common:reconnect`))
     const showIconReload = useRef<boolean>(true)
+    const logged = useRef<boolean>(false)
 
     const loading_account = useAppSelector((state: RootStore) => state.setting.loading_account)
     const account = useAppSelector((state: RootStore) => state.setting.account)
@@ -63,6 +66,15 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
 
     const timer = useRef<any>(null)
     useEffect(() => {
+        if (address && !account?.address && isActive && logged.current) {
+            clearTimeout(timer.current)
+            timer.current = setTimeout(() => {
+                onConfirm()
+            }, 500)
+        }
+    }, [account, address, isActive, loading_account])
+
+    useEffect(() => {
         if (loading_account) {
             clearTimeout(timer.current)
             timer.current = setTimeout(() => {
@@ -71,10 +83,17 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         }
     }, [account])
 
+    const getUserInfo = async (address: string, cb: (e: any) => void) => {
+        const { data } = await fetchApi({ url: API_GET_INFO_USER, params: { owner: address } })
+        if (cb) cb(data)
+    }
+
     useEffect(() => {
         if (address && account.address && account.address !== address) {
-            localStorage.setItem('PUBLIC_ADDRESS', address)
-            dispatch(setAccount({ address: address }))
+            sessionStorage.setItem('PUBLIC_ADDRESS', address)
+            getUserInfo(address, (user) => {
+                if (user) dispatch(setAccount({ address: address, ...user }))
+            })
         }
     }, [account, address])
 
@@ -84,9 +103,9 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
 
     useEffect(() => {
         if (chainId && account.address) {
-            if (!inValidNetword) {
-                setTimeout(() => {
-                    Config.toast.show('error', t('common:error_switch_network'))
+            if (!inValidNetword && !isVisible) {
+                timer.current = setTimeout(() => {
+                    Config.toast?.show('error', t('common:error_switch_network'))
                     setVisible(true)
                     firstTime.current = false
                     oldAddress.current = account.address
@@ -97,11 +116,11 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 connectionError({ code: errorsWallet.Success })
             }
         }
-    }, [isActive, chainId, account, loading, inValidNetword])
+    }, [isActive, chainId, account, loading, inValidNetword, isVisible])
 
-    const connectionError = (error: any) => {
+    const connectionError = async (error: any) => {
         let isNotFoundNetWork = false
-        const code = isString(error?.code) ? error?.code : Math.abs(error?.code)
+        const code = error?.data ? error?.data?.originalError?.code : isString(error?.code) ? error?.code : Math.abs(error?.code)
         switch (code) {
             case 32600:
             case 32601:
@@ -117,7 +136,21 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 break
             case errorsWallet.Not_found:
                 isNotFoundNetWork = true
-                setNetworkError(true)
+                clearTimeout(timer.current)
+                try {
+                    const params: any = getAddChainParameters(Config.chains[0], true)
+                    await (window as any).ethereum
+                        .request({
+                            method: 'wallet_addEthereumChain',
+                            params: [params],
+                        })
+                        .then(() => {
+                            Config.toast.show('success', t('common:connect_successful'))
+                            setVisible(false)
+                        })
+                } catch (error) {
+                    setSwitchNetwork(true)
+                }
                 break
             case errorsWallet.Success:
                 Config.toast.show('success', t('common:connect_successful'))
@@ -165,42 +198,62 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         connectionError({ code: errorsWallet.Connect_failed, message: t('errors:CONNECT_FAILED') })
     }
 
+    const updateRef = async (address: string, cb: (e: any) => void) => {
+        const refCode = localStorage.getItem('REF_CODE')
+        if (refCode) {
+            const { data } = await fetchApi({
+                url: API_UPDATE_USER_INFO,
+                options: {
+                    method: 'PUT',
+                },
+                params: { owner: address, ref: refCode },
+            })
+            data ? cb(data) : getUserInfo(address, cb)
+            localStorage.removeItem('REF_CODE')
+        } else {
+            getUserInfo(address, cb)
+        }
+    }
+
     const onConfirm = async () => {
         firstTime.current = false
+        logged.current = true
         oldAddress.current = !oldAddress.current ? address : oldAddress.current
-        // switch (wallet?.wallet) {
-        //     case wallets.metaMask:
-        //         if (isMobile) {
-        //             if (!Config.isMetaMaskInstalled) {
-        //                 window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}`)
-        //                 return
-        //             }
-        //             Config.web3?.activate(wallets.metaMask)
-        //         } else {
-        //             if (!Config.isMetaMaskInstalled) {
-        //                 setInstaller(true)
-        //                 return
-        //             }
-        //         }
-        //         break
-        //     case wallets.coinbaseWallet:
-        //         if (isMobile) {
-        //             if (!Config.isMetaMaskInstalled) {
-        //                 window.open(`https://go.cb-w.com/dapp?cb_url=${Config.env.APP_URL}`)
-        //                 return
-        //             }
-        //         }
-        //         break
-        //     default:
-        //         break
-        // }
-        if (!isMobile) await Config.web3?.activate(wallet?.wallet)
+        switch (wallet?.wallet) {
+            case wallets.metaMask:
+                if (isMobile) {
+                    if (!Config.isMetaMaskInstalled) {
+                        const refCode = localStorage.getItem('REF_CODE')
+                        window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}?ref=${refCode}`)
+                        return
+                    }
+                    Config.web3?.activate(wallets.metaMask)
+                } else {
+                    if (!Config.isMetaMaskInstalled) {
+                        setInstaller(true)
+                        return
+                    }
+                }
+                break
+            case wallets.coinbaseWallet:
+                if (isMobile) {
+                    if (!Config.isMetaMaskInstalled) {
+                        window.open(`https://go.cb-w.com/dapp?cb_url=${Config.env.APP_URL}`)
+                        return
+                    }
+                }
+                break
+            default:
+                break
+        }
+        if (wallet?.wallet) sessionStorage.setItem('PUBLIC_WALLET', wallet?.wallet)
+        if (!isMobile) Config.web3?.activate(wallet?.wallet)
         if (!oldAddress.current) return
         setErrorConnect(false)
         setLoading(true)
         try {
-            console.log('adderess', address)
-            const token = await Config.web3.contractCaller?.current?.sign(Config.web3?.account)
+            logged.current = false
+            const token = await Config.web3.contractCaller?.sign(oldAddress.current)
             if (!token) {
                 lostConnection()
                 return
@@ -208,14 +261,16 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
             if (token?.message || token?.code) {
                 connectionError(token)
             } else {
-                if (chainId && Config.chains.includes(chainId)) {
-                    Config.toast.show('success', t('common:connect_successful'))
-                }
-                localStorage.setItem('PUBLIC_ADDRESS', oldAddress.current)
-                localStorage.setItem('PUBLIC_TOKEN', token)
+                sessionStorage.setItem('PUBLIC_ADDRESS', oldAddress.current)
+                sessionStorage.setItem('PUBLIC_TOKEN', token)
                 if (wallet?.wallet) localStorage.setItem('PUBLIC_WALLET', wallet?.wallet)
-                dispatch(setAccount({ address: oldAddress.current, wallet: wallet?.wallet }))
-                setVisible(false)
+                updateRef(oldAddress.current, (user) => {
+                    if (chainId && Config.chains.includes(chainId)) {
+                        Config.toast.show('success', t('common:connect_successful'))
+                    }
+                    dispatch(setAccount({ address: oldAddress.current, wallet: wallet?.wallet, ...user }))
+                    setVisible(false)
+                })
             }
         } catch (error: any) {
             console.log('confirm', error)

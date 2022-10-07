@@ -1,6 +1,6 @@
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import React, { useCallback, useState } from 'react'
+import React, { memo, useCallback, useState } from 'react'
 import { X } from 'react-feather'
 import Button from 'components/common/Button/Button'
 import ButtonLanguage from 'components/common/Button/ButtonLanguage'
@@ -11,6 +11,7 @@ import ContactModal from 'components/screens/HomePage/ContactModal'
 import Config from 'config/config'
 import useWindowSize from 'hooks/useWindowSize'
 import { RootStore, useAppSelector } from 'redux/store'
+import { scrollToElement } from 'utils/utils'
 
 const HeaderLanding = () => {
     const router = useRouter()
@@ -25,12 +26,6 @@ const HeaderLanding = () => {
 
     const [isShowContactModal, setIsShowContactModal] = useState(false)
 
-    const scrollTo = (id: string) => {
-        const elId = id.split('#')[1]
-        const section = document.querySelector(`${elId}`)
-        section?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
-
     const handleCloseContactModal = useCallback(() => {
         setIsShowContactModal(false)
     }, [])
@@ -39,6 +34,10 @@ const HeaderLanding = () => {
         // Redirect link
         if (e?.[`href_${language}`]) {
             window.open(e[`href_${language}`])
+            return
+        }
+        if (e?.section) {
+            scrollToElement(e.section)
             return
         }
 
@@ -122,4 +121,4 @@ const HeaderLanding = () => {
     )
 }
 
-export default HeaderLanding
+export default memo(HeaderLanding)

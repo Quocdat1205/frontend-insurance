@@ -46,11 +46,25 @@ class Config {
         },
         97: {
             urls: ['https://data-seed-prebsc-1-s1.binance.org:8545'],
-            name: 'bscTestnet',
+            name: 'Smart Chain - Testnet',
+            chainId: '0x61',
+            nativeCurrency: {
+                name: 'Binance Coin',
+                symbol: 'BNB',
+                decimals: 18,
+            },
+            blockExplorerUrls: ['https://bscscan.com'],
         },
         56: {
             urls: ['https://bsc-dataseed.binance.org'],
             name: 'mainnet',
+            chainId: '0x38',
+            nativeCurrency: {
+                name: 'Binance Coin',
+                symbol: 'BNB',
+                decimals: 18,
+            },
+            blockExplorerUrls: ['https://bscscan.com'],
         },
         69: {
             urls: ['https://kovan-optimistic.etherscan.io'],
@@ -64,9 +78,9 @@ class Config {
     }
 
     static logout = () => {
-        localStorage.removeItem('PUBLIC_ADDRESS')
-        localStorage.removeItem('PUBLIC_TOKEN')
-        localStorage.removeItem('PUBLIC_WALLET')
+        sessionStorage.removeItem('PUBLIC_ADDRESS')
+        sessionStorage.removeItem('PUBLIC_TOKEN')
+        sessionStorage.removeItem('PUBLIC_WALLET')
     }
 
     static MODAL_REGISTER_EMAIL = 'registerEmail'
@@ -94,7 +108,7 @@ class Config {
     static homeMenu = [
         { menuId: 'home', router: '/home', name: 'common:header:home', parentId: 0 },
         { menuId: 'buy-covered-parent', router: '/buy-covered', name: 'common:header:buy_covered', parentId: 0 },
-        // { menuId: 'commission_policy', router: '/buy-covered', name: 'common:header:commission_policy', parentId: 0 },
+        { menuId: 'commission_policy', router: '/commission', name: 'common:header:commission_policy', parentId: 0 },
     ]
 
     static subMenu = [
@@ -145,10 +159,10 @@ class Config {
         },
         {
             menuId: 'faq_section',
-            router: '#faq-section',
+            // router: '#faq-section',
             name: 'home:landing:faq_title',
             parentId: 0,
-            section: 'faq_section',
+            section: 'faq-section',
         },
         {
             menuId: 'modal_contact',
@@ -156,6 +170,10 @@ class Config {
             parentId: 0,
         },
     ]
+
+    static copy = (text: string) => {
+        navigator?.clipboard?.writeText(text)
+    }
 }
 
 export default Config

@@ -11,18 +11,20 @@ import { useRouter } from 'next/router'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import colors from 'styles/colors'
 import { formatPriceToWeiValue, formatWeiValueToPrice } from 'utils/format'
-import { contractAddress } from 'components/web3/constants/contractAddress'
+import { contractAddress, USDTaddress } from 'components/web3/constants/contractAddress'
 import { Menu, Popover } from '@headlessui/react'
 import { ChevronDown } from 'react-feather'
 import Modal from 'components/common/Modal/Modal'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
 import { Input } from 'components/common/Input/input'
-import { RootStore, useAppSelector } from 'redux/store'
+import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
 import { isString } from 'lodash'
 import { useWeb3React } from '@web3-react/core'
 import fetchApi from 'services/fetch-api'
-import { API_GET_BUY_INSURANCE } from 'services/apis'
+import { API_CHECK_REF, API_GET_BUY_INSURANCE } from 'services/apis'
 import { ethers } from 'ethers'
+import InputField from 'components/common/Input/InputField'
+import { setAccount } from 'redux/actions/setting'
 
 export type IBuyInsurance = {
     createInsurance: number
@@ -57,6 +59,7 @@ const AcceptBuyInsurance = () => {
         t,
         i18n: { language },
     } = useTranslation()
+    const dispatch = useAppDispatch()
     const wallet = useWeb3Wallet()
     const router = useRouter()
     const { width, height } = useWindowSize()
@@ -64,7 +67,6 @@ const AcceptBuyInsurance = () => {
     const { account: address, error, chainId, isActive } = useWeb3React()
     const account = useAppSelector((state: RootStore) => state.setting.account)
     const [Noti, setNoti] = useState<string>('')
-    const [price, setPrice] = useState<number>(0)
     const [checkUpgrade, setCheckUpgrade] = useState<boolean>(false)
     const [state, setState] = useState<IState>()
     const [isUpdated, setUpdated] = useState<boolean>(true)
@@ -73,15 +75,12 @@ const AcceptBuyInsurance = () => {
     const [active, setActive] = useState<boolean>(false)
     const [res, setRes] = useState(null)
     const [saved, setSaved] = useState(0)
-    const [referral, setReferral] = useState('')
+    const [refCode, setRefCode] = useState('')
+    const [refError, setRefError] = useState({ isValid: true, message: '' })
     const [count, setCount] = useState(10)
     const reason = useRef<any>(null)
     const textErrorButton = useRef<string>(t(`common:reconnect`))
     const showIconReload = useRef<boolean>(true)
-    const [errorConnect, setErrorConnect] = useState<boolean>(false)
-    const [switchNetwork, setSwitchNetwork] = useState<boolean>(false)
-    const [networkError, setNetworkError] = useState<boolean>(false)
-    const [isVisible, setVisible] = useState(false)
     const isReload = useRef<boolean>(false)
     const unitMoney = useRef<string>('USDT')
 
@@ -111,42 +110,34 @@ const AcceptBuyInsurance = () => {
                     reason.current = t('errors:40001')
                     textErrorButton.current = t(`common:reconnect`)
                     showIconReload.current = true
-                    setErrorConnect(true)
                 }
                 break
             case errorsWallet.Not_found:
                 isNotFoundNetWork = true
-                setNetworkError(true)
                 break
             case errorsWallet.Success:
                 Config.toast.show('success', t('common:connect_successful'))
-                setVisible(false)
                 break
             case errorsWallet.NetWork_error:
                 showIconReload.current = true
                 reason.current = t('common:network_error')
-                setErrorConnect(true)
                 break
             case errorsWallet.Connect_failed:
                 reason.current = t('errors:CONNECT_FAILED')
                 textErrorButton.current = t(`common:refresh`)
                 isReload.current = true
-                setErrorConnect(true)
                 break
             case errorsWallet.Already_opened:
                 reason.current = t('common:user_not_login')
                 showIconReload.current = false
                 textErrorButton.current = t('common:got_it')
-                setErrorConnect(true)
                 break
             default:
                 showIconReload.current = true
                 reason.current = t('errors:CONNECT_FAILED')
-                setErrorConnect(true)
                 break
         }
         setLoading(false)
-        if (!isNotFoundNetWork) setSwitchNetwork(code !== errorsWallet.Success ? !inValidNetword : false)
     }
 
     const getData = async () => {
@@ -155,7 +146,6 @@ const AcceptBuyInsurance = () => {
         if (dataSate) {
             const res = JSON.parse(dataSate)
             setState({ ...res })
-
             if (res.p_claim < res.p_market) {
                 setSaved(res.q_claim + res.q_covered * (res.p_claim - res.p_market) - res.margin + res.q_covered * (res.p_market - res.p_claim))
             }
@@ -169,8 +159,8 @@ const AcceptBuyInsurance = () => {
 
     const fetch = async () => {
         try {
-            const e = await wallet.contractCaller.insuranceContract.contract.filters.EBuyInsurance()
-            const filter = await wallet.contractCaller.insuranceContract.contract.queryFilter(e, 22658137, 22658137 + 1000)
+            const e = await Config.web3.contractCaller.insuranceContract.contract.filters.EBuyInsurance()
+            await wallet.contractCaller.insuranceContract.contract.queryFilter(e, 22658137, 22658137 + 1000)
         } catch (err) {
             console.log(err)
         }
@@ -204,7 +194,7 @@ const AcceptBuyInsurance = () => {
                 if (data.data.length > 0) {
                     const min = data.data[0].p - data.data[0].p * 0.05
                     const max = data.data[0].p + data.data[0].p * 0.05
-                    if (price > max || price < min) {
+                    if (state.p_market > max || state.p_market < min) {
                         setUpdated(false)
                         Config.toast.show('error', t('insurance:buy:price_had_update'))
                         return setActive(false)
@@ -241,14 +231,18 @@ const AcceptBuyInsurance = () => {
                             )
                             return setActive(false)
                         } else {
-                            const allowance = await Config.web3.contractCaller.usdtContract.contract.allowance(account.address, contractAddress)
+                            const allowance = await Config.web3.contractCaller.tokenContract(USDTaddress).contract.allowance(account.address, contractAddress)
+
                             const parseAllowance = formatWeiValueToPrice(allowance)
+
                             if (parseAllowance < state.margin) {
-                                await Config.web3.contractCaller.usdtContract.contract.approve(contractAddress, formatPriceToWeiValue(1000), {
-                                    from: account.address,
-                                })
+                                const approve = await Config.web3.contractCaller
+                                    .tokenContract(USDTaddress)
+                                    .contract.approve(contractAddress, formatPriceToWeiValue(state.margin), {
+                                        from: account.address,
+                                    })
                             }
-                            const buy = await Config.web3.contractCaller.insuranceContract.contract
+                            await Config.web3.contractCaller.insuranceContract.contract
                                 .createInsurance(
                                     dataPost.buyer,
                                     dataPost.asset,
@@ -268,10 +262,22 @@ const AcceptBuyInsurance = () => {
                                     }
                                 })
                                 .catch((result: any) => {
+                                    if (result?.error?.code === -32603) {
+                                        Config.toast.show(
+                                            'error',
+                                            `${
+                                                language === 'vi'
+                                                    ? 'Giao dịch không thành công, số dư USDT của bạn không đủ'
+                                                    : 'Transaction fail, your balance USTD not enough'
+                                            }`,
+                                        )
+                                        return setActive(false)
+                                    }
+
                                     if (result.code === 4001) {
                                         Config.toast.show('error', `${language === 'vi' ? 'Bạn đã hủy giao dịch' : 'You rejected transaction'}`)
+                                        return setActive(false)
                                     }
-                                    return setActive(false)
                                 })
                         }
                     }, 1000)
@@ -290,7 +296,7 @@ const AcceptBuyInsurance = () => {
                 if (_id) {
                     setRes(_id)
                     setNoti('success')
-                    const data = {
+                    const params = {
                         owner: props.from,
                         transaction_hash: props.hash,
                         id_sc: _id,
@@ -301,27 +307,22 @@ const AcceptBuyInsurance = () => {
                         p_claim: Number(state.p_claim),
                         period: Number(state.period),
                         isUseNain: dataPost.isUseNain,
+                        p_market: state.p_market,
+                        ref: !account?.ref && refError.isValid ? refCode : null,
                     }
 
-                    await fetchApi({
+                    const { data } = await fetchApi({
                         url: API_GET_BUY_INSURANCE,
                         options: {
                             method: 'POST',
                         },
-                        params: {
-                            owner: data.owner,
-                            transaction_hash: data.transaction_hash,
-                            id_sc: data.id_sc,
-                            asset_covered: data.asset_covered,
-                            asset_refund: data.asset_refund,
-                            margin: Number(data.margin),
-                            q_covered: Number(data.q_covered),
-                            p_claim: Number(data.p_claim),
-                            period: Number(data.period),
-                            isUseNain: data.isUseNain,
-                        },
+                        params: params,
                         token: authToken,
                     })
+                    if (data) {
+                        if (!account?.ref) dispatch(setAccount({ ...account, ref: params.ref }))
+                        localStorage.removeItem('REF_CODE')
+                    }
                 }
                 if (!_id) {
                     setActive(false)
@@ -337,12 +338,15 @@ const AcceptBuyInsurance = () => {
 
     const rangeOfRefund = () => {
         if (state) {
-            const p_refund = 0.05 * state.p_market
-            if (p_refund > state.p_claim) {
-                return ` $${state.p_claim.toFixed(state?.decimalList?.decimal_p_claim)} - $${p_refund.toFixed(state?.decimalList?.decimal_p_claim)} `
+            if (state.p_claim > state.p_market) {
+                return ` $${(state.p_market + (0.05 / 100) * state.p_market).toFixed(state?.decimalList?.decimal_p_claim)} - $${state.p_claim.toFixed(
+                    state?.decimalList?.decimal_p_claim,
+                )}`
             }
-            if (p_refund < state.p_claim) {
-                return ` $${p_refund.toFixed(state?.decimalList?.decimal_p_claim)} - $${state.p_claim.toFixed(state?.decimalList?.decimal_p_claim)} `
+            if (state.p_claim < state.p_market) {
+                return ` $${(state.p_market - (0.05 / 100) * state.p_market).toFixed(state?.decimalList?.decimal_p_claim)} - $${state.p_claim.toFixed(
+                    state?.decimalList?.decimal_p_claim,
+                )} `
             }
         }
     }
@@ -367,12 +371,45 @@ const AcceptBuyInsurance = () => {
 
             return (
                 <span>
-                    {time.getDate()}/{time.getMonth()}/{time.getFullYear()} - {time.getHours()}:
-                    {time.getMinutes() < 10 ? '0' + time.getMinutes() : time.getMinutes()}
+                    {time.getHours() < 10 ? '0' + time.getHours() : time.getHours()}:{time.getMinutes() < 10 ? '0' + time.getMinutes() : time.getMinutes()} -{' '}
+                    {time.getDate()}/{time.getMonth()}/{time.getFullYear()}
                 </span>
             )
         }
     }
+
+    useEffect(() => {
+        const _refCode = localStorage.getItem('REF_CODE')
+        if (!account?.address) return
+        if (_refCode && !account?.ref) {
+            setRefCode(_refCode)
+        } else {
+            localStorage.removeItem('REF_CODE')
+        }
+    }, [account])
+
+    const checkRef = async () => {
+        try {
+            const { data, message } = await fetchApi({
+                url: API_CHECK_REF,
+                params: { ref: refCode, owner: account.address },
+            })
+            if (!data) {
+                setRefError({ isValid: false, message: t(`errors:${message}`) })
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const timer = useRef<any>(null)
+    useEffect(() => {
+        clearTimeout(timer.current)
+        timer.current = setTimeout(() => {
+            if (refCode) checkRef()
+        }, 1000)
+        setRefError({ isValid: true, message: '' })
+    }, [refCode])
 
     return !loading && state != undefined ? (
         <>
@@ -400,16 +437,14 @@ const AcceptBuyInsurance = () => {
                         {
                             // head Insurance
                             <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto mt-[4rem] mb-[3rem] grid grid-cols-12 content-center items-center justify-between">
-                                <div className="flex items-center font-semibold text-base col-span-4">
+                                <div
+                                    className="flex items-center font-semibold text-base col-span-4 hover:cursor-pointer"
+                                    onClick={() => {
+                                        return router.push('/buy-covered')
+                                    }}
+                                >
                                     <LeftArrow></LeftArrow>
-                                    <span
-                                        className={' text-txtPrimary hover:cursor-pointer ml-[8px]'}
-                                        onClick={() => {
-                                            return router.push('/buy-covered')
-                                        }}
-                                    >
-                                        {language == 'en' ? 'Back' : 'Quay về'}
-                                    </span>
+                                    <span className={' text-txtPrimary hover:cursor-pointer ml-[8px]'}>{language == 'en' ? 'Back' : 'Quay về'}</span>
                                 </div>
 
                                 <div className={'flex flex-col justify-center items-center col-span-4'}>
@@ -487,7 +522,7 @@ const AcceptBuyInsurance = () => {
                                             </span>{' '}
                                             <div className="relative">
                                                 <Menu>
-                                                    <Menu.Button className={' text-blue underline hover:cursor-pointer'}>
+                                                    <Menu.Button disabled={true} className={' text-blue underline hover:cursor-pointer'}>
                                                         <span className={'text-redPrimary decoration-white underline'}>{unitMoney.current}</span>
                                                     </Menu.Button>
                                                     <Menu.Items
@@ -555,25 +590,19 @@ const AcceptBuyInsurance = () => {
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
-                                        <div className={'text-txtSecondary  flex flex-row items-center'}>
-                                            <span className={'mr-[8px]'}>{language === 'vi' ? 'Mã giới thiệu' : 'Referral ID'}</span>
-                                        </div>
-                                        <div className={'font-semibold flex flex-row hover:cursor-pointer w-auto'}>
-                                            <Input
-                                                idInput="input_referral"
-                                                value={referral}
-                                                onChange={(e: any) => {
-                                                    setReferral(e.target.value.toUpperCase())
-                                                }}
-                                                type="text"
-                                                placeholder={language === 'vi' ? 'Nhập mã giới thiệu tại đây' : 'Text referral ID here'}
-                                                className={`${
-                                                    referral.length > 0 ? 'text-redPrimary' : 'text-txtPrimary'
-                                                } !p-0 !m-0 !shadow-none !border-none text-base font-semibold bg-hover text-right min-w-[13.5rem]`}
-                                            />
-                                        </div>
-                                    </div>
+                                    {!account?.ref && (
+                                        <InputField
+                                            label={t('common:ref_code')}
+                                            vertical={false}
+                                            containerClassName="justify-between"
+                                            labelClassName="text-base w-full"
+                                            inputClassName="!h-6 font-semibold text-right text-red text-base"
+                                            placeholder="Nhập mã giới thiệu tại đây"
+                                            validator={refError}
+                                            value={refCode}
+                                            onChange={(e: any) => setRefCode(e.target.value)}
+                                        />
+                                    )}
                                     <div className="text-[#B2B7BC] text-xs py-[16px]">
                                         *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')} {timeEnd()}
                                     </div>
@@ -644,7 +673,7 @@ const AcceptBuyInsurance = () => {
                                         createContract()
                                     }
                                     if (!isUpdated) {
-                                        getPrice(`${state.symbol}${state?.unit}`, setPrice).then(() => {
+                                        getPrice(`${state.symbol}${state?.unit}`, state, setState).then(() => {
                                             setUpdated(true)
                                             setCanBuy(true)
                                             setCount(10)
@@ -807,24 +836,19 @@ const AcceptBuyInsurance = () => {
                                         </span>
                                     </div>
                                 </div>
-                                <div className="flex flex-row justify-between py-[8px] px-[8px] bg-hover">
-                                    <div className={'text-txtSecondary flex flex-row items-center'}>
-                                        <span className={'mr-[8px]'}>{language === 'vi' ? 'Mã giới thiệu' : 'Referral ID'}</span>
-                                    </div>
-                                    <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                        <Input
-                                            value={referral}
-                                            onChange={(e: any) => {
-                                                setReferral(e.target.value.toUpperCase())
-                                            }}
-                                            type="text"
-                                            placeholder={language === 'vi' ? 'Nhập mã giới thiệu tại đây' : 'Text referral ID here'}
-                                            className={`${
-                                                referral.length > 0 ? 'text-redPrimary' : 'text-txtPrimary'
-                                            } h-auto !p-0 !m-0 !shadow-none !border-none text-base font-normal bg-hover text-right min-w-[13.5rem]`}
-                                        />
-                                    </div>
-                                </div>
+                                {!account?.ref && (
+                                    <InputField
+                                        label={t('common:ref_code')}
+                                        vertical={false}
+                                        containerClassName="justify-between"
+                                        labelClassName="text-base w-full"
+                                        inputClassName="!h-6 font-semibold text-right text-red text-base"
+                                        placeholder="Nhập mã giới thiệu tại đây"
+                                        validator={refError}
+                                        value={refCode}
+                                        onChange={(e: any) => setRefCode(e.target.value)}
+                                    />
+                                )}
                                 <div className="text-[#B2B7BC] text-xs py-[16px]">
                                     *{t('insurance:buy:notified')} {rangeOfRefund()} {t('insurance:buy:notified_sub')} {timeEnd()}
                                 </div>
@@ -923,7 +947,7 @@ const AcceptBuyInsurance = () => {
                                     createContract()
                                 }
                                 if (!isUpdated) {
-                                    getPrice(`${state.symbol}${state?.unit}`, setPrice).then(() => {
+                                    getPrice(`${state.symbol}${state?.unit}`, state, setState).then(() => {
                                         setUpdated(true)
                                         setCanBuy(true)
                                         setCount(10)
@@ -945,13 +969,13 @@ const AcceptBuyInsurance = () => {
     )
 }
 
-export const getPrice = async (symbol: string, setState: any) => {
+export const getPrice = async (symbol: string, state: any, setState: any) => {
     try {
         const { data } = await axios.get(`https://test.nami.exchange/api/v3/spot/market_watch?symbol=${symbol}`)
 
         if (data) {
             if (data.data[0]) {
-                return setState(data.data[0]?.p)
+                return setState({ ...state, p_market: data.data[0]?.p })
             }
         }
     } catch (err) {

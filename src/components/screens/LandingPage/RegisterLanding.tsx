@@ -46,7 +46,7 @@ const RegisterLanding = () => {
     }, 3000)
 
     return (
-        <section className="px-4 lg:px-20">
+        <section className="px-4 mb:px-10 lg:px-20">
             <SuccessModal isVisible={visible} onClose={() => setVisible(false)} t={t} />
             <div className="max-w-[1062px] m-auto register-landing flex items-center justify-center pt-20 sm:pt-[10.5rem]">
                 <Background isMobile={isMobile}>

@@ -54,6 +54,14 @@ const InputNumber = ({
         if (onBlur) onBlur(e)
     }
 
+    const showValue = (value: any) => {
+        if (value == -1) return ''
+        if (!value) {
+            return null
+        }
+        return value.toString()
+    }
+
     return (
         <div className={cx('h-11 sm:h-12 rounded-[3px] px-3 py-3 bg-hover w-full relative flex', { 'border border-error': isError }, className)}>
             {isError && focus && validator?.message && (
@@ -71,7 +79,7 @@ const InputNumber = ({
                     thousandSeparator
                     getInputRef={(ref: HTMLInputElement) => (reference = ref)}
                     type="text"
-                    value={value ? value : null}
+                    value={showValue(value)}
                     className={cx('text-left bg-transparent outline-none w-full', inputClassName)}
                     onFocus={_onFocus}
                     onBlur={_onBlur}

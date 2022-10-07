@@ -1,13 +1,13 @@
 import Spinner from 'components/common/Loader/Spinner'
 import Modal from 'components/common/Modal/Modal'
-import { AddCircleIcon, AlarmIcon, CopyIcon, FilterIcon } from 'components/common/Svg/SvgIcon'
+import { AddCircleIcon, AlarmIcon, CheckedIcon, CopyIcon, FilterIcon } from 'components/common/Svg/SvgIcon'
 import Config from 'config/config'
 import { useTranslation } from 'next-i18next'
 import Link from 'next/link'
 import React, { useMemo, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { formatCurrency, formatTime } from 'utils/utils'
-import InsuranceFilterMobile from './InsuranceFilterMobile'
+import { Countdown, formatCurrency, formatTime } from 'utils/utils'
+import InsuranceFilterMobile from 'components/screens/InsuranceHistory/InsuranceFilterMobile'
 import { stateInsurance } from 'utils/constants'
 import { UnitConfig } from 'types/types'
 
@@ -56,6 +56,7 @@ const InsuranceContractMobile = ({
     const [showStatusModal, setShowStatusModal] = useState(false)
     const rowData = useRef(null)
     const { t } = useTranslation()
+    const [copy, setCopy] = useState('')
 
     const totalPage = useMemo(() => {
         return Math.ceil(total / filter?.limit)
@@ -70,8 +71,16 @@ const InsuranceContractMobile = ({
         setShowStatusModal(true)
     }
 
+    const labelFilter: any = useMemo(() => {
+        return {
+            asset: assetsToken.find((rs: any) => rs.symbol === props.asset),
+            state: props.optionsState.find((rs: any) => rs.value === props.state)?.name,
+            date: props.date.startDate ? formatTime(props.date.startDate, 'dd/MM/yyyy') + ' - ' + formatTime(props.date.endDate, 'dd/MM/yyyy') : null,
+        }
+    }, [assetsToken, props.asset, props.state, props.date])
+
     return (
-        <div id="filter-contract" className="bg-hover -mx-4 px-4 sm:px-0 sm:mx-0 pb-8 pt-4">
+        <div id="filter-contract" className="bg-hover -mx-4 px-4 sm:mx-0 pb-8 pt-4">
             <StatusModal
                 data={rowData.current}
                 visible={showStatusModal}
@@ -79,10 +88,36 @@ const InsuranceContractMobile = ({
                 renderContentStatus={renderContentStatus}
                 t={t}
             />
-            <div className="flex items-center justify-between sticky top-[calc(4rem-1px)] bg-hover py-4">
+            <div className="sticky top-[calc(4rem-1px)] bg-hover py-4">
                 <div className="font-semibold">{t('insurance_history:insurance_contract')}</div>
-                <div onClick={() => setShowFilter(true)} className="cursor-pointer">
-                    <FilterIcon />
+                <div className={`flex items-center space-x-4 mt-6 overflow-auto hide-scroll`}>
+                    <div
+                        onClick={() => setShowFilter(true)}
+                        className="flex items-center space-x-2 cursor-pointer text-sm font-semibold py-[6px] px-4 border border-divider rounded-[300px]"
+                    >
+                        <FilterIcon size={18} />
+                        <span>{t('common:filter')}</span>
+                    </div>
+                    {Object.keys(labelFilter).map(
+                        (key: string) =>
+                            (labelFilter[key]?.name || labelFilter[key]) && (
+                                <div
+                                    onClick={() => setShowFilter(true)}
+                                    key={key}
+                                    className="px-4 py-2 bg-pink rounded-full w-max text-red font-semibold text-sm flex items-center space-x-2 whitespace-nowrap"
+                                >
+                                    {labelFilter[key]?.attachment && (
+                                        <img
+                                            src={labelFilter[key]?.attachment}
+                                            width={20}
+                                            height={20}
+                                            className="min-w-[20px] max-h-[20px] rounded-full object-cover"
+                                        />
+                                    )}
+                                    <span>{labelFilter[key]?.name || labelFilter[key]}</span>
+                                </div>
+                            ),
+                    )}
                 </div>
             </div>
             <BgDashed onClick={onBuyInsurance}>
@@ -110,7 +145,7 @@ const InsuranceContractMobile = ({
                             </div>
                             <div className="flex items-center justify-center space-x-2 bg-pink-1 rounded-md">
                                 <AlarmIcon />
-                                <span className="text-xs text-red font-semibold py-2 lowercase">7 ngày 12:30:23</span>
+                                <span className="text-xs text-red font-semibold py-2 lowercase">7D 12:30:23</span>
                             </div>
                             <div className="flex justify-between flex-wrap">
                                 <Item>
@@ -156,10 +191,13 @@ const InsuranceContractMobile = ({
                                             <div
                                                 data-tut={'tour_hashID'}
                                                 className="text-xs text-txtSecondary flex items-center space-x-1"
-                                                onClick={() => navigator.clipboard.writeText(item?._id)}
+                                                onClick={() => {
+                                                    Config.copy(item?._id)
+                                                    setCopy(item?._id)
+                                                }}
                                             >
                                                 <span>{item?._id}</span>
-                                                <CopyIcon />
+                                                {copy === item?._id ? <CheckedIcon size={12} /> : <CopyIcon />}
                                             </div>
                                         </div>
                                     </div>
@@ -171,12 +209,12 @@ const InsuranceContractMobile = ({
                                 <div className="flex items-center justify-center space-x-2 bg-pink-1 rounded-md">
                                     <AlarmIcon />
                                     <span className="text-xs text-red font-semibold py-2 lowercase">
-                                        {item?.period} {t('common:days')} {formatTime(item?.createdAt, 'HH:mm:ss')}
+                                        <Countdown date={item.expired} />
                                     </span>
                                 </div>
                                 <div className="flex justify-between flex-wrap">
                                     <Item>
-                                        <div className="text-txtSecondary text-xs whitespace-nowrap">{t('common:insurance')}</div>
+                                        <div className="text-txtSecondary text-xs">{t('common:insurance')}</div>
                                         <span className="text-xs font-semibold text-red underline">
                                             <Link href={Config.env.BSC + '/' + item?.transaction_hash}>
                                                 <a target="_blank">

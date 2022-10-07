@@ -41,6 +41,7 @@
     "load_more": "Xem thêm",
     "filter_by": "Lọc kết quả theo",
     "undo": "Hoàn tác",
+    "reset": "Đặt lại",
     "notification": {
         "title": "Thông báo",
         "no_notice": "Bạn hiện không có thông báo nào.",
@@ -154,5 +155,17 @@
         "r_claim": "Tỷ lệ chi trả bảo hiểm so với ký quỹ ban đầu",
         "q_claim": "Số lượng chi trả bảo hiểm khi chạm P-Claim",
         "margin": "Giá trị ký quỹ hợp đồng bảo hiểm"
-    }
+    },
+    "no_data": "Không có dữ liệu để hiện thị",
+    "from": "Từ",
+    "to": "Đến",
+    "date": "Ngày",
+    "type": "Loại",
+    "custom": "Tùy chỉnh",
+    "amount": "Số tiền",
+    "address_wallet": "Địa chỉ ví",
+    "ref_code": "Mã giới thiệu",
+    "ref_link": "Link giới thiệu",
+    "submit": "Submit",
+    "retry": "Rút lại"
 }

@@ -79,7 +79,7 @@ const News = ({ news = [] }: any) => {
         $isMobile: isMobile,
     }
     return (
-        <section className="pt-20 sm:pt-[7.5rem] px-4 lg:px-20">
+        <section className="pt-20 sm:pt-[7.5rem] px-4 mb:px-10 lg:px-20">
             <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto">
                 <div className="text-2xl sm:text-5xl font-semibold -mb-2 ">{t('home:home:news')}</div>
                 <StyledNews

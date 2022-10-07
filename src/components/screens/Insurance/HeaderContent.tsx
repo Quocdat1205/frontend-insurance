@@ -5,6 +5,8 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'react-feather'
 import cx from 'classnames'
+import Button from 'components/common/Button/Button'
+import Config from 'config/config'
 
 const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) => {
     const [isDrop, setDrop] = useState<boolean>(false)
@@ -18,21 +20,19 @@ const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) 
         <div
             className={`max-w-screen-layout 4xl:max-w-screen-3xl  mt-[2rem] ${
                 auth ? 'mb-[3rem] ' : 'mb-[1rem] '
-            } grid grid-cols-12 content-center items-center justify-between`}
+            } grid grid-cols-12 content-center items-start justify-between`}
             onClick={() => {
                 setDrop(false)
             }}
         >
-            <div className="flex items-center font-semibold col-span-4">
+            <div
+                className="flex items-center font-semibold col-span-4 hover:cursor-pointer"
+                onClick={() => {
+                    return router.push('/home')
+                }}
+            >
                 <LeftArrow />
-                <span
-                    className={'hover:cursor-pointer ml-2'}
-                    onClick={() => {
-                        return router.push('/home')
-                    }}
-                >
-                    {t('insurance:buy:back_to_home')}
-                </span>
+                <span className={'hover:cursor-pointer ml-2'}>{t('insurance:buy:back_to_home')}</span>
             </div>
 
             <div
@@ -43,6 +43,24 @@ const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) 
             >
                 <div className={'font-semibold text-[32px] leading-[44px]'}>{t('insurance:buy:buy_covered')}</div>
                 {auth == null && <div className={'mt-[12px]'}>{t('insurance:buy:connect_wallet_error')}</div>}
+                {
+                    //checkAuth
+                    auth == null ? (
+                        <div className="w-full mt-[2rem] flex flex-col justify-center items-center max-w-screen-layout 4xl:max-w-screen-3xl m-auto mb-[1rem]">
+                            <Button
+                                variants={'primary'}
+                                className={`bg-red h-[40.5rem] w-[374px] flex justify-center items-center text-white rounded-[0.5rem] py-[12px]`}
+                                onClick={() => {
+                                    Config.connectWallet()
+                                }}
+                            >
+                                {t('insurance:buy:connect_wallet')}
+                            </Button>
+                        </div>
+                    ) : (
+                        ''
+                    )
+                }
             </div>
 
             <Popover className="relative col-span-4 flex justify-end" data-tut="tour_custom" id="tour_custom">

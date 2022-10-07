@@ -1,17 +1,23 @@
 import Button from 'components/common/Button/Button'
 import { CopyIcon } from 'components/common/Svg/SvgIcon'
+import { getAddChainParameters } from 'components/web3/Web3Types'
+import Config from 'config/config'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
 const NetworkError = () => {
     const { t } = useTranslation()
-
-    const onAddNetwork = () => {
-        window.open('chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/home.html#settings/networks/add-network', '_blank')
+    const onAddNetwork = async () => {
+        try {
+            const wallet = sessionStorage.getItem('PUBLIC_WALLET')
+            Config.web3.activate(wallet, Config.chains[0])
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const onCopy = (text: string) => {
-        navigator.clipboard.writeText(text)
+        if (navigator) navigator?.clipboard?.writeText(text)
     }
 
     return (
@@ -30,10 +36,12 @@ const NetworkError = () => {
                     </div>
                 </div>
                 <div className="flex items-center justify-between">
-                    <div className="text-txtSecondary">{t('common:not_found_network:new_rpc_url')}</div>
-                    <div onClick={() => onCopy('https://bsc-dataseed.binance.org/')} className="font-semibold flex items-center space-x-1">
+                    <div className="text-txtSecondary whitespace-nowrap">{t('common:not_found_network:new_rpc_url')}</div>
+                    <div onClick={() => onCopy('https://bsc-dataseed.binance.org/')} className="font-semibold flex items-center text-right space-x-1">
                         <span>https://bsc-dataseed.binance.org/</span>
-                        <CopyIcon size={18} />
+                        <span>
+                            <CopyIcon size={18} />
+                        </span>
                     </div>
                 </div>
                 <div className="flex items-center justify-between">

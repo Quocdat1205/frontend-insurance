@@ -48,6 +48,8 @@ const Banner = () => {
                 value: 119059000,
                 decimal: unitConfig?.assetDigit ?? 2,
                 tooltip: 'common:terminology:q_covered',
+                // prefix: '$',
+                suffix: 'M',
             },
             {
                 title: t('home:landing:total_margin'),
@@ -56,6 +58,8 @@ const Banner = () => {
                 value: 79000,
                 decimal: unitConfig?.assetDigit ?? 2,
                 tooltip: 'common:terminology:margin',
+                // prefix: '$',
+                suffix: 'M',
             },
             {
                 title: t('home:landing:users'),
@@ -85,28 +89,34 @@ const Banner = () => {
     }, [])
 
     return (
-        <section className="pt-20 sm:pt-[7.5rem]">
-            <div className="px-4 lg:px-20 ">
-                <div className="text-2xl sm:text-5xl font-semibold mb-6 max-w-screen-insurance m-auto">{t('home:home:statistics')}</div>
+        <section className="pt-10 sm:pt-[7.5rem]">
+            <div className="px-4 mb:px-10 lg:px-20">
+                <div className="text-2xl sm:text-5xl font-semibold mb-6 max-w-screen-insurance 4xl:max-w-screen-3xl m-auto">{t('home:home:statistics')}</div>
             </div>
             <Background isMobile={isMobile}>
                 <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto text-center flex flex-col space-y-8 sm:space-y-6">
                     <div className="flex flex-col space-y-2">
-                        <div className="leading-5 sm:leading-6">{t('home:landing:total_q_claim')}</div>
+                        <Tooltip className="max-w-[200px]" id={'common:terminology:q_covered'} placement="top" />
+                        <div className="leading-5 sm:leading-6 flex justify-center items-center">
+                            {t('home:landing:total_q_claim')}
+                            <div className={'ml-[0.375rem]'} data-tip={t('common:terminology:q_covered')} data-for={'common:terminology:q_covered'}>
+                                <InfoCircle className={''} size={14} color={colors.txtSecondary} />
+                            </div>
+                        </div>
                         <div
                             className="text-red text-[2.5rem] sm:text-5xl leading-[3.5rem] font-bold sm:font-semibold"
                             data-aos="fade-up"
                             data-aos-delay={DURATION_AOS}
                         >
                             {/* {formatNumber(general?.q_claim, 4)} */}
-                            129,000
+                            129,000M
                         </div>
                     </div>
 
                     <div className="grid grid-rows-4 sm:grid-rows-2 sm:grid-cols-2 lg:grid-rows-1 lg:grid-cols-4 grid-flow-col gap-x-6 lg:gap-6">
-                        <Tooltip className="max-w-[200px]" id={'common:terminology:q_covered'} placement="bottom" />
-                        <Tooltip className="max-w-[200px]" id={'common:terminology:margin'} placement="bottom" />
-                        <Tooltip className="max-w-[200px]" id={'common:terminology:r_claim'} placement="bottom" />
+                        <Tooltip className="max-w-[200px]" id={'common:terminology:q_covered'} placement="top" />
+                        <Tooltip className="max-w-[200px]" id={'common:terminology:margin'} placement="top" />
+                        <Tooltip className="max-w-[200px]" id={'common:terminology:r_claim'} placement="top" />
                         {list.map((item: any, index: number) => (
                             <Item key={index} className=" border-transparent-red lg:border-gradient-red">
                                 <div className="max-h-[54px]">
@@ -122,6 +132,7 @@ const Banner = () => {
                                         )}
                                     </div>
                                     <div className="font-semibold text-2xl" data-aos="fade-up" data-aos-delay={DURATION_AOS} data-aos-offset="50">
+                                        {item?.prefix || ''}
                                         {formatNumber(item.value, item.decimal)}
                                         {item.suffix}
                                     </div>
@@ -146,7 +157,7 @@ const Item = styled.div.attrs<any>({
     border-bottom: 0;
 `
 const Background = styled.div.attrs({
-    className: 'pt-8 px-4 lg:px-20 ',
+    className: 'pt-8 px-4 mb:px-10 lg:px-20',
 })<any>`
     background-image: ${({ isMobile }) => `url(${`/images/screens/home/banner_alt${isMobile ? '_mobile' : ''}.png`})`};
     background-position: top;

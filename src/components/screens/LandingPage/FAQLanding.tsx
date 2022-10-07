@@ -85,7 +85,7 @@ const FaqLanding = () => {
                 {faq_contents.map(({ question, ans, link, href }) => (
                     <div key={question}>
                         <div className="h-[1px] w-full bg-divider" />
-                        <div key={question} className="mx-auto min-w-[20rem] lg:min-w-[48rem] w-full max-w-md rounded-2xl px-6 py-4 lg:p-[1.5rem] ">
+                        <div key={question} className="mx-auto min-w-[20rem] lg:min-w-[48rem] w-full max-w-md rounded-2xl px-6 py-4 lg:p-[1.5rem] cursor-pointer ">
                             <Disclosure>
                                 {({ open }) => (
                                     <>
@@ -113,7 +113,7 @@ const FaqLanding = () => {
 export default FaqLanding
 
 const Background = styled.section.attrs({
-    className: 'lg:mt-[11.25rem] mt-[5rem] banner-landing px-4 lg:px-20 min-h-[350px] flex flex-col justify-end mt-[7.5rem] scroll-mt-[4.25rem]',
+    className: 'lg:mt-[11.25rem] mt-[5rem] banner-landing px-4 mb:px-10 lg:px-20 min-h-[350px] flex flex-col justify-end mt-[7.5rem] scroll-mt-[4.25rem]',
 })<any>`
     background-image: ${() => `url(${`/images/screens/landing-page/bg_faq.png`})`};
     background-position: top;

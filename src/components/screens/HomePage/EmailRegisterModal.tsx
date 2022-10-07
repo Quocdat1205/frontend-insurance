@@ -6,22 +6,23 @@ import InputField, { ErrorSectionNote } from 'components/common/Input/InputField
 import CircleSpinner from 'components/common/Loader/CircleSpinner'
 import Modal from 'components/common/Modal/Modal'
 import Config from 'config/config'
-import useWeb3Wallet from 'hooks/useWeb3Wallet'
-import { RootStore, useAppSelector } from 'redux/store'
-import { API_GET_INFO_USER, API_UPDATE_USER_INFO } from 'services/apis'
+import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
+import { API_UPDATE_USER_INFO } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { setModalSubscribeStorage } from 'utils/utils'
+import { setAccount } from 'redux/actions/setting'
 
 interface EmailRegisterModal {
     visible: boolean
     onClose: () => void
-    isUpdate: boolean
+    email?: string | undefined | null
 }
 
 interface ModalContentProps {
     onSubmit: (email: string) => void
     onClose?: () => void
     isLoading: boolean
+    email?: string | undefined | null
 }
 
 const isValidEmail = (email: any) =>
@@ -32,10 +33,11 @@ const isValidEmail = (email: any) =>
         )
 const isDuplicateEmail = (oldEmail: any, newEmail: any) => newEmail?.toLowerCase() === oldEmail?.toLowerCase()
 
-const EmailSubscriptionModal = ({ visible, onClose, isUpdate }: EmailRegisterModal) => {
+const EmailSubscriptionModal = ({ visible, onClose, email }: EmailRegisterModal) => {
     const { t } = useTranslation()
     const [isLoading, setIsLoading] = useState(false)
-    const { account, chain } = useWeb3Wallet()
+    const account = useAppSelector((state: RootStore) => state.setting.account)
+    const dispatch = useAppDispatch()
 
     const updateEmail = async (email: any) => {
         try {
@@ -46,7 +48,7 @@ const EmailSubscriptionModal = ({ visible, onClose, isUpdate }: EmailRegisterMod
                     method: 'PUT',
                 },
                 params: {
-                    owner: account,
+                    owner: account?.address,
                     email,
                 },
             })
@@ -55,6 +57,7 @@ const EmailSubscriptionModal = ({ visible, onClose, isUpdate }: EmailRegisterMod
             }
             if (statusCode === 200) {
                 // update local storage
+                dispatch(setAccount({ ...data }))
                 setModalSubscribeStorage(Config.MODAL_REGISTER_EMAIL, 'true')
                 Config.toast.show('success', t('common:modal:success_update_email'))
                 onClose()
@@ -79,7 +82,7 @@ const EmailSubscriptionModal = ({ visible, onClose, isUpdate }: EmailRegisterMod
             isVisible={visible}
             onBackdropCb={handleOnClose}
             wrapClassName="!p-6"
-            className={'lg:max-w-[524px]'}
+            className={'sm:max-w-[524px]'}
             containerClassName="z-[9999999]"
         >
             <div className="flex flex-col items-center justify-center pb-5 text-xl font-medium">
@@ -89,8 +92,8 @@ const EmailSubscriptionModal = ({ visible, onClose, isUpdate }: EmailRegisterMod
                     <div className="pt-2 text-sm text-center md:text-base text-txtSecondary">{t('common:modal:email_subscription:description')}</div>
                 </div>
             </div>
-            {isUpdate ? (
-                <UpdateEmailContent onSubmit={updateEmail} onClose={handleOnClose} isLoading={isLoading} />
+            {email ? (
+                <UpdateEmailContent email={email} onSubmit={updateEmail} onClose={handleOnClose} isLoading={isLoading} />
             ) : (
                 <RegisterEmailContent onSubmit={updateEmail} onClose={handleOnClose} isLoading={isLoading} />
             )}
@@ -168,28 +171,10 @@ const RegisterEmailContent = ({ onSubmit, onClose, isLoading }: ModalContentProp
     )
 }
 
-const UpdateEmailContent = ({ onSubmit, onClose, isLoading }: ModalContentProps) => {
+const UpdateEmailContent = ({ onSubmit, onClose, isLoading, email: currentEmail }: ModalContentProps) => {
     const { t } = useTranslation()
     const [email, setEmail] = useState('')
-    const [currentEmail, setCurrentEmail] = useState('a@mail.com')
     const [ableSubmit, setAbleSubmit] = useState(false)
-    const account = useAppSelector((state: RootStore) => state.setting.account)
-
-    const getInfo = useCallback(async (owner: string) => {
-        const { data } = await fetchApi({
-            url: API_GET_INFO_USER,
-            params: {
-                owner,
-            },
-        })
-        if (data) {
-            setCurrentEmail(data.email)
-        }
-    }, [])
-
-    useEffect(() => {
-        if (account?.address) getInfo(account.address)
-    }, [account])
 
     const handleChange = (event: any) => {
         setEmail(event.target.value)

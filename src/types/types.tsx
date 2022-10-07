@@ -23,6 +23,7 @@ export interface IconSvg {
     size?: number
     color?: string
     className?: string
+    onClick?: () => void
 }
 
 export interface StateInsurance {
@@ -48,4 +49,8 @@ export interface PairConfig {
     quoteAsset: string
     symbol: string
     [key: string]: number | string
+}
+
+export interface CountdownType {
+    date: Date
 }

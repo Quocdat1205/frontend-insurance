@@ -2,11 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "fonts";
-@import "fonts";
-@import "datepicker";
-@import "pagination";
-@import "keyframes";
+@import 'fonts';
+@import 'fonts';
+@import 'datepicker';
+@import 'pagination';
+@import 'keyframes';
 
 html,
 body {
@@ -186,13 +186,13 @@ input::-webkit-inner-spin-button {
     margin: 0;
 }
 
-input[type="number"] {
+input[type='number'] {
     -moz-appearance: textfield;
 }
 
 /* Tooltip container */
 .tooltip::after {
-    content: " ";
+    content: ' ';
     position: absolute;
     top: 100%; /* At the bottom of the tooltip */
     left: 80%;
@@ -233,7 +233,7 @@ input[type="number"] {
     margin-left: 12px !important;
 
     &::before {
-        content: "";
+        content: '';
         position: absolute;
         display: block;
         width: 0px;
@@ -292,4 +292,16 @@ input[type="number"] {
     &::-webkit-scrollbar-thumb:hover {
         background: #e5e7e8 !important;
     }
+}
+
+.tab-active {
+    @apply text-red font-semibold;
+}
+
+.hide-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+#faq-section {
+  scroll-behavior: smooth;
 }

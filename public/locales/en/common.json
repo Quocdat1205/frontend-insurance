@@ -41,6 +41,7 @@
     "load_more": "Load More",
     "filter_by": "Filter By",
     "undo": "Undo",
+    "reset": "Reset",
     "notification": {
         "title": "Notification",
         "notice_message": "Insurance contract <span class='text-red'>{{id}}</span> {{status}}",
@@ -78,7 +79,7 @@
     "installer": {
         "metamask_title": "Install Metamask Extension",
         "metamask_content": "Please add Metamask Extension to continue the wallet connection process with Nami Insurance.",
-        "metamask_guide": "Having trouble installing the wallet? Read more <span class='text-blue underline cursor-pointer'>how to Install Metamask Extension</span> now.",
+        "metamask_guide": "Having trouble installing the wallet? Read more <span class='text-blue underline cursor-pointer'>How to Install Metamask Extension</span> now.",
         "coinbase_title": "Cài đặt Coinbase Wallet Extension",
         "coinbase_content": "Vui lòng cài đặt Coinbase Wallet Extension để tiếp tục quá trình kết nối ví đến Nami Insurance.",
         "coinbase_guide": "Chưa biết cách cài đặt ví? Đọc <span class='text-blue underline cursor-pointer'>Hướng dẫn cài đặt Coinbase Wallet Extension</span> ngay.",
@@ -143,7 +144,7 @@
         }
     },
     "terminology": {
-        "q_covered": "Quanity of covered asset",
+        "q_covered": "Quantity of covered asset",
         "p_market": "The current price of the covered asset",
         "p_claim": "Price activates receiving cover payout",
         "p_expired": "Price triggers the insurance contract to expire",
@@ -154,5 +155,17 @@
         "r_claim": "Ratio of  cover payout to Margin ",
         "q_claim": "Quantity of cover payout when reaching P-Claim",
         "margin": "Margin of insurance contract"
-    }
+    },
+    "no_data": "There are no records to display",
+    "from": "From",
+    "to": "To",
+    "date": "Date",
+    "type": "Type",
+    "custom": "Custom",
+    "amount_of_money": "Amount",
+    "address_wallet": "Address Wallet",
+    "ref_code": "Ref Code",
+    "ref_link": "Ref Link",
+    "submit": "Submit",
+    "retry": "Retry"
 }

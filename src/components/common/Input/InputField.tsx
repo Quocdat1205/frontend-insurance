@@ -24,11 +24,14 @@ export type InputProps = {
     label?: string
     onKeyDown?: (e: any) => void
     id?: string
-    disabled?: boolean,
+    disabled?: boolean
     onPaste?: (e?: any) => void
+    containerClassName?: string
+    labelClassName?: string
+    vertical?: boolean
 }
 
-const defaultInputCls = 'bg-hover w-full py-[12px] px-[16px] h-11 sm:h-12 rounded-[3px] ' + 'px-3 py-3 placeholder-gray-400 text-sm focus:outline-none '
+const defaultInputCls = 'bg-hover w-full py-3 px-4 h-11 sm:h-12 rounded-[3px] ' + 'px-3 py-3 placeholder-gray-400 text-sm focus:outline-none '
 
 const defaultAreaCls =
     ' resize-none bg-hover border-none px-3 py-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none '
@@ -55,6 +58,9 @@ const InputField = ({
     onKeyDown,
     placeholder,
     disabled = false,
+    vertical = true,
+    containerClassName = '',
+    labelClassName = '',
     ...inputProps
 }: Partial<InputProps>) => {
     const [focus, setFocus] = useState<boolean>(false)
@@ -74,11 +80,25 @@ const InputField = ({
     }
 
     return (
-        <div className={'flex flex-col items-start mb-4'}>
+        <div
+            className={cx(
+                `flex mb-4 relative`,
+                { 'flex-col items-start': vertical, 'bg-hover items-center p-2': !vertical, 'border border-error': isError && !vertical },
+                containerClassName,
+            )}
+        >
             {label && (
-                <label htmlFor={id} className=" text-sm pb-[8px] text-txtSecondary">
+                <label htmlFor={id} className={cx(`text-sm text-txtSecondary`, { 'pb-2': vertical }, labelClassName)}>
                     {label}
                 </label>
+            )}
+            {isError && focus && !vertical && validator?.message && (
+                <div className="absolute right-0 -top-11 sm:-top-12 text-xs z-[100] bg-white border border-red p-2 rounded-md">
+                    <div className="flex items-center space-x-2">
+                        <ErrorTriggersIcon />
+                        <div dangerouslySetInnerHTML={{ __html: validator?.message }} />
+                    </div>
+                </div>
             )}
             <div className="flex flex-col items-center space-x-2 w-full">
                 {customPrefix && <div className={cx('outline-none', prefixClassName)}>{customPrefix && customPrefix()}</div>}
@@ -88,13 +108,12 @@ const InputField = ({
                         value={value}
                         type={'text'}
                         className={cx([
-                            className,
-                            { ' text-sm lg:text-base border border-error': isError,
-                                'text-gray bg-[#EFF0F2]': disabled },
+                            inputClassName,
+                            { ' text-sm lg:text-base border border-error': isError && vertical, 'text-gray bg-[#EFF0F2]': disabled },
                             defaultInputCls,
-                            animationCls,
+                            // animationCls,
                         ])}
-                        placeholder={placeholder || 'placeholder'}
+                        placeholder={placeholder ?? label}
                         onChange={onChange}
                         disabled={disabled}
                         onFocus={_onFocus}
@@ -130,8 +149,7 @@ const InputField = ({
                 )}
                 {customSuffix && <div className={cx('outline-none', suffixClassName)}>{customSuffix()}</div>}
             </div>
-            {/* </div> */}
-            {isError && validator?.message && (
+            {isError && validator?.message && vertical && (
                 <div className="text-xs mt-2 text-error">
                     <div className="flex items-center space-x-2">
                         <ErrorTriggersIcon />
@@ -145,7 +163,7 @@ const InputField = ({
 
 export const ErrorSectionNote = ({ content }: { content: any }) => (
     <div className={'w-full bg-hover mb-5 py-2 font-normal px-4'}>
-        <div className="text-xs text-red text-sm md:text-base">
+        <div className="text-xs text-red md:text-base">
             <div className="flex items-start space-x-2">
                 <TriggerErrorIconCircle />
                 <div
