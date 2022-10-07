@@ -138,7 +138,7 @@ const InsuranceFilterMobile = (props: InsuranceFilterMobile) => {
                     <div className={`flex items-center justify-between`}>
                         <div className="text-xl leanding-8 font-semibold">{t('common:filter_by')}</div>
                         <div onClick={onReset} className="text-red underline text-sm">
-                            {t('common:undo')}
+                            {t('common:reset')}
                         </div>
                     </div>
                     <Selectbox
