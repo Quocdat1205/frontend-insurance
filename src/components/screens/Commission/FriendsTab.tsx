@@ -88,7 +88,7 @@ const FriendsTab = ({ account, setFriends, unitConfig, doReload }: FriendsTab) =
                 Cell: (e: any) => <div>{formatAddress(e.value)}</div>,
             },
             {
-                Header: t('commission:friends:attached_on'),
+                Header: t('commission:friends:introduced_on'),
                 accessor: 'createdAt',
                 minWidth: 200,
                 Cell: (e: any) => formatTime(e.value, 'dd.MM.yyyy'),
@@ -159,7 +159,7 @@ const FriendsTab = ({ account, setFriends, unitConfig, doReload }: FriendsTab) =
                                 </div>
                                 <div className="flex flex-col text-sm w-full divide-y divide-divider mt-6">
                                     <div className="flex items-center pb-2 justify-between">
-                                        <div className="text-txtSecondary">{t('common:friends:attached_on')}</div>
+                                        <div className="text-txtSecondary">{t('common:friends:introduced_on')}</div>
                                         <div className="font-semibold">{formatTime(item.createdAt, 'dd.MM.yyyy')}</div>
                                     </div>
                                     <div className="flex items-center py-2 justify-between">

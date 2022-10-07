@@ -1,7 +1,7 @@
 {
     "title": "Refer friends <br/> Get rewards",
-    "description": "Earn up to 10% Margin-based reward when your friends make an insurance contract successfully",
-    "current_rate": "Current Commission Rate",
+    "description": "Earn up to 10% Margin-based reward when your friends make an insurance contract successfully.",
+    "current_rate": "Current Reward Rate",
     "reward_stats": "Reward Stats",
     "total_withdrawn_reward": "Total Withdrawn Reward",
     "total_available_reward": "Total Available Reward",
@@ -10,8 +10,8 @@
     "Total_of_friends_margined": "Total of friends margined insurance contract",
     "friends": {
         "title": "Friend list",
-        "friends_list_nodata": "Please connect Wallet to view your friends list",
-        "attached_on": "Ref code attached on",
+        "friends_list_nodata": "Please connect Wallet to view your friends list.",
+        "introduced_on": "Introduced On",
         "total_insurance_contract": "Total Insurance Contract",
         "total_margin": "Total Margin",
         "total_reward": "Total Reward",
@@ -19,7 +19,7 @@
     },
     "history": {
         "title": "Commission history",
-        "commission_history_nodata": "Please connect Wallet to view your Commission history",
+        "commission_history_nodata": "Please connect Wallet to view your reward history.",
         "receive_reward": "Receive Reward",
         "withdraw_reward": "Withdraw Reward"
     },
