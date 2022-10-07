@@ -8,6 +8,8 @@ interface Env {
     CHAINS: string
     PRICE_API_URL: string
     NAMI_API_URL: string
+    USER_SOCKET: string
+    PUBLIC_SOCKET: string
 }
 
 const env: Env = {
@@ -20,6 +22,8 @@ const env: Env = {
     CHAINS: process.env.NEXT_PUBLIC_CHAINS ?? '',
     PRICE_API_URL: process.env.NEXT_PUBLIC_PRICE_API_URL ?? '',
     NAMI_API_URL: process.env.NEXT_PUBLIC_NAMI_API_URL ?? '',
+    USER_SOCKET: process.env.NEXT_PUBLIC_USER_SOCKET ?? '',
+    PUBLIC_SOCKET: process.env.NEXT_PUBLIC_STREAM_SOCKET ?? '',
 }
 
 export default env

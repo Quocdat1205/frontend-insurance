@@ -9,11 +9,12 @@ import { formatAddress, formatCurrency, formatTime } from 'utils/utils'
 import { UnitConfig } from 'types/types'
 import Spinner from 'components/common/Loader/Spinner'
 import { useTranslation } from 'next-i18next'
+import Config from 'config/config'
 
 interface FriendsTab {
     account: any
     setFriends: (e: any) => void
-    unitConfig: UnitConfig,
+    unitConfig: UnitConfig
     doReload: boolean
 }
 
@@ -81,31 +82,31 @@ const FriendsTab = ({ account, setFriends, unitConfig, doReload }: FriendsTab) =
     const columns = useMemo(
         () => [
             {
-                Header: 'Địa chỉ ví',
+                Header: t('commission:friends:wallet'),
                 accessor: 'child',
                 minWidth: 200,
                 Cell: (e: any) => <div>{formatAddress(e.value)}</div>,
             },
             {
-                Header: 'Thời gian gắn',
+                Header: t('commission:friends:attached_on'),
                 accessor: 'createdAt',
                 minWidth: 200,
                 Cell: (e: any) => formatTime(e.value, 'dd.MM.yyyy'),
             },
             {
-                Header: 'Tổng HĐBH',
+                Header: t('commission:friends:total_insurance_contract'),
                 accessor: 'totalInsurance',
                 minWidth: 200,
                 Cell: (e: any) => formatCurrency(e.value),
             },
             {
-                Header: 'Tổng margin',
+                Header: t('commission:friends:total_margin'),
                 accessor: 'totalMargin',
                 minWidth: 200,
                 Cell: (e: any) => formatCurrency(e.value, unitConfig.assetDigit ?? 2) + ` ${unitConfig.assetCode}`,
             },
             {
-                Header: 'Tổng hoa hồng',
+                Header: t('commission:friends:total_reward'),
                 accessor: 'totalCommission',
                 minWidth: 200,
                 Cell: (e: any) => formatCurrency(e.value, unitConfig.assetDigit ?? 2) + ` ${unitConfig.assetCode}`,
@@ -130,12 +131,13 @@ const FriendsTab = ({ account, setFriends, unitConfig, doReload }: FriendsTab) =
 
     return (
         <>
-            <div className="text-xl font-medium mb-6 hidden sm:flex">Danh sách bạn bè</div>
+            <div className="text-xl font-medium mb-6 hidden sm:flex">{t('commission:friends:title')}</div>
             {(dataSource.listFriends.length <= 0 || !account.address) && !loading ? (
                 <NoData
                     className="py-20"
                     showButton={!account.address}
-                    textContent={!account.address ? `Vui lòng kết nối ví để xem danh sách bạn bè` : 'Không có dữ liệu để hiển thị'}
+                    textContent={!account.address ? t('commission:friends:friends_list_nodata') : t('common:no_data')}
+                    onClick={() => Config.connectWallet()}
                 />
             ) : !isMobile ? (
                 <DataTable
@@ -152,24 +154,26 @@ const FriendsTab = ({ account, setFriends, unitConfig, doReload }: FriendsTab) =
                     {dataSource?.listFriends?.map((item: any, index: number) => {
                         return (
                             <div key={index} className="rounded-xl bg-hover p-4">
-                                <div className="font-medium">Ví: {formatAddress(item.child)}</div>
+                                <div className="font-medium">
+                                    {t('commission:friends:wallet')}: {formatAddress(item.child)}
+                                </div>
                                 <div className="flex flex-col text-sm w-full divide-y divide-divider mt-6">
                                     <div className="flex items-center pb-2 justify-between">
-                                        <div className="text-txtSecondary">Thời gian gắn</div>
+                                        <div className="text-txtSecondary">{t('common:friends:attached_on')}</div>
                                         <div className="font-semibold">{formatTime(item.createdAt, 'dd.MM.yyyy')}</div>
                                     </div>
                                     <div className="flex items-center py-2 justify-between">
-                                        <div className="text-txtSecondary">Tổng HĐBH</div>
+                                        <div className="text-txtSecondary">{t('commission:friends:total_insurance_contract')}</div>
                                         <div className="font-semibold">{formatCurrency(item.totalInsurance)}</div>
                                     </div>
                                     <div className="flex items-center py-2 justify-between">
-                                        <div className="text-txtSecondary">Tổng margin</div>
+                                        <div className="text-txtSecondary">{t('commission:friends:total_margin')}</div>
                                         <div className="font-semibold">
                                             {formatCurrency(item.totalMargin, unitConfig.assetDigit ?? 2)} {unitConfig.assetCode}
                                         </div>
                                     </div>
                                     <div className="flex items-center pt-2 justify-between">
-                                        <div className="text-txtSecondary">Tổng hoa hồng</div>
+                                        <div className="text-txtSecondary">{t('commission:friends:total_reward')}</div>
                                         <div className="font-semibold">
                                             {formatCurrency(item.totalCommission, unitConfig.assetDigit ?? 2)} {unitConfig.assetCode}
                                         </div>

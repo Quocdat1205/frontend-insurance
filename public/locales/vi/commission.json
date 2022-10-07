@@ -1,0 +1,38 @@
+{
+    "title": "Giới thiệu thêm bạn <br/> Lợi nhuận vô hạn",
+    "description": "Tỷ lệ hoa hồng lên đến 10% Margin mỗi khi bạn bè của bạn ký quỹ hợp đồng bảo hiểm thành công",
+    "current_rate": "Mức hoa hồng hiện tại",
+    "reward_stats": "Thống kê Hoa hồng",
+    "total_withdrawn_reward": "Tổng hoa hồng đã rút",
+    "total_available_reward": "Tổng hoa hồng khả dụng",
+    "withdraw": "Rút",
+    "total_of_friends": "Tổng số bạn bè",
+    "Total_of_friends_margined": "Tổng số bạn bè đã ký quỹ HĐBH",
+    "friends": {
+        "title": "Danh sách bạn bè",
+        "friends_list_nodata": "Vui lòng kết nối Ví để xem danh sách bạn bè",
+        "attached_on": "Ngày gắn Mã Ref",
+        "total_insurance_contract": "Tổng Hợp đồng bảo hiểm",
+        "total_margin": "Tổng Margin",
+        "total_reward": "Tổng hoa hồng",
+        "wallet": "Ví"
+    },
+    "history": {
+        "title": "Lịch sử hoa hồng ",
+        "commission_history_nodata": "Vui lòng kết nối Ví để xem lịch sử",
+        "receive_reward": "Nhận hoa hồng",
+        "withdraw_reward": "Rút hoa hồng"
+    },
+    "policy": {
+        "title": "Chính sách hoa hồng",
+        "description": "Vối mỗi hợp đồng ký quỹ bảo hiểm thành công từ người dùng do bạn giới thiệu, bạn sẽ nhận được tỷ lệ hoa hồng tương ứng tổng Margin tích luỹ như sau:",
+        "total_margin": "Tổng Margin tích luỹ",
+        "reward_rate": "Tỷ lệ hoa hồng "
+    },
+    "withdraw_reward": {
+        "confirm_withdraw": "Xác nhận rút hoa hồng",
+        "are_you_sure": "Bạn có chắc chắn muốn rút {{value}}",
+        "withdraw_failed": "Yêu cầu rút hoa hồng thất bại",
+        "withdraw_successful": "Yêu cầu rút hoa hồng được xử lý thành công"
+    }
+}

@@ -51,8 +51,6 @@ const Commission = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [account, doReload])
 
-    // console.log(account, userInfo)
-
     return (
         <LayoutWeb3 sponsor={false}>
             <CommissionWithdrawModal
@@ -93,7 +91,7 @@ const Commission = () => {
 
 export const getServerSideProps = async ({ locale }: any) => ({
     props: {
-        ...(await serverSideTranslations(locale, ['common', 'home', 'errors'])),
+        ...(await serverSideTranslations(locale, ['common', 'home', 'errors', 'commission'])),
     },
 })
 

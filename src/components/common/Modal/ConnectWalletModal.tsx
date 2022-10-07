@@ -16,7 +16,7 @@ import NetworkError from 'components/screens/ConnectWallet/NetworkError'
 import SwitchNetwok from 'components/screens/ConnectWallet/SwitchNetwok'
 import { useWeb3React } from '@web3-react/core'
 import { isString } from 'lodash'
-import { API_GET_INFO_USER } from 'services/apis'
+import { API_GET_INFO_USER, API_UPDATE_USER_INFO } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 
 interface ConnectWalletModal {}
@@ -198,6 +198,23 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         connectionError({ code: errorsWallet.Connect_failed, message: t('errors:CONNECT_FAILED') })
     }
 
+    const updateRef = async (address: string, cb: (e: any) => void) => {
+        const refCode = localStorage.getItem('REF_CODE')
+        if (refCode) {
+            const { data } = await fetchApi({
+                url: API_UPDATE_USER_INFO,
+                options: {
+                    method: 'PUT',
+                },
+                params: { owner: address, ref: refCode },
+            })
+            data ? cb(data) : getUserInfo(address, cb)
+            localStorage.removeItem('REF_CODE')
+        } else {
+            getUserInfo(address, cb)
+        }
+    }
+
     const onConfirm = async () => {
         firstTime.current = false
         logged.current = true
@@ -206,7 +223,8 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
             case wallets.metaMask:
                 if (isMobile) {
                     if (!Config.isMetaMaskInstalled) {
-                        window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}`)
+                        const refCode = localStorage.getItem('REF_CODE')
+                        window.open(`https://metamask.app.link/dapp/${'http://192.168.1.61:3000'}?ref=${refCode}`)
                         return
                     }
                     Config.web3?.activate(wallets.metaMask)
@@ -246,7 +264,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 sessionStorage.setItem('PUBLIC_ADDRESS', oldAddress.current)
                 sessionStorage.setItem('PUBLIC_TOKEN', token)
                 if (wallet?.wallet) localStorage.setItem('PUBLIC_WALLET', wallet?.wallet)
-                getUserInfo(oldAddress.current, (user) => {
+                updateRef(oldAddress.current, (user) => {
                     if (chainId && Config.chains.includes(chainId)) {
                         Config.toast.show('success', t('common:connect_successful'))
                     }

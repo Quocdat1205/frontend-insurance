@@ -18,7 +18,7 @@ interface InsuranceFilterMobile {
     date: any
     setDate: (e: any) => void
     filter: any
-    setFilter: (e: any) => void,
+    setFilter: (e: any) => void
     days: any
 }
 
@@ -143,13 +143,15 @@ const CommissionFilterDateMobile = (props: InsuranceFilterMobile) => {
                             <div className="flex items-center space-x-2">
                                 {/* {date?.startDate && <X size={16} onClick={() => onAction('clear')} />} */}
                                 <div className="cursor-pointer flex justify-center gap-2">
-                                    <CalendarIcon />{' '}
+                                    <CalendarIcon color={colors.red.red} />{' '}
                                     {datePicker?.startDate ? (
                                         <div className="w-full flex items-center text-sm sm:text-base ">
-                                            {datePicker?.startDate ? formatTime(datePicker?.startDate, 'dd/MM/yyyy') + ' - ' + formatTime(datePicker?.endDate, 'dd/MM/yyyy') : ''}
+                                            {datePicker?.startDate
+                                                ? formatTime(datePicker?.startDate, 'dd/MM/yyyy') + ' - ' + formatTime(datePicker?.endDate, 'dd/MM/yyyy')
+                                                : ''}
                                         </div>
                                     ) : (
-                                        <span className="font-medium text-sm leading-5">Tuỳ chỉnh</span>
+                                        <span className="font-medium text-sm leading-5">{t('common:custom')}</span>
                                     )}
                                 </div>
                             </div>
