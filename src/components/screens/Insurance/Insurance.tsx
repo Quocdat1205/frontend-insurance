@@ -16,7 +16,7 @@ export const getBalance = async (symbol: string, address: string, constractAdres
                 return 0
             }
         } else {
-            return false
+            return 0
         }
     }
 }
@@ -39,7 +39,7 @@ const Leverage = (p_market: number, p_stop: number) => {
     return leverage < 1 ? 1 : leverage
 }
 
-export const getInfoCoveredDefault = (q_covered: number, p_claim: number, p_market: number) => {
+export const getInfoCoveredDefault = (q_covered: number, p_claim: number, p_market: number, set: any, decimal: number, decimalMargin: number) => {
     const margin = Number((8 * q_covered * p_market) / 100)
     const userCapital = margin
     const systemCapital = userCapital
@@ -49,9 +49,14 @@ export const getInfoCoveredDefault = (q_covered: number, p_claim: number, p_mark
     const laverage = Leverage(p_market, p_stop)
     const ratio_profit = Number(Math.abs(p_claim - p_market) / p_market)
     const q_claim = Number((ratio_profit / 2) * hedge_capital * laverage) * (1 - 0.05) + margin
+
+    set.q_claim = Number(q_claim.toFixed(decimal))
+    set.r_claim = Number((Number(q_claim / margin) * 100).toFixed(decimal))
+    set.p_expired = Number(p_stop.toFixed(decimal))
+    set.margin = Number(margin.toFixed(decimalMargin))
 }
 
-export const getInfoCoveredCustom = (q_covered: number, p_claim: number, p_market: number, margin: number) => {
+export const getInfoCoveredCustom = (q_covered: number, p_claim: number, p_market: number, margin: number, set: any, decimal: number) => {
     const userCapital = margin
     const systemCapital = userCapital
     const hedge_capital = userCapital + systemCapital
@@ -60,9 +65,13 @@ export const getInfoCoveredCustom = (q_covered: number, p_claim: number, p_marke
     const laverage = Leverage(p_market, p_stop)
     const ratio_profit = Number(Math.abs(p_claim - p_market) / p_market)
     const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
+
+    set.q_claim = Number(q_claim.toFixed(decimal))
+    set.r_claim = Number((Number(q_claim / margin) * 100).toFixed(decimal))
+    set.p_expired = Number(p_stop.toFixed(decimal))
 }
 
-export const setDefaultValue = (userBalance: number, minCoveredConfig: number, p_market: number, current: any, flillter: any) => {
+export const setDefaultValue = (userBalance: number, minCoveredConfig: number, p_market: number, current: any, fillter: any) => {
     if (userBalance > minCoveredConfig) {
         current.q_covered = userBalance
         current.p_claim = p_market - (10 / 100) * p_market

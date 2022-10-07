@@ -27,6 +27,7 @@ import { API_GET_PRICE_CHART } from 'services/apis'
 import { countDecimals } from 'utils/utils'
 import { getUnixTime, sub } from 'date-fns'
 import { BTCaddress, DAIaddress, ETHaddress, USDTaddress } from 'components/web3/constants/contractAddress'
+import { getBalance, getInfoCoveredCustom, getInfoCoveredDefault, setDefaultValue } from './Insurance'
 
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
@@ -64,7 +65,7 @@ const InsuranceFrom = () => {
     const tmp_margin = useRef(0)
 
     const [selectTime, setSelectTime] = useState<string>('1Y')
-    const [tab, setTab] = useState<number>(0)
+    const [tab, setTab] = useState<0 | 1>(0)
     const [loadings, setLoadings] = useState(true)
     const [openChangeToken, setOpenChangeToken] = useState(false)
     const [showDetails, setShowDetails] = useState(false)
@@ -243,42 +244,12 @@ const InsuranceFrom = () => {
         validator('q_covered')
         validator('margin')
 
-        if (state.q_covered > 0 && state.p_claim > 0 && tab != 1 && tab != 6) {
-            const margin = Number((8 * state.q_covered * state.p_market) / 100)
-            const userCapital = margin
-            const systemCapital = userCapital
-            const hedge_capital = userCapital + systemCapital
-            const hedge = Number(margin / (state.q_covered * state.p_market))
-            const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
-            const laverage = Leverage(state.p_market, p_stop)
-            const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-            const q_claim = Number((ratio_profit / 2) * hedge_capital * laverage) * (1 - 0.05) + margin
-            setState({
-                ...state,
-                q_claim: Number(q_claim.toFixed(decimalList.decimal_q_covered)),
-                r_claim: Number((Number(q_claim / margin) * 100).toFixed(decimalList.decimal_q_covered)),
-                p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
-                margin: Number(margin.toFixed(decimalList.decimal_margin)),
-            })
+        if (tab != 1) {
+            getInfoCoveredDefault(state.q_covered, state.p_claim, state.p_market, state, decimalList.decimal_q_covered, decimalList.decimal_margin)
+        } else {
+            getInfoCoveredCustom(state.q_covered, state.p_claim, state.p_market, state.margin, state, decimalList.decimal_q_covered)
         }
-
-        if (state.q_covered > 0 && state.p_claim > 0 && state.margin > 0) {
-            const userCapital = state.margin
-            const systemCapital = userCapital
-            const hedge_capital = userCapital + systemCapital
-            const hedge = Number(state.margin / (state.q_covered * state.p_market))
-            const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
-            const laverage = Leverage(state.p_market, p_stop)
-            const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-            const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + state.margin
-            setState({
-                ...state,
-                q_claim: Number(q_claim.toFixed(decimalList.decimal_q_covered)),
-                r_claim: Number((Number(q_claim / state.margin) * 100).toFixed(decimalList.decimal_q_covered)),
-                p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
-            })
-        }
-    }, [state.q_covered, state.margin, state.p_claim, state.period, state.p_market, width])
+    }, [state.q_covered, state.margin, state.p_claim, state.period, state.p_market, width, tab])
 
     useEffect(() => {
         createSaved()
@@ -286,32 +257,8 @@ const InsuranceFrom = () => {
     }, [state])
 
     useEffect(() => {
-        if (tab === 0 || tab === 6) {
-            if (state.q_covered && state.p_claim) {
-                const margin = Number((8 * state.q_covered * state.p_market) / 100)
-                const userCapital = margin
-                const systemCapital = userCapital
-                const hedge_capital = userCapital + systemCapital
-                const hedge = Number(margin / (state.q_covered * state.p_market))
-                const p_stop = P_stop(Number(state.p_market), Number(state.p_claim), Number(hedge))
-                const laverage = Leverage(state.p_market, p_stop)
-                const ratio_profit = Number(Math.abs(state.p_claim - state.p_market) / state.p_market)
-                const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
-                setState({
-                    ...state,
-                    q_claim: Number(q_claim.toFixed(2)),
-                    r_claim: Number((Number(q_claim / margin) * 100).toFixed(decimalList.decimal_q_covered)),
-                    p_expired: Number(p_stop.toFixed(decimalList.decimal_q_covered)),
-                    margin: Number(margin.toFixed(decimalList.decimal_margin)),
-                })
-            }
-        }
-        percentMargin.current = 8
-    }, [tab])
-
-    useEffect(() => {
         if (showGuide) {
-            return setTab(3)
+            return setTab(1)
         } else {
             return
         }
@@ -325,7 +272,7 @@ const InsuranceFrom = () => {
                 min_notinal.current = item?.notional
             }
             if (item?.filterType === 'LOT_SIZE') {
-                const tmp = await getBalaneToken(selectCoin && selectCoin?.type)
+                const tmp: number = await getBalaneToken(selectCoin && selectCoin?.type)
                 if (tmp >= 0) {
                     const decimal = countDecimals(item.stepSize)
                     _decimalList.decimal_q_covered = +decimal
@@ -335,9 +282,11 @@ const InsuranceFrom = () => {
 
                     if (min_Market == Infinity) {
                         const min = Number(item?.minQty)
+                        setDefaultValue(userBalance, min, state.p_market, state, pair_configs)
                         setRangeQ_covered({ ...rangeQ_covered, min: Number(min.toFixed(+decimal)), max: Number(max.toFixed(+decimal)) })
                     } else {
                         const min = Number(item?.minQty) > min_Market ? Number(item?.minQty) : min_Market
+                        setDefaultValue(userBalance, Number(item?.minQty), state.p_market, state, pair_configs)
                         setRangeQ_covered({ ...rangeQ_covered, min: Number(min.toFixed(+decimal)), max: Number(max.toFixed(+decimal)) })
                     }
                 }
@@ -433,10 +382,10 @@ const InsuranceFrom = () => {
                     {state.p_claim > 0 && (
                         <>
                             {t('insurance:buy_mobile:at')} <span className="text-redPrimary">${state.p_claim} </span>
-                            {tab != 6 && '?'}
+                            {tab != 1 && '?'}
                         </>
                     )}
-                    {tab == 6 && (
+                    {tab == 1 && (
                         <>
                             {t('insurance:buy_mobile:and')} {t('insurance:buy_mobile:margin')}{' '}
                             <label>
@@ -466,6 +415,17 @@ const InsuranceFrom = () => {
             </div>
         )
     }
+
+    const timer = useRef<any>(null)
+    useEffect(() => {
+        refreshApi(selectTime, selectCoin)
+        timer.current = setInterval(() => {
+            refreshApi(selectTime, selectCoin)
+        }, 10000)
+        return () => {
+            clearInterval(timer.current)
+        }
+    }, [])
 
     const refreshApi = (
         selectTime: string | undefined,
@@ -557,7 +517,6 @@ const InsuranceFrom = () => {
     const validateP_Claim = (value: number) => {
         const _rangeP_claim = rangeP_claim
 
-        let _check = true
         //Pm*multiplierDown/Up
         const PmDown = state.p_market * percentPrice?.multiplierDown
         const PmUp = state.p_market * percentPrice?.multiplierUp
@@ -926,7 +885,7 @@ const InsuranceFrom = () => {
 
     const getStorage = () => {
         const data = localStorage.getItem('buy_covered_state')
-        if (data !== 'undefined') {
+        if (data && data) {
             const res = JSON.parse(data as string)
             return res
         } else {
@@ -954,79 +913,38 @@ const InsuranceFrom = () => {
 
     const getBalaneToken = async (symbol: string) => {
         try {
-            if (account.address !== null) {
-                if (symbol === 'BNB') {
-                    const result = wallet.getBalance()
-                    return result.then((balance: number) => {
-                        setUserBalance(Number(balance.toFixed(decimalList.decimal_q_covered)))
-                        return Number(balance.toFixed(decimalList.decimal_q_covered))
-                    })
+            if (account?.address) {
+                const _list = [
+                    {
+                        name: 'USDT',
+                        address: USDTaddress,
+                    },
+                    {
+                        name: 'BTC',
+                        address: USDTaddress,
+                    },
+                    {
+                        name: 'ETH',
+                        address: USDTaddress,
+                    },
+                    {
+                        name: 'DAI',
+                        address: DAIaddress,
+                    },
+                    {
+                        name: 'BNB',
+                        address: '',
+                    },
+                ]
+                const _item = _list.find((e: any) => {
+                    return e.name === symbol
+                })
+
+                if (_item) {
+                    const res = getBalance(symbol, account?.address, _item?.address, decimalList.decimal_q_covered)
+                    setUserBalance(await res)
+                    return await res
                 }
-
-                if (symbol === 'USDT') {
-                    const balanceUsdt = await Config.web3.contractCaller?.tokenContract(USDTaddress).contract.balanceOf(account.address)
-                    if (balanceUsdt) {
-                        if (Number(ethers.utils.formatEther(balanceUsdt)) > 0) {
-                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceUsdt)).toFixed(decimalList.decimal_q_covered)))
-
-                            return Number(ethers.utils.formatEther(balanceUsdt))
-                        } else {
-                            setUserBalance(0)
-                            return 0
-                        }
-                    } else {
-                        return false
-                    }
-                }
-
-                if (symbol === 'ETH') {
-                    const balanceETH = await Config.web3.contractCaller?.tokenContract(ETHaddress).contract.balanceOf(account.address)
-
-                    if (balanceETH) {
-                        if (Number(ethers.utils.formatEther(balanceETH)) > 0) {
-                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceETH)).toFixed(decimalList.decimal_q_covered)))
-                            return Number(ethers.utils.formatEther(balanceETH))
-                        } else {
-                            setUserBalance(0)
-                            return 0
-                        }
-                    } else {
-                        return false
-                    }
-                }
-
-                if (symbol === 'BTC') {
-                    const balanceBTC = await Config.web3.contractCaller?.tokenContract(BTCaddress).contract.balanceOf(account.address)
-                    if (balanceBTC) {
-                        if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
-                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceBTC)).toFixed(decimalList.decimal_q_covered)))
-                            return Number(ethers.utils.formatEther(balanceBTC))
-                        } else {
-                            setUserBalance(0)
-                            return 0
-                        }
-                    } else {
-                        return false
-                    }
-                }
-
-                if (symbol === 'DAI') {
-                    const balanceBTC = await Config.web3.contractCaller?.tokenContract(DAIaddress).contract.balanceOf(account.address)
-                    if (balanceBTC) {
-                        if (Number(ethers.utils.formatEther(balanceBTC)) > 0) {
-                            setUserBalance(Number(Number(ethers.utils.formatEther(balanceBTC)).toFixed(decimalList.decimal_q_covered)))
-                            return Number(ethers.utils.formatEther(balanceBTC))
-                        } else {
-                            setUserBalance(0)
-                            return 0
-                        }
-                    } else {
-                        return false
-                    }
-                }
-            } else {
-                setUserBalance(0)
-                return 0
             }
         } catch (err) {
             console.log(err)
@@ -1259,9 +1177,7 @@ const InsuranceFrom = () => {
                                                         }}
                                                     >
                                                         <div
-                                                            className={`${
-                                                                tab == 4 ? 'hidden' : ''
-                                                            } flex flex-row justify-between items-center w-full rounded-[12px] border border-divider border-0.5 px-5 py-4`}
+                                                            className={`flex flex-row justify-between items-center w-full rounded-[12px] border border-divider border-0.5 px-5 py-4`}
                                                         >
                                                             <div className={'text-txtSecondary flex flex-row items-center'}>
                                                                 <span className={'mr-[0.5rem]'}>R-Claim</span>
@@ -1277,9 +1193,7 @@ const InsuranceFrom = () => {
                                                             </div>
                                                         </div>
                                                         <div
-                                                            className={`${
-                                                                tab == 5 ? 'hidden' : ''
-                                                            } flex flex-row justify-between items-center w-full rounded-[12px] border border-divider border-0.5 px-5 py-4 my-[1rem]`}
+                                                            className={` flex flex-row justify-between items-center w-full rounded-[12px] border border-divider border-0.5 px-5 py-4 my-[1rem]`}
                                                         >
                                                             <div className={'text-txtSecondary flex flex-row items-center'}>
                                                                 <span className={'mr-[0.5rem]'}>Q-Claim</span>
@@ -1596,15 +1510,7 @@ const InsuranceFrom = () => {
                                                                     updateFormQCovered(data)
                                                                 }}
                                                                 onTouchStart={() => {
-                                                                    if (userBalance > 0) {
-                                                                        setState({
-                                                                            ...state,
-                                                                            q_covered: Number(
-                                                                                ((data / 100) * rangeQ_covered.max).toFixed(decimalList.decimal_q_covered),
-                                                                            ),
-                                                                        })
-                                                                        percentInsurance.current = data
-                                                                    }
+                                                                    updateFormQCovered(data)
                                                                 }}
                                                             >
                                                                 <div
@@ -1763,25 +1669,25 @@ const InsuranceFrom = () => {
                                             />
                                             <div className="flex items-center">
                                                 <Switch
-                                                    checked={tab == 6 ? true : false}
+                                                    checked={tab == 1 ? true : false}
                                                     onChange={() => {
-                                                        if (tab == 6) {
-                                                            return setTab(3)
+                                                        if (tab == 1) {
+                                                            return setTab(0)
                                                         } else {
                                                             setShowInput({ isShow: true, name: 'margin' })
-                                                            return setTab(6)
+                                                            return setTab(1)
                                                         }
                                                     }}
                                                     className={`${
-                                                        tab == 6 ? 'bg-red' : 'bg-[#F2F3F4]'
+                                                        tab == 1 ? 'bg-red' : 'bg-[#F2F3F4]'
                                                     } relative inline-flex items-center h-[1rem] rounded-full w-[32px] transition-colors shadow-sm`}
                                                 >
                                                     <span
                                                         className={`${
-                                                            tab == 6 ? 'translate-x-[1.25rem] bg-[white]' : 'translate-x-1 bg-[#B2B7BC]'
+                                                            tab == 1 ? 'translate-x-[1.25rem] bg-[white]' : 'translate-x-1 bg-[#B2B7BC]'
                                                         } inline-block w-[6px] h-[6px] transform bg-white rounded-full transition-transform text-white/[0]`}
                                                     >
-                                                        {tab == 6 ? 'Enable' : 'Disable'}
+                                                        {tab == 1 ? 'Enable' : 'Disable'}
                                                     </span>
                                                 </Switch>
                                                 <span className="pl-[0.5rem]">{t('insurance:buy:change')}</span>
@@ -1934,11 +1840,7 @@ const InsuranceFrom = () => {
                                                     </div>
                                                 )}
                                                 <div className={'flex flex-col mt-[24px] hover:cursor-default'}>
-                                                    <div
-                                                        className={`${
-                                                            tab == 4 ? 'hidden' : ''
-                                                        } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[1rem] mx-[12px]`}
-                                                    >
+                                                    <div className={` flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[1rem] mx-[12px]`}>
                                                         <div className={'text-txtSecondary flex flex-row items-center'}>
                                                             <span className={'mr-[0.5rem]'}>R-Claim</span>
                                                             <div data-tip={t('insurance:terminology:r_claim')} data-for={`r_claim`}>
@@ -1952,11 +1854,7 @@ const InsuranceFrom = () => {
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    <div
-                                                        className={`${
-                                                            tab == 5 ? 'hidden' : ''
-                                                        } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[1rem] mx-[12px]`}
-                                                    >
+                                                    <div className={` flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[1rem] mx-[12px]`}>
                                                         <div className={'text-txtSecondary flex flex-row items-center'}>
                                                             <span className={'mr-[0.5rem]'}>Q-Claim</span>
                                                             <div data-tip={t('insurance:terminology:q_claim')} data-for={`q_claim`}>
@@ -1982,7 +1880,7 @@ const InsuranceFrom = () => {
                                                     </div>
                                                     <div
                                                         className={`${
-                                                            tab == 6 ? 'hidden' : ''
+                                                            tab === 1 ? 'hidden' : ''
                                                         } flex flex-row justify-between items-center rounded-[12px] px-[24px] py-[1rem] mx-[12px]`}
                                                     >
                                                         <div className={'text-txtSecondary flex flex-row items-center'}>
@@ -2047,15 +1945,20 @@ export const fetchApiNami = async (symbol: string, from: string, to: string, res
             resolution: resolution,
         }
         const test = await fetchApi({ url: API_GET_PRICE_CHART, baseURL: '', params: params })
-
-        let data: { date: number; value: any }[] = []
-        test?.map((item: any) => {
-            data.push({
-                date: item[0] * 1000,
-                value: item[1],
+        if (test && Array.isArray(test)) {
+            let data: { date: number; value: any }[] = []
+            test?.map((item: any) => {
+                data.push({
+                    date: item[0] * 1000,
+                    value: item[1],
+                })
             })
-        })
-        data.length > 0 && setDataChart(data)
+            if (data.length > 0) {
+                setDataChart(data)
+            } else {
+                console.log('fecth current price error')
+            }
+        }
     } catch (err) {
         console.log('fecth current price error')
     }
