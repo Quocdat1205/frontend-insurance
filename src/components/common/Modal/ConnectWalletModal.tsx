@@ -253,6 +253,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         setLoading(true)
         try {
             logged.current = false
+            oldAddress.current = Config.web3.contractCaller?.provider?.provider?.selectedAddress ?? oldAddress.current
             const token = await Config.web3.contractCaller?.sign(oldAddress.current)
             if (!token) {
                 lostConnection()
