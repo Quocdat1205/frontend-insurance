@@ -50,3 +50,7 @@ export interface PairConfig {
     symbol: string
     [key: string]: number | string
 }
+
+export interface CountdownType {
+    date: Date
+}
