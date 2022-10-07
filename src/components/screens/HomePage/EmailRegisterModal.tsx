@@ -82,7 +82,7 @@ const EmailSubscriptionModal = ({ visible, onClose, email }: EmailRegisterModal)
             isVisible={visible}
             onBackdropCb={handleOnClose}
             wrapClassName="!p-6"
-            className={'lg:max-w-[524px]'}
+            className={'sm:max-w-[524px]'}
             containerClassName="z-[9999999]"
         >
             <div className="flex flex-col items-center justify-center pb-5 text-xl font-medium">

@@ -165,5 +165,7 @@
     "amount_of_money": "Amount",
     "address_wallet": "Address Wallet",
     "ref_code": "Ref Code",
-    "ref_link": "Ref Link"
+    "ref_link": "Ref Link",
+    "submit": "Submit",
+    "retry": "Retry"
 }

@@ -28,5 +28,11 @@
         "description": "For each successfully margined insurance contract referred by you, you will receive a commission rate according to the total Margin accumulated:",
         "total_margin": "Total Accumulated Margin",
         "reward_rate": "Reward Rate"
+    },
+    "withdraw_reward": {
+        "confirm_withdraw": "Confirm Reward Withdrawal",
+        "are_you_sure": "Are you certain that you intend to withdraw {{value}}",
+        "withdraw_failed": "Withdraw Failed",
+        "withdraw_successful": "Withdrawal request successfully processed"
     }
 }

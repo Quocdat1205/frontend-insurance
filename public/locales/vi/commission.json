@@ -28,5 +28,11 @@
         "description": "Vối mỗi hợp đồng ký quỹ bảo hiểm thành công từ người dùng do bạn giới thiệu, bạn sẽ nhận được tỷ lệ hoa hồng tương ứng tổng Margin tích luỹ như sau:",
         "total_margin": "Tổng Margin tích luỹ",
         "reward_rate": "Tỷ lệ hoa hồng "
+    },
+    "withdraw_reward": {
+        "confirm_withdraw": "Xác nhận rút hoa hồng",
+        "are_you_sure": "Bạn có chắc chắn muốn rút {{value}}",
+        "withdraw_failed": "Yêu cầu rút hoa hồng thất bại",
+        "withdraw_successful": "Yêu cầu rút hoa hồng được xử lý thành công"
     }
 }
