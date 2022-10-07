@@ -135,7 +135,35 @@ const InsuranceFrom = () => {
         max: 0,
     })
 
-    const listTime = ['1H', '1D', '1W', '1M', '3M', '1Y']
+    const listTime = ['3D', '1W', '1M', '3M', '1Y']
+
+    const dateTransform: any = {
+        '3D': {
+            resolution: '1m',
+            subtract: 'days',
+            subtractBy: 3,
+        },
+        '1W': {
+            resolution: '1h',
+            subtract: 'weeks',
+            subtractBy: 1,
+        },
+        '1M': {
+            resolution: '1d',
+            subtract: 'months',
+            subtractBy: 1,
+        },
+        '3M': {
+            resolution: '1d',
+            subtract: 'months',
+            subtractBy: 3,
+        },
+        '1Y': {
+            resolution: '1d',
+            subtract: 'years',
+            subtractBy: 1,
+        },
+    }
     const listTabPeriod: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     const menu = [
         { menuId: 'home', router: 'home', name: t('insurance:buy:home'), parentId: 0 },
@@ -446,39 +474,6 @@ const InsuranceFrom = () => {
         const timeEnd = new Date()
         const timeBegin = new Date()
         setLoadings(true)
-
-        const dateTransform: any = {
-            '1H': {
-                resolution: '1m',
-                subtract: 'hours',
-                subtractBy: 1,
-            },
-            '1W': {
-                resolution: '1d',
-                subtract: 'weeks',
-                subtractBy: 1,
-            },
-            '1D': {
-                resolution: '1h',
-                subtract: 'days',
-                subtractBy: 1,
-            },
-            '1M': {
-                resolution: '1d',
-                subtract: 'months',
-                subtractBy: 1,
-            },
-            '3M': {
-                resolution: '1d',
-                subtract: 'months',
-                subtractBy: 3,
-            },
-            '1Y': {
-                resolution: '1d',
-                subtract: 'years',
-                subtractBy: 1,
-            },
-        }
 
         const currentTimeStamp = getUnixTime(new Date())
         try {
@@ -1129,7 +1124,7 @@ const InsuranceFrom = () => {
                                                                     p_expired={Number(state.p_expired)}
                                                                     setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
                                                                     setP_Market={(data: number) => setState({ ...state, p_market: data })}
-                                                                    resolution={state.period}
+                                                                    resolution={selectTime!}
                                                                 />
                                                                 <svg
                                                                     className={`absolute right-0 z-2`}
@@ -1818,7 +1813,7 @@ const InsuranceFrom = () => {
                                                     setP_Claim={(data: number) => setState({ ...state, p_claim: data })}
                                                     setP_Market={(data: number) => setState({ ...state, p_market: data })}
                                                     isMobile={isMobile}
-                                                    resolution={state.period}
+                                                    resolution={selectTime!}
                                                 ></ChartComponent>
                                             </Suspense>
                                             <svg

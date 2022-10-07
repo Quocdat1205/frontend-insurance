@@ -3,7 +3,6 @@ import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themes_animated from '@amcharts/amcharts4/themes/animated'
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
-import { add, getUnixTime } from 'date-fns'
 
 export type iProps = {
     p_expired?: any
@@ -18,7 +17,7 @@ export type iProps = {
     isMobile?: boolean
     width: number
     height: number
-    resolution: number
+    resolution: string
 }
 
 export type Idata = {
@@ -59,7 +58,7 @@ export const dateTransform: any = {
     },
 }
 
-export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number, state: any, resolution: number) => {
+export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number, state: any, resolution: string) => {
     let trend = chart.series.push(new am4charts.LineSeries())
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
@@ -79,22 +78,36 @@ export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number, state
     trend.defaultState.transitionDuration = 1
 
     let endPoint = chart.data[chart.data.length - 1]?.date
+    console.log(/([M]|[Y])/g.test(resolution))
 
     if (p_claim) {
-        trend.data = [
-            {
-                date: chart.data[0]?.date,
-                value: p_claim,
-            },
-            {
-                date: endPoint + (resolution + 8) * 1000 * 3600 * 24 + 4 * 3600 * 24,
-                value: p_claim,
-            },
-        ]
+        if (/([M]|[Y]|[W])/g.test(resolution)) {
+            trend.data = [
+                {
+                    date: chart.data[0]?.date,
+                    value: p_claim,
+                },
+                {
+                    date: endPoint + (state.period + 8) * 1000 * 3600 * 24 + 2 * 3600 * 24,
+                    value: p_claim,
+                },
+            ]
+        } else {
+            trend.data = [
+                {
+                    date: chart.data[0]?.date,
+                    value: p_claim,
+                },
+                {
+                    date: endPoint + (state.period + 2) * 1000 * 3600 * 24 + 2 * 3600 * 24,
+                    value: p_claim,
+                },
+            ]
+        }
     }
 }
 
-export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number, state: any, resolution: number) => {
+export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number, state: any, resolution: string) => {
     let trend = chart.series.push(new am4charts.LineSeries())
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
@@ -112,7 +125,7 @@ export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number,
                 value: chart.data[chart.data.length - 1]?.value,
             },
             {
-                date: endPoint + resolution * 1000 * 3600 * 24,
+                date: endPoint + state.period * 1000 * 3600 * 24,
                 value: p_claim,
             },
         ]
@@ -267,7 +280,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 // load data for chart sub
                 const t_expired = chart.data[chart.data.length - 1]?.date
                 latitudeExpired.data.push({
-                    date: t_expired + resolution * 1000 * 3600 * 24,
+                    date: t_expired + state.period * 1000 * 3600 * 24,
                     value: p_expired,
                 })
 
@@ -308,7 +321,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 latitudeClaim.dataFields.dateX = 'date'
                 latitudeClaim.data = [
                     {
-                        date: timeEnd + resolution * 1000 * 3600 * 24,
+                        date: timeEnd + state.period * 1000 * 3600 * 24,
                         value: p_claim,
                     },
                 ]
@@ -325,7 +338,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 subLatitudeClaim.data = [
                     ...dataChart,
                     {
-                        date: timeEnd + resolution * 1000 * 3600 * 24,
+                        date: timeEnd + state.period * 1000 * 3600 * 24,
                         value: p_claim > 0 ? p_claim : state.p_market,
                     },
                 ]
