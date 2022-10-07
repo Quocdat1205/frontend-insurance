@@ -168,39 +168,39 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     const onConfirm = async () => {
         firstTime.current = false
         oldAddress.current = !oldAddress.current ? address : oldAddress.current
-        // switch (wallet?.wallet) {
-        //     case wallets.metaMask:
-        //         if (isMobile) {
-        //             if (!Config.isMetaMaskInstalled) {
-        //                 window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}`)
-        //                 return
-        //             }
-        //             Config.web3?.activate(wallets.metaMask)
-        //         } else {
-        //             if (!Config.isMetaMaskInstalled) {
-        //                 setInstaller(true)
-        //                 return
-        //             }
-        //         }
-        //         break
-        //     case wallets.coinbaseWallet:
-        //         if (isMobile) {
-        //             if (!Config.isMetaMaskInstalled) {
-        //                 window.open(`https://go.cb-w.com/dapp?cb_url=${Config.env.APP_URL}`)
-        //                 return
-        //             }
-        //         }
-        //         break
-        //     default:
-        //         break
-        // }
+        switch (wallet?.wallet) {
+            case wallets.metaMask:
+                if (isMobile) {
+                    if (!Config.isMetaMaskInstalled) {
+                        window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}`)
+                        return
+                    }
+                    Config.web3?.activate(wallets.metaMask)
+                } else {
+                    if (!Config.isMetaMaskInstalled) {
+                        setInstaller(true)
+                        return
+                    }
+                }
+                break
+            case wallets.coinbaseWallet:
+                if (isMobile) {
+                    if (!Config.isMetaMaskInstalled) {
+                        window.open(`https://go.cb-w.com/dapp?cb_url=${Config.env.APP_URL}`)
+                        return
+                    }
+                }
+                break
+            default:
+                break
+        }
         if (!isMobile) await Config.web3?.activate(wallet?.wallet)
         if (!oldAddress.current) return
         setErrorConnect(false)
         setLoading(true)
         try {
-            console.log('adderess', address)
             const token = await Config.web3.contractCaller?.current?.sign(Config.web3?.account)
+            console.log('adderess',token,  Config.web3?.account)
             if (!token) {
                 lostConnection()
                 return

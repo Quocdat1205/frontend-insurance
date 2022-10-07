@@ -22,24 +22,19 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
 
     const activate = async (connectorId: ConnectorId, _chainId?: number) => {
         const wallet = localStorage.getItem('PUBLIC_WALLET')
-        console.log('connectorId', connectorId)
-        const _connector = connectorsData[connectorId]
-        console.log('_connector', _connector.connector)
+        const { connector: _connector } = connectorsData[connectorId]
         // await _connector.connector.deactivate()
         await deactivate()
-        _connector.connector instanceof WalletConnect
-            ? await _connector.connector.activate(_chainId)
-            : await _connector.connector.activate(!_chainId ? undefined : getAddChainParameters(_chainId))
-        contractCaller.current = connector.provider ? new ContractCaller(new Web3Provider(_connector.connector.provider as any)) : null
+        _connector instanceof WalletConnect
+            ? await _connector.activate(_chainId)
+            : await _connector.activate(!_chainId ? undefined : getAddChainParameters(_chainId))
+        contractCaller.current = connector.provider ? new ContractCaller(new Web3Provider(_connector.provider as any)) : null
         setDoReload(!doReload)
     }
 
     const deactivate = async () => {
         await connector.deactivate()
     }
-
-    console.log('providerrrr', contractCaller)
-    console.log('connector', connector)
 
     useEffect(() => {
         connector.connectEagerly && connector.connectEagerly()
