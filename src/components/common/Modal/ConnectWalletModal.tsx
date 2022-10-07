@@ -224,7 +224,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 if (isMobile) {
                     if (!Config.isMetaMaskInstalled) {
                         const refCode = localStorage.getItem('REF_CODE')
-                        window.open(`https://metamask.app.link/dapp/${'http://192.168.1.61:3000'}?ref=${refCode}`)
+                        window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}?ref=${refCode}`)
                         return
                     }
                     Config.web3?.activate(wallets.metaMask)
