@@ -168,38 +168,39 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     const onConfirm = async () => {
         firstTime.current = false
         oldAddress.current = !oldAddress.current ? address : oldAddress.current
-        switch (wallet?.wallet) {
-            case wallets.metaMask:
-                if (isMobile) {
-                    if (!Config.isMetaMaskInstalled) {
-                        window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}`)
-                        return
-                    }
-                    Config.web3?.activate(wallets.metaMask)
-                } else {
-                    if (!Config.isMetaMaskInstalled) {
-                        setInstaller(true)
-                        return
-                    }
-                }
-                break
-            case wallets.coinbaseWallet:
-                if (isMobile) {
-                    if (!Config.isMetaMaskInstalled) {
-                        window.open(`https://go.cb-w.com/dapp?cb_url=${Config.env.APP_URL}`)
-                        return
-                    }
-                }
-                break
-            default:
-                break
-        }
-        if (!isMobile) Config.web3?.activate(wallet?.wallet)
+        // switch (wallet?.wallet) {
+        //     case wallets.metaMask:
+        //         if (isMobile) {
+        //             if (!Config.isMetaMaskInstalled) {
+        //                 window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}`)
+        //                 return
+        //             }
+        //             Config.web3?.activate(wallets.metaMask)
+        //         } else {
+        //             if (!Config.isMetaMaskInstalled) {
+        //                 setInstaller(true)
+        //                 return
+        //             }
+        //         }
+        //         break
+        //     case wallets.coinbaseWallet:
+        //         if (isMobile) {
+        //             if (!Config.isMetaMaskInstalled) {
+        //                 window.open(`https://go.cb-w.com/dapp?cb_url=${Config.env.APP_URL}`)
+        //                 return
+        //             }
+        //         }
+        //         break
+        //     default:
+        //         break
+        // }
+        if (!isMobile) await Config.web3?.activate(wallet?.wallet)
         if (!oldAddress.current) return
         setErrorConnect(false)
         setLoading(true)
+        console.log('Config.web3.contractCaller',Config.web3.contractCaller.current)
         try {
-            const token = await Config.web3.contractCaller?.sign(oldAddress.current)
+            const token = await Config.web3.contractCaller?.current?.sign(oldAddress.current)
             if (!token) {
                 lostConnection()
                 return
@@ -248,7 +249,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
 
     const walletsFilter: Wallet[] = [
         { name: 'Metamask', icon: '/images/icons/ic_metamask.png', active: true, wallet: wallets.metaMask },
-        { name: 'Coinbase Wallet', icon: '/images/icons/ic_coinbase.png', active: false, wallet: wallets.coinbaseWallet },
+        { name: 'Coinbase Wallet', icon: '/images/icons/ic_coinbase.png', active: true, wallet: wallets.coinbaseWallet },
         { name: 'Trustwallet', icon: '/images/icons/ic_trustwallet.png', active: false, wallet: 'Trustwallet' },
         { name: t('common:other'), active: false, wallet: 'other' },
     ]
