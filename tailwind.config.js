@@ -248,6 +248,7 @@ module.exports = {
                 layout: '1360px',
                 '3xl': '1600px',
                 '4xl': '1920px',
+                iPadPro: { raw: '(width: 1024px) and (height: 1366px)' },
             },
             spacing: {
                 128: '32rem',

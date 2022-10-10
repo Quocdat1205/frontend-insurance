@@ -43,7 +43,7 @@ const FeaturesLanding = () => {
     return (
         <section className="px-4 mb:px-10 lg:px-20">
             <div className="max-w-screen-insurance 4xl:max-w-screen-3xl m-auto text-center flex flex-col justify-center items-center pt-20 sm:pt-[7.5rem]">
-                <div className="mb-4 text-2xl font-semibold sm:text-5xl leading-8">{t('home:landing:unique_features')}</div>
+                <div className="mb-4 text-2xl font-semibold leading-8 sm:text-5xl">{t('home:landing:unique_features')}</div>
                 <div className="max-w-[632px] text-[0.875rem] lg:text-[1rem]">{t('home:landing:unique_features_content')}</div>
                 <div className="flex flex-wrap w-full space-y-6 sm:space-y-0 sm:gap-6 mt-7 sm:mt-9">
                     {features.map((item: any, index: number) => {
@@ -52,7 +52,7 @@ const FeaturesLanding = () => {
                         return (
                             <div key={item.img} className={'bg-hover flex flex-col flex-1 rounded-xl w-[calc(100%/2-24px)] h-full min-w-[310px]'}>
                                 <Container
-                                    data-aos="fade-up"
+                                    data-aos={index === 0 ? 'fade-right' : 'fade-left'}
                                     data-aos-delay={DURATION_AOS * index}
                                     className={'flex'}
                                     img={item.img}
@@ -75,7 +75,11 @@ const FeaturesLanding = () => {
                     })}
 
                     {/* Use FlexBox instead grid to prevent image scale error --- image t0o large */}
-                    <div className="flex flex-col items-start justify-start w-full h-full rounded-xl bg-hover homeNav:flex-row lg:justify-between">
+                    <div
+                        data-aos="fade-up"
+                        data-aos-delay={DURATION_AOS * 2}
+                        className="flex flex-col items-start justify-start w-full h-full rounded-xl bg-hover homeNav:flex-row lg:justify-between"
+                    >
                         <div className={'flex-1 w-full h-full flex flex-col items-start justify-between md:min-h-[400px] p-6'}>
                             <div className={'md:mt-9 text-left max-w-[370px] mb-6 md:bm-0'}>
                                 <div className="mb-2 text-xl font-medium md:text-2xl text-red">{features[2].title}</div>
