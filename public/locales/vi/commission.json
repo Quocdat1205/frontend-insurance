@@ -33,6 +33,7 @@
         "confirm_withdraw": "Xác nhận rút hoa hồng",
         "are_you_sure": "Bạn có chắc chắn muốn rút {{value}}",
         "withdraw_failed": "Yêu cầu rút hoa hồng thất bại",
-        "withdraw_successful": "Yêu cầu rút hoa hồng được xử lý thành công"
+        "withdraw_successful": "Yêu cầu rút hoa hồng được xử lý thành công",
+        "withdrawing": "Đang rút hoa hồng"
     }
 }

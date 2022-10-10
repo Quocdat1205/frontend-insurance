@@ -33,6 +33,7 @@
         "confirm_withdraw": "Confirm Reward Withdrawal",
         "are_you_sure": "Are you certain that you intend to withdraw {{value}}",
         "withdraw_failed": "Withdraw Failed",
-        "withdraw_successful": "Withdrawal request successfully processed"
+        "withdraw_successful": "Withdrawal request successfully processed",
+        "withdrawing": "Withdrawing"
     }
 }
