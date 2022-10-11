@@ -139,7 +139,7 @@ const TransactionsTab = ({ account, unitConfig, doReload }: TransactionsTab) => 
 
     return (
         <>
-            <div className="text-xl font-medium mb-6 hidden sm:flex">Lịch sử giao dịch</div>
+            <div className="text-xl font-medium mb-6 hidden sm:flex"> {t('commission:history:title')}</div>
             {(dataSource?.listHistory.length <= 0 || !account.address) && !loading ? (
                 <NoData
                     className="py-20"
