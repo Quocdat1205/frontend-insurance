@@ -19,11 +19,13 @@ export const setting = () => async (dispatch: Dispatch) => {
     try {
         const address = sessionStorage.getItem('PUBLIC_ADDRESS')
         const wallet = sessionStorage.getItem('PUBLIC_WALLET')
-        if (address && wallet) {
+        const chainId: any = sessionStorage.getItem('PUBLIC_CHAINID')
+        if (address && wallet && chainId) {
+            const chain = { ...Config.networks[Number(chainId)], id: Number(chainId) }
             const { data } = await fetchApi({ url: API_GET_INFO_USER, params: { owner: address } })
             dispatch({
                 type: types.SET_ACCOUNT,
-                payload: { address, wallet, ...data },
+                payload: { address, wallet, chain, ...data },
             })
         }
     } catch (error) {
@@ -32,7 +34,7 @@ export const setting = () => async (dispatch: Dispatch) => {
 }
 
 export const setAccount =
-    (data?: { address: string | null | undefined; wallet?: string | null | undefined; [key: string]: any }) => async (dispatch: Dispatch) => {
+    (data?: { address?: string | null | undefined; wallet?: string | null | undefined; chain?: any; [key: string]: any }) => async (dispatch: Dispatch) => {
         try {
             dispatch({
                 type: types.SET_ACCOUNT,
