@@ -396,6 +396,9 @@ const AcceptBuyInsurance = () => {
             })
             if (!data) {
                 setRefError({ isValid: false, message: t(`errors:${message}`) })
+                setCanBuy(false)
+            } else {
+                setCanBuy(true)
             }
         } catch (error) {
             console.log(error)
@@ -404,6 +407,9 @@ const AcceptBuyInsurance = () => {
 
     const timer = useRef<any>(null)
     useEffect(() => {
+        if (!refCode) {
+            setCanBuy(true)
+        }
         clearTimeout(timer.current)
         timer.current = setTimeout(() => {
             if (refCode) checkRef()
@@ -600,7 +606,10 @@ const AcceptBuyInsurance = () => {
                                             placeholder="Nhập mã giới thiệu tại đây"
                                             validator={refError}
                                             value={refCode}
-                                            onChange={(e: any) => setRefCode(e.target.value)}
+                                            onChange={(e: any) => {
+                                                setRefCode(e.target.value)
+                                                setCanBuy(false)
+                                            }}
                                         />
                                     )}
                                     <div className="text-[#B2B7BC] text-xs py-[16px]">
@@ -846,7 +855,10 @@ const AcceptBuyInsurance = () => {
                                         placeholder="Nhập mã giới thiệu tại đây"
                                         validator={refError}
                                         value={refCode}
-                                        onChange={(e: any) => setRefCode(e.target.value)}
+                                        onChange={(e: any) => {
+                                            setCanBuy(false)
+                                            setRefCode(e.target.value)
+                                        }}
                                     />
                                 )}
                                 <div className="text-[#B2B7BC] text-xs py-[16px]">
