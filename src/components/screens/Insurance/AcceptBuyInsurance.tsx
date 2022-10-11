@@ -265,10 +265,9 @@ const AcceptBuyInsurance = () => {
                                     if (result?.error?.code === -32603) {
                                         Config.toast.show(
                                             'error',
-                                            `${
-                                                language === 'vi'
-                                                    ? 'Giao dịch không thành công, số dư USDT của bạn không đủ'
-                                                    : 'Transaction fail, your balance USTD not enough'
+                                            `${language === 'vi'
+                                                ? 'Giao dịch không thành công, số dư USDT của bạn không đủ'
+                                                : 'Transaction fail, your balance USTD not enough'
                                             }`,
                                         )
                                         return setActive(false)
@@ -396,6 +395,7 @@ const AcceptBuyInsurance = () => {
             })
             if (!data) {
                 setRefError({ isValid: false, message: t(`errors:${message}`) })
+                setCanBuy(false)
             }
         } catch (error) {
             console.log(error)
@@ -404,12 +404,19 @@ const AcceptBuyInsurance = () => {
 
     const timer = useRef<any>(null)
     useEffect(() => {
+        if (refCode === '' || !refCode) {
+            setRefError({ isValid: true, message: '' })
+            setCanBuy(true)
+            return
+        }
         clearTimeout(timer.current)
         timer.current = setTimeout(() => {
             if (refCode) checkRef()
-        }, 1000)
+        }, 500)
         setRefError({ isValid: true, message: '' })
     }, [refCode])
+
+    console.log('refError.isValid', refError)
 
     return !loading && state != undefined ? (
         <>
@@ -627,7 +634,7 @@ const AcceptBuyInsurance = () => {
                                                         id="test1"
                                                         checked={checkUpgrade}
                                                         onClick={() => setCheckUpgrade(!checkUpgrade)}
-                                                        onChange={() => {}}
+                                                        onChange={() => { }}
                                                     />
                                                     <CheckBoxIcon
                                                         bgColor="#F7F8FA"
@@ -640,7 +647,7 @@ const AcceptBuyInsurance = () => {
                                                         checkBorderColor="#EB2B3E"
                                                         className="hover:cursor-pointer mr-[8px]"
                                                         onClick={() => setCheckUpgrade(!checkUpgrade)}
-                                                        onChange={() => {}}
+                                                        onChange={() => { }}
                                                     />
                                                     <label htmlFor="test1" className="select-none font-semibold text-base text-txtPrimary">
                                                         {t('insurance:buy:upgrade')}
@@ -874,7 +881,7 @@ const AcceptBuyInsurance = () => {
                                                     type="radio"
                                                     id="test1"
                                                     checked={checkUpgrade}
-                                                    onChange={() => {}}
+                                                    onChange={() => { }}
                                                     onClick={() => setCheckUpgrade(!checkUpgrade)}
                                                 />
                                                 <CheckBoxIcon
@@ -888,7 +895,7 @@ const AcceptBuyInsurance = () => {
                                                     checkBorderColor="#EB2B3E"
                                                     className="hover:cursor-pointer mr-[8px]"
                                                     onClick={() => setCheckUpgrade(!checkUpgrade)}
-                                                    onChange={() => {}}
+                                                    onChange={() => { }}
                                                 />
                                                 <label htmlFor="test1" className="select-none text-sm text-txtPrimary font-semibold">
                                                     {t('insurance:buy:upgrade')}
@@ -901,9 +908,8 @@ const AcceptBuyInsurance = () => {
                                                 background: 'linear-gradient(88.09deg, #CE0014 0.48%, #E92828 52.94%, #FF5F6D 114.93%)',
                                                 borderRadius: '0px 0px 600px 600px',
                                             }}
-                                            className={`${
-                                                !isMobile ? 'w-[48px] h-[48px]' : 'w-[24px] h-[24px]'
-                                            } absolute top-0 right-[24px]  flex justify-center items-center`}
+                                            className={`${!isMobile ? 'w-[48px] h-[48px]' : 'w-[24px] h-[24px]'
+                                                } absolute top-0 right-[24px]  flex justify-center items-center`}
                                         >
                                             <StartIcon size={!isMobile ? 36 : 24} />
                                         </div>
@@ -938,9 +944,8 @@ const AcceptBuyInsurance = () => {
                         </span>
                         <Button
                             variants={'primary'}
-                            className={`${
-                                !isCanBuy ? 'bg-[#E5E7E8]' : 'bg-redPrimary'
-                            }  h-[48px] w-full flex flex-row justify-center items-center text-white rounded-[8px] py-[12px]`}
+                            className={`${!isCanBuy ? 'bg-[#E5E7E8]' : 'bg-redPrimary'
+                                }  h-[48px] w-full flex flex-row justify-center items-center text-white rounded-[8px] py-[12px]`}
                             onClick={() => {
                                 if (isUpdated) {
                                     setNoti('loading')

@@ -1,15 +1,15 @@
 {
-    "title": "Refer friends <br/> Get rewards",
+    "title": "Refer Friends <br/> Get Rewards",
     "description": "Earn up to 10% Margin-based reward when your friends make an insurance contract successfully.",
     "current_rate": "Current Reward Rate",
     "reward_stats": "Reward Stats",
     "total_withdrawn_reward": "Total Withdrawn Reward",
     "total_available_reward": "Total Available Reward",
     "withdraw": "Withdraw",
-    "total_of_friends": "Total Of Friends",
+    "total_of_friends": "Total of friends",
     "Total_of_friends_margined": "Total of friends margined insurance contract",
     "friends": {
-        "title": "Friend list",
+        "title": "Friend List",
         "friends_list_nodata": "Please connect Wallet to view your friends list.",
         "introduced_on": "Introduced On",
         "total_insurance_contract": "Total Insurance Contract",
@@ -18,10 +18,10 @@
         "wallet": "Wallet"
     },
     "history": {
-        "title": "Commission history",
+        "title": "Commission History",
         "commission_history_nodata": "Please connect Wallet to view your reward history.",
         "receive_reward": "Receive Reward",
-        "withdraw_reward": "Withdraw Reward"
+        "withdraw_reward": "Withdraw Reward",
     },
     "policy": {
         "title": "Commisson Policy",

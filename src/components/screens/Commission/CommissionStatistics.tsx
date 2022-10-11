@@ -143,7 +143,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
             <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
                 <div className="flex lg:items-center justify-between flex-col lg:flex-row">
                     <div className="md:text-xl font-semibold md:font-medium">{t('commission:reward_stats')}</div>
-                    <div className="items-center space-x-4 text-sm hidden md:flex sm:mt-6">
+                    <div className="items-center space-x-4 text-sm hidden md:flex">
                         {days.map((day: any, index: number) => (
                             <div
                                 key={index}

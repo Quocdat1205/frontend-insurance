@@ -25,6 +25,12 @@ const CommissionReferral = ({ account, decimal = 2, commissionConfig, userInfo }
         setCopy('')
     }, [account])
 
+    useEffect(() => {
+        if (copy === 'ref_code' || copy === 'ref_link') {
+            setTimeout(() => setCopy(''), 5000)
+        }
+    }, [copy])
+
     const getCommissionRatio = (totalMargin: number) => {
         let percent = 0,
             limit = 0,
