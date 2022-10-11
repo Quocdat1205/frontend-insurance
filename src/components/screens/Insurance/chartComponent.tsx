@@ -5,9 +5,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
 
 export type iProps = {
-    p_expired?: any
     p_market?: Idata
-    p_claim?: any
     state?: any
     data?: []
     setP_Expired?: any
@@ -131,7 +129,7 @@ export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number,
     }
 }
 
-const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, state, isMobile, width, height, resolution }: iProps) => {
+const ChartComponent = ({ data, setP_Market, setP_Claim, state, isMobile, width, height, resolution }: iProps) => {
     const [dataChart, setDataChart] = useState([])
     const router = useRouter()
     let chart: any
@@ -154,7 +152,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
         if (chart) {
             // setP_Market(chart.data[chart.data.length - 1]?.value)
         }
-    }, [dataChart, p_claim, p_expired, state?.period, state?.q_covered, state?.margin])
+    }, [dataChart, state])
 
     // useEffect(() => {
     //     InitChart(dataChart)
@@ -254,21 +252,21 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             bullet.circle.strokeWidth = 2
             bullet.circle.propertyFields.radius = '1'
 
-            if (p_claim > 0) {
-                handleTrendLine(chart, p_claim, state, resolution)
+            if (state?.p_claim > 0) {
+                handleTrendLine(chart, state?.p_claim, state, resolution)
             } else {
                 // handleTrendLine(chart, 0, state)
             }
 
             // //Label bullet main
             let latitudeLabel = subSeries.bullets.push(new am4charts.LabelBullet())
-            latitudeLabel.label.html = `<div class="text-xs">P-Market: $${chart.data[chart.data.length - 1]?.value}</div>`
+            latitudeLabel.label.html = `<div class="text-xs">P-Market: $${state?.p_market}</div>`
             latitudeLabel.label.horizontalCenter = 'right'
             latitudeLabel.label.dx = -10
             // latitudeLabel.label.dy = -5
             latitudeLabel.label.verticalCenter = 'bottom'
             latitudeLabel.label.fill = am4core.color('#B2B7BC')
-            if (p_expired) {
+            if (state?.p_expired) {
                 //chart Expired
                 let latitudeExpired = chart.series.push(new am4charts.LineSeries())
                 latitudeExpired.dataFields.dateX = 'date'
@@ -280,7 +278,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 const t_expired = chart.data[chart.data.length - 1]?.date
                 latitudeExpired.data.push({
                     date: t_expired + state?.period * 1000 * 3600 * 24,
-                    value: p_expired,
+                    value: state?.p_expired,
                 })
 
                 //bullet expired
@@ -310,8 +308,8 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             }
 
             if (
-                (p_claim > state?.p_market * 1 + (2 * state?.p_market) / 100 && p_claim < state?.p_market * 1 + (70 * state?.p_market) / 100) ||
-                (p_claim > state?.p_market * 1 - (70 * state?.p_market) / 100 && p_claim < state?.p_market * 1 - (2 * state?.p_market) / 100)
+                (state?.p_claim > state?.p_market * 1 + (2 * state?.p_market) / 100 && state?.p_claim < state?.p_market * 1 + (70 * state?.p_market) / 100) ||
+                (state?.p_claim > state?.p_market * 1 - (70 * state?.p_market) / 100 && state?.p_claim < state?.p_market * 1 - (2 * state?.p_market) / 100)
             ) {
                 const timeEnd = chart.data[chart.data.length - 1]?.date
 
@@ -321,7 +319,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 latitudeClaim.data = [
                     {
                         date: timeEnd + state?.period * 1000 * 3600 * 24,
-                        value: p_claim,
+                        value: state?.p_claim,
                     },
                 ]
 
@@ -338,7 +336,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                     ...dataChart,
                     {
                         date: timeEnd + state?.period * 1000 * 3600 * 24,
-                        value: p_claim > 0 ? p_claim : state?.p_market,
+                        value: state?.p_claim > 0 ? state?.p_claim : state?.p_market,
                     },
                 ]
                 series.fillOpacity = 0
@@ -365,7 +363,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
 
                 const percent = (((state?.p_claim - state?.p_market) / state?.p_market) * 100).toFixed(2)
 
-                if (p_claim > 0) {
+                if (state?.p_claim > 0) {
                     if (isMobile) {
                         claimLabel.label.html = `<div id="claimLabel" class="z-[9999] justify-end mt-[0.25rem] hover:cursor-pointer items-center flex text-xs h-[24px] text-[${
                             latitudeClaim.data[0].value < state?.p_market ? '#EB2B3E' : '#52CC74'
@@ -383,7 +381,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                         </span></div>`
                     }
                 }
-                if (p_claim == state?.p_market) {
+                if (state?.p_claim == state?.p_market) {
                     if (!isMobile) {
                         claimLabel.label.html = `<div id="claimLabel" class="hover:cursor-pointer text-[#808890] text-sm z-[1000] bg-[#F7F8FA] rounded-[800px] px-[16px] py-[4px]"><span class="mr-[8px]">P-Claim ${latitudeClaim.data[0].value}</span> <span>0%</span></div>`
                     }
@@ -439,7 +437,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 //     })
                 // }
 
-                handleTrendLineStatus(chart, p_claim, state, resolution)
+                handleTrendLineStatus(chart, state?.p_claim, state, resolution)
             }
         }
     }

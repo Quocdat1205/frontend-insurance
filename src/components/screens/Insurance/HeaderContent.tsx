@@ -8,7 +8,7 @@ import cx from 'classnames'
 import Button from 'components/common/Button/Button'
 import Config from 'config/config'
 
-const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) => {
+const HeaderContent = ({ state, setState, wallet, auth }: any) => {
     const [isDrop, setDrop] = useState<boolean>(false)
     const router = useRouter()
     const {
@@ -84,9 +84,6 @@ const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) 
                                             setDrop(false)
                                             setState(key)
                                             close()
-                                            if (key == 0) {
-                                                setProps({ ...props, percent_margin: 8 })
-                                            }
                                         }}
                                         key={key}
                                         onMouseDown={() => (Press = true)}

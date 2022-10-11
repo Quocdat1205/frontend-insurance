@@ -31,7 +31,6 @@ export const API_POST_WITHDRAW_COMMISSION = '/v1/withdraw-commission'
 export const API_GET_FILTER_COMMISSION = '/v1/filter-commissionn'
 export const API_CHECK_REF = '/v1/check-ref'
 
-
 // futures
 export const API_GET_UNIT_CONFIG = Config.env.NAMI_API_URL + '/api/v3/asset/config'
 export const API_GET_FUTURES_MARKET_WATCH = Config.env.NAMI_API_URL + '/api/v3/futures/ticker'
