@@ -32,11 +32,11 @@ const CommissionWithdrawModal = ({ isWithdrawing, setIsWithdrawing, userInfo, un
                 params: {
                     owner: account?.address,
 
-                    // UNCOMMENT THIS ON PRODUCTION
-                    // amount: userInfo.commissionAvailable,
+                    // USE THIS ON PRODUCTION
+                    amount: userInfo.commissionAvailable,
 
-                    // THIS IS FOR TEST ONLY
-                    amount: 10,
+                    // // THIS IS FOR TEST ONLY
+                    // amount: 10,
                 },
             })
             if (statusCode === 200) {
