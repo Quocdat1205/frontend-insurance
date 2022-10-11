@@ -33,7 +33,6 @@ export class ContractCaller {
             if (!nonce?.data) return nonce
             const signer = this.provider.getSigner()
             const signature = await signer.signMessage(getMessageSign(nonce?.data))
-            console.log('nonce', nonce, 'signer', signer, 'signature', signature)
             return await fetchApi({ url: API_LOGIN, options: { method: 'POST' }, params: { owner: address, signature: signature } })
         } catch (error) {
             console.log('sign', error)

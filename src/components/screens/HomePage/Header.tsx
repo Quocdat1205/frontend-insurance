@@ -41,7 +41,7 @@ const Header = () => {
         Config.connectWallet()
     }
 
-    const network = useMemo(() => ChainDataList[chain?.id], [account, chain])
+    const network = useMemo(() => ChainDataList[account?.chain?.id], [account])
 
     const onChangeMenu = (e: any) => {
         if (isMobile && e?.children.length > 0) return

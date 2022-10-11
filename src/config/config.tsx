@@ -17,7 +17,19 @@ class Config {
         expire: number | null
     } = { token: null, expire: null }
 
-    static web3: any
+    static web3: {
+        account: string
+        switchNetwork: any
+        chain: any
+        activate: any
+        deactivate: any
+        isActive: boolean
+        error: any
+        connector: any
+        provider: any
+        contractCaller: any
+        getBalance: any
+    }
 
     static refConnectWallet: ConnectWalletType
 
@@ -81,6 +93,7 @@ class Config {
         sessionStorage.removeItem('PUBLIC_ADDRESS')
         sessionStorage.removeItem('PUBLIC_TOKEN')
         sessionStorage.removeItem('PUBLIC_WALLET')
+        sessionStorage.removeItem('PUBLIC_CHAINID')
     }
 
     static MODAL_REGISTER_EMAIL = 'registerEmail'
