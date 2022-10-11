@@ -63,6 +63,14 @@ function MyApp({ Component, pageProps }: AppProps) {
             url: Config.networks[Config.chains[0]].urls[0],
             appName: 'Nami Insurance',
         },
+        walletConnect: {
+            rpc: {
+                1: 'https://mainnet.infura.io/v3/8e3937db21b341ceac1607d35ae551dd',
+                4: 'https://rinkeby.infura.io/v3/8e3937db21b341ceac1607d35ae551dd',
+                137: 'https://polygon-mainnet.infura.io/v3/8e3937db21b341ceac1607d35ae551dd',
+                80001: 'https://polygon-mainnet.infura.io/v3/8e3937db21b341ceac1607d35ae551dd',
+            },
+        },
     }
 
     return (

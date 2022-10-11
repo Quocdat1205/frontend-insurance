@@ -94,6 +94,7 @@ class Config {
         sessionStorage.removeItem('PUBLIC_TOKEN')
         sessionStorage.removeItem('PUBLIC_WALLET')
         sessionStorage.removeItem('PUBLIC_CHAINID')
+        localStorage.removeItem('walletconnect')
         window.location.reload()
     }
 
