@@ -87,15 +87,15 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         switch (wallet) {
             case wallets.metaMask:
                 const provider = getKeyMap((window as any).ethereum.providerMap, 'MetaMask')
-                await provider?.on('accountsChanged', (account: any) => {
+                await provider?.on('accountsChanged', (address: any) => {
                     if (!account.address) return
                     clearTimeout(timer.current)
                     timer.current = setTimeout(() => {
-                        getUserInfo(account[0], (user) => {
+                        getUserInfo(address[0], (user) => {
                             if (user) {
-                                Config.web3.account = account[0]
-                                sessionStorage.setItem('PUBLIC_ADDRESS', account[0])
-                                if (user) dispatch(setAccount({ address: account[0], ...user }))
+                                Config.web3.account = address[0]
+                                sessionStorage.setItem('PUBLIC_ADDRESS', address[0])
+                                if (user) dispatch(setAccount({ address: address[0], ...user }))
                             } else {
                                 Config.toast.show('error', 'Không tìm thấy người dùng')
                             }
