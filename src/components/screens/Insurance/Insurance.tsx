@@ -207,9 +207,10 @@ export const setDefaultValue = async (userBalance: number, p_market: number, fil
         })
         if (_res) {
             const margin = _res?.hedge * userBalance * p_market
+
             return {
                 q_covered: userBalance,
-                p_claim: +formatNumber(p_claim, +decimalP_claim),
+                p_claim: +(p_market - 0.1 * p_market).toFixed(+decimalP_claim),
                 period: _res?.period,
                 margin: +formatNumber(margin, +decimalMargin),
             }
@@ -235,7 +236,7 @@ export const setDefaultValue = async (userBalance: number, p_market: number, fil
             return {
                 q_covered: +formatNumber(margin / (_res?.hedge * p_market), +decimalQ_covered),
                 margin: +formatNumber(margin, +decimalMargin),
-                p_claim: +formatNumber(p_claim, +decimalP_claim),
+                p_claim: +(p_market - 0.1 * p_market).toFixed(+decimalP_claim),
                 period: _res?.period,
             }
         }

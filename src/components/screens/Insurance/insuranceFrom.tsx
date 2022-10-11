@@ -65,6 +65,7 @@ const InsuranceFrom = () => {
     const handleClick = useRef(true)
     const tmp_q_covered = useRef(0)
     const tmp_margin = useRef(0)
+    const step = useRef<number>(0)
 
     const [selectTime, setSelectTime] = useState<string>('1Y')
     const [tab, setTab] = useState<number>(0)
@@ -180,19 +181,38 @@ const InsuranceFrom = () => {
     }, [loadings])
 
     useEffect(() => {
+        step.current = 0
+    }, [])
+
+    useEffect(() => {
         if (assetsToken) {
             setDataIcon()
+            step.current = 1
+        } else {
+            return
         }
     }, [assetsToken])
 
     useEffect(() => {
-        getConfig(selectCoin?.type)
+        if (step.current === 1) {
+            getConfig(selectCoin?.type)
+        }
         runSocket()
     }, [selectCoin, publicSocket])
+    const timer = useRef<any>(null)
 
     useEffect(() => {
+        loadValidator()
+        getDefaultValue()
+    }, [])
+
+    useEffect(() => {
+        loadValidator()
+        getBalaneToken(selectCoin?.type)
         runSocket()
         timer.current = setInterval(() => {
+            loadValidator()
+            getBalaneToken(selectCoin?.type)
             runSocket()
         }, 10000)
         return () => {
@@ -201,6 +221,8 @@ const InsuranceFrom = () => {
     }, [selectCoin])
 
     useEffect(() => {
+        loadValidator()
+        getDefaultValue()
         if (pair_configs && p_market.current) {
             if (!account.address) {
                 setUserBalance(0)
@@ -216,13 +238,11 @@ const InsuranceFrom = () => {
                     }
                 })
             } else {
-                setSaved(0)
                 getBalaneToken(selectCoin?.type)
                     .then(async (res) => {
                         const balance = await res
                         setDefaultValue(balance, p_market.current, pair_configs.filters).then(async (e) => {
                             const value = await e
-
                             if (value) {
                                 q_covered.current = value.q_covered
                                 margin.current = value.margin
@@ -241,6 +261,8 @@ const InsuranceFrom = () => {
                                     r_claim.current = res?.r_claim
                                     margin.current = res?.margin!
                                 }
+                                createSaved()
+                                clear.current = handleCheckFinal()
                             }, 1000)
                         } else {
                             setTimeout(() => {
@@ -250,12 +272,34 @@ const InsuranceFrom = () => {
                                     q_claim.current = result?.q_claim
                                     r_claim.current = result?.r_claim
                                 }
+                                createSaved()
+                                clear.current = handleCheckFinal()
                             }, 1000)
                         }
                     })
             }
         }
+        createSaved()
     }, [pair_configs])
+
+    const timeOut = useRef<any>(null)
+    useEffect(() => {
+        getDefaultValue()
+    }, [userBalance])
+
+    const getDefaultValue = () => {
+        if (userBalance && p_market.current && pair_configs) {
+            setDefaultValue(userBalance, p_market.current, pair_configs.filters).then(async (e) => {
+                const value = await e
+                if (value) {
+                    q_covered.current = value.q_covered
+                    margin.current = value.margin
+                    period.current = value.period
+                    p_claim.current = value.p_claim
+                }
+            })
+        }
+    }
 
     const runSocket = () => {
         if (publicSocket && selectCoin?.symbol) publicSocket.emit('subscribe:futures:ticker', selectCoin?.symbol)
@@ -308,70 +352,76 @@ const InsuranceFrom = () => {
     }, [showGuide])
 
     useEffect(() => {
+        loadValidator()
+    }, [pair_configs, q_covered, selectCoin, p_claim, userBalance])
+
+    const loadValidator = () => {
         const _decimalList = { ...decimalList }
         let _percentPrice: any
-        pair_configs?.filters?.map(async (item: any) => {
-            if (item?.filterType === 'MIN_NOTIONAL') {
-                min_notinal.current = item?.notional
-            }
-            if (item?.filterType === 'LOT_SIZE') {
-                if (userBalance) {
-                    const decimal = countDecimals(item.stepSize)
-                    _decimalList.decimal_q_covered = +decimal
-                    const min_Market = +(min_notinal.current / p_market.current).toFixed(+decimal)
+        if (pair_configs?.filters && pair_configs?.filters.length > 0) {
+            pair_configs?.filters?.map(async (item: any) => {
+                if (item?.filterType === 'MIN_NOTIONAL') {
+                    min_notinal.current = item?.notional
+                }
+                if (item?.filterType === 'LOT_SIZE') {
+                    if (userBalance) {
+                        const decimal = countDecimals(item.stepSize)
+                        _decimalList.decimal_q_covered = +decimal
+                        const min_Market = +(min_notinal.current / p_market.current).toFixed(+decimal)
 
-                    const max = Number(item?.maxQty) < userBalance ? Number(item?.maxQty) : userBalance
+                        const max = Number(item?.maxQty) < userBalance ? Number(item?.maxQty) : userBalance
 
-                    if (min_Market == Infinity) {
-                        const min = Number(item?.minQty)
-                        setRangeQ_covered({ ...rangeQ_covered, min: Number(min.toFixed(+decimal)), max: Number(max.toFixed(+decimal)) })
-                    } else {
-                        const min = Number(item?.minQty) > min_Market ? Number(item?.minQty) : min_Market
-                        setRangeQ_covered({ ...rangeQ_covered, min: Number(min.toFixed(+decimal)), max: Number(max.toFixed(+decimal)) })
+                        if (min_Market == Infinity) {
+                            const min = Number(item?.minQty)
+                            setRangeQ_covered({ ...rangeQ_covered, min: Number(min.toFixed(+decimal)), max: Number(max.toFixed(+decimal)) })
+                        } else {
+                            const min = Number(item?.minQty) > min_Market ? Number(item?.minQty) : min_Market
+                            setRangeQ_covered({ ...rangeQ_covered, min: Number(min.toFixed(+decimal)), max: Number(max.toFixed(+decimal)) })
+                        }
                     }
                 }
-            }
-            if (item?.filterType === 'PERCENT_PRICE') {
-                _percentPrice = item
-            }
-            if (item?.filterType === 'PRICE_FILTER') {
-                const decimal_p_claim = countDecimals(Number(item.tickSize))
-
-                _decimalList.decimal_p_claim = +decimal_p_claim
-
-                const min1 = p_market.current + (2 / 100) * p_market.current
-                const max1 = p_market.current + (70 / 100) * p_market.current
-
-                const min2 = p_market.current - (70 / 100) * p_market.current
-                const max2 = p_market.current - (2 / 100) * p_market.current
-
-                if (p_claim.current > p_market.current) {
-                    setRangeP_claim({
-                        ...rangeP_claim,
-                        min: Number(min1),
-                        max: Number(max1),
-                    })
-                } else {
-                    setRangeP_claim({
-                        ...rangeP_claim,
-                        min: Number(min2),
-                        max: Number(max2),
-                    })
+                if (item?.filterType === 'PERCENT_PRICE') {
+                    _percentPrice = item
                 }
-            }
-            if (item?.filterType === 'MARGIN') {
-                const decimalMargin = countDecimals(item.stepSize)
-                _decimalList.decimal_margin = +decimalMargin
+                if (item?.filterType === 'PRICE_FILTER') {
+                    const decimal_p_claim = countDecimals(Number(item.tickSize))
 
-                const MIN = Number((q_covered.current * p_market.current * item.minQtyRatio).toFixed(Number(decimalMargin)))
-                const MAX = Number((q_covered.current * p_market.current * item.maxQtyRatio).toFixed(Number(decimalMargin)))
-                setRangeMargin({ ...rangeP_claim, min: MIN, max: MAX })
-            }
-            setDecimalList({ ..._decimalList })
-            setPercentPrice({ ..._percentPrice })
-            validateP_Claim(p_claim.current)
-        })
-    }, [pair_configs, q_covered, selectCoin, p_claim, userBalance])
+                    _decimalList.decimal_p_claim = +decimal_p_claim
+
+                    const min1 = p_market.current + (2 / 100) * p_market.current
+                    const max1 = p_market.current + (70 / 100) * p_market.current
+
+                    const min2 = p_market.current - (70 / 100) * p_market.current
+                    const max2 = p_market.current - (2 / 100) * p_market.current
+
+                    if (p_claim.current > p_market.current) {
+                        setRangeP_claim({
+                            ...rangeP_claim,
+                            min: Number(min1),
+                            max: Number(max1),
+                        })
+                    } else {
+                        setRangeP_claim({
+                            ...rangeP_claim,
+                            min: Number(min2),
+                            max: Number(max2),
+                        })
+                    }
+                }
+                if (item?.filterType === 'MARGIN') {
+                    const decimalMargin = countDecimals(item.stepSize)
+                    _decimalList.decimal_margin = +decimalMargin
+
+                    const MIN = Number((q_covered.current * p_market.current * item.minQtyRatio).toFixed(Number(decimalMargin)))
+                    const MAX = Number((q_covered.current * p_market.current * item.maxQtyRatio).toFixed(Number(decimalMargin)))
+                    setRangeMargin({ ...rangeP_claim, min: MIN, max: MAX })
+                }
+                setDecimalList({ ..._decimalList })
+                setPercentPrice({ ..._percentPrice })
+                validateP_Claim(p_claim.current)
+            })
+        }
+    }
 
     const componentsInputMobile = () => {
         return (
@@ -438,8 +488,6 @@ const InsuranceFrom = () => {
         )
     }
 
-    const timer = useRef<any>(null)
-
     const refreshApi = (
         selectTime: string | undefined,
         selectCoin: { id?: string; name?: string; icon?: string; disable?: boolean | undefined; symbol?: string; type: any },
@@ -498,6 +546,8 @@ const InsuranceFrom = () => {
             }
             clearTimeout(time)
         }, 500)
+
+        step.current = step.current + 1
     }
 
     const createSaved = () => {
@@ -864,6 +914,7 @@ const InsuranceFrom = () => {
                 }
             })
             if (item) {
+                runSocket()
                 return setPairConfigs(item)
             }
         }
