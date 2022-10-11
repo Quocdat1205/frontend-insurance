@@ -34,7 +34,7 @@ export const setting = () => async (dispatch: Dispatch) => {
 }
 
 export const setAccount =
-    (data?: { address: string | null | undefined; wallet?: string | null | undefined; [key: string]: any }) => async (dispatch: Dispatch) => {
+    (data?: { address?: string | null | undefined; wallet?: string | null | undefined; chain?: any; [key: string]: any }) => async (dispatch: Dispatch) => {
         try {
             dispatch({
                 type: types.SET_ACCOUNT,

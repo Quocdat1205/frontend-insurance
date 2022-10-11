@@ -94,6 +94,7 @@ class Config {
         sessionStorage.removeItem('PUBLIC_TOKEN')
         sessionStorage.removeItem('PUBLIC_WALLET')
         sessionStorage.removeItem('PUBLIC_CHAINID')
+        window.location.reload()
     }
 
     static MODAL_REGISTER_EMAIL = 'registerEmail'
