@@ -86,15 +86,8 @@ const CommissionWithdrawModal = ({ isWithdrawing, setIsWithdrawing, userInfo, un
                 modal = (
                     <>
                         <div className="w-full flex flex-col items-center justify">
-                            <Loading>
-                                <div className="bg-white w-[calc(5rem-30px)] h-[calc(5rem-30px)] sm:w-[calc(7rem-40px)] sm:h-[calc(7rem-40px)] flex items-center justify-center rounded-full" />
-                            </Loading>
-                            <div className="mt-8 font-semibold text-xl leading-6 text-center">Quá trình có thể kéo dài đến 10s</div>
-                        </div>
-                        <div className="w-full mt-8">
-                            <Button variants="primary" disabled className="w-full py-[14px] px-6 leading-5 font-bold text-sm">
-                                Đang thực hiện rút hoa hồng
-                            </Button>
+                            <img className="max-w-[160px]" src="/images/gif/ic_loading.gif" />
+                            <div className="mt-4 mb-8 font-medium text-xl text-center">{t('commission:withdraw_reward:withdrawing')}</div>
                         </div>
                     </>
                 )

@@ -226,11 +226,10 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                             <div className="flex items-center justify-between mt-4">
                                 <div className="text-xl sm:text-2xl font-semibold sm:font-medium">{formatNumber(userInfo?.commissionAvailable, decimal)}</div>
                                 <div
-                                    className="flex items-center space-x-1 text-sm sm:text-base font-semibold text-red cursor-pointer"
+                                    className="text-center text-xs sm:text-sm px-8 py-2 font-semibold text-red cursor-pointer border border-red rounded-lg bg-btnOutline"
                                     onClick={() => setShowWithDrawCommission(true)}
                                 >
                                     <span>{t('commission:withdraw')}</span>
-                                    <img src="/images/icons/ic_withdraw.png" className="w-4 h-4 sm:w-6 sm:h-6" />
                                 </div>
                             </div>
                         </div>
