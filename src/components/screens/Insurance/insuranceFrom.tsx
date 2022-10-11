@@ -2,11 +2,10 @@ import dynamic from 'next/dynamic'
 import LayoutInsurance from 'components/layout/layoutInsurance'
 import useWeb3Wallet from 'hooks/useWeb3Wallet'
 import Button from 'components/common/Button/Button'
-import axios from 'axios'
 import { Menu, Popover, Switch, Tab } from '@headlessui/react'
 import { ICoin } from 'components/common/Input/input.interface'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CheckCircle, InfoCircle, XMark, BxDollarCircle, BxLineChartDown, BxCaledarCheck } from 'components/common/Svg/SvgIcon'
 import { ChevronDown, Check, ChevronUp, ArrowLeft } from 'react-feather'
 import { useTranslation } from 'next-i18next'
@@ -206,19 +205,45 @@ const InsuranceFrom = () => {
         }
     }, [assetsToken])
 
-    // useEffect(() => {
-    //     if (listCoin.length > 0) {
-    //         const timeEnd = new Date()
-    //         const timeBegin = new Date()
-    //         timeBegin.setDate(timeEnd.getDate() - 10)
-    //         setState({ ...state, t_market: timeEnd })
-    //     }
-    // }, [listCoin])
-
     useEffect(() => {
         getConfig(selectCoin?.type)
-
         runSocket()
+
+        return () => {
+            if (pair_configs && state.p_market) {
+                if (!account.address) {
+                    setUserBalance(0)
+                    percentInsurance.current = 0
+                    percentMargin.current = 0
+                    setDefaultValue(0, state, pair_configs.filters).then((res) => {
+                        setState({ ...state, q_covered: res?.q_covered, margin: res?.margin, period: res?.period, p_claim: res?.p_claim })
+                    })
+                } else {
+                    localStorage.setItem('buy_covered_state', JSON.stringify(selectCoin))
+                    setSaved(0)
+
+                    getBalaneToken(selectCoin?.type)
+                        .then((res) => {
+                            setDefaultValue(res, state, pair_configs.filters).then((e) => {
+                                setState({ ...state, q_covered: e?.q_covered, margin: e?.margin, period: e?.period, p_claim: e?.p_claim })
+                            })
+                        })
+                        .then(() => {
+                            if (tab === 0) {
+                                const res = getInfoCoveredDefault(state, decimalList)
+                                if (res) {
+                                    setState({ ...state, p_expired: res?.p_expired!, q_claim: res?.q_claim!, r_claim: res?.r_claim!, margin: res?.margin! })
+                                }
+                            } else {
+                                const result = getInfoCoveredCustom(state, decimalList)
+                                if (result) {
+                                    setState({ ...state, p_expired: result?.p_expired!, q_claim: result?.q_claim!, r_claim: result?.r_claim! })
+                                }
+                            }
+                        })
+                }
+            }
+        }
     }, [selectCoin, publicSocket])
 
     const runSocket = async () => {
@@ -233,40 +258,6 @@ const InsuranceFrom = () => {
             }
         })
 
-        if (pair_configs && state.p_market) {
-            if (!account.address) {
-                setUserBalance(0)
-                percentInsurance.current = 0
-                percentMargin.current = 0
-                await setDefaultValue(0, state, pair_configs.filters).then((res) => {
-                    setState({ ...state, q_covered: res?.q_covered, margin: res?.margin, period: res?.period, p_claim: res?.p_claim })
-                })
-            } else {
-                localStorage.setItem('buy_covered_state', JSON.stringify(selectCoin))
-                setSaved(0)
-
-                await getBalaneToken(selectCoin?.type)
-                    .then((res) => {
-                        setDefaultValue(res, state, pair_configs.filters).then((e) => {
-                            setState({ ...state, q_covered: e?.q_covered, margin: e?.margin, period: e?.period, p_claim: e?.p_claim })
-                        })
-                    })
-                    .then(() => {
-                        if (tab === 0) {
-                            const res = getInfoCoveredDefault(state, decimalList)
-                            if (res) {
-                                setState({ ...state, p_expired: res?.p_expired!, q_claim: res?.q_claim!, r_claim: res?.r_claim!, margin: res?.margin! })
-                            }
-                        } else {
-                            const result = getInfoCoveredCustom(state, decimalList)
-                            if (result) {
-                                setState({ ...state, p_expired: result?.p_expired!, q_claim: result?.q_claim!, r_claim: result?.r_claim! })
-                            }
-                        }
-                    })
-            }
-        }
-
         return () => {
             if (publicSocket) publicSocket?.emit('unsubscribe:futures:ticker', selectCoin?.symbol)
             Emitter.off(PublicSocketEvent.FUTURES_TICKER_UPDATE)
@@ -279,7 +270,7 @@ const InsuranceFrom = () => {
     }, [state])
 
     useEffect(() => {
-        if (tab === 0) {
+        if (tab === 0 && state?.q_covered && state?.p_claim && state?.period) {
             const res = getInfoCoveredDefault(state, decimalList)
             if (res) {
                 setState({ ...state, p_expired: res?.p_expired!, q_claim: res?.q_claim!, r_claim: res?.r_claim!, margin: res?.margin! })
@@ -707,16 +698,6 @@ const InsuranceFrom = () => {
             </Popover.Panel>
         </Popover>
     )
-
-    useEffect(() => {
-        if (tab == 0) {
-            const _res = getInfoCoveredDefault(state, decimalList)
-            setState({ ...state, q_claim: _res?.q_claim, r_claim: _res?.r_claim, p_expired: _res?.p_expired, margin: _res?.margin })
-        } else {
-            const _res = getInfoCoveredCustom(state, decimalList)
-            setState({ ...state, q_claim: _res?.q_claim, r_claim: _res?.r_claim, p_expired: _res?.p_expired })
-        }
-    }, [])
 
     const onHandleChange = (key: string, e: any) => {
         const value = +e.value
