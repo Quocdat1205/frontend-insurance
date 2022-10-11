@@ -143,7 +143,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
             <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
                 <div className="flex lg:items-center justify-between flex-col lg:flex-row">
                     <div className="md:text-xl font-semibold md:font-medium">{t('commission:reward_stats')}</div>
-                    <div className="items-center space-x-4 text-sm hidden md:flex sm:mt-6">
+                    <div className="items-center space-x-4 text-sm hidden lg:flex">
                         {days.map((day: any, index: number) => (
                             <div
                                 key={index}
@@ -177,7 +177,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                             {t('common:reset')}
                         </div>
                     </div>
-                    <div className="flex md:hidden mt-6 space-x-4">
+                    <div className="flex lg:hidden mt-6 space-x-4">
                         <div
                             className="px-4 py-[6px] rounded-full font-semibold flex items-center space-x-2 bg-hover"
                             onClick={() => setShowMobileDatePicker(true)}
@@ -226,11 +226,10 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                             <div className="flex items-center justify-between mt-4">
                                 <div className="text-xl sm:text-2xl font-semibold sm:font-medium">{formatNumber(userInfo?.commissionAvailable, decimal)}</div>
                                 <div
-                                    className="flex items-center space-x-1 text-sm sm:text-base font-semibold text-red cursor-pointer"
+                                    className="text-center text-xs sm:text-sm px-8 py-2 font-semibold text-red cursor-pointer border border-red rounded-lg bg-btnOutline"
                                     onClick={() => setShowWithDrawCommission(true)}
                                 >
                                     <span>{t('commission:withdraw')}</span>
-                                    <img src="/images/icons/ic_withdraw.png" className="w-4 h-4 sm:w-6 sm:h-6" />
                                 </div>
                             </div>
                         </div>

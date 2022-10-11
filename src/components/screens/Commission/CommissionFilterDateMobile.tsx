@@ -160,7 +160,7 @@ const CommissionFilterDateMobile = (props: InsuranceFilterMobile) => {
                 </div>
                 <div className={`${showPicker ? 'translate-x-0 min-h-[360px]' : 'translate-x-full absolute'} mt-6 transition-all`}>
                     <div className={`${!showPicker ? 'translate-x-0' : '-translate-x-full absolute'} transition-all flex flex-col space-y-6`}></div>
-                    <div className="date-range-picker flex justify-center !bg-white">
+                    <div className="customDatePickerWidth date-range-picker w-full flex justify-center !bg-white">
                         <DateRangePicker
                             className="relative h-full"
                             ranges={[datePicker]}
