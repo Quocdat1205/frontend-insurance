@@ -413,7 +413,7 @@ const AcceptBuyInsurance = () => {
         clearTimeout(timer.current)
         timer.current = setTimeout(() => {
             if (refCode) checkRef()
-        }, 1000)
+        }, 500)
         setRefError({ isValid: true, message: '' })
     }, [refCode])
 
@@ -503,7 +503,7 @@ const AcceptBuyInsurance = () => {
                                         </div>
                                         <div className={'font-semibold'}>
                                             <span className={`${checkUpgrade ? 'line-through text-txtSecondary text-xs pr-[8px]' : 'pr-[8px]'}`}>
-                                                {state?.r_claim.toFixed(state?.decimalList?.decimal_q_covered)} %
+                                                {state?.r_claim?.toFixed(state?.decimalList?.decimal_q_covered)} %
                                             </span>
                                             <span className={`${checkUpgrade ? 'text-[#52CC74] font-semibold' : 'hidden'}`}>
                                                 {((state?.q_claim + (state?.q_claim * 5) / 100) / state?.margin).toFixed(state?.decimalList?.decimal_q_covered)}{' '}

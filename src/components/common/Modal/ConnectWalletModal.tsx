@@ -35,7 +35,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     } = useTranslation()
     const dispatch = useAppDispatch()
 
-    const { account: address, error, chainId, isActive } = useWeb3React()
+    const { error, isActive } = useWeb3React()
     const [isVisible, setVisible] = useState(false)
     const [wallet, setWallet] = useState<Wallet | null>()
     const [loading, setLoading] = useState<boolean>(false)
@@ -45,14 +45,15 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     const [switchNetwork, setSwitchNetwork] = useState<boolean>(false)
     const [networkError, setNetworkError] = useState<boolean>(false)
     const firstTime = useRef<boolean>(true)
-    const oldAddress = useRef<string | null>()
     const isReload = useRef<boolean>(false)
     const textErrorButton = useRef<string>(t(`common:reconnect`))
     const showIconReload = useRef<boolean>(true)
     const logged = useRef<boolean>(false)
+    const [inValidNetword, setInValidNetword] = useState(true)
 
     const loading_account = useAppSelector((state: RootStore) => state.setting.loading_account)
     const account = useAppSelector((state: RootStore) => state.setting.account)
+    const timer = useRef<any>(null)
 
     useImperativeHandle(ref, () => ({
         show: onShow,
@@ -64,16 +65,6 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         }
     }, [error, isVisible, isActive])
 
-    const timer = useRef<any>(null)
-    useEffect(() => {
-        if (address && !account?.address && isActive && logged.current) {
-            clearTimeout(timer.current)
-            timer.current = setTimeout(() => {
-                onConfirm()
-            }, 500)
-        }
-    }, [account, address, isActive, loading_account])
-
     useEffect(() => {
         if (loading_account) {
             clearTimeout(timer.current)
@@ -81,42 +72,105 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 dispatch(onLoading(false))
             }, 500)
         }
-    }, [account])
+    }, [account.address])
 
     const getUserInfo = async (address: string, cb: (e: any) => void) => {
         const { data } = await fetchApi({ url: API_GET_INFO_USER, params: { owner: address } })
         if (cb) cb(data)
     }
 
-    useEffect(() => {
-        if (address && account.address && account.address !== address) {
-            sessionStorage.setItem('PUBLIC_ADDRESS', address)
-            getUserInfo(address, (user) => {
-                if (user) dispatch(setAccount({ address: address, ...user }))
-            })
-        }
-    }, [account, address])
+    const getKeyMap = (arr: any, val: string) => {
+        return arr?.providerMap ? [...arr.providerMap].find(([key, value]) => val === key)[1] : arr
+    }
 
-    const inValidNetword = useMemo(() => {
-        return account.address ? (chainId ? Config.chains.includes(chainId) : false) : true
-    }, [chainId, account])
+    const onChangeAccount = async (wallet: string) => {
+        switch (wallet) {
+            case wallets.metaMask:
+                const provider = getKeyMap((window as any).ethereum, 'MetaMask')
+                await provider?.on('accountsChanged', (address: any) => {
+                    if (!provider.selectedAddress) return
+                    clearTimeout(timer.current)
+                    timer.current = setTimeout(() => {
+                        getUserInfo(address[0], (user) => {
+                            if (user) {
+                                Config.web3.account = address[0]
+                                sessionStorage.setItem('PUBLIC_ADDRESS', address[0])
+                                if (user) dispatch(setAccount({ address: address[0], ...user }))
+                            } else {
+                                Config.logout()
+                                dispatch(setAccount({ address: null, wallet: null }))
+                            }
+                        })
+                    }, 500)
+                })
+                return
+            default:
+                break
+        }
+    }
+
+
+    const onChangeNetwork = async (wallet: string) => {
+        let provider: any
+        switch (wallet) {
+            case wallets.metaMask:
+            case wallets.coinbaseWallet:
+                provider = getKeyMap((window as any).ethereum, wallet === wallets.metaMask ? 'MetaMask' : 'CoinbaseWallet')
+                await provider?.on('chainChanged', (chainId: string) => {
+                    if (!provider.selectedAddress) return
+                    clearTimeout(timer.current)
+                    timer.current = setTimeout(() => {
+                        if (Config.chains.includes(Number(chainId))) {
+                            connectionError({ code: errorsWallet.Success })
+                        } else {
+                            checkNetWork(wallet)
+                        }
+                        setChainAccount(Number(chainId))
+                    }, 500)
+                })
+                break
+            default:
+                break
+        }
+    }
+
+    const setChainAccount = (chainId: number) => {
+        const chain = { ...Config.networks[chainId], id: chainId }
+        sessionStorage.setItem('PUBLIC_CHAINID', JSON.stringify(chainId))
+        dispatch(setAccount({ chain: chain }))
+    }
+
+    const checkNetWork = async (wallet: string, checked = false) => {
+        if (!account.address) return
+        let provider
+        switch (wallet) {
+            case wallets.metaMask:
+                provider = getKeyMap((window as any).ethereum, 'MetaMask')
+                break
+            case wallets.coinbaseWallet:
+                provider = getKeyMap((window as any).ethereum, 'CoinbaseWallet')
+                break
+            default:
+                break
+        }
+        const chainId = Number(await provider?.chainId)
+        sessionStorage.setItem('PUBLIC_CHAINID', JSON.stringify(chainId))
+        const isValid = Config.chains.includes(chainId)
+        if (!isValid && !checked) {
+            Config.toast?.show('error', t('common:error_switch_network'))
+            setInValidNetword(isValid)
+            setVisible(true)
+            firstTime.current = false
+            setSwitchNetwork(true)
+        }
+    }
 
     useEffect(() => {
-        if (chainId && account.address) {
-            if (!inValidNetword && !isVisible) {
-                timer.current = setTimeout(() => {
-                    Config.toast?.show('error', t('common:error_switch_network'))
-                    setVisible(true)
-                    firstTime.current = false
-                    oldAddress.current = account.address
-                    setWallet(account.wallet)
-                    setSwitchNetwork(true)
-                }, 200)
-            } else if (inValidNetword && loading) {
-                connectionError({ code: errorsWallet.Success })
-            }
-        }
-    }, [isActive, chainId, account, loading, inValidNetword, isVisible])
+        if (!account.address) return
+        onChangeAccount(account.wallet)
+        onChangeNetwork(account.wallet)
+        checkNetWork(account.wallet)
+    }, [account.address])
 
     const connectionError = async (error: any) => {
         let isNotFoundNetWork = false
@@ -132,6 +186,8 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                     textErrorButton.current = t(`common:reconnect`)
                     showIconReload.current = true
                     setErrorConnect(true)
+                } else {
+                    await checkNetWork(account.wallet, true)
                 }
                 break
             case errorsWallet.Not_found:
@@ -186,12 +242,35 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     const onShow = () => {
         firstTime.current = true
         setVisible(true)
+        setLoading(false)
+        setInValidNetword(true)
     }
 
-    const onSwitch = () => {
-        Config.web3.switchNetwork(Config.chains[0])
-        setLoading(true)
-        setSwitchNetwork(false)
+    const onSwitch = async () => {
+        switch (account?.wallet) {
+            case wallets.metaMask:
+                Config.web3.switchNetwork(Config.chains[0])
+                setLoading(true)
+                setSwitchNetwork(false)
+                break
+            case wallets.coinbaseWallet:
+                try {
+                    const result = await (window as any).ethereum.send('wallet_switchEthereumChain', [{ chainId: Config.networks[Config.chains[0]].chainId }])
+                    connectionError({ code: errorsWallet.Success })
+                } catch (switchError: any) {
+                    if (switchError.code === 4902) {
+                        await (window as any).ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [getAddChainParameters(Config.chains[0])],
+                        })
+                    } else {
+                        Config.toast.show('error', 'Operation failed. Choose the Binance Smart Chain on your wallet')
+                    }
+                }
+                break
+            default:
+                break
+        }
     }
 
     const lostConnection = () => {
@@ -215,10 +294,39 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         }
     }
 
+    const onLogin = async () => {
+        if (!Config.web3.account) return
+        try {
+            logged.current = false
+            const token = await Config.web3.contractCaller?.sign(Config.web3.account)
+            if (!token) {
+                lostConnection()
+                return
+            }
+            if (token?.message || token?.code || !token) {
+                connectionError(token)
+            } else {
+                sessionStorage.setItem('PUBLIC_ADDRESS', Config.web3.account)
+                sessionStorage.setItem('PUBLIC_TOKEN', token)
+                if (wallet?.wallet) localStorage.setItem('PUBLIC_WALLET', wallet?.wallet)
+                updateRef(Config.web3.account, (user) => {
+                    if (Config.chains.includes(Config.web3.chain.id)) {
+                        Config.toast.show('success', t('common:connect_successful'))
+                    }
+                    const chain = { ...Config.networks[Config.web3.chain.id], id: Config.web3.chain.id }
+                    dispatch(setAccount({ address: Config.web3.account, wallet: wallet?.wallet, chain: chain, ...user }))
+                    setVisible(false)
+                })
+            }
+        } catch (error: any) {
+            console.log('confirm', error)
+        } finally {
+        }
+    }
+
     const onConfirm = async () => {
         firstTime.current = false
         logged.current = true
-        oldAddress.current = !oldAddress.current ? address : oldAddress.current
         switch (wallet?.wallet) {
             case wallets.metaMask:
                 if (isMobile) {
@@ -227,7 +335,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                         window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}?ref=${refCode}`)
                         return
                     }
-                    Config.web3?.activate(wallets.metaMask)
+                    await Config.web3?.activate(wallets.metaMask)
                 } else {
                     if (!Config.isMetaMaskInstalled) {
                         setInstaller(true)
@@ -236,9 +344,15 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 }
                 break
             case wallets.coinbaseWallet:
+                const provider = getKeyMap((window as any).ethereum, 'CoinbaseWallet')
                 if (isMobile) {
-                    if (!Config.isMetaMaskInstalled) {
+                    if (!provider?.isCoinbaseWallet) {
                         window.open(`https://go.cb-w.com/dapp?cb_url=${Config.env.APP_URL}`)
+                        return
+                    }
+                } else {
+                    if (!provider?.isCoinbaseWallet) {
+                        setInstaller(true)
                         return
                     }
                 }
@@ -247,35 +361,12 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 break
         }
         if (wallet?.wallet) sessionStorage.setItem('PUBLIC_WALLET', wallet?.wallet)
-        if (!isMobile) Config.web3?.activate(wallet?.wallet)
-        if (!oldAddress.current) return
         setErrorConnect(false)
         setLoading(true)
-        try {
-            logged.current = false
-            const token = await Config.web3.contractCaller?.sign(oldAddress.current)
-            if (!token) {
-                lostConnection()
-                return
-            }
-            if (token?.message || token?.code) {
-                connectionError(token)
-            } else {
-                sessionStorage.setItem('PUBLIC_ADDRESS', oldAddress.current)
-                sessionStorage.setItem('PUBLIC_TOKEN', token)
-                if (wallet?.wallet) localStorage.setItem('PUBLIC_WALLET', wallet?.wallet)
-                updateRef(oldAddress.current, (user) => {
-                    if (chainId && Config.chains.includes(chainId)) {
-                        Config.toast.show('success', t('common:connect_successful'))
-                    }
-                    dispatch(setAccount({ address: oldAddress.current, wallet: wallet?.wallet, ...user }))
-                    setVisible(false)
-                })
-            }
-        } catch (error: any) {
-            console.log('confirm', error)
-        } finally {
-        }
+        if (!isMobile)
+            await Config.web3?.activate(wallet?.wallet, wallet?.wallet === wallets.metaMask ? null : Config.chains[0], () => {
+                onLogin()
+            })
     }
 
     const onCancel = () => {
@@ -304,7 +395,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
 
     const walletsFilter: Wallet[] = [
         { name: 'Metamask', icon: '/images/icons/ic_metamask.png', active: true, wallet: wallets.metaMask },
-        { name: 'Coinbase Wallet', icon: '/images/icons/ic_coinbase.png', active: false, wallet: wallets.coinbaseWallet },
+        { name: 'Coinbase Wallet', icon: '/images/icons/ic_coinbase.png', active: true, wallet: wallets.coinbaseWallet },
         { name: 'Trustwallet', icon: '/images/icons/ic_trustwallet.png', active: false, wallet: 'Trustwallet' },
         { name: t('common:other'), active: false, wallet: 'other' },
     ]
@@ -338,9 +429,10 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                         {!loading && <div className="text-xl font-medium text-left sm:text-center w-full"> {t('home:home:connect_wallet')}</div>}
                         {loading ? (
                             <div className="flex flex-col space-y-6 justify-center items-center">
-                                <Loading>
+                                <img className="max-w-[167px]" src="/images/gif/ic_loading.gif" />
+                                {/* <Loading>
                                     <div className="bg-white w-[calc(5rem-30px)] h-[calc(5rem-30px)] sm:w-[calc(7rem-40px)] sm:h-[calc(7rem-40px)] flex items-center justify-center rounded-full" />
-                                </Loading>
+                                </Loading> */}
                                 <div className="text-xl font-medium">{t('common:connecting')}</div>
                             </div>
                         ) : (

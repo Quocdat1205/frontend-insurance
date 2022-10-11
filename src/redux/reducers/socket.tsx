@@ -4,7 +4,7 @@ import { Action } from 'types/types'
 const initialState = {
     publicSocket: null,
 }
-const setting = (state = initialState, action: Action) => {
+const socket = (state = initialState, action: Action) => {
     switch (action.type) {
         case types.SET_PUBLIC_SOCKET:
             return {
@@ -15,4 +15,4 @@ const setting = (state = initialState, action: Action) => {
             return state
     }
 }
-export default setting
+export default socket

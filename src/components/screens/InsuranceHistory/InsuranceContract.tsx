@@ -9,7 +9,7 @@ import React, { useEffect, useMemo, useState, useRef } from 'react'
 import { API_GET_INSURANCE_BY_ADDRESS } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { screens, stateInsurance } from 'utils/constants'
-import { formatCurrency, formatNumber, formatTime, getDecimalPrice } from 'utils/utils'
+import { Countdown, formatCurrency, formatNumber, formatTime, getDecimalPrice } from 'utils/utils'
 import InsuranceContractMobile from './InsuranceContractMobile'
 import { useAppSelector, RootStore } from 'redux/store'
 import colors from 'styles/colors'
@@ -275,7 +275,7 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
     const renderPeriod = (e: any) => {
         return (
             <div className="text-red">
-                {e?.value}D {formatTime(e.row.original.createdAt, 'HH:mm:ss')}
+                <Countdown date={e.row.original.expired} />
             </div>
         )
     }
@@ -357,9 +357,7 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
                 minWidth: 120,
                 Cell: (e: any) => (
                     <div className="underline text-red font-light cursor-pointer">
-                        {/* <Link href={Config.env.BSC + '/' + e.value}>
-                            <a target="_blank">{e.value}</a>
-                        </Link> */}
+                       
                         <Link href={Config.env.BSC + '/' + e.value}>
                             <a target="_blank">{e.value?.length > 10 ? String(e.value).substr(0, 5) + '...' + String(e.value).substr(-3) : e.value}</a>
                         </Link>

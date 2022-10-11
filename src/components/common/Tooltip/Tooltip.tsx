@@ -1,5 +1,4 @@
-import { ReactNode, useRef } from 'react'
-import styled from 'styled-components'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import classnames from 'classnames'
 import ReactTooltip from 'react-tooltip'
 import colors from 'styles/colors'
@@ -14,7 +13,14 @@ interface Tooltip {
 }
 
 const Tooltip = ({ children, placement = 'right', className, id, backgroundColor, arrowColor, ...props }: Tooltip) => {
+    const [mount, setMount] = useState<boolean>(false)
     const ref = useRef<any>()
+
+    useEffect(() => {
+        setMount(true)
+    }, [])
+    if (!mount) return null
+
     return (
         <ReactTooltip
             id={id}

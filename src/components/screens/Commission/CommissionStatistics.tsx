@@ -143,7 +143,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
             <div className="max-w-screen-layout 4xl:max-w-screen-3xl m-auto">
                 <div className="flex lg:items-center justify-between flex-col lg:flex-row">
                     <div className="md:text-xl font-semibold md:font-medium">{t('commission:reward_stats')}</div>
-                    <div className="items-center space-x-4 text-sm hidden md:flex sm:mt-6">
+                    <div className="items-center space-x-4 text-sm hidden lg:flex">
                         {days.map((day: any, index: number) => (
                             <div
                                 key={index}
@@ -177,7 +177,7 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                             {t('common:reset')}
                         </div>
                     </div>
-                    <div className="flex md:hidden mt-6 space-x-4">
+                    <div className="flex lg:hidden mt-6 space-x-4">
                         <div
                             className="px-4 py-[6px] rounded-full font-semibold flex items-center space-x-2 bg-hover"
                             onClick={() => setShowMobileDatePicker(true)}
