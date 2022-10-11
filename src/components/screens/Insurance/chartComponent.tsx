@@ -3,12 +3,9 @@ import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themes_animated from '@amcharts/amcharts4/themes/animated'
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
-import { add, getUnixTime } from 'date-fns'
 
 export type iProps = {
-    p_expired?: any
     p_market?: Idata
-    p_claim?: any
     state?: any
     data?: []
     setP_Expired?: any
@@ -18,7 +15,7 @@ export type iProps = {
     isMobile?: boolean
     width: number
     height: number
-    resolution: number
+    resolution: string
 }
 
 export type Idata = {
@@ -59,19 +56,19 @@ export const dateTransform: any = {
     },
 }
 
-export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number, state: any, resolution: number) => {
+export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number, state: any, resolution: string) => {
     let trend = chart.series.push(new am4charts.LineSeries())
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
     trend.strokeWidth = 1.5
     trend.strokeDasharray = '3,3'
     trend.defaultState.transitionDuration = 1
-    if (state.p_claim < state.p_market) {
+    if (state?.p_claim < state?.p_market) {
         trend.stroke = am4core.color('#EB2B3E')
     } else {
         trend.stroke = am4core.color('#52CC74')
     }
-    if (state.p_claim == state.p_market || state.p_claim == 0) {
+    if (state?.p_claim == state?.p_market || state?.p_claim == 0) {
         trend.stroke = am4core.color('#22313F')
     }
 
@@ -81,20 +78,33 @@ export const handleTrendLine = (chart: am4charts.XYChart, p_claim: number, state
     let endPoint = chart.data[chart.data.length - 1]?.date
 
     if (p_claim) {
-        trend.data = [
-            {
-                date: chart.data[0]?.date,
-                value: p_claim,
-            },
-            {
-                date: endPoint + (resolution + 8) * 1000 * 3600 * 24 + 4 * 3600 * 24,
-                value: p_claim,
-            },
-        ]
+        if (/([M]|[Y]|[W])/g.test(resolution)) {
+            trend.data = [
+                {
+                    date: chart.data[0]?.date,
+                    value: p_claim,
+                },
+                {
+                    date: endPoint + (state?.period + 8) * 1000 * 3600 * 24 + 2 * 3600 * 24,
+                    value: p_claim,
+                },
+            ]
+        } else {
+            trend.data = [
+                {
+                    date: chart.data[0]?.date,
+                    value: p_claim,
+                },
+                {
+                    date: endPoint + (state?.period + 2) * 1000 * 3600 * 24 + 2 * 3600 * 24,
+                    value: p_claim,
+                },
+            ]
+        }
     }
 }
 
-export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number, state: any, resolution: number) => {
+export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number, state: any, resolution: string) => {
     let trend = chart.series.push(new am4charts.LineSeries())
     trend.dataFields.valueY = 'value'
     trend.dataFields.dateX = 'date'
@@ -112,14 +122,14 @@ export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number,
                 value: chart.data[chart.data.length - 1]?.value,
             },
             {
-                date: endPoint + resolution * 1000 * 3600 * 24,
+                date: endPoint + state?.period * 1000 * 3600 * 24,
                 value: p_claim,
             },
         ]
     }
 }
 
-const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, state, isMobile, width, height, resolution }: iProps) => {
+const ChartComponent = ({ data, setP_Market, setP_Claim, state, isMobile, width, height, resolution }: iProps) => {
     const [dataChart, setDataChart] = useState([])
     const router = useRouter()
     let chart: any
@@ -130,7 +140,6 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
     }, [data])
 
     useEffect(() => {
-        chart?.dispose()
         InitChart(dataChart)
     }, [dataChart])
 
@@ -138,13 +147,12 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
     useEffect(() => {
         clearTimeout(timer.current)
         timer.current = setTimeout(() => {
-            chart?.dispose()
             InitChart(dataChart)
         }, 500)
         if (chart) {
-            setP_Market(chart.data[chart.data.length - 1]?.value)
+            // setP_Market(chart.data[chart.data.length - 1]?.value)
         }
-    }, [dataChart, p_claim, p_expired, state.period, state.q_covered, state.margin])
+    }, [dataChart, state])
 
     // useEffect(() => {
     //     InitChart(dataChart)
@@ -152,7 +160,9 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
 
     const InitChart = async (test_data: Idata[]) => {
         am4core.unuseTheme(am4themes_animated)
+
         chart = am4core.create('chartdiv', am4charts.XYChart)
+        am4core.options.autoDispose = true
         chart.updateCurrentData = true
 
         if (chart) {
@@ -242,21 +252,21 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
             bullet.circle.strokeWidth = 2
             bullet.circle.propertyFields.radius = '1'
 
-            if (p_claim > 0) {
-                handleTrendLine(chart, p_claim, state, resolution)
+            if (state?.p_claim > 0) {
+                handleTrendLine(chart, state?.p_claim, state, resolution)
             } else {
                 // handleTrendLine(chart, 0, state)
             }
 
             // //Label bullet main
             let latitudeLabel = subSeries.bullets.push(new am4charts.LabelBullet())
-            latitudeLabel.label.html = `<div class="text-xs">P-Market: $${chart.data[chart.data.length - 1]?.value}</div>`
+            latitudeLabel.label.html = `<div class="text-xs">P-Market: $${state?.p_market}</div>`
             latitudeLabel.label.horizontalCenter = 'right'
             latitudeLabel.label.dx = -10
             // latitudeLabel.label.dy = -5
             latitudeLabel.label.verticalCenter = 'bottom'
             latitudeLabel.label.fill = am4core.color('#B2B7BC')
-            if (p_expired) {
+            if (state?.p_expired) {
                 //chart Expired
                 let latitudeExpired = chart.series.push(new am4charts.LineSeries())
                 latitudeExpired.dataFields.dateX = 'date'
@@ -267,8 +277,8 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 // load data for chart sub
                 const t_expired = chart.data[chart.data.length - 1]?.date
                 latitudeExpired.data.push({
-                    date: t_expired + resolution * 1000 * 3600 * 24,
-                    value: p_expired,
+                    date: t_expired + state?.period * 1000 * 3600 * 24,
+                    value: state?.p_expired,
                 })
 
                 //bullet expired
@@ -280,7 +290,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
 
                 //label expired
                 let expiredLabel = latitudeExpired.bullets.push(new am4charts.LabelBullet())
-                if (state.p_claim && state.q_covered) {
+                if (state?.p_claim && state?.q_covered) {
                     expiredLabel.label.html = `<div class="text-xs">P-Expired: $${latitudeExpired.data[0].value}</div>`
                 } else {
                     bulletExpired.disabled = true
@@ -291,15 +301,15 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                     expiredLabel.label.dx = -10
                     expiredLabel.label.verticalCenter = 'middle'
                 } else {
-                    expiredLabel.label.dy = latitudeExpired.data[0].value > state.p_market ? 23 : -5
+                    expiredLabel.label.dy = latitudeExpired.data[0].value > state?.p_market ? 23 : -5
                     expiredLabel.label.verticalCenter = 'bottom'
                 }
                 expiredLabel.label.fill = am4core.color('#B2B7BC')
             }
 
             if (
-                (p_claim > state.p_market * 1 + (2 * state.p_market) / 100 && p_claim < state.p_market * 1 + (70 * state.p_market) / 100) ||
-                (p_claim > state.p_market * 1 - (70 * state.p_market) / 100 && p_claim < state.p_market * 1 - (2 * state.p_market) / 100)
+                (state?.p_claim > state?.p_market * 1 + (2 * state?.p_market) / 100 && state?.p_claim < state?.p_market * 1 + (70 * state?.p_market) / 100) ||
+                (state?.p_claim > state?.p_market * 1 - (70 * state?.p_market) / 100 && state?.p_claim < state?.p_market * 1 - (2 * state?.p_market) / 100)
             ) {
                 const timeEnd = chart.data[chart.data.length - 1]?.date
 
@@ -308,8 +318,8 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 latitudeClaim.dataFields.dateX = 'date'
                 latitudeClaim.data = [
                     {
-                        date: timeEnd + resolution * 1000 * 3600 * 24,
-                        value: p_claim,
+                        date: timeEnd + state?.period * 1000 * 3600 * 24,
+                        value: state?.p_claim,
                     },
                 ]
 
@@ -325,8 +335,8 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 subLatitudeClaim.data = [
                     ...dataChart,
                     {
-                        date: timeEnd + resolution * 1000 * 3600 * 24,
-                        value: p_claim > 0 ? p_claim : state.p_market,
+                        date: timeEnd + state?.period * 1000 * 3600 * 24,
+                        value: state?.p_claim > 0 ? state?.p_claim : state?.p_market,
                     },
                 ]
                 series.fillOpacity = 0
@@ -335,7 +345,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 let bulletClaim = latitudeClaim.bullets.push(new am4charts.CircleBullet())
                 bulletClaim.fill = am4core.color('white')
                 bulletClaim.stroke = am4core.color(
-                    `${latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : latitudeClaim.data[0].value > state.p_market ? '#52CC74' : '#808890'}`,
+                    `${latitudeClaim.data[0].value < state?.p_market ? '#EB2B3E' : latitudeClaim.data[0].value > state?.p_market ? '#52CC74' : '#808890'}`,
                 )
                 bulletClaim.properties.alwaysShowTooltip = true
 
@@ -345,33 +355,33 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 claimLabel.label.html = ''
                 claimLabel.label.draggable = false
                 claimLabel.label.position = [0, 0]
-                claimLabel.label.dy = latitudeClaim.data[0].value > state.p_market ? 20 : -20
+                claimLabel.label.dy = latitudeClaim.data[0].value > state?.p_market ? 20 : -20
                 claimLabel.label.dx = -90
                 if (isMobile) {
                     claimLabel.label.dx = -90
                 }
 
-                const percent = (((state.p_claim - state.p_market) / state.p_market) * 100).toFixed(2)
+                const percent = (((state?.p_claim - state?.p_market) / state?.p_market) * 100).toFixed(2)
 
-                if (p_claim > 0) {
+                if (state?.p_claim > 0) {
                     if (isMobile) {
                         claimLabel.label.html = `<div id="claimLabel" class="z-[9999] justify-end mt-[0.25rem] hover:cursor-pointer items-center flex text-xs h-[24px] text-[${
-                            latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : '#52CC74'
+                            latitudeClaim.data[0].value < state?.p_market ? '#EB2B3E' : '#52CC74'
                         }] "><span>P-Claim: $${
                             latitudeClaim.data[0].value
                         }</span><span class="ml-[8px] h-[24px] py-[2px] px-[8px] items-center border rounded-full bg-[${
-                            latitudeClaim.data[0].value < state.p_market ? '#FFF1F2' : '#F1FFF5'
+                            latitudeClaim.data[0].value < state?.p_market ? '#FFF1F2' : '#F1FFF5'
                         }]">${percent}%</span></div>`
                     } else {
                         claimLabel.label.html = `<div id="claimLabel" class="hover:cursor-pointer text-sm z-[1000]" style="color: ${
-                            latitudeClaim.data[0].value < state.p_market ? '#EB2B3E' : '#52CC74'
+                            latitudeClaim.data[0].value < state?.p_market ? '#EB2B3E' : '#52CC74'
                         } ; border-radius: 800px; padding: 4px 16px; background-color: ${
-                            latitudeClaim.data[0].value < state.p_market ? '#FFF1F2' : '#F1FFF5'
+                            latitudeClaim.data[0].value < state?.p_market ? '#FFF1F2' : '#F1FFF5'
                         }  "><span class="mr-[8px]">P-Claim: $${latitudeClaim.data[0].value}</span> <span> ${percent}%
                         </span></div>`
                     }
                 }
-                if (p_claim == state.p_market) {
+                if (state?.p_claim == state?.p_market) {
                     if (!isMobile) {
                         claimLabel.label.html = `<div id="claimLabel" class="hover:cursor-pointer text-[#808890] text-sm z-[1000] bg-[#F7F8FA] rounded-[800px] px-[16px] py-[4px]"><span class="mr-[8px]">P-Claim ${latitudeClaim.data[0].value}</span> <span>0%</span></div>`
                     }
@@ -383,14 +393,14 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                     event.target.dataItem.valueY = value
                     const claimLabel = document.getElementById('claimLabel')
                     if (claimLabel) {
-                        if (value < state.p_market) {
+                        if (value < state?.p_market) {
                             // claimLabel.style.color = '#EB2B3E'
                             // claimLabel.style.backgroundColor = '#FFF1F2'
-                            claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                            claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state?.p_market) / state?.p_market) * 100).toFixed(2)}%`
                         } else {
                             // claimLabel.style.color = '#52CC74'
                             // claimLabel.style.backgroundColor = '#F1FFF5'
-                            claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                            claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state?.p_market) / state?.p_market) * 100).toFixed(2)}%`
                         }
                     }
                 })
@@ -408,14 +418,14 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 //             const claimLabel = document.getElementById('claimLabel')
 
                 //             if (claimLabel) {
-                //                 if (value < state.p_market) {
+                //                 if (value < state?.p_market) {
                 //                     claimLabel.style.color = '#EB2B3E'
                 //                     claimLabel.style.backgroundColor = '#FFF1F2'
-                //                     claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                //                     claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state?.p_market) / state?.p_market) * 100).toFixed(2)}%`
                 //                 } else {
                 //                     claimLabel.style.color = '#52CC74'
                 //                     claimLabel.style.backgroundColor = '#F1FFF5'
-                //                     claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state.p_market) / state.p_market) * 100).toFixed(2)}%`
+                //                     claimLabel.innerHTML = `P-Claim: $${value} ${(((value - state?.p_market) / state?.p_market) * 100).toFixed(2)}%`
                 //                 }
                 //             }
                 //             if (ev) {
@@ -427,7 +437,7 @@ const ChartComponent = ({ p_expired, p_claim, data, setP_Market, setP_Claim, sta
                 //     })
                 // }
 
-                handleTrendLineStatus(chart, p_claim, state, resolution)
+                handleTrendLineStatus(chart, state?.p_claim, state, resolution)
             }
         }
     }

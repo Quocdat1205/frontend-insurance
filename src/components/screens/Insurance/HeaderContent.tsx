@@ -8,7 +8,7 @@ import cx from 'classnames'
 import Button from 'components/common/Button/Button'
 import Config from 'config/config'
 
-const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) => {
+const HeaderContent = ({ state, setState, wallet, auth }: any) => {
     const [isDrop, setDrop] = useState<boolean>(false)
     const router = useRouter()
     const {
@@ -25,18 +25,18 @@ const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) 
                 setDrop(false)
             }}
         >
-            <div
-                className="flex items-center font-semibold col-span-4 hover:cursor-pointer"
+            {/* <div
+                className=" flex items-center font-semibold col-span-4 hover:cursor-pointer"
                 onClick={() => {
                     return router.push('/home')
                 }}
             >
                 <LeftArrow />
                 <span className={'hover:cursor-pointer ml-2'}>{t('insurance:buy:back_to_home')}</span>
-            </div>
+            </div> */}
 
             <div
-                className={'flex flex-col justify-center items-center col-span-4'}
+                className={'flex flex-col justify-center items-center col-span-4 col-start-5'}
                 onClick={() => {
                     setDrop(false)
                 }}
@@ -84,9 +84,6 @@ const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) 
                                             setDrop(false)
                                             setState(key)
                                             close()
-                                            if (key == 0) {
-                                                setProps({ ...props, percent_margin: 8 })
-                                            }
                                         }}
                                         key={key}
                                         onMouseDown={() => (Press = true)}
