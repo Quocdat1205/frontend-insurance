@@ -85,7 +85,7 @@ const HeaderContent = ({ state, setState, wallet, auth, setProps, props }: any) 
                                             setState(key)
                                             close()
                                             if (key == 0) {
-                                                setProps.percent_margin = 8
+                                                setProps({ ...props, percent_margin: 8 })
                                             }
                                         }}
                                         key={key}
