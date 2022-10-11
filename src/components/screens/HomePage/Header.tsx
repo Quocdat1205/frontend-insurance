@@ -41,6 +41,9 @@ const Header = () => {
         Config.connectWallet()
     }
 
+    console.log('loading_account', loading_account);
+    
+
     const network = useMemo(() => ChainDataList[account?.chain?.id], [account])
 
     const onChangeMenu = (e: any) => {

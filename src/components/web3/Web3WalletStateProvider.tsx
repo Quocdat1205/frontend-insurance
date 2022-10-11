@@ -6,13 +6,15 @@ import { getConnectorInfo, getAddChainParameters, ConnectorId, ConnectorsData } 
 import { ContractCaller } from 'components/web3/contract/index'
 import { Web3WalletContext } from 'hooks/useWeb3Wallet'
 import Config from 'config/config'
-import { RootStore, useAppSelector } from 'redux/store'
+import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
 import { Web3Provider } from '@ethersproject/providers'
+import { onLoading } from 'redux/actions/setting'
 
 const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorId; name: string; connector: Connector }>) => {
     const { connector, account, chainId, isActive, error, provider } = useWeb3React()
     const connected = useAppSelector((state: RootStore) => state.setting.account)
     const [flag, setFlag] = useState(false)
+    const dispatch = useAppDispatch()
 
     const activate = async (connectorId: ConnectorId, _chainId?: number, cb?: () => void) => {
         const wallet = sessionStorage.getItem('PUBLIC_WALLET')
@@ -52,7 +54,7 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
         if (wallet && address) {
             const { connector: _connector }: any = connectorsData[wallet as ConnectorId]
             setTimeout(() => {
-                initConfig(_connector, wallet as ConnectorId)
+                initConfig(_connector, wallet as ConnectorId, () => dispatch(onLoading(false)))
             }, 500)
         }
     }, [])
