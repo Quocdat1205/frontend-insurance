@@ -176,7 +176,7 @@ const InsuranceFrom = () => {
         if (loadings && isMobile) {
             setTimeout(() => {
                 setShowGuide(true)
-            }, 1500)
+            }, 1000)
         }
     }, [loadings])
 
@@ -198,21 +198,20 @@ const InsuranceFrom = () => {
             getConfig(selectCoin?.type)
         }
         runSocket()
-    }, [selectCoin, publicSocket])
+    }, [selectCoin, publicSocket, listCoin])
     const timer = useRef<any>(null)
 
     useEffect(() => {
-        loadValidator()
         getDefaultValue()
-    }, [])
+    }, [selectCoin])
 
     useEffect(() => {
-        loadValidator()
         getBalaneToken(selectCoin?.type)
+        getDefaultValue()
         runSocket()
         timer.current = setInterval(() => {
-            loadValidator()
             getBalaneToken(selectCoin?.type)
+            getDefaultValue()
             runSocket()
         }, 10000)
         return () => {
@@ -221,7 +220,6 @@ const InsuranceFrom = () => {
     }, [selectCoin])
 
     useEffect(() => {
-        loadValidator()
         getDefaultValue()
         if (pair_configs && p_market.current) {
             if (!account.address) {
@@ -280,9 +278,8 @@ const InsuranceFrom = () => {
             }
         }
         createSaved()
-    }, [pair_configs])
+    }, [pair_configs, selectCoin, account, p_market])
 
-    const timeOut = useRef<any>(null)
     useEffect(() => {
         getDefaultValue()
     }, [userBalance])
@@ -341,7 +338,7 @@ const InsuranceFrom = () => {
                 r_claim.current = result?.r_claim
             }
         }
-    }, [tab])
+    }, [tab, p_claim, q_covered])
 
     useEffect(() => {
         if (showGuide) {
@@ -353,7 +350,7 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         loadValidator()
-    }, [pair_configs, q_covered, selectCoin, p_claim, userBalance])
+    }, [pair_configs, q_covered, selectCoin, p_claim, userBalance, selectCoin])
 
     const loadValidator = () => {
         const _decimalList = { ...decimalList }
@@ -545,9 +542,9 @@ const InsuranceFrom = () => {
                 handleUpdateToken(itemFilter)
             }
             clearTimeout(time)
+            step.current = step.current + 1
+            loadValidator()
         }, 500)
-
-        step.current = step.current + 1
     }
 
     const createSaved = () => {
