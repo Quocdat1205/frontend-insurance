@@ -181,16 +181,19 @@ export const getInfoCoveredCustom = (margin: number, q_covered: number, p_claim:
 }
 
 export const setDefaultValue = async (userBalance: number, p_market: number, fillter: any) => {
-    const configP_claim = fillter?.find((rs: any) => rs.filterType === 'PRICE_FILTER')
-    const configPrice = fillter?.find((rs: any) => rs.filterType === 'LOT_SIZE')
+    const configP_claim = await fillter?.find((rs: any) => rs.filterType === 'PRICE_FILTER')
+    const configPrice = await fillter?.find((rs: any) => rs.filterType === 'LOT_SIZE')
     const decimalQ_covered = countDecimals(configPrice?.stepSize)
-    const configMin = fillter?.find((rs: any) => rs.filterType === 'MIN_NOTIONAL')
-    const configMargin = fillter?.find((rs: any) => rs.filterType === 'MARGIN')
+    const configMin = await fillter?.find((rs: any) => rs.filterType === 'MIN_NOTIONAL')
+    const configMargin = await fillter?.find((rs: any) => rs.filterType === 'MARGIN')
     const balanceUSDT = await getBalance('USDT', Config.web3.account, USDTaddress, Number(decimalQ_covered))
     const decimalMargin = countDecimals(configMargin?.stepSize)
     const decimalP_claim = countDecimals(configP_claim?.tickSize)
+    // console.log(fillter[1])
 
-    if (userBalance > configPrice?.minQty) {
+    if (configPrice && userBalance > fillter[1]?.minQty) {
+        console.log('zo')
+
         const p_claim = p_market - 0.1 * p_market
         const ratioMarClaim = formatNumber(Math.abs((p_claim - p_market) / p_market), 2)
 
@@ -242,3 +245,5 @@ export const setDefaultValue = async (userBalance: number, p_market: number, fil
         }
     }
 }
+
+export const changePeriod = () => {}

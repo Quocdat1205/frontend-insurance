@@ -65,7 +65,6 @@ const InsuranceFrom = () => {
     const handleClick = useRef(true)
     const tmp_q_covered = useRef(0)
     const tmp_margin = useRef(0)
-    const step = useRef<number>(0)
 
     const [selectTime, setSelectTime] = useState<string>('1Y')
     const [tab, setTab] = useState<number>(0)
@@ -181,22 +180,15 @@ const InsuranceFrom = () => {
     }, [loadings])
 
     useEffect(() => {
-        step.current = 0
-    }, [])
-
-    useEffect(() => {
         if (assetsToken) {
             setDataIcon()
-            step.current = 1
         } else {
             return
         }
     }, [assetsToken])
 
     useEffect(() => {
-        if (step.current === 1) {
-            getConfig(selectCoin?.type)
-        }
+        getConfig(selectCoin?.type)
         runSocket()
     }, [selectCoin, publicSocket, listCoin])
     const timer = useRef<any>(null)
@@ -206,12 +198,8 @@ const InsuranceFrom = () => {
     }, [selectCoin])
 
     useEffect(() => {
-        getBalaneToken(selectCoin?.type)
-        getDefaultValue()
         runSocket()
         timer.current = setInterval(() => {
-            getBalaneToken(selectCoin?.type)
-            getDefaultValue()
             runSocket()
         }, 10000)
         return () => {
@@ -220,65 +208,77 @@ const InsuranceFrom = () => {
     }, [selectCoin])
 
     useEffect(() => {
-        getDefaultValue()
-        if (pair_configs && p_market.current) {
-            if (!account.address) {
-                setUserBalance(0)
-                percentInsurance.current = 0
-                percentMargin.current = 0
-                setDefaultValue(0, p_market.current, pair_configs.filters).then(async (res) => {
-                    const _res = await res
-                    if (_res) {
-                        q_covered.current = _res?.q_covered
-                        margin.current = _res?.margin
-                        period.current = _res?.period
-                        p_claim.current = _res?.p_claim
-                    }
-                })
-            } else {
-                getBalaneToken(selectCoin?.type)
-                    .then(async (res) => {
-                        const balance = await res
-                        setDefaultValue(balance, p_market.current, pair_configs.filters).then(async (e) => {
-                            const value = await e
-                            if (value) {
-                                q_covered.current = value.q_covered
-                                margin.current = value.margin
-                                period.current = value.period
-                                p_claim.current = value.p_claim
-                            }
-                        })
-                    })
-                    .then(async () => {
-                        if (tab === 0) {
-                            setTimeout(() => {
-                                const res = getInfoCoveredDefault(p_market.current, q_covered.current, p_claim.current, decimalList)
-                                if (res) {
-                                    p_expired.current = res?.p_expired
-                                    q_claim.current = res?.q_claim
-                                    r_claim.current = res?.r_claim
-                                    margin.current = res?.margin!
-                                }
-                                createSaved()
-                                clear.current = handleCheckFinal()
-                            }, 1000)
-                        } else {
-                            setTimeout(() => {
-                                const result = getInfoCoveredCustom(margin.current, q_covered.current, p_claim.current, p_market.current, decimalList)
-                                if (result) {
-                                    p_expired.current = result?.p_expired
-                                    q_claim.current = result?.q_claim
-                                    r_claim.current = result?.r_claim
-                                }
-                                createSaved()
-                                clear.current = handleCheckFinal()
-                            }, 1000)
+        setTimeout(() => {
+            loadData()
+        }, 2000)
+    }, [pair_configs, selectCoin, account, p_market, userBalance])
+
+    const loadData = async () => {
+        if (pair_configs && selectCoin && account && p_market) {
+            console.log(pair_configs)
+
+            if (pair_configs && p_market.current) {
+                if (!Config.web3.account) {
+                    setUserBalance(0)
+                    percentInsurance.current = 0
+                    percentMargin.current = 0
+
+                    await setDefaultValue(0, p_market.current, pair_configs.filters).then(async (res) => {
+                        const _res = await res
+                        if (_res) {
+                            q_covered.current = _res?.q_covered
+                            margin.current = _res?.margin
+                            period.current = _res?.period
+                            p_claim.current = _res?.p_claim
                         }
                     })
+                } else {
+                    await getBalaneToken(selectCoin?.type)
+                        .then(async (res) => {
+                            const balance = await res
+                            if (balance) {
+                                await setDefaultValue(balance, p_market.current, pair_configs.filters).then(async (e) => {
+                                    const value = await e
+                                    if (value) {
+                                        q_covered.current = value.q_covered
+                                        margin.current = value.margin
+                                        period.current = value.period
+                                        p_claim.current = value.p_claim
+                                    }
+                                })
+                            }
+                        })
+                        .then(async () => {
+                            if (tab === 0) {
+                                setTimeout(() => {
+                                    const res = getInfoCoveredDefault(p_market.current, q_covered.current, p_claim.current, decimalList)
+                                    if (res) {
+                                        p_expired.current = res?.p_expired
+                                        q_claim.current = res?.q_claim
+                                        r_claim.current = res?.r_claim
+                                        margin.current = res?.margin!
+                                    }
+                                    createSaved()
+                                    clear.current = handleCheckFinal()
+                                }, 1000)
+                            } else {
+                                setTimeout(() => {
+                                    const result = getInfoCoveredCustom(margin.current, q_covered.current, p_claim.current, p_market.current, decimalList)
+                                    if (result) {
+                                        p_expired.current = result?.p_expired
+                                        q_claim.current = result?.q_claim
+                                        r_claim.current = result?.r_claim
+                                    }
+                                    createSaved()
+                                    clear.current = handleCheckFinal()
+                                }, 1000)
+                            }
+                        })
+                }
             }
+            createSaved()
         }
-        createSaved()
-    }, [pair_configs, selectCoin, account, p_market])
+    }
 
     useEffect(() => {
         getDefaultValue()
@@ -542,7 +542,6 @@ const InsuranceFrom = () => {
                 handleUpdateToken(itemFilter)
             }
             clearTimeout(time)
-            step.current = step.current + 1
             loadValidator()
         }, 500)
     }
@@ -889,17 +888,15 @@ const InsuranceFrom = () => {
     }
 
     const updateFormQCovered = (data: number) => {
-        if (!account.address) {
-            return
+        percentInsurance.current = data
+        if (data === 25) {
+            q_covered.current = Number((0.25 * userBalance).toFixed(decimalList.decimal_q_covered))
+        } else if (data === 100) {
+            q_covered.current = userBalance
         } else {
-            percentInsurance.current = data
-            if (data === 25) {
-                q_covered.current = Number((0.25 * userBalance).toFixed(decimalList.decimal_q_covered))
-            } else if (data === 100) {
-                q_covered.current = userBalance
-            } else {
-                q_covered.current = Number(((data / 100) * userBalance).toFixed(decimalList.decimal_q_covered))
-            }
+            console.log(Number(((data / 100) * userBalance).toFixed(decimalList.decimal_q_covered)))
+
+            q_covered.current = Number(((data / 100) * userBalance).toFixed(decimalList.decimal_q_covered))
         }
     }
 
