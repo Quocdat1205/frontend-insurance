@@ -2,6 +2,7 @@ import Modal from 'components/common/Modal/Modal'
 import { USDTaddress } from 'components/web3/constants/contractAddress'
 import Config from 'config/config'
 import { ethers } from 'ethers'
+import { useEffect, useRef, useState } from 'react'
 import { API_GET_PRICE_CHART } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { countDecimals, formatNumber } from 'utils/utils'
@@ -74,6 +75,8 @@ export const getInfoCoveredDefault = (p_market: number, q_covered: number, p_cla
     const laverage = Leverage(p_market, p_stop)
     const ratio_profit = Number(Math.abs(p_claim - p_market) / p_market)
     const q_claim = Number((ratio_profit / 2) * hedge_capital * laverage) * (1 - 0.05) + margin
+
+    default_r_claim.current = Number((Number(q_claim / margin) * 100).toFixed(decimalList?.decimal_q_covered))
 
     return {
         q_claim: Number(q_claim.toFixed(decimalList?.decimal_q_covered)),
@@ -173,6 +176,7 @@ export const getInfoCoveredCustom = (margin: number, q_covered: number, p_claim:
     const ratio_profit = Number(Math.abs(p_claim - p_market) / p_market)
     const q_claim = Number(ratio_profit * hedge_capital * laverage) * (1 - 0.05) + margin
 
+    default_r_claim.current = Number((Number(q_claim / margin) * 100).toFixed(decimalList?.decimal_q_covered))
     return {
         q_claim: Number(q_claim.toFixed(decimalList?.decimal_q_covered)),
         r_claim: Number((Number(q_claim / margin) * 100).toFixed(decimalList?.decimal_q_covered)),
@@ -210,7 +214,7 @@ export const setDefaultValue = async (userBalance: number, p_market: number, fil
         })
         if (_res) {
             const margin = _res?.hedge * userBalance * p_market
-
+            default_period.current = _res?.period
             return {
                 q_covered: userBalance,
                 p_claim: +(p_market - 0.1 * p_market).toFixed(+decimalP_claim),
@@ -236,6 +240,7 @@ export const setDefaultValue = async (userBalance: number, p_market: number, fil
         })
 
         if (_res) {
+            default_period.current = _res?.period
             return {
                 q_covered: +formatNumber(margin / (_res?.hedge * p_market), +decimalQ_covered),
                 margin: +formatNumber(margin, +decimalMargin),
@@ -246,4 +251,109 @@ export const setDefaultValue = async (userBalance: number, p_market: number, fil
     }
 }
 
-export const changePeriod = () => {}
+const default_period = useRef<number>(0)
+const default_r_claim = useRef<number>(0)
+
+// export const changePeriod = (value: number, margin: number, q_claim: any, r_claim: any) => {
+//     if (value > default_period.current) {
+//         const step = value - default_period.current
+//         switch (step) {
+//             case 1:
+//                 new_r_claim(31.5 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 2:
+//                 new_r_claim(36.5 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 3:
+//                 new_r_claim(40.5 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 4:
+//                 new_r_claim(45.5 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 5:
+//                 new_r_claim(48.5 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 6:
+//                 new_r_claim(52.5 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 7:
+//                 new_r_claim(57.5 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 8:
+//                 new_r_claim(60.5 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 9:
+//                 new_r_claim(64.5 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 10:
+//                 new_r_claim(69.5 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 11:
+//                 new_r_claim(72.5 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 12:
+//                 new_r_claim(76.5 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 13:
+//                 new_r_claim(83.5 / 100, margin, q_claim, r_claim)
+//                 break
+//         }
+//     } else {
+//         const step = default_period.current - value
+//         switch (step) {
+//             case 1:
+//                 new_r_claim_(70 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 2:
+//                 new_r_claim_(67 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 3:
+//                 new_r_claim_(63 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 4:
+//                 new_r_claim_(58 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 5:
+//                 new_r_claim_(55 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 6:
+//                 new_r_claim_(51 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 7:
+//                 new_r_claim_(46 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 8:
+//                 new_r_claim_(43 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 9:
+//                 new_r_claim_(39 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 10:
+//                 new_r_claim_(34 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 11:
+//                 new_r_claim_(31 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 12:
+//                 new_r_claim_(27 / 100, margin, q_claim, r_claim)
+//                 break
+//             case 13:
+//                 new_r_claim_(20 / 100, margin, q_claim, r_claim)
+//                 break
+//         }
+//     }
+// }
+
+const new_r_claim = (x: number, margin: number, q_claim: any, r_claim: any) => {
+    const new_r_claim = (100 / 100 + (default_r_claim.current - 100 / 100) * (1 - x)) * 100
+    const new_q_claim = r_claim * margin
+    r_claim.current = new_r_claim
+    q_claim.current = new_q_claim
+}
+
+const new_r_claim_ = (x: number, margin: number, q_claim: any, r_claim: any) => {
+    const new_r_claim = (100 / 100 + (default_r_claim.current - 100 / 100) * (1 + x)) * 100
+    const new_q_claim = r_claim * margin
+    r_claim.current = new_r_claim
+    q_claim.current = new_q_claim
+}

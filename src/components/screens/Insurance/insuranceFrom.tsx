@@ -68,7 +68,7 @@ const InsuranceFrom = () => {
 
     const [selectTime, setSelectTime] = useState<string>('1Y')
     const [tab, setTab] = useState<number>(0)
-    const [loadings, setLoadings] = useState(true)
+    const [loadings, setLoadings] = useState(false)
     const [openChangeToken, setOpenChangeToken] = useState(false)
     const [showDetails, setShowDetails] = useState(false)
     const [unitMoney, setUnitMoney] = useState('USDT')
@@ -504,7 +504,9 @@ const InsuranceFrom = () => {
                     `${currentTimeStamp}`,
                     dateTransform[selectTime!].resolution,
                     setDataChart,
-                )
+                ).then(() => {
+                    setLoadings(false)
+                })
             }
         } catch (err) {
             console.log(err)
