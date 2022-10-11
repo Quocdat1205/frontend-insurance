@@ -1,7 +1,7 @@
 import { useWeb3React } from '@web3-react/core'
 import { Connector } from '@web3-react/types'
-import { ethers, providers } from 'ethers'
-import React, { useEffect, useMemo, ReactNode, useRef, useState } from 'react'
+import { ethers } from 'ethers'
+import React, { useEffect, ReactNode, useState } from 'react'
 import { getConnectorInfo, getAddChainParameters, ConnectorId, ConnectorsData } from 'components/web3/Web3Types'
 import { ContractCaller } from 'components/web3/contract/index'
 import { Web3WalletContext } from 'hooks/useWeb3Wallet'
@@ -10,7 +10,7 @@ import { RootStore, useAppSelector } from 'redux/store'
 import { Web3Provider } from '@ethersproject/providers'
 
 const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorId; name: string; connector: Connector }>) => {
-    const { connector, account, chainId, isActive, error, provider } = useWeb3React()
+    const { connector, account, isActive, error, provider } = useWeb3React()
     const connected = useAppSelector((state: RootStore) => state.setting.account)
     const [flag, setFlag] = useState(false)
 
@@ -19,15 +19,12 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
         const _wallet = connectorId ?? connected?.wallet ?? wallet
         const { connector: _connector } = connectorsData[_wallet]
         await _connector.deactivate()
-        if (_chainId) {
-            await _connector.activate(_chainId || getAddChainParameters(_chainId))
-        } else {
-            initConfig(_connector, _wallet, cb)
-        }
+        await _connector.activate(!_chainId ? undefined : getAddChainParameters(_chainId))
+        initConfig(_connector, _wallet, cb)
     }
 
     const initConfig = async (connector: any, wallet: ConnectorId, cb?: () => void) => {
-        const chainId = Number(connector?.provider?.chainId ?? (window as any).ethereum.providers[0].getChainId())
+        const chainId = Number(connector?.provider?.chainId ?? (window as any).ethereum?.providers[0]?.getChainId())
         if (!connector.provider) {
             await connector.activate(chainId || getAddChainParameters(chainId))
         }
@@ -85,7 +82,7 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
         isActive,
         error,
         connector: Config.web3?.connector,
-        provider,
+        provider: Config.web3?.provider,
         // balance,
         contractCaller: Config.web3?.contractCaller,
         getBalance,

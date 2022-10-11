@@ -79,16 +79,16 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         if (cb) cb(data)
     }
 
-    const getKeyMap = (arr: any[], val: string) => {
-        return [...arr].find(([key, value]) => val === key)[1]
+    const getKeyMap = (arr: any, val: string) => {
+        return arr?.providerMap ? [...arr.providerMap].find(([key, value]) => val === key)[1] : arr
     }
 
     const onChangeAccount = async (wallet: string) => {
         switch (wallet) {
             case wallets.metaMask:
-                const provider = getKeyMap((window as any).ethereum.providerMap, 'MetaMask')
+                const provider = getKeyMap((window as any).ethereum, 'MetaMask')
                 await provider?.on('accountsChanged', (address: any) => {
-                    if (!account.address) return
+                    if (!provider.selectedAddress) return
                     clearTimeout(timer.current)
                     timer.current = setTimeout(() => {
                         getUserInfo(address[0], (user) => {
@@ -97,7 +97,8 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                                 sessionStorage.setItem('PUBLIC_ADDRESS', address[0])
                                 if (user) dispatch(setAccount({ address: address[0], ...user }))
                             } else {
-                                Config.toast.show('error', 'Không tìm thấy người dùng')
+                                Config.logout()
+                                dispatch(setAccount({ address: null, wallet: null }))
                             }
                         })
                     }, 500)
@@ -108,14 +109,15 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         }
     }
 
+
     const onChangeNetwork = async (wallet: string) => {
-        let provider
+        let provider: any
         switch (wallet) {
             case wallets.metaMask:
             case wallets.coinbaseWallet:
-                provider = getKeyMap((window as any).ethereum.providerMap, wallet === wallets.metaMask ? 'MetaMask' : 'CoinbaseWallet')
+                provider = getKeyMap((window as any).ethereum, wallet === wallets.metaMask ? 'MetaMask' : 'CoinbaseWallet')
                 await provider?.on('chainChanged', (chainId: string) => {
-                    if (!account.address) return
+                    if (!provider.selectedAddress) return
                     clearTimeout(timer.current)
                     timer.current = setTimeout(() => {
                         if (Config.chains.includes(Number(chainId))) {
@@ -134,7 +136,8 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
 
     const setChainAccount = (chainId: number) => {
         const chain = { ...Config.networks[chainId], id: chainId }
-        dispatch(setAccount({ ...account, chain: chain }))
+        sessionStorage.setItem('PUBLIC_CHAINID', JSON.stringify(chainId))
+        dispatch(setAccount({ chain: chain }))
     }
 
     const checkNetWork = async (wallet: string, checked = false) => {
@@ -142,10 +145,10 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         let provider
         switch (wallet) {
             case wallets.metaMask:
-                provider = getKeyMap((window as any).ethereum.providerMap, 'MetaMask')
+                provider = getKeyMap((window as any).ethereum, 'MetaMask')
                 break
             case wallets.coinbaseWallet:
-                provider = getKeyMap((window as any).ethereum.providerMap, 'CoinbaseWallet')
+                provider = getKeyMap((window as any).ethereum, 'CoinbaseWallet')
                 break
             default:
                 break
@@ -240,6 +243,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         firstTime.current = true
         setVisible(true)
         setLoading(false)
+        setInValidNetword(true)
     }
 
     const onSwitch = async () => {
@@ -323,7 +327,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     const onConfirm = async () => {
         firstTime.current = false
         logged.current = true
-        switch (account?.wallet) {
+        switch (wallet?.wallet) {
             case wallets.metaMask:
                 if (isMobile) {
                     if (!Config.isMetaMaskInstalled) {
@@ -340,9 +344,15 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 }
                 break
             case wallets.coinbaseWallet:
+                const provider = getKeyMap((window as any).ethereum, 'CoinbaseWallet')
                 if (isMobile) {
-                    if (!Config.isMetaMaskInstalled) {
+                    if (!provider?.isCoinbaseWallet) {
                         window.open(`https://go.cb-w.com/dapp?cb_url=${Config.env.APP_URL}`)
+                        return
+                    }
+                } else {
+                    if (!provider?.isCoinbaseWallet) {
+                        setInstaller(true)
                         return
                     }
                 }
@@ -354,7 +364,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         setErrorConnect(false)
         setLoading(true)
         if (!isMobile)
-            await Config.web3?.activate(wallet?.wallet, null, () => {
+            await Config.web3?.activate(wallet?.wallet, wallet?.wallet === wallets.metaMask ? null : Config.chains[0], () => {
                 onLogin()
             })
     }
@@ -367,7 +377,6 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         setInstaller(false)
         setNetworkError(false)
         setSwitchNetwork(false)
-        setInValidNetword(true)
     }
 
     const onRead = (e: any) => {

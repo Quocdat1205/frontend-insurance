@@ -23,7 +23,6 @@ import { getModalSubscribeStorage, isFunction, removeLocalStorage, setModalSubsc
 
 const Header = () => {
     const { t } = useTranslation()
-    const { chain } = useWeb3Wallet()
     const { width } = useWindowSize()
     const router = useRouter()
     const isMobile = width && width <= screens.drawer
@@ -41,7 +40,7 @@ const Header = () => {
         Config.connectWallet()
     }
 
-    const network = useMemo(() => ChainDataList[account?.chain?.id], [account])
+    const network = useMemo(() => ChainDataList[account?.chain?.id], [account.chain])
 
     const onChangeMenu = (e: any) => {
         if (isMobile && e?.children.length > 0) return
