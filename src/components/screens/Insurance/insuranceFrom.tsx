@@ -26,7 +26,6 @@ import { BTCaddress, DAIaddress, ETHaddress, USDTaddress } from 'components/web3
 import Emitter from 'socket/emitter'
 import { PublicSocketEvent } from 'socket/socketEvent'
 import FuturesMarketWatch from 'models/FuturesMarketWatch'
-import { ethers } from 'ethers'
 import { fetchApiNami, getBalance, getInfoCoveredCustom, getInfoCoveredDefault, GuidelineModal, setDefaultValue } from './Insurance'
 
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
@@ -34,7 +33,10 @@ const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
 })
 
 //chart
-const ChartComponent = dynamic(() => import('components/screens/Insurance/chartComponent'), { ssr: false, suspense: true })
+const ChartComponent = dynamic(() => import('components/screens/Insurance/chartComponent'), {
+    ssr: false,
+    suspense: true,
+})
 
 const InsuranceFrom = () => {
     const {
@@ -84,6 +86,8 @@ const InsuranceFrom = () => {
     const [pair_configs, setPairConfigs] = useState<any>({})
     const [dataChart, setDataChart] = useState()
     const [percentPrice, setPercentPrice] = useState<any>()
+    const default_period = useRef(0)
+    const default_r_claim = useRef(0)
 
     const [rangeQ_covered, setRangeQ_covered] = useState({
         min: 0,
@@ -215,15 +219,13 @@ const InsuranceFrom = () => {
 
     const loadData = async () => {
         if (pair_configs && selectCoin && account && p_market) {
-            console.log(pair_configs)
-
             if (pair_configs && p_market.current) {
                 if (!Config.web3.account) {
                     setUserBalance(0)
                     percentInsurance.current = 0
                     percentMargin.current = 0
 
-                    await setDefaultValue(0, p_market.current, pair_configs.filters).then(async (res) => {
+                    await setDefaultValue(0, p_market.current, pair_configs.filters, default_period).then(async (res) => {
                         const _res = await res
                         if (_res) {
                             q_covered.current = _res?.q_covered
@@ -237,7 +239,7 @@ const InsuranceFrom = () => {
                         .then(async (res) => {
                             const balance = await res
                             if (balance) {
-                                await setDefaultValue(balance, p_market.current, pair_configs.filters).then(async (e) => {
+                                await setDefaultValue(balance, p_market.current, pair_configs.filters, default_period).then(async (e) => {
                                     const value = await e
                                     if (value) {
                                         q_covered.current = value.q_covered
@@ -251,7 +253,7 @@ const InsuranceFrom = () => {
                         .then(async () => {
                             if (tab === 0) {
                                 setTimeout(() => {
-                                    const res = getInfoCoveredDefault(p_market.current, q_covered.current, p_claim.current, decimalList)
+                                    const res = getInfoCoveredDefault(p_market.current, q_covered.current, p_claim.current, decimalList, default_r_claim)
                                     if (res) {
                                         p_expired.current = res?.p_expired
                                         q_claim.current = res?.q_claim
@@ -263,7 +265,14 @@ const InsuranceFrom = () => {
                                 }, 1000)
                             } else {
                                 setTimeout(() => {
-                                    const result = getInfoCoveredCustom(margin.current, q_covered.current, p_claim.current, p_market.current, decimalList)
+                                    const result = getInfoCoveredCustom(
+                                        margin.current,
+                                        q_covered.current,
+                                        p_claim.current,
+                                        p_market.current,
+                                        decimalList,
+                                        default_r_claim,
+                                    )
                                     if (result) {
                                         p_expired.current = result?.p_expired
                                         q_claim.current = result?.q_claim
@@ -286,7 +295,7 @@ const InsuranceFrom = () => {
 
     const getDefaultValue = () => {
         if (userBalance && p_market.current && pair_configs) {
-            setDefaultValue(userBalance, p_market.current, pair_configs.filters).then(async (e) => {
+            setDefaultValue(userBalance, p_market.current, pair_configs.filters, default_period).then(async (e) => {
                 const value = await e
                 if (value) {
                     q_covered.current = value.q_covered
@@ -323,7 +332,7 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         if (tab === 0 && q_covered.current && p_claim.current && period.current) {
-            const res = getInfoCoveredDefault(p_market.current, q_covered.current, p_claim.current, decimalList)
+            const res = getInfoCoveredDefault(p_market.current, q_covered.current, p_claim.current, decimalList, default_r_claim)
             if (res) {
                 p_expired.current = res?.p_expired
                 q_claim.current = res?.q_claim
@@ -331,7 +340,7 @@ const InsuranceFrom = () => {
                 margin.current = res?.margin
             }
         } else {
-            const result = getInfoCoveredCustom(margin.current, q_covered.current, p_claim.current, p_market.current, decimalList)
+            const result = getInfoCoveredCustom(margin.current, q_covered.current, p_claim.current, p_market.current, decimalList, default_r_claim)
             if (result) {
                 p_expired.current = result?.p_expired
                 q_claim.current = result?.q_claim

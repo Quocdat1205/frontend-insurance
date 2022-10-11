@@ -2,7 +2,7 @@ import Modal from 'components/common/Modal/Modal'
 import { USDTaddress } from 'components/web3/constants/contractAddress'
 import Config from 'config/config'
 import { ethers } from 'ethers'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { API_GET_PRICE_CHART } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 import { countDecimals, formatNumber } from 'utils/utils'
@@ -65,7 +65,7 @@ export const GuidelineModal = ({ visible, onClose, t, onShowTerminologyModal, on
     )
 }
 
-export const getInfoCoveredDefault = (p_market: number, q_covered: number, p_claim: number, decimalList: any) => {
+export const getInfoCoveredDefault = (p_market: number, q_covered: number, p_claim: number, decimalList: any, default_r_claim: any) => {
     const margin = Number((8 * q_covered * p_market) / 100)
     const userCapital = margin
     const systemCapital = userCapital
@@ -166,7 +166,7 @@ const Leverage = (p_market: number, p_stop: number) => {
     return leverage < 1 ? 1 : leverage
 }
 
-export const getInfoCoveredCustom = (margin: number, q_covered: number, p_claim: number, p_market: number, decimalList: any) => {
+export const getInfoCoveredCustom = (margin: number, q_covered: number, p_claim: number, p_market: number, decimalList: any, default_r_claim: any) => {
     const userCapital = margin
     const systemCapital = userCapital
     const hedge_capital = userCapital + systemCapital
@@ -184,7 +184,7 @@ export const getInfoCoveredCustom = (margin: number, q_covered: number, p_claim:
     }
 }
 
-export const setDefaultValue = async (userBalance: number, p_market: number, fillter: any) => {
+export const setDefaultValue = async (userBalance: number, p_market: number, fillter: any, default_period: any) => {
     const configP_claim = await fillter?.find((rs: any) => rs.filterType === 'PRICE_FILTER')
     const configPrice = await fillter?.find((rs: any) => rs.filterType === 'LOT_SIZE')
     const decimalQ_covered = countDecimals(configPrice?.stepSize)
@@ -251,108 +251,105 @@ export const setDefaultValue = async (userBalance: number, p_market: number, fil
     }
 }
 
-const default_period = useRef<number>(0)
-const default_r_claim = useRef<number>(0)
+export const changePeriod = (value: number, margin: number, q_claim: any, r_claim: any, default_period: any, default_r_claim: any) => {
+    if (value > default_period?.current) {
+        const step = value - default_period?.current
+        switch (step) {
+            case 1:
+                new_r_claim(31.5 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 2:
+                new_r_claim(36.5 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 3:
+                new_r_claim(40.5 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 4:
+                new_r_claim(45.5 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 5:
+                new_r_claim(48.5 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 6:
+                new_r_claim(52.5 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 7:
+                new_r_claim(57.5 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 8:
+                new_r_claim(60.5 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 9:
+                new_r_claim(64.5 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 10:
+                new_r_claim(69.5 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 11:
+                new_r_claim(72.5 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 12:
+                new_r_claim(76.5 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 13:
+                new_r_claim(83.5 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+        }
+    } else {
+        const step = default_period.current - value
+        switch (step) {
+            case 1:
+                new_r_claim_(70 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 2:
+                new_r_claim_(67 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 3:
+                new_r_claim_(63 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 4:
+                new_r_claim_(58 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 5:
+                new_r_claim_(55 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 6:
+                new_r_claim_(51 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 7:
+                new_r_claim_(46 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 8:
+                new_r_claim_(43 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 9:
+                new_r_claim_(39 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 10:
+                new_r_claim_(34 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 11:
+                new_r_claim_(31 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 12:
+                new_r_claim_(27 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            case 13:
+                new_r_claim_(20 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+        }
+    }
+}
 
-// export const changePeriod = (value: number, margin: number, q_claim: any, r_claim: any) => {
-//     if (value > default_period.current) {
-//         const step = value - default_period.current
-//         switch (step) {
-//             case 1:
-//                 new_r_claim(31.5 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 2:
-//                 new_r_claim(36.5 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 3:
-//                 new_r_claim(40.5 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 4:
-//                 new_r_claim(45.5 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 5:
-//                 new_r_claim(48.5 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 6:
-//                 new_r_claim(52.5 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 7:
-//                 new_r_claim(57.5 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 8:
-//                 new_r_claim(60.5 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 9:
-//                 new_r_claim(64.5 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 10:
-//                 new_r_claim(69.5 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 11:
-//                 new_r_claim(72.5 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 12:
-//                 new_r_claim(76.5 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 13:
-//                 new_r_claim(83.5 / 100, margin, q_claim, r_claim)
-//                 break
-//         }
-//     } else {
-//         const step = default_period.current - value
-//         switch (step) {
-//             case 1:
-//                 new_r_claim_(70 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 2:
-//                 new_r_claim_(67 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 3:
-//                 new_r_claim_(63 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 4:
-//                 new_r_claim_(58 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 5:
-//                 new_r_claim_(55 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 6:
-//                 new_r_claim_(51 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 7:
-//                 new_r_claim_(46 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 8:
-//                 new_r_claim_(43 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 9:
-//                 new_r_claim_(39 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 10:
-//                 new_r_claim_(34 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 11:
-//                 new_r_claim_(31 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 12:
-//                 new_r_claim_(27 / 100, margin, q_claim, r_claim)
-//                 break
-//             case 13:
-//                 new_r_claim_(20 / 100, margin, q_claim, r_claim)
-//                 break
-//         }
-//     }
-// }
-
-const new_r_claim = (x: number, margin: number, q_claim: any, r_claim: any) => {
-    const new_r_claim = (100 / 100 + (default_r_claim.current - 100 / 100) * (1 - x)) * 100
+const new_r_claim = (x: number, margin: number, q_claim: any, r_claim: any, default_r_claim: any) => {
+    const new_r_claim = (100 / 100 + (default_r_claim?.current - 100 / 100) * (1 - x)) * 100
     const new_q_claim = r_claim * margin
     r_claim.current = new_r_claim
     q_claim.current = new_q_claim
 }
 
-const new_r_claim_ = (x: number, margin: number, q_claim: any, r_claim: any) => {
-    const new_r_claim = (100 / 100 + (default_r_claim.current - 100 / 100) * (1 + x)) * 100
+const new_r_claim_ = (x: number, margin: number, q_claim: any, r_claim: any, default_r_claim: any) => {
+    const new_r_claim = (100 / 100 + (default_r_claim?.current - 100 / 100) * (1 + x)) * 100
     const new_q_claim = r_claim * margin
     r_claim.current = new_r_claim
     q_claim.current = new_q_claim
