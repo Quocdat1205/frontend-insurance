@@ -35,7 +35,7 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
         Config.web3.connector = connectorsData[wallet]
         Config.web3.contractCaller = contractCaller
         Config.web3.provider = contractCaller?.provider
-        Config.web3.account = contractCaller?.provider?.provider?.selectedAddress ?? Config.web3.account
+        Config.web3.account = contractCaller?.provider?.provider?.selectedAddress ?? Config.web3.account ?? contractCaller?.provider?.provider?.accounts[0]
         setFlag(!flag)
         if (cb) cb()
     }
