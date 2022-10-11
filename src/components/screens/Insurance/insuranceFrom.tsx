@@ -215,20 +215,23 @@ const InsuranceFrom = () => {
                     setUserBalance(0)
                     percentInsurance.current = 0
                     percentMargin.current = 0
-                    setDefaultValue(0, state, pair_configs.filters).then((res) => {
-                        setState({ ...state, q_covered: res?.q_covered, margin: res?.margin, period: res?.period, p_claim: res?.p_claim })
+                    setDefaultValue(0, state, pair_configs.filters).then(async (res) => {
+                        const _res = await res
+                        setState({ ...state, q_covered: _res?.q_covered, margin: _res?.margin, period: _res?.period, p_claim: _res?.p_claim })
                     })
                 } else {
                     localStorage.setItem('buy_covered_state', JSON.stringify(selectCoin))
                     setSaved(0)
 
                     getBalaneToken(selectCoin?.type)
-                        .then((res) => {
-                            setDefaultValue(res, state, pair_configs.filters).then((e) => {
-                                setState({ ...state, q_covered: e?.q_covered, margin: e?.margin, period: e?.period, p_claim: e?.p_claim })
+                        .then(async (res) => {
+                            const balance = await res
+                            setDefaultValue(balance, state, pair_configs.filters).then(async (e) => {
+                                const value = await e
+                                setState({ ...state, q_covered: value?.q_covered, margin: value?.margin, period: value?.period, p_claim: value?.p_claim })
                             })
                         })
-                        .then(() => {
+                        .then(async () => {
                             if (tab === 0) {
                                 const res = getInfoCoveredDefault(state, decimalList)
                                 if (res) {
