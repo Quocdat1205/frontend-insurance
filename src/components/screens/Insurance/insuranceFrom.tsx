@@ -26,7 +26,7 @@ import { BTCaddress, DAIaddress, ETHaddress, USDTaddress } from 'components/web3
 import Emitter from 'socket/emitter'
 import { PublicSocketEvent } from 'socket/socketEvent'
 import FuturesMarketWatch from 'models/FuturesMarketWatch'
-import { fetchApiNami, getBalance, getInfoCoveredCustom, getInfoCoveredDefault, GuidelineModal, setDefaultValue } from './Insurance'
+import { fetchApiNami, getBalance, getInfoCoveredCustom, getInfoCoveredDefault, GuidelineModal, setDefaultValue } from './Insurance_funtion'
 
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
@@ -905,8 +905,6 @@ const InsuranceFrom = () => {
         } else if (data === 100) {
             q_covered.current = userBalance
         } else {
-            console.log(Number(((data / 100) * userBalance).toFixed(decimalList.decimal_q_covered)))
-
             q_covered.current = Number(((data / 100) * userBalance).toFixed(decimalList.decimal_q_covered))
         }
     }

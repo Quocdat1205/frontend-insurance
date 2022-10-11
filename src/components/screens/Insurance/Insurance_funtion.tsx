@@ -196,8 +196,6 @@ export const setDefaultValue = async (userBalance: number, p_market: number, fil
     // console.log(fillter[1])
 
     if (configPrice && userBalance > fillter[1]?.minQty) {
-        console.log('zo')
-
         const p_claim = p_market - 0.1 * p_market
         const ratioMarClaim = formatNumber(Math.abs((p_claim - p_market) / p_market), 2)
 
