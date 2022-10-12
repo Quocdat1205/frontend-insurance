@@ -335,7 +335,9 @@ const ConnectWalletModal = forwardRef(({ }: ConnectWalletModal, ref) => {
                         window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}?ref=${refCode}`)
                         return
                     }
-                    await Config.web3?.activate(wallets.metaMask)
+                    await Config.web3?.activate(wallets.metaMask, null, () => {
+                        onLogin()
+                    })
                 } else {
                     if (!Config.isMetaMaskInstalled) {
                         setInstaller(true)
