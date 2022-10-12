@@ -13,7 +13,7 @@ import { screens } from 'utils/constants'
 import HeaderContent from './HeaderContent'
 import { Menu, Popover, Tab } from '@headlessui/react'
 
-const ChartComponent = dynamic(() => import('./ChartComponent'), {
+const ChartComponent = dynamic(() => import('./ChartInsurance'), {
     ssr: false,
     suspense: true,
 })

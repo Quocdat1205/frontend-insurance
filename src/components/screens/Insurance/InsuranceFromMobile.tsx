@@ -16,7 +16,7 @@ import { Switch } from '@headlessui/react'
 import dynamic from 'next/dynamic'
 import { screens } from 'utils/constants'
 
-const ChartComponent = dynamic(() => import('./ChartComponent'), {
+const ChartComponent = dynamic(() => import('./ChartInsurance'), {
     ssr: false,
     suspense: true,
 })
