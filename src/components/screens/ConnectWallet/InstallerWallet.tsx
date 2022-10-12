@@ -25,7 +25,7 @@ const InstallerWallet = ({ wallet }: InstallerWallet) => {
                 break
             case wallets.coinbaseWallet:
                 data = {
-                    url: 'https://www.coinbase.com/wallet',
+                    url: 'https://www.coinbase.com/wallet/downloads',
                     icon: '/images/icons/ic_coinbase.png',
                     title: t(`common:installer:coinbase_title`),
                     content: t(`common:installer:coinbase_content`),

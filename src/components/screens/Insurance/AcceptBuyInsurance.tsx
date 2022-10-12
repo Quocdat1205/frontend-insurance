@@ -412,7 +412,10 @@ const AcceptBuyInsurance = () => {
         }
         clearTimeout(timer.current)
         timer.current = setTimeout(() => {
-            if (refCode) checkRef()
+            if (refCode) {
+                setCanBuy(false)
+                checkRef()
+            }
         }, 500)
         setRefError({ isValid: true, message: '' })
     }, [refCode])
@@ -573,7 +576,7 @@ const AcceptBuyInsurance = () => {
                                             </div>
                                         </div>
                                         <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                            <span className={'pr-[8px]'}>{(state?.margin).toFixed(state?.decimalList?.decimal_margin)}</span>{' '}
+                                            <span className={'pr-[8px]'}>{state?.margin!.toFixed(state?.decimalList?.decimal_margin)}</span>{' '}
                                             <span className={'text-txtPrimary'}>{state?.unit}</span>
                                         </div>
                                     </div>

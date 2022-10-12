@@ -7,7 +7,7 @@ const InsuranceFrom = dynamic(() => import('components/screens/Insurance/insuran
 })
 
 const BuyCovered = () => {
-    return <InsuranceFrom></InsuranceFrom>
+    return <InsuranceFrom />
 }
 
 export const getStaticProps: GetStaticProps = async ({ locale }: any) => ({

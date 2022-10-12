@@ -18,7 +18,7 @@
         "wallet": "Wallet"
     },
     "history": {
-        "title": "Commission History",
+        "title": "Reward History",
         "commission_history_nodata": "Please connect Wallet to view your reward history.",
         "receive_reward": "Receive Reward",
         "withdraw_reward": "Withdraw Reward"

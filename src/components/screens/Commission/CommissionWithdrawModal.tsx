@@ -63,7 +63,7 @@ const CommissionWithdrawModal = ({ isWithdrawing, setIsWithdrawing, userInfo, un
                         </div>
                         <div className="mt-6 w-full text-center">
                             <div className="font-semibold text-xl leading-6">{t('commission:withdraw_reward:confirm_withdraw')}?</div>
-                            <div className="mt-2 font-medium text-sm leading-5 text-txtSecondary">
+                            <div className="mt-2 font-medium text-base leading-5 text-txtSecondary">
                                 {t('commission:withdraw_reward:are_you_sure', {
                                     value: `$${formatNumber(userInfo?.commissionAvailable, unitConfig?.assetDigit)} USDT?`,
                                 })}
@@ -73,7 +73,7 @@ const CommissionWithdrawModal = ({ isWithdrawing, setIsWithdrawing, userInfo, un
                             <Button
                                 disabled={!account || userInfo?.commissionAvailable <= 0}
                                 variants="primary"
-                                className="w-full py-[14px] px-6 leading-5 font-bold text-sm"
+                                className="w-full py-[14px] px-6 leading-5 font-bold text-base"
                                 onClick={handleWithDrawCommissionShare}
                             >
                                 {t('common:submit')}
