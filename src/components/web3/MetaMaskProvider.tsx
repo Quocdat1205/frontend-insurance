@@ -38,7 +38,7 @@ function MetaMaskProvider({ children, config }: Web3WalletProviderProps) {
 
     return (
         <Web3ReactProvider connectors={connectors}>
-            <Web3WalletStateProvider connectorsData={connectorsData}>{children}</Web3WalletStateProvider>
+            <Web3WalletStateProvider connectors={connectors} connectorsData={connectorsData}>{children}</Web3WalletStateProvider>
         </Web3ReactProvider>
     )
 }

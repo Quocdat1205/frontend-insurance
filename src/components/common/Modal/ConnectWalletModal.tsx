@@ -59,6 +59,14 @@ const ConnectWalletModal = forwardRef(({ }: ConnectWalletModal, ref) => {
         show: onShow,
     }))
 
+    const coinbaseError = Config.web3?.useErrorCoinbase()
+
+    useEffect(() => {
+        if (wallet?.wallet === wallets.coinbaseWallet && isVisible && coinbaseError && !firstTime.current) {
+            connectionError(coinbaseError)
+        }
+    }, [coinbaseError, isVisible, isActive])
+
     useEffect(() => {
         if (isVisible && error && !firstTime.current) {
             connectionError(error)

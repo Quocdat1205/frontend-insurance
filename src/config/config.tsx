@@ -29,6 +29,7 @@ class Config {
         provider: any
         contractCaller: any
         getBalance: any
+        useErrorCoinbase: any
     }
 
     static refConnectWallet: ConnectWalletType
