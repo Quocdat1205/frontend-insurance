@@ -615,12 +615,11 @@ const InsuranceFromMobile = ({
                                                 <div
                                                     key={key}
                                                     className={`${
-                                                        period.current == item && 'bg-[#FFF1F2] text-red'
+                                                        period == item && 'bg-[#FFF1F2] text-red'
                                                     } bg-hover rounded-[300px] p-3 h-[32px] w-[49px] flex justify-center items-center hover:cursor-pointer ${
                                                         isMobile && !(item == 15) && 'mr-[12px]'
                                                     }`}
                                                     onClick={() => {
-                                                        period.current = item
                                                         handleChangePeriod(item)
                                                     }}
                                                 >

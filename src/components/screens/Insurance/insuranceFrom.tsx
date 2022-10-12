@@ -81,7 +81,7 @@ const InsuranceFrom = () => {
         disable: false,
     })
     const margin = useRef<number>(0)
-    const period = useRef<number>(0)
+    const [period, setPeriod] = useState<number>(0)
     const p_claim = useRef<number>(0)
     const q_claim = useRef<number>(0)
     const r_claim = useRef<number>(0)
@@ -226,7 +226,7 @@ const InsuranceFrom = () => {
                             if (_res) {
                                 q_covered.current = _res?.q_covered
                                 margin.current = _res?.margin
-                                period.current = _res?.period
+                                setPeriod(_res?.period)
                                 p_claim.current = _res?.p_claim
                             }
                         })
@@ -241,7 +241,7 @@ const InsuranceFrom = () => {
                                     if (value) {
                                         q_covered.current = value.q_covered
                                         margin.current = value.margin
-                                        period.current = value.period
+                                        setPeriod(value.period)
                                         p_claim.current = value.p_claim
                                     }
                                 })
@@ -304,7 +304,7 @@ const InsuranceFrom = () => {
                 if (value) {
                     q_covered.current = value.q_covered
                     margin.current = value.margin
-                    period.current = value.period
+                    setPeriod(value.period)
                     p_claim.current = value.p_claim
                 }
             })
@@ -335,7 +335,7 @@ const InsuranceFrom = () => {
     }, [q_covered, p_claim, p_market, margin])
 
     useEffect(() => {
-        if (tab === 0 && q_covered.current && p_claim.current && period.current) {
+        if (tab === 0 && q_covered.current && p_claim.current && period) {
             const res = getInfoCoveredDefault(p_market.current, q_covered.current, p_claim.current, decimalList, default_r_claim)
             if (res) {
                 p_expired.current = res?.p_expired
@@ -359,8 +359,8 @@ const InsuranceFrom = () => {
     }, [pair_configs, q_covered, selectCoin, p_claim, userBalance, selectCoin])
 
     const handleChangePeriod = (item: number) => {
-        period.current = item
-        changePeriod(item, margin.current, q_claim, r_claim, default_period, default_r_claim)
+        setPeriod(item)
+        changePeriod(item, margin.current, q_claim, r_claim, default_period.current, default_r_claim.current)
     }
 
     const loadValidator = () => {
@@ -761,7 +761,7 @@ const InsuranceFrom = () => {
             r_claim: Number(r_claim.current),
             q_claim: Number(q_claim.current),
             margin: Number(margin.current),
-            period: Number(period.current),
+            period: Number(period),
             symbol: selectCoin?.type,
             unit: unitMoney,
             p_claim: Number(p_claim.current),

@@ -373,15 +373,12 @@ const InsuranceFromWeb = ({
                                                     return (
                                                         <div
                                                             key={key}
-                                                            className={`${
-                                                                period.current == item && 'bg-pink text-red font-semibold'
-                                                            } bg-hover rounded-[300px] ${
+                                                            className={`${period == item && 'bg-pink text-red font-semibold'} bg-hover rounded-[300px] ${
                                                                 key != 0 ? 'ml-[0.75rem]' : ''
                                                             } px-4 py-1 flex justify-center items-center hover:cursor-pointer ${
                                                                 isMobile && !(item == 15) && 'mr-[12px]'
                                                             }`}
                                                             onClick={() => {
-                                                                period.current = item
                                                                 handleChangePeriod(item)
                                                             }}
                                                         >
