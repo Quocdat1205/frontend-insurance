@@ -9,6 +9,7 @@ import fetchApi from 'services/fetch-api'
 import colors from 'styles/colors'
 import { formatNumber, formatTime } from 'utils/utils'
 import CommissionFilterDateMobile from './CommissionFilterDateMobile'
+import Tooltip from 'components/common/Tooltip/Tooltip'
 
 interface CommissionStatistics {
     account: any
@@ -148,9 +149,8 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                             <div
                                 key={index}
                                 onClick={() => setFilter(day)}
-                                className={`px-4 py-2 rounded-full bg-hover cursor-pointer ${
-                                    day.id === filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
-                                }`}
+                                className={`px-4 py-2 rounded-full bg-hover cursor-pointer ${day.id === filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
+                                    }`}
                             >
                                 {day[language]}
                             </div>
@@ -160,9 +160,8 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                             onChange={onChangePicker}
                             customLabel={() => (
                                 <div
-                                    className={`px-4 py-2 rounded-full bg-hover cursor-pointer flex items-center space-x-2 ${
-                                        !filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
-                                    }`}
+                                    className={`px-4 py-2 rounded-full bg-hover cursor-pointer flex items-center space-x-2 ${!filter?.id ? 'bg-btnOutline font-semibold text-red' : ''
+                                        }`}
                                 >
                                     <CalendarIcon color={!filter?.id ? colors.red.red : colors.gray.gray} size={16} />
                                     <span>
@@ -225,11 +224,15 @@ const CommissionStatistics = ({ account, userInfo, decimal = 2, setShowWithDrawC
                             </div>
                             <div className="flex items-center justify-between mt-4">
                                 <div className="text-xl sm:text-2xl font-semibold sm:font-medium">{formatNumber(userInfo?.commissionAvailable, decimal)}</div>
-                                {userInfo?.commissionAvailable > 0 && (
+                                {userInfo?.commissionAvailable > 0 ? (
                                     <div
                                         className="text-center text-xs sm:text-sm px-8 py-2 font-semibold text-red cursor-pointer border border-red rounded-lg bg-btnOutline"
                                         onClick={() => setShowWithDrawCommission(true)}
                                     >
+                                        <span>{t('commission:withdraw')}</span>
+                                    </div>
+                                ) : (
+                                    <div className="text-center text-xs sm:text-sm px-8 py-2 font-semibold text-white rounded-lg bg-disabled">
                                         <span>{t('commission:withdraw')}</span>
                                     </div>
                                 )}

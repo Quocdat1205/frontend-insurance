@@ -24,7 +24,7 @@
         "withdraw_reward": "Withdraw Reward"
     },
     "policy": {
-        "title": "Commisson Policy",
+        "title": "Commission Policy",
         "description": "For each successfully margined insurance contract referred by you, you will receive a commission rate according to the total Margin accumulated:",
         "total_margin": "Total Accumulated Margin",
         "reward_rate": "Reward Rate"

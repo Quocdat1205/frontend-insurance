@@ -27,7 +27,7 @@ const CommissionPolicy = ({ commissionConfig }: CommissionPolicy) => {
         <Background className="">
             <div className="text-2xl sm:text-5xl font-semibold text-center">{t('commission:policy:title')}</div>
             <div className="text-sm sm:text-base max-w-[780px] text-center mt-4">{t('commission:policy:description')}</div>
-            <div className="border border-red rounded-xl mt-10 sm:mt-12 w-full sm:w-max text-sm sm:text-base">
+            <div className="border border-red rounded-xl mt-10 sm:mt-12 w-full lg:w-max text-sm sm:text-base">
                 <div className="bg-pink-2 text-red font-semibold flex items-center rounded-t-xl">
                     <div className="px-4 pt-6 pb-4 sm:pl-12 sm:pr-6 sm:py-6 w-1/2 sm:min-w-[237px] rounded-t-xl">{t('commission:policy:total_margin')}</div>
                     <div className="px-4 pt-6 pb-4 sm:pl-12 sm:pr-6 sm:py-6 w-1/2 sm:min-w-[359px] rounded-tr-xl">{t('commission:policy:reward_rate')}</div>
