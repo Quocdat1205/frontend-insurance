@@ -193,7 +193,6 @@ export const setDefaultValue = async (userBalance: number, p_market: number, fil
     const balanceUSDT = await getBalance('USDT', Config.web3.account, USDTaddress, Number(decimalQ_covered))
     const decimalMargin = countDecimals(configMargin?.stepSize)
     const decimalP_claim = countDecimals(configP_claim?.tickSize)
-    // console.log(fillter[1])
 
     if (configPrice && userBalance > fillter[1]?.minQty) {
         const p_claim = p_market - 0.1 * p_market
@@ -250,6 +249,8 @@ export const setDefaultValue = async (userBalance: number, p_market: number, fil
 }
 
 export const changePeriod = (value: number, margin: number, q_claim: any, r_claim: any, default_period: any, default_r_claim: any) => {
+    console.log(default_period?.current)
+
     if (value > default_period?.current) {
         const step = value - default_period?.current
         switch (step) {
@@ -291,6 +292,8 @@ export const changePeriod = (value: number, margin: number, q_claim: any, r_clai
                 break
             case 13:
                 new_r_claim(83.5 / 100, margin, q_claim, r_claim, default_r_claim)
+                break
+            default:
                 break
         }
     } else {
@@ -335,13 +338,15 @@ export const changePeriod = (value: number, margin: number, q_claim: any, r_clai
             case 13:
                 new_r_claim_(20 / 100, margin, q_claim, r_claim, default_r_claim)
                 break
+            default:
+                break
         }
     }
 }
 
 const new_r_claim = (x: number, margin: number, q_claim: any, r_claim: any, default_r_claim: any) => {
-    const new_r_claim = (100 / 100 + (default_r_claim?.current - 100 / 100) * (1 - x)) * 100
-    const new_q_claim = new_r_claim * margin
+    const new_r_claim = (100 / 100 + (default_r_claim?.current / 100 - 100 / 100) * (1 - x)) * 100
+    const new_q_claim = new_r_claim * (margin / 100)
     r_claim.current = new_r_claim
     q_claim.current = new_q_claim
     return {
@@ -351,8 +356,8 @@ const new_r_claim = (x: number, margin: number, q_claim: any, r_claim: any, defa
 }
 
 const new_r_claim_ = (x: number, margin: number, q_claim: any, r_claim: any, default_r_claim: any) => {
-    const new_r_claim = (100 / 100 + (default_r_claim?.current - 100 / 100) * (1 + x)) * 100
-    const new_q_claim = new_r_claim * margin
+    const new_r_claim = (100 / 100 + (default_r_claim?.current / 100 - 100 / 100) * (1 + x)) * 100
+    const new_q_claim = new_r_claim * (margin / 100)
     r_claim.current = new_r_claim
     q_claim.current = new_q_claim
     return {

@@ -2,7 +2,7 @@ import { GetStaticProps } from 'next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
 import dynamic from 'next/dynamic'
-const InsuranceFrom = dynamic(() => import('components/screens/Insurance/insuranceFrom'), {
+const InsuranceFrom = dynamic(() => import('components/screens/Insurance/InsuranceFrom'), {
     ssr: true,
 })
 

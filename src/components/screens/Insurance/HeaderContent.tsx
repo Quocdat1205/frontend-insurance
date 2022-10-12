@@ -8,7 +8,7 @@ import cx from 'classnames'
 import Button from 'components/common/Button/Button'
 import Config from 'config/config'
 
-const HeaderContent = ({ state, setState, wallet, auth }: any) => {
+const HeaderContent = ({ state, setState, auth }: any) => {
     const [isDrop, setDrop] = useState<boolean>(false)
     const router = useRouter()
     const {
