@@ -39,9 +39,9 @@ const CommissionTable = ({ account, unitConfig, doReload }: CommissionTable) => 
                     {t('commission:history:title')}
                 </TabItem>
             </Tabs>
-            <div className="font-semibold mt-6 flex sm:hidden">{tabs.Friends === tab ? 'Danh sách bạn bè' : 'Lịch sử giao dịch'}</div>
+            <div className="font-semibold mt-6 flex sm:hidden">{tabs.Friends === tab ? t('commission:friends:title') : t('commission:history:title')}</div>
             {tabs.Friends === tab && account?.address && (
-                <div className="mt-6 flex flex-col sm:flex-row items-center">
+                <div className="mt-6 flex flex-col sm:flex-row items-stretch">
                     <div className="flex items-center shadow-table p-4 sm:p-6 bg-white rounded-xl w-full">
                         <img src="/images/icons/ic_group.png" className="w-9 h-9 flex sm:hidden mr-4" />
                         <div className="flex flex-col w-full">
