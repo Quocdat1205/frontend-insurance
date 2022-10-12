@@ -24,6 +24,7 @@ type IProps = {
     margin: number
     period: number
     p_market: number
+    p_expired: number
     account: any
     selectCoin: ICoin
     tab: number | 0 | 1
@@ -74,6 +75,7 @@ const InsuranceFromWeb = ({
     listCoin,
     dataChart,
     period,
+    p_expired,
     p_market,
     listTime,
     clear,
@@ -281,6 +283,7 @@ const InsuranceFromWeb = ({
                                                         margin: margin,
                                                         p_claim: p_claim,
                                                         p_market: p_market,
+                                                        p_expired: p_expired,
                                                     }}
                                                     setP_Claim={(data: number) => {
                                                         onHandleChange('p_claim', data)

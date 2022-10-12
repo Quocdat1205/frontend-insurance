@@ -261,6 +261,7 @@ const ChartComponent = ({ data, setP_Claim, state, isMobile, height, resolution 
             // latitudeLabel.label.dy = -5
             latitudeLabel.label.verticalCenter = 'bottom'
             latitudeLabel.label.fill = am4core.color('#B2B7BC')
+
             if (state?.p_expired) {
                 //chart Expired
                 let latitudeExpired = chart.series.push(new am4charts.LineSeries())
@@ -284,9 +285,10 @@ const ChartComponent = ({ data, setP_Claim, state, isMobile, height, resolution 
                 bulletExpired.stroke = am4core.color('white')
 
                 //label expired
+
                 let expiredLabel = latitudeExpired.bullets.push(new am4charts.LabelBullet())
                 if (state?.p_claim && state?.q_covered) {
-                    expiredLabel.label.html = `<div class="text-xs">P-Expired: $${latitudeExpired.data[0].value}</div>`
+                    expiredLabel.label.html = `<div class="text-xs">P-Expired: $${state?.p_expired}</div>`
                 } else {
                     bulletExpired.disabled = true
                 }

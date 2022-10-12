@@ -85,9 +85,9 @@ const InsuranceFrom = () => {
     const [p_claim, setP_claim] = useState<number>(0)
     const [q_covered, setQ_covered] = useState<number>(0)
     const [p_market, setP_market] = useState<number>(0)
+    const [p_expired, setP_expired] = useState<number>(0)
     const q_claim = useRef<number>(0)
     const r_claim = useRef<number>(0)
-    const p_expired = useRef<number>(0)
 
     const [rangeP_claim, setRangeP_claim] = useState({
         min: 0,
@@ -188,7 +188,7 @@ const InsuranceFrom = () => {
     useEffect(() => {
         if (!q_covered || q_covered == 0 || !p_claim || p_claim == 0) {
             setSaved(0)
-            p_expired.current = 0
+            setP_expired(0)
             q_claim.current = 0
             r_claim.current = 0
             setMargin(0)
@@ -196,7 +196,7 @@ const InsuranceFrom = () => {
             if (tab == 0) {
                 const res = getInfoCoveredDefault(p_market, q_covered, p_claim, decimalList, default_r_claim)
                 if (res) {
-                    p_expired.current = res?.p_expired
+                    setP_expired(res?.p_expired)
                     q_claim.current = res?.q_claim
                     r_claim.current = res?.r_claim
                     setMargin(res?.margin)
@@ -204,7 +204,7 @@ const InsuranceFrom = () => {
             } else {
                 const result = getInfoCoveredCustom(margin, q_covered, p_claim, p_market, decimalList, default_r_claim)
                 if (result) {
-                    p_expired.current = result?.p_expired
+                    setP_expired(result?.p_expired)
                     q_claim.current = result?.q_claim
                     r_claim.current = result?.r_claim
                 }
@@ -252,7 +252,7 @@ const InsuranceFrom = () => {
                                 const timeout_getData = setTimeout(() => {
                                     const res = getInfoCoveredDefault(p_market, q_covered, p_claim, decimalList, default_r_claim)
                                     if (res) {
-                                        p_expired.current = res?.p_expired
+                                        setP_expired(res?.p_expired)
                                         q_claim.current = res?.q_claim
                                         r_claim.current = res?.r_claim
                                         setMargin(res?.margin)
@@ -267,7 +267,7 @@ const InsuranceFrom = () => {
                                 const timeout_getData = setTimeout(() => {
                                     const result = getInfoCoveredCustom(margin, q_covered, p_claim, p_market, decimalList, default_r_claim)
                                     if (result) {
-                                        p_expired.current = result?.p_expired
+                                        setP_expired(result?.p_expired)
                                         q_claim.current = result?.q_claim
                                         r_claim.current = result?.r_claim
                                     }
@@ -331,7 +331,7 @@ const InsuranceFrom = () => {
         if (tab === 0 && q_covered && p_claim && period) {
             const res = getInfoCoveredDefault(p_market, q_covered, p_claim, decimalList, default_r_claim)
             if (res) {
-                p_expired.current = res?.p_expired
+                setP_expired(res?.p_expired)
                 q_claim.current = res?.q_claim
                 r_claim.current = res?.r_claim
                 setMargin(res?.margin)
@@ -819,6 +819,7 @@ const InsuranceFrom = () => {
                             }}
                         >
                             <InsuranceFromWeb
+                                p_expired={p_expired}
                                 account={account}
                                 q_covered={q_covered}
                                 p_claim={p_claim}
@@ -859,6 +860,7 @@ const InsuranceFrom = () => {
                     </>
                 ) : (
                     <InsuranceFromMobile
+                        p_expired={p_expired}
                         account={account}
                         q_covered={q_covered}
                         p_claim={p_claim}

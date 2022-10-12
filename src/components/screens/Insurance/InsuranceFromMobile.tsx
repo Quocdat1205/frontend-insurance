@@ -33,6 +33,7 @@ type IProps = {
     percentInsurance: any
     unitMoney: string
     percentMargin: any
+    p_expired: number
     decimalList: {
         decimal_q_covered: number
         decimal_margin: number
@@ -77,6 +78,7 @@ const InsuranceFromMobile = ({
     percentInsurance,
     percentMargin,
     isCanSave,
+    p_expired,
     listCoin,
     dataChart,
     period,
@@ -545,6 +547,7 @@ const InsuranceFromMobile = ({
                                             margin: margin,
                                             p_claim: p_claim,
                                             p_market: p_market,
+                                            p_expired: p_expired,
                                         }}
                                         setP_Claim={(data: number) => onHandleChange('p_claim', data)}
                                         isMobile={isMobile as boolean}
