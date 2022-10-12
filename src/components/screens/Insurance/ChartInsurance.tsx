@@ -128,29 +128,29 @@ export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number,
 }
 
 const ChartComponent = ({ data, setP_Claim, state, isMobile, height, resolution }: iProps) => {
-    const [dataChart, setDataChart] = useState([])
+    const dataChart = useRef([])
     const router = useRouter()
     let chart: any
     // const ref = useRef<any>(null)
 
     useEffect(() => {
-        if (data && data.length > 0) setDataChart(data)
+        if (data && data.length > 0) dataChart.current = data
     }, [data])
 
     useEffect(() => {
-        InitChart(dataChart)
-    }, [dataChart])
+        InitChart(dataChart.current)
+    }, [dataChart.current])
 
     const timer = useRef<any>(null)
     useEffect(() => {
         clearTimeout(timer.current)
         timer.current = setTimeout(() => {
-            InitChart(dataChart)
+            InitChart(dataChart.current)
         }, 500)
-    }, [dataChart, state])
+    }, [dataChart.current, state])
 
     // useEffect(() => {
-    //     InitChart(dataChart)
+    //     InitChart(dataChart.current)
     // }, [data])
 
     const InitChart = async (test_data: Idata[]) => {
@@ -330,7 +330,7 @@ const ChartComponent = ({ data, setP_Claim, state, isMobile, height, resolution 
                 subLatitudeClaim.fillOpacity = 0.25
                 subLatitudeClaim.fill = gradient
                 subLatitudeClaim.data = [
-                    ...dataChart,
+                    ...dataChart.current,
                     {
                         date: timeEnd + state?.period * 1000 * 3600 * 24,
                         value: state?.p_claim > 0 ? state?.p_claim : state?.p_market,
