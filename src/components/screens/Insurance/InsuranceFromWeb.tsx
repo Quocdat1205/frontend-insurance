@@ -13,6 +13,11 @@ import { screens } from 'utils/constants'
 import HeaderContent from './HeaderContent'
 import { Menu, Popover, Tab } from '@headlessui/react'
 
+const ChartComponent = dynamic(() => import('./ChartComponent'), {
+    ssr: false,
+    suspense: true,
+})
+
 type IProps = {
     q_covered: number
     p_claim: number
@@ -100,11 +105,6 @@ const InsuranceFromWeb = ({
         t,
         i18n: { language },
     } = useTranslation()
-
-    const ChartComponent = dynamic(() => import('./ChartComponent'), {
-        ssr: false,
-        suspense: true,
-    })
 
     const renderPopoverQCover = () => (
         <Popover className="relative outline-none bg-hover focus:ring-0 flex items-center justify-center">

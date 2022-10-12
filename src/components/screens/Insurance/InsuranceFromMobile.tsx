@@ -16,6 +16,11 @@ import { Switch } from '@headlessui/react'
 import dynamic from 'next/dynamic'
 import { screens } from 'utils/constants'
 
+const ChartComponent = dynamic(() => import('./ChartComponent'), {
+    ssr: false,
+    suspense: true,
+})
+
 type IProps = {
     account: any
     q_covered: number
@@ -117,11 +122,6 @@ const InsuranceFromMobile = ({
     })
     const table = useRef<any>(null)
     const container = useRef<any>(null)
-
-    const ChartComponent = dynamic(() => import('./ChartComponent'), {
-        ssr: false,
-        suspense: true,
-    })
 
     const [showInput, setShowInput] = useState<{ isShow: boolean; name: string }>({ isShow: false, name: '' })
     useEffect(() => {
