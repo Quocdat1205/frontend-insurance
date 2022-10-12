@@ -36,6 +36,13 @@ export class ContractCaller {
             return await fetchApi({ url: API_LOGIN, options: { method: 'POST' }, params: { owner: address, signature: signature } })
         } catch (error) {
             console.log('sign', error)
+
+            // coinbase error la 1 string nen return ve object error
+            if (typeof error === 'string')
+                return {
+                    message: error,
+                }
+
             return error
         }
     }
