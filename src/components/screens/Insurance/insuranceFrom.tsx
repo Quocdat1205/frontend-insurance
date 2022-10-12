@@ -137,7 +137,6 @@ const InsuranceFrom = () => {
         if (loadings && isMobile) {
             const timeout_guiled = setTimeout(() => {
                 setShowGuide(true)
-
                 return () => {
                     clearTimeout(timeout_guiled)
                 }
@@ -177,6 +176,8 @@ const InsuranceFrom = () => {
         const first_timeout = setTimeout(() => {
             if (run_first) {
                 loadData()
+            } else {
+                getBalaneToken(selectCoin?.type)
             }
             return () => {
                 clearTimeout(first_timeout)

@@ -1,4 +1,4 @@
-import { useWeb3React } from '@web3-react/core'
+import { useWeb3React, Web3ReactHooks } from '@web3-react/core'
 import { Connector } from '@web3-react/types'
 import { ethers } from 'ethers'
 import React, { useEffect, ReactNode, useState } from 'react'
@@ -10,11 +10,15 @@ import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
 import { Web3Provider } from '@ethersproject/providers'
 import { onLoading } from 'redux/actions/setting'
 
-const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorId; name: string; connector: Connector }>) => {
+const useWeb3WalletState = (
+    connectorsData: Record<ConnectorId, { id: ConnectorId; name: string; connector: Connector }>,
+    connectors: [Connector, Web3ReactHooks][],
+) => {
     const { connector, account, isActive, error, provider } = useWeb3React()
     const connected = useAppSelector((state: RootStore) => state.setting.account)
     const [flag, setFlag] = useState(false)
     const dispatch = useAppDispatch()
+    const { useError: useErrorCoinbase } = connectors[1][1]
 
     const activate = async (connectorId: ConnectorId, _chainId?: number, cb?: () => void) => {
         const wallet = sessionStorage.getItem('PUBLIC_WALLET')
@@ -88,11 +92,20 @@ const useWeb3WalletState = (connectorsData: Record<ConnectorId, { id: ConnectorI
         // balance,
         contractCaller: Config.web3?.contractCaller,
         getBalance,
+        useErrorCoinbase,
     }
 }
 
-function Web3WalletStateProvider({ children, connectorsData }: { children: ReactNode; connectorsData: ConnectorsData }) {
-    const state = useWeb3WalletState(connectorsData)
+function Web3WalletStateProvider({
+    children,
+    connectorsData,
+    connectors,
+}: {
+    children: ReactNode
+    connectorsData: ConnectorsData
+    connectors: [Connector, Web3ReactHooks][]
+}) {
+    const state = useWeb3WalletState(connectorsData, connectors)
     Config.web3 = state
     return <Web3WalletContext.Provider value={state}>{children}</Web3WalletContext.Provider>
 }

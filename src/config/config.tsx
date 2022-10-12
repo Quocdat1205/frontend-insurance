@@ -18,6 +18,7 @@ class Config {
     } = { token: null, expire: null }
 
     static web3: {
+        [x: string]: any
         account: string
         switchNetwork: any
         chain: any
@@ -29,6 +30,7 @@ class Config {
         provider: any
         contractCaller: any
         getBalance: any
+        useErrorCoinbase: any
     }
 
     static refConnectWallet: ConnectWalletType

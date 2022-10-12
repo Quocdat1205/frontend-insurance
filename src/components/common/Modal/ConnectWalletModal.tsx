@@ -19,7 +19,7 @@ import { isString } from 'lodash'
 import { API_GET_INFO_USER, API_UPDATE_USER_INFO } from 'services/apis'
 import fetchApi from 'services/fetch-api'
 
-interface ConnectWalletModal { }
+interface ConnectWalletModal {}
 
 interface Wallet {
     name: string
@@ -28,7 +28,7 @@ interface Wallet {
     wallet?: string
 }
 
-const ConnectWalletModal = forwardRef(({ }: ConnectWalletModal, ref) => {
+const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     const {
         t,
         i18n: { language },
@@ -58,6 +58,14 @@ const ConnectWalletModal = forwardRef(({ }: ConnectWalletModal, ref) => {
     useImperativeHandle(ref, () => ({
         show: onShow,
     }))
+
+    const coinbaseError = Config.web3?.useErrorCoinbase()
+
+    useEffect(() => {
+        if (wallet?.wallet === wallets.coinbaseWallet && isVisible && coinbaseError && !firstTime.current) {
+            connectionError(coinbaseError)
+        }
+    }, [coinbaseError, isVisible, isActive])
 
     useEffect(() => {
         if (isVisible && error && !firstTime.current) {
@@ -108,7 +116,6 @@ const ConnectWalletModal = forwardRef(({ }: ConnectWalletModal, ref) => {
                 break
         }
     }
-
 
     const onChangeNetwork = async (wallet: string) => {
         let provider: any
@@ -335,7 +342,9 @@ const ConnectWalletModal = forwardRef(({ }: ConnectWalletModal, ref) => {
                         window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}?ref=${refCode}`)
                         return
                     }
-                    await Config.web3?.activate(wallets.metaMask)
+                    await Config.web3?.activate(wallets.metaMask, null, () => {
+                        onLogin()
+                    })
                 } else {
                     if (!Config.isMetaMaskInstalled) {
                         setInstaller(true)
@@ -441,38 +450,40 @@ const ConnectWalletModal = forwardRef(({ }: ConnectWalletModal, ref) => {
                                 <div className="text-xl font-medium">{t('common:connecting')}</div>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 gap-4 w-full">
-                                {walletsFilter.map((item: Wallet, index: number) => (
-                                    <CartWallet key={index} onClick={() => setWallet(item)} active={wallet?.wallet === item?.wallet}>
-                                        <div className="w-10 h-10 flex justify-center items-center relative">
-                                            {item.icon ? (
-                                                <img src={item.icon} className="w-10 h-10" />
-                                            ) : (
-                                                <div className="flex items-center space-x-1">
-                                                    <div className="bg-gray w-[5px] h-[5px] rounded-full" />
-                                                    <div className="bg-gray w-[5px] h-[5px] rounded-full" />
-                                                    <div className="bg-gray w-[5px] h-[5px] rounded-full" />
-                                                </div>
-                                            )}
-                                            {!item?.active && (
-                                                <div className="rounded-sm whitespace-nowrap absolute bottom-0 text-[6px] text-red font-semibold border border-red py-[2px] px-1 leading-[8px] bg-white">
-                                                    {t('common:coming_soon')}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="text-sm sm:text-base">{item.name}</div>
-                                    </CartWallet>
-                                ))}
-                            </div>
+                            <>
+                                <div className="grid grid-cols-2 gap-4 w-full">
+                                    {walletsFilter.map((item: Wallet, index: number) => (
+                                        <CartWallet key={index} onClick={() => setWallet(item)} active={wallet?.wallet === item?.wallet}>
+                                            <div className="w-10 h-10 flex justify-center items-center relative">
+                                                {item.icon ? (
+                                                    <img src={item.icon} className="w-10 h-10" />
+                                                ) : (
+                                                    <div className="flex items-center space-x-1">
+                                                        <div className="bg-gray w-[5px] h-[5px] rounded-full" />
+                                                        <div className="bg-gray w-[5px] h-[5px] rounded-full" />
+                                                        <div className="bg-gray w-[5px] h-[5px] rounded-full" />
+                                                    </div>
+                                                )}
+                                                {!item?.active && (
+                                                    <div className="rounded-sm whitespace-nowrap absolute bottom-0 text-[6px] text-red font-semibold border border-red py-[2px] px-1 leading-[8px] bg-white">
+                                                        {t('common:coming_soon')}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="text-sm sm:text-base">{item.name}</div>
+                                        </CartWallet>
+                                    ))}
+                                </div>
+                                <Button
+                                    onClick={onConfirm}
+                                    disabled={!wallet?.active ? true : false || loading}
+                                    variants="primary"
+                                    className="w-full py-3 !mt-8 text-sm sm:text-base"
+                                >
+                                    {t('home:home:connect_wallet')}
+                                </Button>
+                            </>
                         )}
-                        <Button
-                            onClick={onConfirm}
-                            disabled={!wallet?.active ? true : false || loading}
-                            variants="primary"
-                            className="w-full py-3 !mt-8 text-sm sm:text-base"
-                        >
-                            {t('home:home:connect_wallet')}
-                        </Button>
                         <div
                             onClick={onRead}
                             className="text-txtSecondary text-sm sm:text-base text-center"
@@ -492,7 +503,7 @@ const CartWallet = styled.div.attrs<{ active: boolean }>(({ active }) => ({
             'after:!block': active,
         },
     ),
-})) <any>`
+}))<any>`
     &:after {
         display: none;
         content: '';
