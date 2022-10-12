@@ -86,7 +86,7 @@ export const getInfoCoveredDefault = (p_market: number, q_covered: number, p_cla
     }
 }
 
-const configRatioMarketClaim = [
+export const configRatioMarketClaim = [
     {
         min: 0.02,
         max: 0.1,
@@ -341,14 +341,22 @@ export const changePeriod = (value: number, margin: number, q_claim: any, r_clai
 
 const new_r_claim = (x: number, margin: number, q_claim: any, r_claim: any, default_r_claim: any) => {
     const new_r_claim = (100 / 100 + (default_r_claim?.current - 100 / 100) * (1 - x)) * 100
-    const new_q_claim = r_claim * margin
+    const new_q_claim = new_r_claim * margin
     r_claim.current = new_r_claim
     q_claim.current = new_q_claim
+    return {
+        r_claim: new_r_claim,
+        q_claim: new_q_claim,
+    }
 }
 
 const new_r_claim_ = (x: number, margin: number, q_claim: any, r_claim: any, default_r_claim: any) => {
     const new_r_claim = (100 / 100 + (default_r_claim?.current - 100 / 100) * (1 + x)) * 100
-    const new_q_claim = r_claim * margin
+    const new_q_claim = new_r_claim * margin
     r_claim.current = new_r_claim
     q_claim.current = new_q_claim
+    return {
+        r_claim: new_r_claim,
+        q_claim: new_q_claim,
+    }
 }

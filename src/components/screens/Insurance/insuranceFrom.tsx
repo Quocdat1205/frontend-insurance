@@ -26,7 +26,7 @@ import { BTCaddress, DAIaddress, ETHaddress, USDTaddress } from 'components/web3
 import Emitter from 'socket/emitter'
 import { PublicSocketEvent } from 'socket/socketEvent'
 import FuturesMarketWatch from 'models/FuturesMarketWatch'
-import { fetchApiNami, getBalance, getInfoCoveredCustom, getInfoCoveredDefault, GuidelineModal, setDefaultValue } from './Insurance_funtion'
+import { changePeriod, fetchApiNami, getBalance, getInfoCoveredCustom, getInfoCoveredDefault, GuidelineModal, setDefaultValue } from './Insurance_funtion'
 
 const Guide = dynamic(() => import('components/screens/Insurance/Guide'), {
     ssr: false,
@@ -88,6 +88,7 @@ const InsuranceFrom = () => {
     const [percentPrice, setPercentPrice] = useState<any>()
     const default_period = useRef(0)
     const default_r_claim = useRef(0)
+    const [run_first, setFirst] = useState<boolean>(true)
 
     const [rangeQ_covered, setRangeQ_covered] = useState({
         min: 0,
@@ -176,10 +177,14 @@ const InsuranceFrom = () => {
     ]
 
     useEffect(() => {
+        setFirst(true)
+    }, [])
+
+    useEffect(() => {
         if (loadings && isMobile) {
             setTimeout(() => {
                 setShowGuide(true)
-            }, 1000)
+            }, 500)
         }
     }, [loadings])
 
@@ -213,9 +218,30 @@ const InsuranceFrom = () => {
 
     useEffect(() => {
         setTimeout(() => {
-            loadData()
-        }, 2000)
+            if (run_first) {
+                loadData()
+            }
+        }, 1000)
     }, [pair_configs, selectCoin, account, p_market, userBalance])
+
+    useEffect(() => {
+        if (tab == 0) {
+            const res = getInfoCoveredDefault(p_market.current, q_covered.current, p_claim.current, decimalList, default_r_claim)
+            if (res) {
+                p_expired.current = res?.p_expired
+                q_claim.current = res?.q_claim
+                r_claim.current = res?.r_claim
+                margin.current = res?.margin
+            }
+        } else {
+            const result = getInfoCoveredCustom(margin.current, q_covered.current, p_claim.current, p_market.current, decimalList, default_r_claim)
+            if (result) {
+                p_expired.current = result?.p_expired
+                q_claim.current = result?.q_claim
+                r_claim.current = result?.r_claim
+            }
+        }
+    }, [q_covered.current, p_claim.current, margin.current])
 
     const loadData = async () => {
         if (pair_configs && selectCoin && account && p_market) {
@@ -225,15 +251,17 @@ const InsuranceFrom = () => {
                     percentInsurance.current = 0
                     percentMargin.current = 0
 
-                    await setDefaultValue(0, p_market.current, pair_configs.filters, default_period).then(async (res) => {
-                        const _res = await res
-                        if (_res) {
-                            q_covered.current = _res?.q_covered
-                            margin.current = _res?.margin
-                            period.current = _res?.period
-                            p_claim.current = _res?.p_claim
-                        }
-                    })
+                    await setDefaultValue(0, p_market.current, pair_configs.filters, default_period)
+                        .then(async (res) => {
+                            const _res = await res
+                            if (_res) {
+                                q_covered.current = _res?.q_covered
+                                margin.current = _res?.margin
+                                period.current = _res?.period
+                                p_claim.current = _res?.p_claim
+                            }
+                        })
+                        .finally(() => setFirst(false))
                 } else {
                     await getBalaneToken(selectCoin?.type)
                         .then(async (res) => {
@@ -262,7 +290,7 @@ const InsuranceFrom = () => {
                                     }
                                     createSaved()
                                     clear.current = handleCheckFinal()
-                                }, 1000)
+                                }, 500)
                             } else {
                                 setTimeout(() => {
                                     const result = getInfoCoveredCustom(
@@ -280,9 +308,10 @@ const InsuranceFrom = () => {
                                     }
                                     createSaved()
                                     clear.current = handleCheckFinal()
-                                }, 1000)
+                                }, 500)
                             }
                         })
+                        .finally(() => setFirst(false))
                 }
             }
             createSaved()
@@ -347,7 +376,7 @@ const InsuranceFrom = () => {
                 r_claim.current = result?.r_claim
             }
         }
-    }, [tab, p_claim, q_covered])
+    }, [tab])
 
     useEffect(() => {
         if (showGuide) {
@@ -360,6 +389,11 @@ const InsuranceFrom = () => {
     useEffect(() => {
         loadValidator()
     }, [pair_configs, q_covered, selectCoin, p_claim, userBalance, selectCoin])
+
+    const handleChangePeriod = (item: number) => {
+        period.current = item
+        changePeriod(item, margin.current, q_claim, r_claim, default_period, default_r_claim)
+    }
 
     const loadValidator = () => {
         const _decimalList = { ...decimalList }
@@ -1180,13 +1214,16 @@ const InsuranceFrom = () => {
                                                                         <div
                                                                             key={key}
                                                                             className={`${
-                                                                                period.current === item && 'bg-pink text-red font-semibold'
+                                                                                period.current == item && 'bg-pink text-red font-semibold'
                                                                             } bg-hover rounded-[300px] ${
                                                                                 key != 0 ? 'ml-[0.75rem]' : ''
                                                                             } px-4 py-1 flex justify-center items-center hover:cursor-pointer ${
                                                                                 isMobile && !(item == 15) && 'mr-[12px]'
                                                                             }`}
-                                                                            onClick={() => (period.current = item)}
+                                                                            onClick={() => {
+                                                                                period.current = item
+                                                                                handleChangePeriod(item)
+                                                                            }}
                                                                         >
                                                                             {item}
                                                                         </div>
@@ -1841,7 +1878,7 @@ const InsuranceFrom = () => {
                                                 className={`hide-scroll flex flex-row justify-between mt-[1rem]  ${isMobile ? 'w-full' : 'w-[85%]'} `}
                                             >
                                                 {listTabPeriod.map((item, key) => {
-                                                    if (item === period.current || item <= item + 6)
+                                                    if (item == period.current || item <= item + 6)
                                                         return (
                                                             <div
                                                                 key={key}
@@ -1851,7 +1888,8 @@ const InsuranceFrom = () => {
                                                                     isMobile && !(item == 15) && 'mr-[12px]'
                                                                 }`}
                                                                 onClick={() => {
-                                                                    // setState({ ...state, period: item })
+                                                                    period.current = item
+                                                                    handleChangePeriod(item)
                                                                 }}
                                                             >
                                                                 {item}
