@@ -9,11 +9,9 @@ export type iProps = {
     state?: any
     data?: []
     setP_Expired?: any
-    setP_Market?: any
     setP_Claim?: any
     ref?: any
     isMobile?: boolean
-    width: number
     height: number
     resolution: string
 }
@@ -129,7 +127,7 @@ export const handleTrendLineStatus = (chart: am4charts.XYChart, p_claim: number,
     }
 }
 
-const ChartComponent = ({ data, setP_Market, setP_Claim, state, isMobile, width, height, resolution }: iProps) => {
+const ChartComponent = ({ data, setP_Claim, state, isMobile, height, resolution }: iProps) => {
     const [dataChart, setDataChart] = useState([])
     const router = useRouter()
     let chart: any
@@ -149,9 +147,6 @@ const ChartComponent = ({ data, setP_Market, setP_Claim, state, isMobile, width,
         timer.current = setTimeout(() => {
             InitChart(dataChart)
         }, 500)
-        if (chart) {
-            // setP_Market(chart.data[chart.data.length - 1]?.value)
-        }
     }, [dataChart, state])
 
     // useEffect(() => {

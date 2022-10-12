@@ -14,14 +14,14 @@ import HeaderContent from './HeaderContent'
 import { Menu, Popover, Tab } from '@headlessui/react'
 
 type IProps = {
+    q_covered: number
+    p_claim: number
+    margin: number
+    period: number
+    p_market: number
     account: any
-    q_covered: any
     selectCoin: ICoin
-    p_claim: any
     tab: number | 0 | 1
-    margin: any
-    period: any
-    p_market: any
     percentInsurance: any
     unitMoney: string
     percentMargin: any
@@ -52,6 +52,7 @@ type IProps = {
     setChosing: (value: boolean) => any
     handleNext: () => any
     setShowDetails: (value: boolean) => any
+    setP_market: (value: number) => any
 }
 
 const InsuranceFromWeb = ({
@@ -89,6 +90,7 @@ const InsuranceFromWeb = ({
     setChosing,
     handleNext,
     setShowDetails,
+    setP_market,
 }: IProps) => {
     const router = useRouter()
     const { width, height } = useWindowSize()
@@ -238,7 +240,7 @@ const InsuranceFromWeb = ({
                                             <div className={`flex justify-between border-collapse rounded-[3px] shadow-none w-full`}>
                                                 <InputNumber
                                                     validator={validator('q_covered')}
-                                                    value={q_covered.current}
+                                                    value={q_covered}
                                                     onChange={(e: any) => onHandleChange('q_covered', e)}
                                                     customSuffix={renderPopoverQCover}
                                                     decimal={decimalList.decimal_q_covered}
@@ -271,21 +273,17 @@ const InsuranceFromWeb = ({
                                         <div className={'flex flex-row relative'}>
                                             <Suspense fallback={`Loading...`}>
                                                 <ChartComponent
-                                                    width={795}
                                                     height={280}
                                                     data={dataChart}
                                                     state={{
-                                                        period: period.current,
-                                                        q_covered: q_covered.current,
-                                                        margin: margin.current,
-                                                        p_claim: p_claim.current,
-                                                        p_market: p_market.current,
+                                                        period: period,
+                                                        q_covered: q_covered,
+                                                        margin: margin,
+                                                        p_claim: p_claim,
+                                                        p_market: p_market,
                                                     }}
                                                     setP_Claim={(data: number) => {
                                                         onHandleChange('p_claim', data)
-                                                    }}
-                                                    setP_Market={(data: number) => {
-                                                        return (p_market.current = data)
                                                     }}
                                                     resolution={selectTime!}
                                                 />
@@ -339,7 +337,7 @@ const InsuranceFromWeb = ({
                                             <InputNumber
                                                 className="mt-2"
                                                 validator={validator('p_claim')}
-                                                value={p_claim.current}
+                                                value={p_claim}
                                                 onChange={(e: any) => onHandleChange('p_claim', e)}
                                                 customSuffix={() => unitMoney}
                                                 suffixClassName="text-txtSecondary"
@@ -462,7 +460,7 @@ const InsuranceFromWeb = ({
                                                 </div>
                                             </div>
                                             <div className={'flex flex-row items-center justify-center hover:cursor-pointer relative max-h-[24px]'}>
-                                                {margin.current > 0 ? Number(margin.current.toFixed(decimalList.decimal_margin)) : 0}
+                                                {margin > 0 ? Number(margin.toFixed(decimalList.decimal_margin)) : 0}
                                                 <span className={'pl-2 mr-1'}>{unitMoney}</span>
                                                 <div className="relative"></div>
                                             </div>
@@ -481,7 +479,7 @@ const InsuranceFromWeb = ({
                                                 <div className={`flex justify-between border-collapse rounded-[3px] shadow-none w-full`}>
                                                     <InputNumber
                                                         validator={validator('margin')}
-                                                        value={margin.current}
+                                                        value={margin}
                                                         onChange={(e: any) => onHandleChange('margin', e)}
                                                         customSuffix={renderPopoverMargin}
                                                         decimal={decimalList.decimal_margin}

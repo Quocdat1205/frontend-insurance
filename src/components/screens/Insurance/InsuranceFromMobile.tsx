@@ -18,13 +18,13 @@ import { screens } from 'utils/constants'
 
 type IProps = {
     account: any
-    q_covered: any
+    q_covered: number
     selectCoin: ICoin
-    p_claim: any
+    p_claim: number
     tab: number | 0 | 1
-    margin: any
-    period: any
-    p_market: any
+    margin: number
+    period: number
+    p_market: number
     percentInsurance: any
     unitMoney: string
     percentMargin: any
@@ -56,6 +56,8 @@ type IProps = {
     setChosing: (value: boolean) => any
     handleNext: () => any
     setShowDetails: (value: boolean) => any
+    setP_claim: (value: number) => any
+    setP_market: (value: number) => any
 }
 
 const InsuranceFromMobile = ({
@@ -94,6 +96,8 @@ const InsuranceFromMobile = ({
     setChosing,
     handleNext,
     setShowDetails,
+    setP_claim,
+    setP_market,
 }: IProps) => {
     const router = useRouter()
     const { width, height } = useWindowSize()
@@ -143,26 +147,26 @@ const InsuranceFromMobile = ({
                             className="z-1 !w-max text-redPrimary"
                             onClick={() => {
                                 setOpenChangeToken(true)
-                                tmp_q_covered.current = q_covered.current
+                                tmp_q_covered.current = q_covered
                             }}
                         >
                             {' '}
                             {width && width < 513 && width >= 437 && <br />}
-                            {q_covered.current}{' '}
+                            {q_covered}{' '}
                         </span>
                     </label>
                     <span
                         className="text-redPrimary z-1"
                         onClick={() => {
                             setOpenChangeToken(true)
-                            tmp_q_covered.current = q_covered.current
+                            tmp_q_covered.current = q_covered
                         }}
                     >
                         {selectCoin?.type}{' '}
                     </span>
-                    {p_claim.current > 0 && (
+                    {p_claim > 0 && (
                         <>
-                            {t('insurance:buy_mobile:at')} <span className="text-redPrimary">${p_claim.current} </span>
+                            {t('insurance:buy_mobile:at')} <span className="text-redPrimary">${p_claim} </span>
                             {tab != 1 && '?'}
                         </>
                     )}
@@ -174,15 +178,15 @@ const InsuranceFromMobile = ({
                                     <span
                                         onClick={() => {
                                             setShowInput({ isShow: true, name: 'margin' })
-                                            tmp_margin.current = margin.current
+                                            tmp_margin.current = margin
                                         }}
                                     >
-                                        {margin.current && margin.current}{' '}
+                                        {margin && margin}{' '}
                                     </span>
                                     <span
                                         onClick={() => {
                                             setShowInput({ isShow: true, name: 'margin' })
-                                            tmp_margin.current = margin.current
+                                            tmp_margin.current = margin
                                         }}
                                     >
                                         {unitMoney}
@@ -303,11 +307,11 @@ const InsuranceFromMobile = ({
                             onBackdropCb={() => {
                                 setShowInput({ ...showInput, isShow: false, name: '' })
                                 if (showInput.name == 'q_covered') {
-                                    q_covered.current = tmp_q_covered.current
+                                    q_covered = tmp_q_covered.current
                                     percentInsurance.current = 0
                                 }
                                 if (showInput.name == 'margin') {
-                                    margin.current = tmp_margin.current
+                                    margin = tmp_margin.current
                                     percentMargin.current = 0
                                 }
                             }}
@@ -327,7 +331,7 @@ const InsuranceFromMobile = ({
                                         <div className={`flex justify-between border-collapse rounded-[3px] shadow-none w-full mb-[0.5rem]`}>
                                             <InputNumber
                                                 validator={validator(`q_covered`)}
-                                                value={q_covered.current}
+                                                value={q_covered}
                                                 onChange={(e: any) => onHandleChange('q_covered', e)}
                                                 decimal={decimalList.decimal_q_covered}
                                             />
@@ -338,7 +342,7 @@ const InsuranceFromMobile = ({
                                         <div className={`flex justify-between border-collapse rounded-[3px] shadow-none w-full mb-[0.5rem]`}>
                                             <InputNumber
                                                 validator={validator(`margin`)}
-                                                value={margin.current}
+                                                value={margin}
                                                 onChange={(e: any) => onHandleChange('margin', e)}
                                                 decimal={decimalList.decimal_margin}
                                             />
@@ -533,18 +537,16 @@ const InsuranceFromMobile = ({
                             <div className={'flex flex-row relative'}>
                                 <Suspense fallback={`Loading...`}>
                                     <ChartComponent
-                                        width={358}
                                         height={252}
                                         data={dataChart}
                                         state={{
-                                            period: period.current,
-                                            q_covered: q_covered.current,
-                                            margin: margin.current,
-                                            p_claim: p_claim.current,
-                                            p_market: p_market.current,
+                                            period: period,
+                                            q_covered: q_covered,
+                                            margin: margin,
+                                            p_claim: p_claim,
+                                            p_market: p_market,
                                         }}
-                                        setP_Claim={(data: number) => (p_claim.current = data)}
-                                        setP_Market={(data: number) => (p_market.current = data)}
+                                        setP_Claim={(data: number) => onHandleChange('p_claim', data)}
                                         isMobile={isMobile as boolean}
                                         resolution={selectTime!}
                                     ></ChartComponent>
@@ -587,7 +589,7 @@ const InsuranceFromMobile = ({
                                 <InputNumber
                                     className="mt-2"
                                     validator={validator('p_claim')}
-                                    value={p_claim.current}
+                                    value={p_claim}
                                     onChange={(e: any) => onHandleChange('p_claim', e)}
                                     customSuffix={() => unitMoney}
                                     suffixClassName="text-txtSecondary"
@@ -610,7 +612,7 @@ const InsuranceFromMobile = ({
                             <div ref={table} className="overflow-auto hide-scroll scroll-table">
                                 <div ref={container} className={`hide-scroll flex flex-row justify-between mt-[1rem]  ${isMobile ? 'w-full' : 'w-[85%]'} `}>
                                     {listTabPeriod.map((item, key) => {
-                                        if (item == period.current || item <= item + 6)
+                                        if (item == period || item <= item + 6)
                                             return (
                                                 <div
                                                     key={key}
@@ -703,7 +705,7 @@ const InsuranceFromMobile = ({
                                                 </div>
                                             </div>
                                             <div className={'font-semibold flex flex-row hover:cursor-pointer'}>
-                                                {margin.current > 0 ? Number(margin.current.toFixed(decimalList.decimal_margin)) : 0}
+                                                {margin > 0 ? Number(margin.toFixed(decimalList.decimal_margin)) : 0}
 
                                                 <span
                                                     className={'text-red pl-[0.5rem]'}

@@ -80,13 +80,13 @@ const InsuranceFrom = () => {
         type: '',
         disable: false,
     })
-    const margin = useRef<number>(0)
+    const [margin, setMargin] = useState<number>(0)
     const [period, setPeriod] = useState<number>(0)
-    const p_claim = useRef<number>(0)
+    const [p_claim, setP_claim] = useState<number>(0)
+    const [q_covered, setQ_covered] = useState<number>(0)
+    const [p_market, setP_market] = useState<number>(0)
     const q_claim = useRef<number>(0)
     const r_claim = useRef<number>(0)
-    const q_covered = useRef<number>(0)
-    const p_market = useRef<number>(0)
     const p_expired = useRef<number>(0)
 
     const [rangeP_claim, setRangeP_claim] = useState({
@@ -186,23 +186,23 @@ const InsuranceFrom = () => {
     }, [pair_configs, selectCoin, account, p_market, userBalance])
 
     useEffect(() => {
-        if (!q_covered.current || q_covered.current == 0 || !p_claim.current || p_claim.current == 0) {
+        if (!q_covered || q_covered == 0 || !p_claim || p_claim == 0) {
             setSaved(0)
             p_expired.current = 0
             q_claim.current = 0
             r_claim.current = 0
-            margin.current = 0
+            setMargin(0)
         } else {
             if (tab == 0) {
-                const res = getInfoCoveredDefault(p_market.current, q_covered.current, p_claim.current, decimalList, default_r_claim)
+                const res = getInfoCoveredDefault(p_market, q_covered, p_claim, decimalList, default_r_claim)
                 if (res) {
                     p_expired.current = res?.p_expired
                     q_claim.current = res?.q_claim
                     r_claim.current = res?.r_claim
-                    margin.current = res?.margin
+                    setMargin(res?.margin)
                 }
             } else {
-                const result = getInfoCoveredCustom(margin.current, q_covered.current, p_claim.current, p_market.current, decimalList, default_r_claim)
+                const result = getInfoCoveredCustom(margin, q_covered, p_claim, p_market, decimalList, default_r_claim)
                 if (result) {
                     p_expired.current = result?.p_expired
                     q_claim.current = result?.q_claim
@@ -214,20 +214,20 @@ const InsuranceFrom = () => {
 
     const loadData = async () => {
         if (pair_configs && selectCoin && account && p_market) {
-            if (pair_configs && p_market.current) {
+            if (pair_configs && p_market) {
                 if (!Config.web3.account) {
                     setUserBalance(0)
                     percentInsurance.current = 0
                     percentMargin.current = 0
 
-                    await setDefaultValue(0, p_market.current, pair_configs.filters, default_period)
+                    await setDefaultValue(0, p_market, pair_configs.filters, default_period)
                         .then(async (res) => {
                             const _res = await res
                             if (_res) {
-                                q_covered.current = _res?.q_covered
-                                margin.current = _res?.margin
+                                setQ_covered(_res?.q_covered)
+                                setMargin(_res?.margin)
                                 setPeriod(_res?.period)
-                                p_claim.current = _res?.p_claim
+                                setP_claim(_res?.p_claim)
                             }
                         })
                         .finally(() => setFirst(false))
@@ -236,13 +236,13 @@ const InsuranceFrom = () => {
                         .then(async (res) => {
                             const balance = await res
                             if (balance) {
-                                await setDefaultValue(balance, p_market.current, pair_configs.filters, default_period).then(async (e) => {
+                                await setDefaultValue(balance, p_market, pair_configs.filters, default_period).then(async (e) => {
                                     const value = await e
                                     if (value) {
-                                        q_covered.current = value.q_covered
-                                        margin.current = value.margin
+                                        setQ_covered(value.q_covered)
+                                        setMargin(value.margin)
                                         setPeriod(value.period)
-                                        p_claim.current = value.p_claim
+                                        setP_claim(value.p_claim)
                                     }
                                 })
                             }
@@ -250,12 +250,12 @@ const InsuranceFrom = () => {
                         .then(async () => {
                             if (tab === 0) {
                                 const timeout_getData = setTimeout(() => {
-                                    const res = getInfoCoveredDefault(p_market.current, q_covered.current, p_claim.current, decimalList, default_r_claim)
+                                    const res = getInfoCoveredDefault(p_market, q_covered, p_claim, decimalList, default_r_claim)
                                     if (res) {
                                         p_expired.current = res?.p_expired
                                         q_claim.current = res?.q_claim
                                         r_claim.current = res?.r_claim
-                                        margin.current = res?.margin!
+                                        setMargin(res?.margin)
                                     }
                                     createSaved()
                                     clear.current = handleCheckFinal()
@@ -265,14 +265,7 @@ const InsuranceFrom = () => {
                                 }, 500)
                             } else {
                                 const timeout_getData = setTimeout(() => {
-                                    const result = getInfoCoveredCustom(
-                                        margin.current,
-                                        q_covered.current,
-                                        p_claim.current,
-                                        p_market.current,
-                                        decimalList,
-                                        default_r_claim,
-                                    )
+                                    const result = getInfoCoveredCustom(margin, q_covered, p_claim, p_market, decimalList, default_r_claim)
                                     if (result) {
                                         p_expired.current = result?.p_expired
                                         q_claim.current = result?.q_claim
@@ -298,14 +291,14 @@ const InsuranceFrom = () => {
     }, [userBalance])
 
     const getDefaultValue = () => {
-        if (userBalance && p_market.current && pair_configs) {
-            setDefaultValue(userBalance, p_market.current, pair_configs.filters, default_period).then(async (e) => {
+        if (userBalance && p_market && pair_configs) {
+            setDefaultValue(userBalance, p_market, pair_configs.filters, default_period).then(async (e) => {
                 const value = await e
                 if (value) {
-                    q_covered.current = value.q_covered
-                    margin.current = value.margin
+                    setQ_covered(value.q_covered)
+                    setMargin(value.margin)
                     setPeriod(value.period)
-                    p_claim.current = value.p_claim
+                    setP_claim(value.p_claim)
                 }
             })
         }
@@ -319,7 +312,7 @@ const InsuranceFrom = () => {
         Emitter.on(PublicSocketEvent.FUTURES_TICKER_UPDATE + selectCoin?.symbol, (data) => {
             const pairPrice = FuturesMarketWatch.create(data)
             if (pairPrice?.lastPrice) {
-                p_market.current = +pairPrice?.lastPrice
+                setP_market(+pairPrice?.lastPrice)
             }
         })
 
@@ -335,13 +328,13 @@ const InsuranceFrom = () => {
     }, [q_covered, p_claim, p_market, margin])
 
     useEffect(() => {
-        if (tab === 0 && q_covered.current && p_claim.current && period) {
-            const res = getInfoCoveredDefault(p_market.current, q_covered.current, p_claim.current, decimalList, default_r_claim)
+        if (tab === 0 && q_covered && p_claim && period) {
+            const res = getInfoCoveredDefault(p_market, q_covered, p_claim, decimalList, default_r_claim)
             if (res) {
                 p_expired.current = res?.p_expired
                 q_claim.current = res?.q_claim
                 r_claim.current = res?.r_claim
-                margin.current = res?.margin
+                setMargin(res?.margin)
             }
         }
     }, [tab])
@@ -360,7 +353,7 @@ const InsuranceFrom = () => {
 
     const handleChangePeriod = (item: number) => {
         setPeriod(item)
-        changePeriod(item, margin.current, q_claim, r_claim, default_period.current, default_r_claim.current)
+        changePeriod(item, margin, q_claim, r_claim, default_period.current, default_r_claim.current)
     }
 
     const loadValidator = () => {
@@ -375,7 +368,7 @@ const InsuranceFrom = () => {
                     if (userBalance) {
                         const decimal = countDecimals(item.stepSize)
                         _decimalList.decimal_q_covered = +decimal
-                        const min_Market = +(min_notinal.current / p_market.current).toFixed(+decimal)
+                        const min_Market = +(min_notinal.current / p_market).toFixed(+decimal)
 
                         const max = Number(item?.maxQty) < userBalance ? Number(item?.maxQty) : userBalance
 
@@ -396,13 +389,13 @@ const InsuranceFrom = () => {
 
                     _decimalList.decimal_p_claim = +decimal_p_claim
 
-                    const min1 = p_market.current + (2 / 100) * p_market.current
-                    const max1 = p_market.current + (70 / 100) * p_market.current
+                    const min1 = p_market + (2 / 100) * p_market
+                    const max1 = p_market + (70 / 100) * p_market
 
-                    const min2 = p_market.current - (70 / 100) * p_market.current
-                    const max2 = p_market.current - (2 / 100) * p_market.current
+                    const min2 = p_market - (70 / 100) * p_market
+                    const max2 = p_market - (2 / 100) * p_market
 
-                    if (p_claim.current > p_market.current) {
+                    if (p_claim > p_market) {
                         setRangeP_claim({
                             ...rangeP_claim,
                             min: Number(min1),
@@ -420,13 +413,13 @@ const InsuranceFrom = () => {
                     const decimalMargin = countDecimals(item.stepSize)
                     _decimalList.decimal_margin = +decimalMargin
 
-                    const MIN = Number((q_covered.current * p_market.current * item.minQtyRatio).toFixed(Number(decimalMargin)))
-                    const MAX = Number((q_covered.current * p_market.current * item.maxQtyRatio).toFixed(Number(decimalMargin)))
+                    const MIN = Number((q_covered * p_market * item.minQtyRatio).toFixed(Number(decimalMargin)))
+                    const MAX = Number((q_covered * p_market * item.maxQtyRatio).toFixed(Number(decimalMargin)))
                     setRangeMargin({ ...rangeP_claim, min: MIN, max: MAX })
                 }
                 setDecimalList({ ..._decimalList })
                 setPercentPrice({ ..._percentPrice })
-                validateP_Claim(p_claim.current)
+                validateP_Claim(p_claim)
             })
         }
     }
@@ -495,16 +488,16 @@ const InsuranceFrom = () => {
     }
 
     const createSaved = () => {
-        if (q_covered.current <= 0 || p_claim.current <= 0) {
+        if (q_covered <= 0 || p_claim <= 0) {
             return setSaved(0)
         } else {
-            const y = q_covered.current * (p_claim.current - p_market.current)
-            const z = q_covered.current * Math.abs(p_claim.current - p_market.current)
+            const y = q_covered * (p_claim - p_market)
+            const z = q_covered * Math.abs(p_claim - p_market)
 
-            if (p_claim.current < p_market.current) {
-                setSaved(q_claim.current + y - margin.current + z)
+            if (p_claim < p_market) {
+                setSaved(q_claim.current + y - margin + z)
             } else {
-                setSaved(q_claim.current + y - margin.current)
+                setSaved(q_claim.current + y - margin)
             }
         }
     }
@@ -513,23 +506,22 @@ const InsuranceFrom = () => {
         const _rangeP_claim = rangeP_claim
 
         //Pm*multiplierDown/Up
-        const PmDown = p_market.current * percentPrice?.multiplierDown
-        const PmUp = p_market.current * percentPrice?.multiplierUp
+        const PmDown = p_market * percentPrice?.multiplierDown
+        const PmUp = p_market * percentPrice?.multiplierUp
         //+-2 -> +-70
-        const min1 = p_market.current + (2 / 100) * p_market.current
-        const max1 = p_market.current + (70 / 100) * p_market.current
+        const min1 = p_market + (2 / 100) * p_market
+        const max1 = p_market + (70 / 100) * p_market
 
-        const min2 = p_market.current - (70 / 100) * p_market.current
-        const max2 = p_market.current - (2 / 100) * p_market.current
-
-        if (p_claim.current < p_market.current) {
+        const min2 = p_market - (70 / 100) * p_market
+        const max2 = p_market - (2 / 100) * p_market
+        if (p_claim < p_market) {
             const min = min2 > PmDown ? PmDown : min2
             const max = max2 > PmUp ? PmUp : max2
             _rangeP_claim.min = +min.toFixed(decimalList.decimal_p_claim)
             _rangeP_claim.max = +max.toFixed(decimalList.decimal_p_claim)
             return setRangeP_claim({ ..._rangeP_claim })
         }
-        if (p_claim.current > p_market.current) {
+        if (p_claim > p_market) {
             const min = min1 > PmDown ? min1 : PmDown
             const max = max1 > PmUp ? max1 : PmUp
             _rangeP_claim.min = +min.toFixed(decimalList.decimal_p_claim)
@@ -544,13 +536,13 @@ const InsuranceFrom = () => {
         switch (key) {
             case 'q_covered':
                 rs.isValid = !(
-                    q_covered.current > Number(rangeQ_covered?.max?.toFixed(decimalList.decimal_q_covered)) ||
-                    q_covered.current < rangeQ_covered?.min ||
-                    q_covered.current <= 0
+                    q_covered > Number(rangeQ_covered?.max?.toFixed(decimalList.decimal_q_covered)) ||
+                    q_covered < rangeQ_covered?.min ||
+                    q_covered <= 0
                 )
                 rs.message = `<div class="flex items-center ">
                     ${
-                        q_covered.current > Number(rangeQ_covered?.max?.toFixed(decimalList.decimal_q_covered))
+                        q_covered > Number(rangeQ_covered?.max?.toFixed(decimalList.decimal_q_covered))
                             ? t('common:available', {
                                   value: `${Number(rangeQ_covered?.max?.toFixed(decimalList.decimal_q_covered))}`,
                               })
@@ -559,21 +551,21 @@ const InsuranceFrom = () => {
                 </div>`
                 break
             case 'p_claim':
-                rs.isValid = !(p_claim.current < rangeP_claim.min || p_claim.current > rangeP_claim.max)
+                rs.isValid = !(p_claim < rangeP_claim.min || p_claim > rangeP_claim.max)
                 rs.message = `<div class="flex items-center">
-                ${p_claim.current < p_market.current ? 'P-Claim < P-Market: ' : 'P-Claim > P-Market: '}
+                ${p_claim < p_market ? 'P-Claim < P-Market: ' : 'P-Claim > P-Market: '}
                   ${
-                      p_claim.current > Number(rangeP_claim.max)
+                      p_claim > Number(rangeP_claim.max)
                           ? t('common:max', { value: `${Number(rangeP_claim.max)}` })
                           : t('common:min', { value: `${Number(rangeP_claim.min)}` })
                   }
                   </div>`
                 break
             case 'margin':
-                rs.isValid = !(margin.current < Number(rangeMargin.min) || margin.current > Number(rangeMargin.max) || margin.current <= 0)
+                rs.isValid = !(margin < Number(rangeMargin.min) || margin > Number(rangeMargin.max) || margin <= 0)
                 rs.message = `<div class="flex items-center">
                 ${
-                    margin.current > Number(rangeMargin.max)
+                    margin > Number(rangeMargin.max)
                         ? t('common:max', { value: `${Number(rangeMargin.max)}` })
                         : t('common:min', { value: `${Number(rangeMargin.min)}` })
                 }
@@ -605,8 +597,8 @@ const InsuranceFrom = () => {
 
         if (userBalance > 0 && key === 'margin') {
             const percent2 = Number(rangeMargin.min)
-            const percent5 = Number((q_covered.current * p_market.current * 0.05).toFixed(decimalList.decimal_margin))
-            const percent7 = Number((q_covered.current * p_market.current * 0.07).toFixed(decimalList.decimal_margin))
+            const percent5 = Number((q_covered * p_market * 0.05).toFixed(decimalList.decimal_margin))
+            const percent7 = Number((q_covered * p_market * 0.07).toFixed(decimalList.decimal_margin))
             const percent10 = Number(rangeMargin.max)
             switch (value) {
                 case percent2:
@@ -660,8 +652,8 @@ const InsuranceFrom = () => {
 
         switch (key) {
             case 'q_covered':
-                q_covered.current = value
-                if (value == 0 || q_covered.current.toString().length > value.toString().length) {
+                setQ_covered(value)
+                if (value == 0 || q_covered.toString().length > value.toString().length) {
                     percentInsurance.current = 0
                 }
                 if (value > Number(rangeQ_covered?.max?.toFixed(decimalList.decimal_q_covered)) || value < rangeQ_covered.min || value <= 0) {
@@ -672,14 +664,13 @@ const InsuranceFrom = () => {
 
                 break
             case 'p_claim':
-                p_claim.current = value
-
+                setP_claim(value)
                 break
             case 'margin':
-                if (value == 0 || margin.current.toString().length > value.toString().length) {
+                if (value == 0 || margin.toString().length > value.toString().length) {
                     percentMargin.current = 0
                 }
-                margin.current = value
+                setMargin(value)
                 if (value < Number(rangeMargin.min) || value > Number(rangeMargin.max) || value <= 0) {
                     setIsCanSave(false)
                 } else {
@@ -695,7 +686,7 @@ const InsuranceFrom = () => {
     const handleCheckFinal = () => {
         if (account.address == null) {
             return false
-        } else if (q_covered.current <= 0 || margin.current <= 0 || p_claim.current <= 0) {
+        } else if (q_covered <= 0 || margin <= 0 || p_claim <= 0) {
             return false
         } else if (userBalance == null || userBalance == 0) {
             return false
@@ -708,15 +699,15 @@ const InsuranceFrom = () => {
         if (!account.address) {
             return
         }
-        if (q_covered.current > 0 && account.address) {
+        if (q_covered > 0 && account.address) {
             percentMargin.current = value
 
             if (value == 2) {
-                margin.current = rangeMargin.min
+                setMargin(rangeMargin.min)
             } else if (value == 10) {
-                margin.current = rangeMargin.max
+                setMargin(rangeMargin.max)
             } else {
-                margin.current = Number(((value / 100) * q_covered.current * p_market.current).toFixed(decimalList.decimal_margin))
+                setMargin(Number(((value / 100) * q_covered * p_market).toFixed(decimalList.decimal_margin)))
             }
         }
     }
@@ -724,11 +715,11 @@ const InsuranceFrom = () => {
     const updateFormQCovered = (data: number) => {
         percentInsurance.current = data
         if (data === 25) {
-            q_covered.current = Number((0.25 * userBalance).toFixed(decimalList.decimal_q_covered))
+            setQ_covered(Number((0.25 * userBalance).toFixed(decimalList.decimal_q_covered)))
         } else if (data === 100) {
-            q_covered.current = userBalance
+            setQ_covered(userBalance)
         } else {
-            q_covered.current = Number(((data / 100) * userBalance).toFixed(decimalList.decimal_q_covered))
+            setQ_covered(Number(((data / 100) * userBalance).toFixed(decimalList.decimal_q_covered)))
         }
     }
 
@@ -760,14 +751,14 @@ const InsuranceFrom = () => {
         const query = {
             r_claim: Number(r_claim.current),
             q_claim: Number(q_claim.current),
-            margin: Number(margin.current),
+            margin: Number(margin),
             period: Number(period),
             symbol: selectCoin?.type,
             unit: unitMoney,
-            p_claim: Number(p_claim.current),
+            p_claim: Number(p_claim),
             tab: tab,
-            q_covered: Number(q_covered.current),
-            p_market: Number(p_market.current),
+            q_covered: Number(q_covered),
+            p_market: Number(p_market),
             decimalList: { ...decimalList },
         }
         localStorage.setItem('info_covered_state', JSON.stringify(query))
@@ -862,6 +853,7 @@ const InsuranceFrom = () => {
                                 setChosing={setChosing}
                                 handleNext={handleNext}
                                 setShowDetails={setShowDetails}
+                                setP_market={setP_market}
                             />
                         </LayoutInsurance>
                     </>
@@ -902,6 +894,8 @@ const InsuranceFrom = () => {
                         setChosing={setChosing}
                         handleNext={handleNext}
                         setShowDetails={setShowDetails}
+                        setP_claim={setP_claim}
+                        setP_market={setP_market}
                     />
                 )
             ) : (
