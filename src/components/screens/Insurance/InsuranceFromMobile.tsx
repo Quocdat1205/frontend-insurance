@@ -118,7 +118,7 @@ const InsuranceFromMobile = ({
     const table = useRef<any>(null)
     const container = useRef<any>(null)
 
-    const ChartComponent = dynamic(() => import('components/screens/Insurance/ChartComponent'), {
+    const ChartComponent = dynamic(() => import('./ChartComponent'), {
         ssr: false,
         suspense: true,
     })
