@@ -397,7 +397,7 @@ const ConnectWalletModal = forwardRef(({ }: ConnectWalletModal, ref) => {
 
     const walletsFilter: Wallet[] = [
         { name: 'Metamask', icon: '/images/icons/ic_metamask.png', active: true, wallet: wallets.metaMask },
-        { name: 'Coinbase Wallet', icon: '/images/icons/ic_coinbase.png', active: true, wallet: wallets.coinbaseWallet },
+        { name: 'Coinbase Wallet', icon: '/images/icons/ic_coinbase.png', active: !isMobile, wallet: wallets.coinbaseWallet },
         { name: 'Trustwallet', icon: '/images/icons/ic_trustwallet.png', active: false, wallet: 'Trustwallet' },
         { name: t('common:other'), active: false, wallet: 'other' },
     ]
