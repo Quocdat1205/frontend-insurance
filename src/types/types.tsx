@@ -53,4 +53,5 @@ export interface PairConfig {
 
 export interface CountdownType {
     date: Date
+    onEnded?: () => void
 }

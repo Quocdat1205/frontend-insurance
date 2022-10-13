@@ -224,7 +224,7 @@ export const scrollToElement = (id: string) => {
     section?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-export const Countdown = ({ date }: CountdownType) => {
+export const Countdown = ({ date, onEnded }: CountdownType) => {
     const timer = useRef<any>(null)
     const [count, setCount] = useState({
         days: 0,
@@ -245,9 +245,11 @@ export const Countdown = ({ date }: CountdownType) => {
         setCount({ days, hours, minutes, seconds })
         if (distance < 0) {
             clearInterval(timer.current)
+            setCount({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+            if (onEnded) onEnded()
         }
     }
-    
+
     useEffect(() => {
         if (!date) return
         timer.current = setInterval(() => {

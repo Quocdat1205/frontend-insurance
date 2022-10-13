@@ -274,10 +274,17 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
         )
     }
 
+    const onEnded = (e: any) => {
+        if (e?.row?.original?.state === stateInsurance.EXPIRED) return
+        const _dataSource = [...dataSource?.insurance]
+        _dataSource[e?.row?.index].state = stateInsurance.EXPIRED
+        setDataSource({ ...dataSource, insurance: _dataSource })
+    }
+
     const renderPeriod = (e: any) => {
         return (
             <div className="text-red">
-                <Countdown date={e.row.original.expired} />
+                <Countdown date={e.row.original.expired} onEnded={() => onEnded(e)} />
             </div>
         )
     }
@@ -371,7 +378,7 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
                 minWidth: 150,
             },
         ],
-        [assetsToken, unitConfig],
+        [assetsToken, unitConfig, dataSource],
     )
 
     const renderContentPicker = () => {
@@ -434,6 +441,7 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
                 filter={filter}
                 setFilter={setFilter}
                 dataSource={dataSource}
+                setDataSource={setDataSource}
                 total={dataSource?.count ?? 0}
                 asset={asset}
                 setAsset={setAsset}

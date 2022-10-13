@@ -127,7 +127,7 @@ const InsuranceHistory = () => {
                     {((account?.address && hasInsurance) || showGuide) && (
                         <Statistics account={account?.address} hasInsurance={hasInsurance} unitConfig={unitConfig} />
                     )}
-                    <CardShadow mobileNoShadow className="lg:mt-12 lg:p-8">
+                    <CardShadow mobileNoShadow className="md:mt-12 md:p-8">
                         <InsuranceContract
                             hasInsurance={hasInsurance}
                             setHasInsurance={setHasInsurance}

@@ -15,6 +15,7 @@ interface InsuranceContractMobile {
     filter: any
     setFilter: (e: any) => void
     dataSource: any
+    setDataSource: (e: any) => void
     renderStatus: any
     total: number
     assetsToken: any[]
@@ -40,6 +41,7 @@ interface InsuranceContractMobile {
 const InsuranceContractMobile = ({
     filter,
     dataSource,
+    setDataSource,
     renderStatus,
     total,
     assetsToken,
@@ -69,6 +71,13 @@ const InsuranceContractMobile = ({
     const onShowStatusModal = (item: any) => {
         rowData.current = item
         setShowStatusModal(true)
+    }
+
+    const onEnded = (item: any, index: number) => {
+        if (item?.state === stateInsurance.EXPIRED) return
+        const _dataSource = [...dataSource?.insurance]
+        _dataSource[index].state = stateInsurance.EXPIRED
+        setDataSource({ ...dataSource, insurance: _dataSource })
     }
 
     const labelFilter: any = useMemo(() => {
@@ -209,7 +218,7 @@ const InsuranceContractMobile = ({
                                 <div className="flex items-center justify-center space-x-2 bg-pink-1 rounded-md">
                                     <AlarmIcon />
                                     <span className="text-xs text-red font-semibold py-2 lowercase">
-                                        <Countdown date={item.expired} />
+                                        <Countdown date={item.expired} onEnded={() => onEnded(item, index)} />
                                     </span>
                                 </div>
                                 <div className="flex justify-between flex-wrap">
