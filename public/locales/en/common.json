@@ -167,5 +167,6 @@
     "ref_code": "Ref Code",
     "ref_link": "Ref Link",
     "submit": "Submit",
-    "retry": "Retry"
+    "retry": "Retry",
+    "input_ref_code": "Enter Ref Code"
 }
