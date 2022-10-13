@@ -655,7 +655,7 @@ const AcceptBuyInsurance = () => {
                                             containerClassName="justify-between"
                                             labelClassName="text-base w-full"
                                             inputClassName="!h-6 font-semibold text-right text-red text-base"
-                                            placeholder="Nhập mã giới thiệu tại đây"
+                                            placeholder={t('common:input_ref_code')}
                                             validator={refError}
                                             value={refCode}
                                             onChange={(e: any) => {
@@ -904,7 +904,7 @@ const AcceptBuyInsurance = () => {
                                         containerClassName="justify-between"
                                         labelClassName="text-base w-full"
                                         inputClassName="!h-6 font-semibold text-right text-red text-base"
-                                        placeholder="Nhập mã giới thiệu tại đây"
+                                        placeholder={t('common:input_ref_code')}
                                         validator={refError}
                                         value={refCode}
                                         onChange={(e: any) => {
