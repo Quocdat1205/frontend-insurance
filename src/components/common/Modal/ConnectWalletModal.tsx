@@ -334,17 +334,15 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     const onConfirm = async () => {
         firstTime.current = false
         logged.current = true
+        const refCode = localStorage.getItem('REF_CODE')
+        const params = refCode ? `?ref=${refCode}` : ''
         switch (wallet?.wallet) {
             case wallets.metaMask:
                 if (isMobile) {
                     if (!Config.isMetaMaskInstalled) {
-                        const refCode = localStorage.getItem('REF_CODE')
-                        window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}?ref=${refCode}`)
+                        window.open(`https://metamask.app.link/dapp/${Config.env.APP_URL}${params}`)
                         return
                     }
-                    await Config.web3?.activate(wallets.metaMask, null, () => {
-                        onLogin()
-                    })
                 } else {
                     if (!Config.isMetaMaskInstalled) {
                         setInstaller(true)
@@ -356,7 +354,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 const provider = getKeyMap((window as any).ethereum, 'CoinbaseWallet')
                 if (isMobile) {
                     if (!provider?.isCoinbaseWallet) {
-                        window.open(`https://go.cb-w.com/dapp?cb_url=${Config.env.APP_URL}`)
+                        window.open(`https://go.cb-w.com/dapp?cb_url=${'http://192.168.1.35:3000/'}${params}`)
                         return
                     }
                 } else {
@@ -372,14 +370,9 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
         if (wallet?.wallet) sessionStorage.setItem('PUBLIC_WALLET', wallet?.wallet)
         setErrorConnect(false)
         setLoading(true)
-        if (!isMobile)
-            await Config.web3?.activate(
-                wallet?.wallet,
-                wallet?.wallet === wallets.metaMask || wallet?.wallet === wallets.walletConnect ? null : Config.chains[0],
-                () => {
-                    onLogin()
-                },
-            )
+        await Config.web3?.activate(wallet?.wallet, wallet?.wallet === wallets.metaMask ? null : Config.chains[0], () => {
+            onLogin()
+        })
     }
 
     const onCancel = () => {
@@ -409,7 +402,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
     const walletsFilter: Wallet[] = [
         { name: 'Metamask', icon: '/images/icons/ic_metamask.png', active: true, wallet: wallets.metaMask },
         { name: 'Coinbase Wallet', icon: '/images/icons/ic_coinbase.png', active: true, wallet: wallets.coinbaseWallet },
-        { name: 'Wallet Connect', icon: '/images/icons/ic_walletconnect.png', active: true, wallet: wallets.walletConnect },
+        { name: 'Wallet Connect', icon: '/images/icons/ic_walletconnect.png', active: false, wallet: wallets.walletConnect },
         { name: 'Trustwallet', icon: '/images/icons/ic_trustwallet.png', active: false, wallet: 'Trustwallet' },
         { name: t('common:other'), active: false, wallet: 'other' },
     ]
