@@ -22,7 +22,7 @@ const Notifications = () => {
     const unitConfig: UnitConfig = useAppSelector((state: RootStore) => getUnit(state, 'USDT'))
     const { t } = useTranslation()
     const { width } = useWindowSize()
-    const isMobile = (width && width < screens.drawer) && mobile
+    const isMobile = width && width < screens.drawer && mobile
     const [visible, setVisible] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(true)
     const [isLoadMore, setIsLoadMore] = useState<boolean>(false)
@@ -85,6 +85,10 @@ const Notifications = () => {
                     _id: id,
                 },
             })
+            const dataFilter = dataSource.list_notice.filter((rs: any) => !rs.isConfirm)
+            if (dataFilter.length <= 1) {
+                setHasNotice(false)
+            }
         } catch (e) {
             console.log(e)
         } finally {
@@ -97,7 +101,7 @@ const Notifications = () => {
                 url: API_GET_NOTICE,
                 options: { method: 'GET' },
                 params: {
-                    owner: account,
+                    owner: account?.address,
                     ...filter.current,
                 },
             })
@@ -195,7 +199,7 @@ const Notifications = () => {
             <NotiDetailModal isMobile={isMobile} data={rowData.current} visible={showNotiDetail} onClose={() => setShowNotiDetail(false)} t={t} />
             <div onClick={() => setVisible(true)} className="p-2 sm:p-0 hover:bg-hover rounded-[3px] relative">
                 <NotificationsIcon />
-                {hasNotice && <div className="bg-red w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[50%] absolute top-[30%] right-[20%] sm:right-[30%]" />}
+                {hasNotice && <div className="bg-red w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[50%] absolute top-[20%] right-[20%]" />}
             </div>
             {isMobile ? (
                 <Modal
@@ -254,7 +258,7 @@ const Notifications = () => {
 
 const NotiDetailModal = ({ visible, onClose, data, t, isMobile }: any) => {
     return (
-        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} className={'max-w-[424px]'}>
+        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} className={'sm:max-w-[424px]'}>
             <div className="overflow-hidden relative sm:-mx-6"> {renderContentStatus(data, t)}</div>
         </Modal>
     )

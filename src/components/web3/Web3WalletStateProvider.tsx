@@ -30,7 +30,7 @@ const useWeb3WalletState = (
     }
 
     const initConfig = async (connector: any, wallet: ConnectorId, cb?: () => void) => {
-        const chainId = Number(connector?.provider?.chainId ?? (window as any).ethereum?.providers[0]?.getChainId())
+        const chainId = Number(connector?.provider?.chainId ?? (window as any).ethereum?.providers?.[0]?.getChainId() ?? Config.chains[0])
         if (!connector.provider) {
             await connector.activate(chainId || getAddChainParameters(chainId))
         }

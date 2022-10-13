@@ -78,7 +78,7 @@ const GlossaryModal = ({ visible, onClose }: GlossaryModal) => {
     }, [])
 
     return (
-        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'lg:max-w-[600px]'} containerClassName="z-[999]">
+        <Modal isMobile={isMobile} isVisible={visible} onBackdropCb={onClose} wrapClassName="!p-6" className={'lg:max-w-[600px]'} containerClassName="z-[99999999]">
             <div className="text-xl font-medium mb-6 sm:mb-8 sm:text-center">{t('insurance:guild:the_glossary')}</div>
 
             <Tabs tab={tab} className="mb-6 text-sm">
