@@ -137,10 +137,10 @@ const InsuranceFrom = () => {
         if (loadings && isMobile) {
             const timeout_guiled = setTimeout(() => {
                 setShowGuide(true)
-                return () => {
-                    clearTimeout(timeout_guiled)
-                }
             }, 500)
+            return () => {
+                clearTimeout(timeout_guiled)
+            }
         }
     }, [loadings])
 
@@ -179,10 +179,10 @@ const InsuranceFrom = () => {
             } else {
                 getBalaneToken(selectCoin?.type)
             }
-            return () => {
-                clearTimeout(first_timeout)
-            }
         }, 1000)
+        return () => {
+            clearTimeout(first_timeout)
+        }
     }, [pair_configs, selectCoin, account, p_market, userBalance])
 
     useEffect(() => {
@@ -321,6 +321,10 @@ const InsuranceFrom = () => {
             Emitter.off(PublicSocketEvent.FUTURES_TICKER_UPDATE)
         }
     }
+
+    useEffect(() => {
+        refreshApi(selectTime, selectCoin)
+    }, [selectTime])
 
     useEffect(() => {
         createSaved()

@@ -147,11 +147,7 @@ const ChartComponent = ({ data, setP_Claim, state, isMobile, height, resolution 
         timer.current = setTimeout(() => {
             InitChart(dataChart.current)
         }, 500)
-    }, [dataChart.current, state])
-
-    // useEffect(() => {
-    //     InitChart(dataChart.current)
-    // }, [data])
+    }, [dataChart.current, state?.p_claim, state?.p_expired, state?.p_expired])
 
     const InitChart = async (test_data: Idata[]) => {
         am4core.unuseTheme(am4themes_animated)
@@ -247,11 +243,11 @@ const ChartComponent = ({ data, setP_Claim, state, isMobile, height, resolution 
             bullet.circle.strokeWidth = 2
             bullet.circle.propertyFields.radius = '1'
 
-            if (state?.p_claim > 0) {
-                handleTrendLine(chart, state?.p_claim, state, resolution)
-            } else {
-                // handleTrendLine(chart, 0, state)
-            }
+            // if (state?.p_claim > 0) {
+            //     handleTrendLine(chart, state?.p_claim, state, resolution)
+            // } else {
+            //     // handleTrendLine(chart, 0, state)
+            // }
 
             // //Label bullet main
             let latitudeLabel = subSeries.bullets.push(new am4charts.LabelBullet())
@@ -287,7 +283,11 @@ const ChartComponent = ({ data, setP_Claim, state, isMobile, height, resolution 
                 //label expired
 
                 let expiredLabel = latitudeExpired.bullets.push(new am4charts.LabelBullet())
-                if (state?.p_claim && state?.q_covered) {
+                if (
+                    (state?.p_claim > state?.p_market * 1 + (2 * state?.p_market) / 100 &&
+                        state?.p_claim < state?.p_market * 1 + (70 * state?.p_market) / 100) ||
+                    (state?.p_claim > state?.p_market * 1 - (70 * state?.p_market) / 100 && state?.p_claim < state?.p_market * 1 - (2 * state?.p_market) / 100)
+                ) {
                     expiredLabel.label.html = `<div class="text-xs">P-Expired: $${state?.p_expired}</div>`
                 } else {
                     bulletExpired.disabled = true
