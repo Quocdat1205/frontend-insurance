@@ -3,6 +3,8 @@ import React, { ReactNode, useEffect, useMemo, useRef, useState, Fragment } from
 import styled from 'styled-components'
 import colors from 'styles/colors'
 import { isMobile } from 'react-device-detect'
+import useWindowSize from 'hooks/useWindowSize'
+import { screens } from 'utils/constants'
 
 interface Tabs {
     children: any
@@ -11,7 +13,8 @@ interface Tabs {
 const Tabs = ({ children, tab }: Tabs) => {
     const TabRef = useRef<any>(null)
     const [mount, setMount] = useState<boolean>(false)
-
+    const { width } = useWindowSize()
+    const mobile = width && width < 768 && isMobile
     useEffect(() => {
         setMount(true)
     }, [])
@@ -32,13 +35,13 @@ const Tabs = ({ children, tab }: Tabs) => {
         if (!mount) return null
         const el: any = document.querySelector('#tab-item-' + tab)
         return {
-            left: isMobile ? 0 : `${el?.offsetLeft}px`,
-            width: isMobile ? `calc(100% / ${children.length ?? 1})` : `${el?.offsetWidth}px` ?? '100%',
+            left: mobile ? 0 : `${el?.offsetLeft}px`,
+            width: mobile ? `calc(100% / ${children.length ?? 1})` : `${el?.offsetWidth}px` ?? '100%',
         }
     }, [tab, mount])
 
     return (
-        <Tab offset={offset} isMobile={isMobile} ref={TabRef} active={active}>
+        <Tab offset={offset} isMobile={mobile} ref={TabRef} active={active}>
             {children}
         </Tab>
     )
@@ -76,6 +79,5 @@ export const TabItem = styled.div.attrs<TabItem>(({ value }) => ({
     className: classnames('px-4 py-3 whitespace-nowrap text-center cursor-pointer w-full sm:w-max text-gray tab-item sm:px-12'),
     id: `tab-item-${value}`,
 }))<TabItem>``
-
 
 export default Tabs

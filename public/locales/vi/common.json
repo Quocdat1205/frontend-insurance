@@ -167,5 +167,6 @@
     "ref_code": "Mã giới thiệu",
     "ref_link": "Link giới thiệu",
     "submit": "Submit",
-    "retry": "Rút lại"
+    "retry": "Rút lại",
+    "input_ref_code": "Nhập mã giới thiệu"
 }

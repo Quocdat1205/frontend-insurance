@@ -65,7 +65,9 @@ const useWeb3WalletState = (
     }
 
     const getBalance = async () => {
-        const balance = provider && (await provider!.getBalance(account!).then((res) => parseFloat(ethers.utils.formatEther(res))))
+        const balance =
+            Config.web3?.provider &&
+            (await Config.web3?.provider!.getBalance(Config.web3?.account!).then((res: any) => parseFloat(ethers.utils.formatEther(res))))
         return balance
     }
 

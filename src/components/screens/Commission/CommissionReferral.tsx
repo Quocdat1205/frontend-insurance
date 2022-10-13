@@ -77,9 +77,9 @@ const CommissionReferral = ({ account, decimal = 2, commissionConfig, userInfo }
 
     return (
         <>
-            <div className="flex flex-col mb:flex-row items-center justify-between relative">
-                <div className="flex flex-col items-center text-center sm:text-left sm:items-start  max-w-[600px]">
-                    <div className="text-4xl mb:text-[3rem] mb:leading-[4rem] font-semibold" dangerouslySetInnerHTML={{ __html: t('commission:title') }}></div>
+            <div className="flex flex-col mb:flex-row items-center justify-between relative md:space-x-8">
+                <div className="flex flex-col items-center text-center sm:text-left sm:items-start max-w-[600px]">
+                    <div className="text-4xl mb:text-[3rem] mb:leading-[4rem] font-semibold xl:whitespace-nowrap" dangerouslySetInnerHTML={{ __html: t('commission:title') }}></div>
                     <div className="mt-4 text-sm sm:text-base">{t('commission:description')}</div>
                     {!account?.address && (
                         <Button onClick={onConnectWallet} className="px-6 py-3 w-max mt-8">
@@ -92,7 +92,7 @@ const CommissionReferral = ({ account, decimal = 2, commissionConfig, userInfo }
                 </div>
             </div>
             {account?.address && (
-                <div className="border border-red shadow-dropdown rounded-xl p-4 sm:p-6 flex flex-col lg:flex-row flex-wrap lg:flex-nowrap md:items-center mt-8">
+                <div className="border border-red shadow-dropdown rounded-xl p-4 sm:p-6 flex flex-col md:flex-row flex-wrap lg:flex-nowrap md:items-center mt-8">
                     <div className="flex flex-col space-y-2 mr-8">
                         <div className="text-txtSecondary text-sm md:text-base">{t('common:ref_code')}</div>
                         <div className="flex items-center space-x-4">
@@ -133,7 +133,7 @@ const CommissionReferral = ({ account, decimal = 2, commissionConfig, userInfo }
                             )}
                         </div>
                     </div>
-                    <div className="bg-hover rounded-xl p-4 mt-6 lg:mt-0 ml-0 lg:ml-11 xl:ml-20 sm:min-w-[390px] w-full">
+                    <div className="bg-hover rounded-xl p-4 mt-6 lg:mt-0 ml-0 lg:ml-11 xl:ml-20 xl:min-w-[390px] w-full">
                         <div className="text-txtSecondary text-sm sm:text-base mb-2">{t('commission:current_rate')}</div>
                         <div className="flex items-center space-x-4 md:space-x-8">
                             <div className="text-xl sm:text-5xl font-medium sm:font-semibold text-red">
