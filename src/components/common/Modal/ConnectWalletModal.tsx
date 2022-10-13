@@ -354,7 +354,7 @@ const ConnectWalletModal = forwardRef(({}: ConnectWalletModal, ref) => {
                 const provider = getKeyMap((window as any).ethereum, 'CoinbaseWallet')
                 if (isMobile) {
                     if (!provider?.isCoinbaseWallet) {
-                        window.open(`https://go.cb-w.com/dapp?cb_url=${'http://192.168.1.35:3000/'}${params}`)
+                        window.open(`https://go.cb-w.com/dapp?cb_url=${Config.env.APP_URL}${params}`)
                         return
                     }
                 } else {
