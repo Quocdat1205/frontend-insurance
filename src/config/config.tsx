@@ -2,6 +2,7 @@ import { DisconnectIcon, EmailIcon, HistoryIcon, UserIcon } from 'components/com
 import { BasicChainInformation, ExtendedChainInformation, wallets } from 'components/web3/Web3Types'
 import env from 'config/env'
 import { ConnectWalletType, Toast } from 'types/types'
+import { isMobile } from 'react-device-detect'
 
 class Config {
     static env = env
@@ -17,7 +18,21 @@ class Config {
         expire: number | null
     } = { token: null, expire: null }
 
-    static web3: any
+    static web3: {
+        [x: string]: any
+        account: string
+        switchNetwork: any
+        chain: any
+        activate: any
+        deactivate: any
+        isActive: boolean
+        error: any
+        connector: any
+        provider: any
+        contractCaller: any
+        getBalance: any
+        useErrorCoinbase: any
+    }
 
     static refConnectWallet: ConnectWalletType
 
@@ -81,6 +96,9 @@ class Config {
         sessionStorage.removeItem('PUBLIC_ADDRESS')
         sessionStorage.removeItem('PUBLIC_TOKEN')
         sessionStorage.removeItem('PUBLIC_WALLET')
+        sessionStorage.removeItem('PUBLIC_CHAINID')
+        localStorage.removeItem('walletconnect')
+        if (!isMobile) window.location.reload()
     }
 
     static MODAL_REGISTER_EMAIL = 'registerEmail'

@@ -6,8 +6,9 @@ import numeral from 'numeral'
 import { createSelector } from 'reselect'
 import Config from 'config/config'
 import { RootStore } from 'redux/store'
-import { PairConfig, UnitConfig } from 'types/types'
+import { PairConfig, UnitConfig, CountdownType } from 'types/types'
 import { stateInsurance } from './constants'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 export const getS3Url = (url: string) => Config.env.CDN + url
 
@@ -221,4 +222,47 @@ export const formatAddress = (wallet: string, start: number = 10, end: number = 
 export const scrollToElement = (id: string) => {
     const section = document.getElementById(`${id}`)
     section?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+export const Countdown = ({ date, onEnded }: CountdownType) => {
+    const timer = useRef<any>(null)
+    const [count, setCount] = useState({
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+    })
+
+    const startCountDown = (date: Date) => {
+        if (!date) return
+        const countDownDate = new Date(date).getTime()
+        const now = new Date().getTime()
+        const distance = countDownDate - now
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000)
+        setCount({ days, hours, minutes, seconds })
+        if (distance < 0) {
+            clearInterval(timer.current)
+            setCount({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+            if (onEnded) onEnded()
+        }
+    }
+
+    useEffect(() => {
+        if (!date) return
+        timer.current = setInterval(() => {
+            startCountDown(date)
+        }, 1000)
+        return () => {
+            clearInterval(timer.current)
+        }
+    }, [date])
+
+    return (
+        <>
+            {count?.days}D {count?.hours}:{count?.minutes}:{count?.seconds}
+        </>
+    )
 }

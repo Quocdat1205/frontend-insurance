@@ -139,12 +139,12 @@ const TransactionsTab = ({ account, unitConfig, doReload }: TransactionsTab) => 
 
     return (
         <>
-            <div className="text-xl font-medium mb-6 hidden sm:flex">Lịch sử giao dịch</div>
+            <div className="text-xl font-medium mb-6 hidden sm:flex"> {t('commission:history:title')}</div>
             {(dataSource?.listHistory.length <= 0 || !account.address) && !loading ? (
                 <NoData
                     className="py-20"
                     showButton={!account.address}
-                    textContent={!account.address ? t('commisson:history:commission_history_nodata') : 'Không có dữ liệu để hiển thị'}
+                    textContent={!account.address ? t('commission:history:commission_history_nodata') : t('common:no_data')}
                     onClick={() => Config.connectWallet()}
                 />
             ) : !isMobile ? (

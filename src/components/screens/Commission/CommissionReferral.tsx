@@ -25,6 +25,12 @@ const CommissionReferral = ({ account, decimal = 2, commissionConfig, userInfo }
         setCopy('')
     }, [account])
 
+    useEffect(() => {
+        if (copy === 'ref_code' || copy === 'ref_link') {
+            setTimeout(() => setCopy(''), 5000)
+        }
+    }, [copy])
+
     const getCommissionRatio = (totalMargin: number) => {
         let percent = 0,
             limit = 0,
@@ -86,11 +92,11 @@ const CommissionReferral = ({ account, decimal = 2, commissionConfig, userInfo }
                 </div>
             </div>
             {account?.address && (
-                <div className="border border-red shadow-dropdown rounded-xl p-4 sm:p-6 flex flex-col md:flex-row flex-wrap lg:flex-nowrap md:items-center mt-8">
+                <div className="border border-red shadow-dropdown rounded-xl p-4 sm:p-6 flex flex-col lg:flex-row flex-wrap lg:flex-nowrap md:items-center mt-8">
                     <div className="flex flex-col space-y-2 mr-8">
-                        <div className="text-txtSecondary text-sm sm:text-base">{t('common:ref_code')}</div>
+                        <div className="text-txtSecondary text-sm md:text-base">{t('common:ref_code')}</div>
                         <div className="flex items-center space-x-4">
-                            <span className="text-red font-medium text-xl sm:text-4xl">{account?.myRef}</span>
+                            <span className="text-red font-medium text-xl md:text-4xl">{account?.myRef}</span>
                             {copy === 'ref_code' ? (
                                 <CheckedIcon size={width && width < 640 ? 18 : 22} className="min-w-[22px]" />
                             ) : (
@@ -127,7 +133,7 @@ const CommissionReferral = ({ account, decimal = 2, commissionConfig, userInfo }
                             )}
                         </div>
                     </div>
-                    <div className="bg-hover rounded-xl p-4 mt-6 lg:mt-0 lg:ml-20 sm:min-w-[390px] w-full">
+                    <div className="bg-hover rounded-xl p-4 mt-6 lg:mt-0 ml-0 lg:ml-11 xl:ml-20 sm:min-w-[390px] w-full">
                         <div className="text-txtSecondary text-sm sm:text-base mb-2">{t('commission:current_rate')}</div>
                         <div className="flex items-center space-x-4 md:space-x-8">
                             <div className="text-xl sm:text-5xl font-medium sm:font-semibold text-red">

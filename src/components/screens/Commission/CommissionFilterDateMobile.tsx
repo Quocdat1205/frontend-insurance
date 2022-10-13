@@ -114,7 +114,17 @@ const CommissionFilterDateMobile = (props: InsuranceFilterMobile) => {
                         </div>
                     </div>
                     <div className="w-full !mt-0">
-                        <div className="flex items-center justify-between flex-wrap w-full">
+                        <div
+                            className=""
+                            style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, [col-start] minmax(100px, 1fr) [col-end])',
+                                justifyContent: ' space-between',
+                                gridGap: '20px',
+                                justifyItems: 'center',
+                                alignItems: 'center',
+                            }}
+                        >
                             {days.map((item: any, index: number) => (
                                 <div
                                     key={index}
@@ -137,7 +147,7 @@ const CommissionFilterDateMobile = (props: InsuranceFilterMobile) => {
                         </div>
                     </div>
                 </div>
-                <div className={`mt-4 w-full rounded-[600px] bg-hover font-semibold ${datePicker?.startDate && `text-red bg-pink`} ${showPicker && 'hidden'}`}>
+                <div className={`mt-6 w-full rounded-[600px] bg-hover font-semibold ${datePicker?.startDate && `text-red bg-pink`} ${showPicker && 'hidden'}`}>
                     <div onClick={() => onAction('open')}>
                         <div className="flex items-center justify-center w-full px-4 h-9 sm:h-[3rem]">
                             <div className="flex items-center space-x-2">
@@ -160,7 +170,7 @@ const CommissionFilterDateMobile = (props: InsuranceFilterMobile) => {
                 </div>
                 <div className={`${showPicker ? 'translate-x-0 min-h-[360px]' : 'translate-x-full absolute'} mt-6 transition-all`}>
                     <div className={`${!showPicker ? 'translate-x-0' : '-translate-x-full absolute'} transition-all flex flex-col space-y-6`}></div>
-                    <div className="date-range-picker flex justify-center !bg-white">
+                    <div className="customDatePickerWidth date-range-picker w-full flex justify-center !bg-white">
                         <DateRangePicker
                             className="relative h-full"
                             ranges={[datePicker]}

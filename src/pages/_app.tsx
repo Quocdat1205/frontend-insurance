@@ -15,6 +15,7 @@ import vi from 'date-fns/locale/vi'
 import en from 'date-fns/locale/en-US'
 import { days, months } from 'utils/constants'
 import Container from 'components/layout/Container'
+import Config from 'config/config'
 
 vi.localize = {
     day: (n: number) => days[n]['vi'],
@@ -59,8 +60,16 @@ function MyApp({ Component, pageProps }: AppProps) {
 
     const config = {
         coinbaseWallet: {
-            url: 'https://mainet.infura.io/v3/f87b967bc65a41c0a1a25635493fa482',
+            url: Config.networks[Config.chains[0]].urls[0],
             appName: 'Nami Insurance',
+        },
+        walletConnect: {
+            rpc: {
+                1: 'https://mainnet.infura.io/v3/8e3937db21b341ceac1607d35ae551dd',
+                4: 'https://rinkeby.infura.io/v3/8e3937db21b341ceac1607d35ae551dd',
+                137: 'https://polygon-mainnet.infura.io/v3/8e3937db21b341ceac1607d35ae551dd',
+                80001: 'https://polygon-mainnet.infura.io/v3/8e3937db21b341ceac1607d35ae551dd',
+            },
         },
     }
 

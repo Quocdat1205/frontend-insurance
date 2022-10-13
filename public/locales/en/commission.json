@@ -1,30 +1,30 @@
 {
-    "title": "Refer friends <br/> Get rewards",
-    "description": "Earn up to 10% Margin-based reward when your friends make an insurance contract successfully",
-    "current_rate": "Current Commission Rate",
+    "title": "Refer Friends <br/> Get Rewards",
+    "description": "Earn up to 10% Margin-based reward when your friends make an insurance contract successfully.",
+    "current_rate": "Current Reward Rate",
     "reward_stats": "Reward Stats",
     "total_withdrawn_reward": "Total Withdrawn Reward",
     "total_available_reward": "Total Available Reward",
     "withdraw": "Withdraw",
-    "total_of_friends": "Total Of Friends",
+    "total_of_friends": "Total of friends",
     "Total_of_friends_margined": "Total of friends margined insurance contract",
     "friends": {
-        "title": "Friend list",
-        "friends_list_nodata": "Please connect Wallet to view your friends list",
-        "attached_on": "Ref code attached on",
+        "title": "Friend List",
+        "friends_list_nodata": "Please connect Wallet to view your friends list.",
+        "introduced_on": "Introduced On",
         "total_insurance_contract": "Total Insurance Contract",
         "total_margin": "Total Margin",
         "total_reward": "Total Reward",
         "wallet": "Wallet"
     },
     "history": {
-        "title": "Commission history",
-        "commission_history_nodata": "Please connect Wallet to view your Commission history",
+        "title": "Reward History",
+        "commission_history_nodata": "Please connect Wallet to view your reward history.",
         "receive_reward": "Receive Reward",
         "withdraw_reward": "Withdraw Reward"
     },
     "policy": {
-        "title": "Commisson Policy",
+        "title": "Commission Policy",
         "description": "For each successfully margined insurance contract referred by you, you will receive a commission rate according to the total Margin accumulated:",
         "total_margin": "Total Accumulated Margin",
         "reward_rate": "Reward Rate"
@@ -33,6 +33,7 @@
         "confirm_withdraw": "Confirm Reward Withdrawal",
         "are_you_sure": "Are you certain that you intend to withdraw {{value}}",
         "withdraw_failed": "Withdraw Failed",
-        "withdraw_successful": "Withdrawal request successfully processed"
+        "withdraw_successful": "Withdrawal request successfully processed",
+        "withdrawing": "Withdrawing"
     }
 }
