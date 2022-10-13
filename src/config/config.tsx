@@ -2,6 +2,7 @@ import { DisconnectIcon, EmailIcon, HistoryIcon, UserIcon } from 'components/com
 import { BasicChainInformation, ExtendedChainInformation, wallets } from 'components/web3/Web3Types'
 import env from 'config/env'
 import { ConnectWalletType, Toast } from 'types/types'
+import { isMobile } from 'react-device-detect'
 
 class Config {
     static env = env
@@ -95,7 +96,7 @@ class Config {
         sessionStorage.removeItem('PUBLIC_TOKEN')
         sessionStorage.removeItem('PUBLIC_WALLET')
         sessionStorage.removeItem('PUBLIC_CHAINID')
-        window.location.reload()
+        if (!isMobile) window.location.reload()
     }
 
     static MODAL_REGISTER_EMAIL = 'registerEmail'
