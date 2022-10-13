@@ -63,7 +63,7 @@ const Header = () => {
                 setShowModalSubscribe(true)
                 break
             case 'recent-transaction':
-                window.open(`${Config.env.BSC}/address/${contractAddress}?fromaddress=${account?.address}`)
+                window.open(`${Config.env.BSC}/address/${contractAddress}?fromaddress=${Config.web3.account}`)
                 break
             default:
                 break
