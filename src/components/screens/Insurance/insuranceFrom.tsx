@@ -460,31 +460,38 @@ const InsuranceFrom = () => {
 
     const setDataIcon = () => {
         const res = getStorage()
-        const tokenFilter = assetsToken.map((rs: any) => {
-            return {
-                icon: rs?.attachment,
-                id: rs?._id,
-                name: rs?.name,
-                symbol: `${rs?.symbol}USDT`,
-                type: rs?.symbol,
-                disable: !rs?.isActive,
+        const _list: any[] = assetsToken
+        _list.map((item: any, index: number) => {
+            if (item?.symbol === 'DAI') {
+                _list.splice(index, 1)
             }
         })
+        const tokenFilter: ICoin[] = _list.map((rs: any) => {
+            return {
+                icon: rs.attachment,
+                id: rs._id,
+                name: rs.name,
+                symbol: `${rs.symbol}USDT`,
+                type: rs.symbol,
+                disable: !rs.isActive,
+            }
+        })
+
         setListCoin(tokenFilter)
 
         const time = setTimeout(() => {
             if (res) {
                 if (!res.form_history) {
                     let itemFilter = tokenFilter.find((rs: any) => rs.type === res?.type)
-                    handleUpdateToken(itemFilter)
+                    handleUpdateToken(itemFilter!)
                 } else {
                     let itemFilter = tokenFilter.find((rs: any) => rs.type === res?.type)
-                    handleUpdateToken(itemFilter)
+                    handleUpdateToken(itemFilter!)
                     clear.current = false
                 }
             } else {
                 let itemFilter = tokenFilter.find((rs: any) => rs.type === 'BNB')
-                handleUpdateToken(itemFilter)
+                handleUpdateToken(itemFilter!)
             }
             loadValidator()
             clearTimeout(time)
@@ -764,6 +771,7 @@ const InsuranceFrom = () => {
             q_covered: Number(q_covered),
             p_market: Number(p_market),
             decimalList: { ...decimalList },
+            default_r_claim: default_r_claim,
         }
         localStorage.setItem('info_covered_state', JSON.stringify(query))
         return router.push('/buy-covered/info-covered')

@@ -128,9 +128,9 @@ const InsuranceFromWeb = ({
                             listCoin.map((coin, key) => {
                                 let isPress = false
                                 // @ts-ignore
-                                return !coin.disable ? (
+                                return !coin?.disable ? (
                                     <div
-                                        id={`${coin.id}`}
+                                        id={`${coin?.id}`}
                                         key={key}
                                         onMouseDown={() => (isPress = true)}
                                         onMouseUp={() => {
@@ -145,24 +145,24 @@ const InsuranceFromWeb = ({
                                         } flex flex-row justify-start w-full items-center p-3 font-medium`}
                                     >
                                         <div className="max-w-[20px] mr-[0.5rem] max-h-[20px] ">
-                                            <img alt={''} src={`${coin.icon}`} width="20" height="20" className={'mr-[5px] rounded-[50%]'}></img>
+                                            <img alt={''} src={`${coin?.icon}`} width="20" height="20" className={'mr-[5px] rounded-[50%]'}></img>
                                         </div>
                                         <div className={'flex flex-row justify-between w-full text-sm'}>
-                                            <span className={'hover:cursor-default'}>{coin.name}</span>
-                                            {coin.id === selectCoin?.id ? <Check size={16} className={'text-red'}></Check> : ''}
+                                            <span className={'hover:cursor-default'}>{coin?.name}</span>
+                                            {coin?.id === selectCoin?.id ? <Check size={16} className={'text-red'}></Check> : ''}
                                         </div>
                                     </div>
                                 ) : (
                                     <a
-                                        id={`${coin.id}`}
+                                        id={`${coin?.id}`}
                                         key={key}
                                         className={`hover:bg-hover flex flex-row justify-start w-full items-center p-3 text-divider font-medium`}
                                     >
                                         <div className="max-w-[20px] mr-[0.5rem] max-h-[20px] ">
-                                            <img alt={''} src={`${coin.icon}`} width="20" height="20" className={'mr-[5px] rounded-[50%]'}></img>
+                                            <img alt={''} src={`${coin?.icon}`} width="20" height="20" className={'mr-[5px] rounded-[50%]'}></img>
                                         </div>
                                         <div className={'flex flex-row justify-between w-full text-sm'}>
-                                            <span>{coin.name}</span>
+                                            <span>{coin?.name}</span>
                                         </div>
                                     </a>
                                 )

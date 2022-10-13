@@ -16,15 +16,14 @@ import { Menu, Popover } from '@headlessui/react'
 import { ChevronDown } from 'react-feather'
 import Modal from 'components/common/Modal/Modal'
 import NotificationInsurance from 'components/layout/notifucationInsurance'
-import { Input } from 'components/common/Input/input'
 import { RootStore, useAppDispatch, useAppSelector } from 'redux/store'
 import { isString } from 'lodash'
 import { useWeb3React } from '@web3-react/core'
 import fetchApi from 'services/fetch-api'
 import { API_CHECK_REF, API_GET_BUY_INSURANCE } from 'services/apis'
-import { ethers } from 'ethers'
 import InputField from 'components/common/Input/InputField'
 import { setAccount } from 'redux/actions/setting'
+import { getInfoCoveredCustom } from './Insurance_funtion'
 
 export type IBuyInsurance = {
     createInsurance: number
@@ -52,6 +51,7 @@ export type IState = {
         decimal_p_claim: number
         decimal_q_covered: number
     }
+    default_r_claim: any
 }
 
 const AcceptBuyInsurance = () => {
@@ -68,7 +68,24 @@ const AcceptBuyInsurance = () => {
     const account = useAppSelector((state: RootStore) => state.setting.account)
     const [Noti, setNoti] = useState<string>('')
     const [checkUpgrade, setCheckUpgrade] = useState<boolean>(false)
-    const [state, setState] = useState<IState>()
+    const [state, setState] = useState<IState>({
+        period: 0,
+        p_claim: 0,
+        q_claim: 0,
+        r_claim: 0,
+        margin: 0,
+        symbol: '',
+        unit: '',
+        tab: '',
+        q_covered: 0,
+        p_market: 0,
+        decimalList: {
+            decimal_margin: 0,
+            decimal_p_claim: 0,
+            decimal_q_covered: 0,
+        },
+        default_r_claim: { current: 0 },
+    })
     const [isUpdated, setUpdated] = useState<boolean>(true)
     const [isCanBuy, setCanBuy] = useState<boolean>(true)
     const [loading, setLoading] = useState<boolean>(false)
@@ -156,6 +173,20 @@ const AcceptBuyInsurance = () => {
         }
         setLoading(false)
     }
+
+    useEffect(() => {
+        console.log(state?.p_market)
+        const res = getInfoCoveredCustom(state?.margin!, state?.q_covered!, state?.p_claim!, state?.p_market!, state?.decimalList!, state?.default_r_claim!)
+        if (res) {
+            setState({ ...state, q_claim: res?.q_claim, r_claim: res?.r_claim })
+        }
+    }, [state?.p_market])
+
+    useEffect(() => {
+        if (!account?.address) {
+            router.push('/buy-covered')
+        }
+    }, [account])
 
     const fetch = async () => {
         try {
@@ -268,7 +299,7 @@ const AcceptBuyInsurance = () => {
                                             `${
                                                 language === 'vi'
                                                     ? 'Giao dịch không thành công, số dư USDT của bạn không đủ'
-                                                    : 'Transaction fail, your balance USTD not enough'
+                                                    : 'Transaction fail, your balance USDT not enough'
                                             }`,
                                         )
                                         return setActive(false)
@@ -364,15 +395,33 @@ const AcceptBuyInsurance = () => {
         }, 1000)
     }, [count])
 
+    const getHoursEN = (hours: number, minutes: number) => {
+        const min = minutes < 10 ? `0${minutes}` : minutes
+        if (hours < 12) {
+            return (hours < 10 ? `0${hours}` : hours) + ':' + min + ' AM'
+        } else if (hours == 12) {
+            return hours + ':' + min + ' PM'
+        } else if (hours == 24) {
+            return 0 + 'AM'
+        } else {
+            return hours - 12 + ':' + min + ' PM'
+        }
+    }
+
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
     const timeEnd = () => {
         if (state) {
             let time = new Date()
-            time.setDate(time.getDate() + state.period)
 
-            return (
+            return language === 'en' ? (
+                <span>
+                    {getHoursEN(time.getHours(), time.getMinutes())} - {monthNames[time.getMonth() + 1]}/{time.getDate()}/{time.getFullYear()}
+                </span>
+            ) : (
                 <span>
                     {time.getHours() < 10 ? '0' + time.getHours() : time.getHours()}:{time.getMinutes() < 10 ? '0' + time.getMinutes() : time.getMinutes()} -{' '}
-                    {time.getDate()}/{time.getMonth()}/{time.getFullYear()}
+                    {time.getDate()}/{time.getMonth() + 1}/{time.getFullYear()}
                 </span>
             )
         }
