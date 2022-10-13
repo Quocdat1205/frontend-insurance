@@ -205,7 +205,7 @@ const Notifications = () => {
                 <Modal
                     isMobile
                     containerClassName="flex-col justify-end !bg-transparent"
-                    className="h-[calc(100%-4rem)]"
+                    className="h-[calc(100%-4rem)] !max-h-full"
                     wrapClassName="!px-4 !py-8 h-full"
                     isVisible={visible}
                     onBackdropCb={() => setVisible(false)}
