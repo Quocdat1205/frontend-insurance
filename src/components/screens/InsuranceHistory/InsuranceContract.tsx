@@ -20,6 +20,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import Tooltip from 'components/common/Tooltip/Tooltip'
 import { PairConfig, StateInsurance, UnitConfig } from 'types/types'
+import startOfDay from 'date-fns/startOfDay'
+import endOfDay from 'date-fns/endOfDay'
 
 interface InsuranceContract {
     account: any
@@ -211,8 +213,8 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
     }
 
     const getInsurance = async () => {
-        const from = date.startDate ? new Date(date.startDate).getTime() : null
-        const to = date.startDate ? new Date(date.endDate).getTime() : null
+        const from = date.startDate ? startOfDay(date.startDate).valueOf() : null
+        const to = date.startDate ? endOfDay(date.endDate).valueOf() : null
         const mode = to ? period : null
         setLoading(true)
         try {
@@ -357,7 +359,6 @@ const InsuranceContract = ({ account, showGuide, unitConfig, setHasInsurance, ha
                 minWidth: 120,
                 Cell: (e: any) => (
                     <div className="underline text-red font-light cursor-pointer">
-                       
                         <Link href={Config.env.BSC + '/' + e.value}>
                             <a target="_blank">{e.value?.length > 10 ? String(e.value).substr(0, 5) + '...' + String(e.value).substr(-3) : e.value}</a>
                         </Link>
