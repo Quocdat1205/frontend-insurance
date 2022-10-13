@@ -245,6 +245,8 @@ const ChartComponent = ({ data, setP_Claim, state, isMobile, height, resolution 
 
             if (!state?.p_claim || state?.p_claim < 0) {
                 setP_Claim(state?.p_market - state?.p_market * 0.1)
+            } else {
+                handleTrendLine(chart, state?.p_claim, state, resolution)
             }
 
             // //Label bullet main
