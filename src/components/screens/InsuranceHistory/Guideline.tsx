@@ -17,6 +17,7 @@ const Guideline = ({ start, setStart, seen, setShowTerminologyModal }: Guideline
     const step = useRef<number>(0)
     const refGuide = useRef<any>(null)
     const [flag, setFlag] = useState<boolean>(false)
+    const timer = useRef<any>(null)
 
     const getCurrentStep = (e: number) => {
         if (e === 0) {
@@ -35,6 +36,12 @@ const Guideline = ({ start, setStart, seen, setShowTerminologyModal }: Guideline
         if (start) {
             const _el = document.querySelector('#tour_statistics')
             if (_el) _el.scrollIntoView()
+            clearTimeout(timer.current)
+            timer.current = setTimeout(() => {
+                document.body.classList.add('overflow-hidden')
+            }, 300)
+        } else {
+            document.body.classList.remove('overflow-hidden')
         }
     }, [start])
 
@@ -98,7 +105,7 @@ const Guideline = ({ start, setStart, seen, setShowTerminologyModal }: Guideline
                     <Content
                         title={t('insurance_history:status')}
                         content={t('insurance_history:guidelines:step_content_4', {
-                            value: `<span class='text-red underline'>${t('insurance_history:the_glossary')}</span>`,
+                            value: `<span class='text-red underline'>${t('insurance:guild:the_glossary')}</span>`,
                         })}
                         {...props}
                         top
@@ -161,8 +168,8 @@ const Guideline = ({ start, setStart, seen, setShowTerminologyModal }: Guideline
             showButtons={false}
             showNumber={false}
             ref={refGuide}
-            onAfterOpen={disableBodyScroll}
-            onBeforeClose={enableBodyScroll}
+            // onAfterOpen={disableBodyScroll}
+            // onBeforeClose={enableBodyScroll}
             // inViewThreshold={100}
         />
     )
