@@ -285,9 +285,7 @@ const InsuranceFromWeb = ({
                                                         p_market: p_market,
                                                         p_expired: p_expired,
                                                     }}
-                                                    setP_Claim={(data: number) => {
-                                                        onHandleChange('p_claim', data)
-                                                    }}
+                                                    setP_Claim={(data: number) => onHandleChange('p_claim', { value: data })}
                                                     resolution={selectTime!}
                                                 />
                                                 <svg

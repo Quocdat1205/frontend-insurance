@@ -243,11 +243,9 @@ const ChartComponent = ({ data, setP_Claim, state, isMobile, height, resolution 
             bullet.circle.strokeWidth = 2
             bullet.circle.propertyFields.radius = '1'
 
-            // if (state?.p_claim > 0) {
-            //     handleTrendLine(chart, state?.p_claim, state, resolution)
-            // } else {
-            //     // handleTrendLine(chart, 0, state)
-            // }
+            if (!state?.p_claim || state?.p_claim < 0) {
+                setP_Claim(state?.p_market - state?.p_market * 0.1)
+            }
 
             // //Label bullet main
             let latitudeLabel = subSeries.bullets.push(new am4charts.LabelBullet())
@@ -404,6 +402,8 @@ const ChartComponent = ({ data, setP_Claim, state, isMobile, height, resolution 
 
                 claimLabel.events.on('dragstop', (event: any) => {
                     let value = valueAxis.yToValue(event.target.pixelY)
+                    console.log(value)
+
                     setP_Claim(value)
                 })
 
